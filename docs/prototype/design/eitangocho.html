@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin: 0; padding: 0; background: #c9cfda; }
+  a { color: #0a6ee0; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  input::placeholder, textarea::placeholder { color: rgba(0,0,0,0.3); }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:36px;background:linear-gradient(160deg,#d9dee8,#c2c9d6);font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Hiragino Sans','Helvetica Neue',sans-serif;box-sizing:border-box;">
+  <div style="width:1200px;height:780px;max-width:100%;border-radius:12px;overflow:hidden;background:#ffffff;box-shadow:0 0 0 1px rgba(0,0,0,0.18), 0 24px 60px rgba(0,0,0,0.30);display:flex;">
+
+    <!-- Sidebar -->
+    <div style="width:212px;flex-shrink:0;background:#f0f0f3;border-right:1px solid rgba(0,0,0,0.08);display:flex;flex-direction:column;">
+      <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;flex-shrink:0;">
+        <div style="width:12px;height:12px;border-radius:50%;background:#ff5f57;border:0.5px solid rgba(0,0,0,0.12);"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#febc2e;border:0.5px solid rgba(0,0,0,0.12);"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#28c840;border:0.5px solid rgba(0,0,0,0.12);"></div>
+      </div>
+      <div style="padding:6px 8px 2px 18px;font-size:11px;font-weight:700;color:rgba(0,0,0,0.42);">単語帳</div>
+      <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="4">
+        <div onClick="{{ nav.onClick }}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;margin:1px 10px;border-radius:6px;background:{{ nav.bg }};font-size:13px;color:#1d1d1f;cursor:default;user-select:none;" style-hover="background:rgba(0,0,0,0.06)">
+          <span style="flex:1;font-weight:{{ nav.weight }};">{{ nav.label }}</span>
+          <span style="font-size:11px;color:rgba(0,0,0,0.38);">{{ nav.count }}</span>
+        </div>
+      </sc-for>
+      <div style="flex:1;"></div>
+      <div style="padding:12px 18px;font-size:11px;color:rgba(0,0,0,0.35);border-top:1px solid rgba(0,0,0,0.06);">ローカル DB に保存済み</div>
+    </div>
+
+    <!-- Main -->
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#ffffff;">
+
+      <!-- Toolbar -->
+      <div style="height:52px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(0,0,0,0.08);">
+        <div style="font-size:15px;font-weight:700;color:#1d1d1f;">{{ viewTitle }}</div>
+        <div style="flex:1;"></div>
+        <sc-if value="{{ showSearch }}" hint-placeholder-val="{{ true }}">
+          <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="検索" style="width:200px;padding:6px 10px;border:1px solid rgba(0,0,0,0.14);border-radius:7px;font-size:13px;outline:none;background:#f7f7f8;box-sizing:border-box;" />
+        </sc-if>
+        <button onClick="{{ goAdd }}" style="padding:6px 14px;border:none;border-radius:7px;background:#0a6ee0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">＋ 単語を登録</button>
+      </div>
+
+      <!-- ===== 学習中 (cards) ===== -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div data-screen-label="学習中リスト" style="flex:1;overflow:auto;padding:20px;box-sizing:border-box;">
+          <sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:80px 0;display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="color:rgba(0,0,0,0.45);font-size:14px;text-align:center;line-height:1.7;">学習中の単語はありません。<br />単語を登録しましょう。</div>
+              <button onClick="{{ goAdd }}" style="padding:9px 20px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">＋ 単語を登録</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ homeHasCards }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:12px;color:rgba(0,0,0,0.45);margin:0 0 14px;">チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。</div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
+            <sc-for list="{{ homeCards }}" as="c" hint-placeholder-count="6">
+              <div onClick="{{ c.openEdit }}" onContextMenu="{{ c.onContext }}" style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,0.04);animation:cardIn 0.25s ease;cursor:pointer;" style-hover="border-color:rgba(10,110,224,0.45);box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+                <div style="display:flex;align-items:baseline;gap:8px;">
+                  <div style="font-size:17px;font-weight:700;color:#1d1d1f;">{{ c.word }}</div>
+                  <sc-if value="{{ c.showIpa }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:12px;color:rgba(0,0,0,0.45);font-family:ui-monospace,Menlo,monospace;">{{ c.ipa }}</div>
+                  </sc-if>
+                  <div style="flex:1;"></div>
+                  <div style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:{{ c.pillBg }};color:{{ c.pillColor }};white-space:nowrap;">{{ c.category }}</div>
+                </div>
+                <sc-if value="{{ c.hidden }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ c.toggleReveal }}" style="padding:8px 10px;border:1px dashed rgba(0,0,0,0.18);border-radius:7px;font-size:12px;color:rgba(0,0,0,0.4);cursor:pointer;user-select:none;" style-hover="background:rgba(0,0,0,0.03)">日本語訳を表示</div>
+                </sc-if>
+                <sc-if value="{{ c.revealed }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ c.toggleReveal }}" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.08);background:#f7f7f8;border-radius:7px;font-size:13px;color:#1d1d1f;cursor:pointer;">{{ c.ja }}</div>
+                </sc-if>
+                <sc-if value="{{ c.hasExample }}" hint-placeholder-val="{{ true }}">
+                  <div style="font-size:13px;color:rgba(0,0,0,0.7);line-height:1.5;">{{ c.exEn }}</div>
+                  <sc-if value="{{ c.revealed }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12px;color:rgba(0,0,0,0.5);line-height:1.5;">{{ c.exJa }}</div>
+                  </sc-if>
+                </sc-if>
+                <sc-if value="{{ c.noExample }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:rgba(0,0,0,0.3);line-height:1.5;">例文なし</div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:6px;border-top:1px solid rgba(0,0,0,0.06);">
+                  <label onClick="{{ stopProp }}" style="display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(0,0,0,0.6);cursor:pointer;">
+                    <input type="checkbox" checked="{{ c.learned }}" onChange="{{ c.toggleLearned }}" style="width:14px;height:14px;accent-color:#0a6ee0;" />
+                    学習済みにする
+                  </label>
+                  <div style="flex:1;"></div>
+                  <sc-if value="{{ c.hasAudio }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ c.play }}" title="発音を再生" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;" style-hover="background:#eceef2">
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ c.noAudio }}" hint-placeholder-val="{{ false }}">
+                    <a href="{{ c.url }}" target="_blank" onClick="{{ stopProp }}" style="font-size:12px;">発音を確認 ↗</a>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== 全単語 (table) ===== -->
+      <sc-if value="{{ isAll }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="全単語テーブル" style="flex:1;overflow:auto;box-sizing:border-box;">
+        <div style="min-width:880px;">
+          <div style="display:grid;grid-template-columns:64px 140px 130px 100px 1fr 1.5fr 56px;gap:0 12px;padding:8px 20px;border-bottom:1px solid rgba(0,0,0,0.10);position:sticky;top:0;background:#fafafb;font-size:11px;font-weight:700;color:rgba(0,0,0,0.45);z-index:1;">
+            <div>学習済み</div><div>単語</div><div>発音記号</div><div>品詞</div><div>日本語訳</div><div>例文</div><div>発音</div>
+          </div>
+          <sc-for list="{{ allRows }}" as="r" hint-placeholder-count="8">
+            <div onClick="{{ r.openEdit }}" onContextMenu="{{ r.onContext }}" style="display:grid;grid-template-columns:64px 140px 130px 100px 1fr 1.5fr 56px;gap:0 12px;padding:10px 20px;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13px;align-items:start;background:{{ r.rowBg }};cursor:pointer;" style-hover="background:#f2f6fc">
+              <div onClick="{{ stopProp }}"><input type="checkbox" checked="{{ r.learned }}" onChange="{{ r.toggleLearned }}" style="width:14px;height:14px;accent-color:#0a6ee0;" /></div>
+              <div style="font-weight:600;color:#1d1d1f;">{{ r.word }}</div>
+              <div style="color:rgba(0,0,0,0.5);font-family:ui-monospace,Menlo,monospace;font-size:12px;">{{ r.ipa }}</div>
+              <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:{{ r.pillBg }};color:{{ r.pillColor }};white-space:nowrap;">{{ r.category }}</span></div>
+              <div style="color:rgba(0,0,0,0.75);">{{ r.ja }}</div>
+              <div style="color:rgba(0,0,0,0.6);font-size:12px;line-height:1.5;">
+                <sc-if value="{{ r.hasExample }}" hint-placeholder-val="{{ true }}">
+                  {{ r.exEn }}<br />{{ r.exJa }}
+                </sc-if>
+                <sc-if value="{{ r.noExample }}" hint-placeholder-val="{{ false }}">
+                  <span style="color:rgba(0,0,0,0.3);">例文なし</span>
+                </sc-if>
+              </div>
+              <div>
+                <sc-if value="{{ r.hasAudio }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ r.play }}" title="発音を再生" style="width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;" style-hover="background:#eceef2">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ r.noAudio }}" hint-placeholder-val="{{ false }}">
+                  <a href="{{ r.url }}" target="_blank" onClick="{{ stopProp }}" title="外部サイトで発音を確認" style="font-size:12px;white-space:nowrap;">↗</a>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== フラッシュクイズ ===== -->
+      <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="フラッシュクイズ" style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+          <sc-if value="{{ quizEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="text-align:center;color:rgba(0,0,0,0.45);font-size:14px;line-height:1.8;">復習対象の単語がまだありません。<br />単語を学習済みにするとここに表示されます。</div>
+              <button onClick="{{ goHome }}" style="padding:9px 20px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#0a6ee0;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#f5f8fd">学習中リストへ</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ quizActive }}" hint-placeholder-val="{{ false }}">
+            <div style="width:480px;max-width:100%;display:flex;flex-direction:column;gap:16px;">
+              <div style="font-size:12px;color:rgba(0,0,0,0.45);text-align:center;">{{ quizProgress }}</div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:44px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:220px;box-sizing:border-box;justify-content:center;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="font-size:32px;font-weight:700;color:#1d1d1f;text-align:center;">{{ quizFront }}</div>
+                  <sc-if value="{{ quizFrontAudio }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ quizPlay }}" title="発音を再生" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;" style-hover="background:#eceef2">
+                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                    </button>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ quizNoAudio }}" hint-placeholder-val="{{ false }}">
+                  <a href="{{ quizUrl }}" target="_blank" style="font-size:12px;">発音を確認 ↗</a>
+                </sc-if>
+                <div style="font-size:13px;color:rgba(0,0,0,0.45);font-family:ui-monospace,Menlo,monospace;">{{ quizIpa }}</div>
+                <sc-if value="{{ quizRevealed }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:10px;border-top:1px solid rgba(0,0,0,0.08);padding-top:14px;width:100%;justify-content:center;">
+                    <div style="font-size:18px;color:#1d1d1f;text-align:center;">{{ quizBack }}</div>
+                    <sc-if value="{{ quizBackAudio }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ quizPlay }}" title="発音を再生" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;" style-hover="background:#eceef2">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                      </button>
+                    </sc-if>
+                  </div>
+                  <div style="font-size:13px;color:rgba(0,0,0,0.55);text-align:center;line-height:1.6;">{{ quizExEn }}<br />{{ quizExJa }}</div>
+                </sc-if>
+              </div>
+              <sc-if value="{{ quizHiddenAnswer }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ quizReveal }}" style="padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">答えを表示</button>
+              </sc-if>
+              <sc-if value="{{ quizRevealed }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:10px;">
+                  <button onClick="{{ quizForgot }}" style="flex:1;padding:11px;border:1px solid rgba(0,0,0,0.14);border-radius:9px;background:#fff;color:#c03030;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#fdf2f2">忘れていた</button>
+                  <button onClick="{{ quizKnew }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">覚えている</button>
+                </div>
+                <div style="font-size:11px;color:rgba(0,0,0,0.38);text-align:center;">「忘れていた」を選ぶと学習中リストに戻ります</div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ quizDone }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="クイズ結果" style="width:480px;max-width:100%;display:flex;flex-direction:column;gap:16px;align-items:stretch;">
+              <div style="text-align:center;display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:22px;font-weight:700;color:#1d1d1f;">復習完了</div>
+                <div style="font-size:14px;color:rgba(0,0,0,0.6);">覚えている {{ quizOkCount }}語 / 忘れていた {{ quizNgCount }}語</div>
+              </div>
+              <sc-if value="{{ quizHasForgot }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:12px;overflow:hidden;">
+                  <div style="padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.07);font-size:12px;font-weight:700;color:rgba(0,0,0,0.55);background:#fafafb;">忘れていた単語(学習中リストに戻りました)</div>
+                  <sc-for list="{{ quizForgotWords }}" as="fw" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:baseline;gap:12px;padding:9px 16px;border-bottom:1px solid rgba(0,0,0,0.05);font-size:13px;">
+                      <div style="font-weight:600;color:#1d1d1f;min-width:110px;">{{ fw.word }}</div>
+                      <div style="color:rgba(0,0,0,0.6);">{{ fw.ja }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:10px;">
+                <button onClick="{{ quizRestart }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">もう一度</button>
+                <button onClick="{{ goHome }}" style="flex:1;padding:11px;border:1px solid rgba(0,0,0,0.14);border-radius:9px;background:#fff;color:#1d1d1f;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#f5f5f6">学習中リストへ</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===== 単語を登録 ===== -->
+      <sc-if value="{{ isAdd }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="単語を登録" style="flex:1;overflow:auto;padding:28px;box-sizing:border-box;">
+
+          <!-- ステップ1: 単語入力 -->
+          <sc-if value="{{ addStepInput }}" hint-placeholder-val="{{ true }}">
+            <div style="width:560px;max-width:100%;display:flex;flex-direction:column;gap:14px;">
+              <div style="font-size:12px;color:rgba(0,0,0,0.45);">英単語を入力すると、発音記号・日本語訳・例文などを辞書から自動取得します。</div>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">英単語 *
+                <div style="display:flex;gap:10px;">
+                  <input value="{{ fWord }}" onChange="{{ onWord }}" onKeyDown="{{ onWordKey }}" placeholder="serendipity" style="flex:1;padding:9px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+                  <button onClick="{{ autoFill }}" style="padding:9px 20px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;" style-hover="background:#0b63c6">自動入力</button>
+                </div>
+              </label>
+              <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#c03030;">{{ formErrorMsg }}</div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button onClick="{{ goManual }}" style="padding:0;border:none;background:none;font-size:12px;color:#0a6ee0;cursor:pointer;" style-hover="text-decoration:underline">スキップして手動で入力する</button>
+              </div>
+              <div style="font-size:11px;color:rgba(0,0,0,0.32);border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;">プロトタイプ用デモ: serendipity / ephemeral / resilient は辞書ヒット、それ以外は「未収録」の挙動になります。</div>
+            </div>
+          </sc-if>
+
+          <!-- ローディング -->
+          <sc-if value="{{ addStepLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="width:560px;max-width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;padding:70px 0;">
+              <div style="width:28px;height:28px;border-radius:50%;border:3px solid rgba(0,0,0,0.1);border-top-color:#0a6ee0;animation:spin 0.8s linear infinite;"></div>
+              <div style="font-size:13px;color:rgba(0,0,0,0.5);">辞書データを取得中...</div>
+            </div>
+          </sc-if>
+
+          <!-- ステップ2: 編集フォーム -->
+          <sc-if value="{{ addStepForm }}" hint-placeholder-val="{{ false }}">
+            <div style="width:560px;max-width:100%;display:flex;flex-direction:column;gap:14px;">
+              <sc-if value="{{ addNotFound }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:10px 14px;border:1px solid #ecd9a0;background:#fdf6e3;border-radius:8px;font-size:13px;color:#8a6d1a;">辞書に見つかりませんでした。手動で入力できます。</div>
+              </sc-if>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                  <span style="display:flex;align-items:center;gap:6px;">英単語 *</span>
+                  <input value="{{ fWord }}" onChange="{{ onWord }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                  <span style="display:flex;align-items:center;gap:6px;">発音記号 (IPA)
+                    <sc-if value="{{ autoIpa }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#e2f3e8;color:#1c7a3f;">自動入力</span></sc-if>
+                  </span>
+                  <input value="{{ fIpa }}" onChange="{{ onIpa }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+                </label>
+              </div>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                <span style="display:flex;align-items:center;gap:6px;">日本語訳 *
+                  <sc-if value="{{ autoJa }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#e2f3e8;color:#1c7a3f;">自動入力</span></sc-if>
+                </span>
+                <input value="{{ fJa }}" onChange="{{ onJa }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+              </label>
+              <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                <span style="display:flex;align-items:center;gap:6px;">品詞(複数選択可)
+                  <sc-if value="{{ autoCategory }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#e2f3e8;color:#1c7a3f;">自動入力</span></sc-if>
+                </span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <sc-for list="{{ addCatChips }}" as="cat" hint-placeholder-count="5">
+                    <button onClick="{{ cat.toggle }}" style="padding:5px 14px;border-radius:99px;border:1px solid {{ cat.border }};background:{{ cat.bg }};color:{{ cat.color }};font-size:12px;font-weight:600;cursor:pointer;">{{ cat.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                <span style="display:flex;align-items:center;gap:6px;">英例文
+                  <sc-if value="{{ autoExEn }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#e2f3e8;color:#1c7a3f;">自動入力</span></sc-if>
+                </span>
+                <textarea value="{{ fExEn }}" onChange="{{ onExEn }}" rows="2" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;resize:vertical;font-weight:400;"></textarea>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">
+                <span style="display:flex;align-items:center;gap:6px;">日本語例文
+                  <sc-if value="{{ autoExJa }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#e2f3e8;color:#1c7a3f;">自動入力</span></sc-if>
+                </span>
+                <textarea value="{{ fExJa }}" onChange="{{ onExJa }}" rows="2" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;resize:vertical;font-weight:400;"></textarea>
+              </label>
+              <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#c03030;">{{ formErrorMsg }}</div>
+              </sc-if>
+              <div style="display:flex;gap:10px;margin-top:4px;">
+                <button onClick="{{ saveWord }}" style="padding:9px 22px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">登録する</button>
+                <button onClick="{{ backToStep1 }}" style="padding:9px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:14px;cursor:pointer;" style-hover="background:#f5f5f6">戻る</button>
+                <button onClick="{{ cancelAdd }}" style="padding:9px 18px;border:none;background:none;color:rgba(0,0,0,0.5);font-size:14px;cursor:pointer;" style-hover="color:#1d1d1f">キャンセル</button>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- ===== コンテキストメニュー ===== -->
+  <sc-if value="{{ ctxOpen }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div onClick="{{ ctxClose }}" onContextMenu="{{ ctxCloseCtx }}" style="position:fixed;inset:0;z-index:90;"></div>
+      <div style="position:fixed;left:{{ ctxX }}px;top:{{ ctxY }}px;z-index:91;background:rgba(250,250,251,0.98);border:1px solid rgba(0,0,0,0.12);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.18);padding:4px;min-width:140px;">
+        <div onClick="{{ ctxEdit }}" style="padding:6px 12px;border-radius:5px;font-size:13px;color:#1d1d1f;cursor:default;user-select:none;" style-hover="background:#0a6ee0;color:#fff">編集...</div>
+        <div onClick="{{ ctxDelete }}" style="padding:6px 12px;border-radius:5px;font-size:13px;color:#c03030;cursor:default;user-select:none;" style-hover="background:#c03030;color:#fff">削除...</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== 編集モーダル ===== -->
+  <sc-if value="{{ editOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeEdit }}" data-screen-label="単語を編集" style="position:fixed;inset:0;z-index:80;background:rgba(20,25,35,0.35);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;">
+      <div onClick="{{ stopProp }}" style="width:560px;max-width:100%;max-height:100%;overflow:auto;background:#fff;border-radius:13px;box-shadow:0 24px 70px rgba(0,0,0,0.35);padding:22px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:16px;font-weight:700;color:#1d1d1f;">単語を編集</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">英単語 *
+            <input value="{{ eWord }}" onChange="{{ onEWord }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">発音記号 (IPA)
+            <input value="{{ eIpa }}" onChange="{{ onEIpa }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+          </label>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">日本語訳 *
+          <input value="{{ eJa }}" onChange="{{ onEJa }}" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
+        </label>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">品詞(複数選択可)
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <sc-for list="{{ editCatChips }}" as="cat" hint-placeholder-count="5">
+              <button onClick="{{ cat.toggle }}" style="padding:5px 14px;border-radius:99px;border:1px solid {{ cat.border }};background:{{ cat.bg }};color:{{ cat.color }};font-size:12px;font-weight:600;cursor:pointer;">{{ cat.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">英例文
+          <textarea value="{{ eExEn }}" onChange="{{ onEExEn }}" rows="2" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;resize:vertical;font-weight:400;"></textarea>
+        </label>
+        <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">日本語例文
+          <textarea value="{{ eExJa }}" onChange="{{ onEExJa }}" rows="2" placeholder="手動で入力してください" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;resize:vertical;font-weight:400;"></textarea>
+        </label>
+        <sc-if value="{{ editError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#c03030;">英単語と日本語訳は必須です。</div>
+        </sc-if>
+        <div style="display:flex;gap:10px;margin-top:4px;align-items:center;">
+          <button onClick="{{ saveEdit }}" style="padding:9px 22px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">保存</button>
+          <button onClick="{{ closeEdit }}" style="padding:9px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:14px;cursor:pointer;" style-hover="background:#f5f5f6">キャンセル</button>
+          <div style="flex:1;"></div>
+          <button onClick="{{ askDelete }}" style="padding:9px 18px;border:1px solid rgba(192,48,48,0.35);border-radius:8px;background:#fff;color:#c03030;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#fdf2f2">削除...</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== 削除確認ダイアログ ===== -->
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="削除確認" style="position:fixed;inset:0;z-index:100;background:rgba(20,25,35,0.35);display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;">
+      <div style="width:380px;max-width:100%;background:#fff;border-radius:13px;box-shadow:0 24px 70px rgba(0,0,0,0.35);padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;text-align:center;">
+        <div style="font-size:15px;font-weight:700;color:#1d1d1f;">「{{ confirmWord }}」を削除しますか?</div>
+        <div style="font-size:12px;color:rgba(0,0,0,0.5);">この操作は取り消せません。</div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button onClick="{{ cancelDelete }}" style="flex:1;padding:9px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#f5f5f6">やめる</button>
+          <button onClick="{{ confirmDelete }}" style="flex:1;padding:9px;border:none;border-radius:8px;background:#c03030;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#a82828">削除する</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;quizDirection&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;en-ja&quot;, &quot;options&quot;: [&quot;en-ja&quot;, &quot;ja-en&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;クイズ&quot; },
+  &quot;showIPA&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;表示&quot; }
+}">
+const G_URL = (w) => 'https://translate.google.com/?sl=en&tl=ja&text=' + encodeURIComponent(w) + '&op=translate';
+
+const SEED = [
+  { id: 1, word: 'tantalize', ipa: '/ˈtæntəlaɪz/', ja: 'じらす、じれったがらせる', category: '動詞', exEn: 'The aroma of fresh bread tantalizes the senses.', exJa: '焼きたてのパンの香りが感覚をじらす。', url: '', learned: false, hasAudio: true },
+  { id: 2, word: 'teem', ipa: '/tiːm/', ja: '満ちあふれる、富む', category: '動詞', exEn: 'The river teems with fish.', exJa: 'その川は魚であふれている。', url: '', learned: false, hasAudio: true },
+  { id: 3, word: 'ravel', ipa: '/ˈrævəl/', ja: 'もつれさせる、ほぐす', category: '動詞・名詞', exEn: 'She tried to ravel out the tangled yarn.', exJa: '彼女はもつれた糸をほぐそうとした。', url: '', learned: false, hasAudio: true },
+  { id: 4, word: 'cadaverous', ipa: '/kəˈdævərəs/', ja: '死体のような、蒼白い、痩せこけた', category: '形容詞', exEn: 'The cadaverous look of the starving children broke her heart.', exJa: '飢えた子どもたちの死体のような外見は彼女の心を痛めた。', url: '', learned: false, hasAudio: true },
+  { id: 5, word: 'hincty', ipa: '/ˈhɪŋkti/', ja: '傲慢な、俺様気質な', category: '形容詞', exEn: 'He was acting hincty at the party, looking down on everyone else.', exJa: '彼はパーティーで傲慢に振る舞い、他の皆を見下していた。', url: '', learned: false, hasAudio: false },
+  { id: 6, word: 'comradeship', ipa: '/ˈkɑːmrædʃɪp/', ja: '同志愛、友情、仲間意識', category: '名詞', exEn: 'There was a sense of comradeship between them.', exJa: '彼らの間には仲間意識があった。', url: '', learned: false, hasAudio: true },
+  { id: 13, word: 'bode', ipa: '/boʊd/', ja: '前兆となる、兆しである', category: '動詞', exEn: '', exJa: '', url: '', learned: false, hasAudio: true },
+  { id: 7, word: 'dwindle', ipa: '/ˈdwɪndəl/', ja: '減少する、縮小する、衰える', category: '動詞', exEn: 'Their supplies began to dwindle after a week.', exJa: '1週間後、彼らの供給は減少し始めた。', url: '', learned: true, hasAudio: true },
+  { id: 8, word: 'wacky', ipa: '/ˈwæki/', ja: '風変わりな、ふざけた、滑稽な', category: '形容詞', exEn: 'Her wacky ideas were always entertaining.', exJa: '彼女の風変わりなアイデアはいつも楽しかった。', url: '', learned: true, hasAudio: true },
+  { id: 9, word: 'swarm', ipa: '/swɔːrm/', ja: '群れ、蜂群、(群れで)移動する', category: '名詞・動詞', exEn: 'A swarm of bees flew out of the hive.', exJa: 'ミツバチの群れが巣から飛び出した。', url: '', learned: true, hasAudio: true },
+  { id: 10, word: 'grotto', ipa: '/ˈɡrɒtəʊ/', ja: '洞窟、人工の洞窟風の休憩所', category: '名詞', exEn: 'They discovered a hidden grotto behind the waterfall.', exJa: '彼らは滝の後ろに隠れた洞窟を発見した。', url: '', learned: true, hasAudio: false },
+  { id: 11, word: 'deity', ipa: '/ˈdiːəti/', ja: '神、神格', category: '名詞', exEn: 'In Greek mythology, Zeus is the chief deity.', exJa: 'ギリシャ神話では、ゼウスは主神である。', url: '', learned: true, hasAudio: true },
+  { id: 12, word: 'sob', ipa: '/sɒb/', ja: 'すすり泣く、号泣する', category: '動詞・名詞', exEn: 'She sobbed uncontrollably after hearing the tragic news.', exJa: '彼女は悲劇的なニュースを聞いた後、号泣した。', url: '', learned: true, hasAudio: true },
+];
+
+const MOCK_DICT = {
+  serendipity: { ipa: '/ˌserənˈdɪpəti/', ja: '偶然の幸運、思いがけない発見', category: ['名詞'], exEn: 'Meeting her was pure serendipity.', exJa: '彼女に出会えたのはまったくの偶然の幸運だった。', hasAudio: true },
+  ephemeral: { ipa: '/ɪˈfemərəl/', ja: 'つかの間の、儚い', category: ['形容詞', '名詞'], exEn: 'Fame in the industry is often ephemeral.', exJa: '', hasAudio: true },
+  resilient: { ipa: '/rɪˈzɪliənt/', ja: '回復力のある、弾力のある', category: ['形容詞'], exEn: 'Children are often more resilient than adults.', exJa: '子どもは大人よりも回復力があることが多い。', hasAudio: false },
+};
+
+const LS_KEY = 'eitango-words-v2';
+
+const CAT_OPTIONS = ['動詞', '名詞', '形容詞', '副詞', 'その他'];
+
+const PILLS = [
+  { match: '動詞', bg: '#e3edfb', color: '#1c56a8' },
+  { match: '名詞', bg: '#eee7fa', color: '#5b3ba8' },
+  { match: '形容詞', bg: '#fbe7e7', color: '#a83b3b' },
+  { match: '副詞', bg: '#dff1ec', color: '#1f6f5c' },
+  { match: 'その他', bg: '#ececef', color: '#55555c' },
+];
+
+const EMPTY_FORM = { word: '', ipa: '', ja: '', cats: [], exEn: '', exJa: '' };
+
+class Component extends DCLogic {
+  state = {
+    words: SEED,
+    view: 'home',
+    search: '',
+    revealed: {},
+    quiz: null,
+    addStep: 'input',
+    addNotFound: false,
+    autoKeys: {},
+    pendingAudio: false,
+    form: { ...EMPTY_FORM },
+    formError: false,
+    formErrorMsg: '',
+    editId: null,
+    editForm: { ...EMPTY_FORM },
+    editError: false,
+    deleteId: null,
+    ctx: null,
+  };
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) this.setState({ words: parsed });
+      }
+    } catch (e) {}
+  }
+
+  componentWillUnmount() {
+    if (this._t) clearTimeout(this._t);
+  }
+
+  persist(words) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(words)); } catch (e) {}
+  }
+
+  setWords(fn) {
+    this.setState((s) => {
+      const words = fn(s.words);
+      this.persist(words);
+      return { words };
+    });
+  }
+
+  toggleLearned(id) {
+    this.setWords((ws) => ws.map((w) => (w.id === id ? { ...w, learned: !w.learned } : w)));
+  }
+
+  speak(word) {
+    try {
+      const u = new SpeechSynthesisUtterance(word);
+      u.lang = 'en-US';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  resetAdd() {
+    return { addStep: 'input', addNotFound: false, autoKeys: {}, pendingAudio: false, form: { ...EMPTY_FORM }, formError: false, formErrorMsg: '' };
+  }
+
+  autoFill() {
+    const word = this.state.form.word.trim();
+    if (!word) {
+      this.setState({ formError: true, formErrorMsg: '英単語を入力してください。' });
+      return;
+    }
+    this.setState({ addStep: 'loading', formError: false });
+    if (this._t) clearTimeout(this._t);
+    this._t = setTimeout(() => {
+      const hit = MOCK_DICT[word.toLowerCase()];
+      if (hit) {
+        const autoKeys = { ipa: !!hit.ipa, ja: !!hit.ja, category: !!(hit.category && hit.category.length), exEn: !!hit.exEn, exJa: !!hit.exJa };
+        this.setState((s) => ({
+          addStep: 'form',
+          addNotFound: false,
+          autoKeys,
+          pendingAudio: !!hit.hasAudio,
+          form: {
+            ...s.form,
+            ipa: hit.ipa || '',
+            ja: hit.ja || '',
+            cats: hit.category || [],
+            exEn: hit.exEn || '',
+            exJa: hit.exJa || '',
+          },
+        }));
+      } else {
+        this.setState({ addStep: 'form', addNotFound: true, autoKeys: {}, pendingAudio: false });
+      }
+    }, 1400);
+  }
+
+  quizAnswer(knew, id) {
+    this.setState((s) => {
+      const q = s.quiz;
+      if (!q) return {};
+      const next = q.i + 1;
+      return {
+        quiz: {
+          ...q,
+          i: next,
+          revealed: false,
+          ok: q.ok + (knew ? 1 : 0),
+          forgot: knew ? q.forgot : [...q.forgot, id],
+          done: next >= q.order.length,
+        },
+      };
+    });
+  }
+
+  startQuiz() {
+    const learned = this.state.words.filter((w) => w.learned);
+    const order = learned.map((w) => w.id).sort(() => Math.random() - 0.5);
+    this.setState({ quiz: { order, i: 0, revealed: false, ok: 0, forgot: [], done: false }, view: 'quiz' });
+  }
+
+  formField(key) {
+    return (e) => {
+      const v = e.target.value;
+      this.setState((s) => ({
+        form: { ...s.form, [key]: v },
+        formError: false,
+        autoKeys: key in s.autoKeys ? { ...s.autoKeys, [key]: s.autoKeys[key] && v !== '' ? s.autoKeys[key] : false } : s.autoKeys,
+      }));
+    };
+  }
+
+  editField(key) {
+    return (e) => {
+      const v = e.target.value;
+      this.setState((s) => ({ editForm: { ...s.editForm, [key]: v }, editError: false }));
+    };
+  }
+
+  catChips(cats, onToggle) {
+    return CAT_OPTIONS.map((o) => {
+      const selected = cats.includes(o);
+      return {
+        label: o,
+        bg: selected ? '#0a6ee0' : '#fff',
+        color: selected ? '#fff' : 'rgba(0,0,0,0.65)',
+        border: selected ? '#0a6ee0' : 'rgba(0,0,0,0.18)',
+        toggle: (e) => { e.stopPropagation(); onToggle(o); },
+      };
+    });
+  }
+
+  saveWord() {
+    const f = this.state.form;
+    if (!f.word.trim() || !f.ja.trim()) {
+      this.setState({ formError: true, formErrorMsg: '英単語と日本語訳は必須です。' });
+      return;
+    }
+    const maxId = this.state.words.reduce((m, w) => Math.max(m, w.id), 0);
+    const nw = {
+      id: maxId + 1,
+      word: f.word.trim(),
+      ipa: f.ipa.trim(),
+      ja: f.ja.trim(),
+      category: f.cats.length ? f.cats.join('・') : 'その他',
+      exEn: f.exEn.trim(),
+      exJa: f.exJa.trim(),
+      url: '',
+      learned: false,
+      hasAudio: this.state.pendingAudio,
+    };
+    this.setWords((ws) => [nw, ...ws]);
+    this.setState({ ...this.resetAdd(), view: 'home' });
+  }
+
+  openEdit(id) {
+    const w = this.state.words.find((x) => x.id === id);
+    if (!w) return;
+    this.setState({
+      editId: id,
+      editForm: {
+        word: w.word, ipa: w.ipa, ja: w.ja,
+        cats: (w.category || '').split('・').filter((c) => CAT_OPTIONS.includes(c)),
+        exEn: w.exEn, exJa: w.exJa,
+      },
+      editError: false,
+      ctx: null,
+    });
+  }
+
+  saveEdit() {
+    const f = this.state.editForm;
+    if (!f.word.trim() || !f.ja.trim()) {
+      this.setState({ editError: true });
+      return;
+    }
+    const id = this.state.editId;
+    this.setWords((ws) => ws.map((w) => w.id === id ? {
+      ...w,
+      word: f.word.trim(),
+      ipa: f.ipa.trim(),
+      ja: f.ja.trim(),
+      category: f.cats.length ? f.cats.join('・') : 'その他',
+      exEn: f.exEn.trim(),
+      exJa: f.exJa.trim(),
+    } : w));
+    this.setState({ editId: null });
+  }
+
+  doDelete() {
+    const id = this.state.deleteId;
+    this.setWords((ws) => ws.filter((w) => w.id !== id));
+    this.setState({ deleteId: null, editId: null, ctx: null });
+  }
+
+  pillFor(category) {
+    const hit = PILLS.find((p) => (category || '').includes(p.match));
+    return hit || { bg: '#ececef', color: 'rgba(0,0,0,0.55)' };
+  }
+
+  decorate(w) {
+    const pill = this.pillFor(w.category);
+    const revealed = !!this.state.revealed[w.id];
+    const showIpaProp = this.props.showIPA ?? true;
+    const hasAudio = !!w.hasAudio;
+    const hasExample = !!(w.exEn && w.exEn.trim());
+    return {
+      ...w,
+      url: w.url || G_URL(w.word),
+      showIpa: showIpaProp && !!w.ipa,
+      pillBg: pill.bg,
+      pillColor: pill.color,
+      revealed,
+      hidden: !revealed,
+      hasAudio,
+      noAudio: !hasAudio,
+      hasExample,
+      noExample: !hasExample,
+      rowBg: w.learned ? '#fafafb' : '#ffffff',
+      play: (e) => { e.stopPropagation(); this.speak(w.word); },
+      openEdit: () => this.openEdit(w.id),
+      onContext: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState({ ctx: { x: e.clientX, y: e.clientY, id: w.id } });
+      },
+      toggleReveal: (e) => {
+        e.stopPropagation();
+        this.setState((s) => ({ revealed: { ...s.revealed, [w.id]: !s.revealed[w.id] } }));
+      },
+      toggleLearned: (e) => { e.stopPropagation(); this.toggleLearned(w.id); },
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const words = s.words || [];
+    const q = (s.search || '').toLowerCase().trim();
+    const match = (w) =>
+      !q || w.word.toLowerCase().includes(q) || (w.ja || '').includes(s.search.trim());
+
+    const learning = words.filter((w) => !w.learned);
+    const learned = words.filter((w) => w.learned);
+    const homeCards = learning.filter(match).map((w) => this.decorate(w));
+    const allRows = words.filter(match).map((w) => this.decorate(w));
+
+    const titles = { home: '学習中の単語', all: '全単語', quiz: 'フラッシュクイズ', add: '単語を登録' };
+    const navDefs = [
+      { v: 'home', label: '学習中', count: String(learning.length) },
+      { v: 'all', label: '全単語', count: String(words.length) },
+      { v: 'quiz', label: 'フラッシュクイズ', count: String(learned.length) },
+      { v: 'add', label: '単語を登録', count: '' },
+    ];
+    const navItems = navDefs.map((n) => ({
+      ...n,
+      bg: s.view === n.v ? 'rgba(0,0,0,0.09)' : 'transparent',
+      weight: s.view === n.v ? 600 : 400,
+      onClick: () => {
+        if (n.v === 'quiz') this.startQuiz();
+        else if (n.v === 'add') this.setState({ ...this.resetAdd(), view: 'add' });
+        else this.setState({ view: n.v });
+      },
+    }));
+
+    // Quiz vals
+    const quiz = s.quiz;
+    const dir = this.props.quizDirection ?? 'en-ja';
+    let quizWord = null;
+    if (quiz && !quiz.done && quiz.order.length) {
+      const id = quiz.order[quiz.i];
+      quizWord = words.find((w) => w.id === id) || null;
+    }
+    const quizActive = s.view === 'quiz' && !!quizWord;
+    const quizDone = s.view === 'quiz' && !!quiz && quiz.done && quiz.order.length > 0;
+    const quizEmpty = s.view === 'quiz' && (!quiz || quiz.order.length === 0);
+    const front = quizWord ? (dir === 'ja-en' ? quizWord.ja : quizWord.word) : '';
+    const back = quizWord ? (dir === 'ja-en' ? quizWord.word : quizWord.ja) : '';
+    const quizHasAudio = quizActive && !!quizWord.hasAudio;
+    const forgotWords = quiz ? quiz.forgot.map((id) => words.find((w) => w.id === id)).filter(Boolean) : [];
+
+    // Edit / delete vals
+    const deleteWord = s.deleteId != null ? words.find((w) => w.id === s.deleteId) : null;
+
+    return {
+      viewTitle: titles[s.view],
+      isHome: s.view === 'home',
+      isAll: s.view === 'all',
+      isQuiz: s.view === 'quiz',
+      isAdd: s.view === 'add',
+      showSearch: s.view === 'home' || s.view === 'all',
+      search: s.search,
+      onSearch: (e) => this.setState({ search: e.target.value }),
+      goAdd: () => this.setState({ ...this.resetAdd(), view: 'add' }),
+      goHome: () => this.setState({ view: 'home' }),
+      stopProp: (e) => e.stopPropagation(),
+      navItems,
+      homeCards,
+      homeEmpty: homeCards.length === 0,
+      homeHasCards: homeCards.length > 0,
+      allRows,
+
+      quizEmpty,
+      quizActive,
+      quizDone,
+      quizProgress: quiz ? `${Math.min(quiz.i + 1, quiz.order.length)} / ${quiz.order.length}` : '',
+      quizFront: front,
+      quizBack: back,
+      quizIpa: quizWord && (dir !== 'ja-en') ? quizWord.ipa : '',
+      quizExEn: quizWord ? quizWord.exEn : '',
+      quizExJa: quizWord ? quizWord.exJa : '',
+      quizHasAudio,
+      quizFrontAudio: quizHasAudio && dir !== 'ja-en',
+      quizBackAudio: quizHasAudio && dir === 'ja-en',
+      quizNoAudio: quizActive && !quizWord.hasAudio,
+      quizUrl: quizWord ? (quizWord.url || G_URL(quizWord.word)) : '',
+      quizPlay: () => { if (quizWord) this.speak(quizWord.word); },
+      quizRevealed: quizActive && quiz.revealed,
+      quizHiddenAnswer: quizActive && !quiz.revealed,
+      quizReveal: () => this.setState((st) => ({ quiz: { ...st.quiz, revealed: true } })),
+      quizKnew: () => this.quizAnswer(true, quizWord ? quizWord.id : null),
+      quizForgot: () => {
+        if (quizWord) this.toggleLearned(quizWord.id);
+        this.quizAnswer(false, quizWord ? quizWord.id : null);
+      },
+      quizRestart: () => this.startQuiz(),
+      quizOkCount: quiz ? String(quiz.ok) : '0',
+      quizNgCount: quiz ? String(quiz.forgot.length) : '0',
+      quizHasForgot: forgotWords.length > 0,
+      quizForgotWords: forgotWords,
+
+      // Add flow
+      addStepInput: s.addStep === 'input',
+      addStepLoading: s.addStep === 'loading',
+      addStepForm: s.addStep === 'form',
+      addNotFound: s.addNotFound,
+      autoFill: () => this.autoFill(),
+      goManual: () => this.setState({ addStep: 'form', addNotFound: false, autoKeys: {}, pendingAudio: false, formError: false }),
+      backToStep1: () => this.setState({ addStep: 'input', addNotFound: false, formError: false }),
+      onWordKey: (e) => { if (e.key === 'Enter') this.autoFill(); },
+      autoIpa: !!s.autoKeys.ipa,
+      autoJa: !!s.autoKeys.ja,
+      autoCategory: !!s.autoKeys.category,
+      autoExEn: !!s.autoKeys.exEn,
+      autoExJa: !!s.autoKeys.exJa,
+      addCatChips: this.catChips(s.form.cats, (o) => this.setState((st) => ({
+        form: { ...st.form, cats: st.form.cats.includes(o) ? st.form.cats.filter((c) => c !== o) : [...st.form.cats, o] },
+        autoKeys: { ...st.autoKeys, category: false },
+      }))),
+
+      fWord: s.form.word, onWord: this.formField('word'),
+      fIpa: s.form.ipa, onIpa: this.formField('ipa'),
+      fJa: s.form.ja, onJa: this.formField('ja'),
+      fExEn: s.form.exEn, onExEn: this.formField('exEn'),
+      fExJa: s.form.exJa, onExJa: this.formField('exJa'),
+      formError: s.formError,
+      formErrorMsg: s.formErrorMsg,
+      saveWord: () => this.saveWord(),
+      cancelAdd: () => this.setState({ ...this.resetAdd(), view: 'home' }),
+
+      // Edit modal
+      editOpen: s.editId != null,
+      eWord: s.editForm.word, onEWord: this.editField('word'),
+      eIpa: s.editForm.ipa, onEIpa: this.editField('ipa'),
+      eJa: s.editForm.ja, onEJa: this.editField('ja'),
+      eExEn: s.editForm.exEn, onEExEn: this.editField('exEn'),
+      eExJa: s.editForm.exJa, onEExJa: this.editField('exJa'),
+      editCatChips: this.catChips(s.editForm.cats, (o) => this.setState((st) => ({
+        editForm: { ...st.editForm, cats: st.editForm.cats.includes(o) ? st.editForm.cats.filter((c) => c !== o) : [...st.editForm.cats, o] },
+      }))),
+      editError: s.editError,
+      saveEdit: () => this.saveEdit(),
+      closeEdit: () => this.setState({ editId: null }),
+      askDelete: () => this.setState({ deleteId: s.editId }),
+
+      // Delete confirm
+      confirmOpen: s.deleteId != null,
+      confirmWord: deleteWord ? deleteWord.word : '',
+      confirmDelete: () => this.doDelete(),
+      cancelDelete: () => this.setState({ deleteId: null }),
+
+      // Context menu
+      ctxOpen: !!s.ctx,
+      ctxX: s.ctx ? s.ctx.x : 0,
+      ctxY: s.ctx ? s.ctx.y : 0,
+      ctxClose: () => this.setState({ ctx: null }),
+      ctxCloseCtx: (e) => { e.preventDefault(); this.setState({ ctx: null }); },
+      ctxEdit: () => { if (s.ctx) this.openEdit(s.ctx.id); },
+      ctxDelete: () => this.setState({ deleteId: s.ctx ? s.ctx.id : null, ctx: null }),
+    };
+  }
+}
+</script>
+</body>
+</html>
