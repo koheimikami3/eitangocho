@@ -103,9 +103,12 @@ flutter analyze                                         # 静的解析
 
 ## リント
 
-`pedantic_mono` ベース(`analysis_options.yaml` 参照)。
+`flutter_lints` ベース(`analysis_options.yaml` 参照)。
 コードスタイルはリンタが強制するため、この md には書かない。
 リンタで表現できない規約のみ「規約」「コメント規約」に記載している。
+
+(当初 `pedantic_mono` を予定していたが、Phase 1 実装時にユーザー判断で
+見送り、`flutter_lints` を継続採用することにした)
 
 ## Planning
 
