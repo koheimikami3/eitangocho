@@ -3,6 +3,7 @@ import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/sidebar_item.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:flutter/material.dart';
@@ -62,9 +63,11 @@ class AppSidebar extends ConsumerWidget {
             label: 'フラッシュクイズ',
             count: '$learnedCount',
             selected: view == MainView.quiz,
-            onTap: () => ref
-                .read(mainPageProvider.notifier)
-                .selectView(MainView.quiz),
+            // クリックで常に新セッションを開始してからビューへ切り替える。
+            onTap: () {
+              ref.read(quizPageProvider.notifier).startQuiz();
+              ref.read(mainPageProvider.notifier).selectView(MainView.quiz);
+            },
           ),
           SidebarItem(
             label: '単語を登録',

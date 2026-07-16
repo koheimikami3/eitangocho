@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/app_sidebar.dart';
 import 'package:eitangocho/app/widgets/main_toolbar.dart';
+import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
 import 'package:eitangocho/features/word/presentation/all_words_view.dart';
 import 'package:eitangocho/features/word/presentation/learning_words_view.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_view.dart';
@@ -28,9 +29,9 @@ class MainPage extends ConsumerWidget {
                   child: switch (view) {
                     MainView.learning => const LearningWordsView(),
                     MainView.allWords => const AllWordsView(),
-                    // クイズ・設定ビューは後続コミットで実装する。
-                    MainView.quiz => const Center(child: Text('未実装')),
+                    MainView.quiz => const QuizView(),
                     MainView.registration => const WordRegistrationView(),
+                    // 設定ビューは C3 で実装する。
                     MainView.settings => const Center(child: Text('未実装')),
                   },
                 ),

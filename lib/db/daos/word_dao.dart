@@ -42,6 +42,19 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
         ),
       );
 
-  // Phase 2 で recordQuizResult(id, {required bool knew}) を追加する
-  // (lastReviewedAt = now、knew なら correctCount + 1)
+  /// クイズ回答を実績として記録する。lastReviewedAt = now、knew のとき correctCount を +1。
+  /// updatedAt は「単語内容の編集」を表すものとして予約するため、実績記録では更新しない
+  /// (将来の iCloud 同期でクイズ実績だけの端末が内容を上書きしないようにするため)。
+  /// correctCount の加算は式更新で行い、読み取り→書き込みの競合を避ける。
+  Future<void> recordQuizResult(int id, {required bool knew}) {
+    final now = DateTime.now();
+    return (update(words)..where((t) => t.id.equals(id))).write(
+      knew
+          ? WordsCompanion.custom(
+              lastReviewedAt: Variable(now),
+              correctCount: words.correctCount + const Constant(1),
+            )
+          : WordsCompanion(lastReviewedAt: Value(now)),
+    );
+  }
 }
