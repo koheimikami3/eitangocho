@@ -4,11 +4,14 @@ import 'package:eitangocho/features/quiz/presentation/widgets/quiz_answer_button
 import 'package:eitangocho/features/quiz/presentation/widgets/quiz_card.dart';
 import 'package:eitangocho/features/quiz/presentation/widgets/quiz_empty_state.dart';
 import 'package:eitangocho/features/quiz/presentation/widgets/quiz_result_view.dart';
+import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
+import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// フラッシュクイズのビュー。phase で空状態 / 出題 / 完了画面を出し分ける。
-/// 出題方向は現状 en→ja 固定(設定による切替は Phase 2 C3 で接続する)。
+/// 出題方向は設定 quizDirection に従う(ja→en のときは表面=訳・裏面=英単語・IPA 非表示)。
 class QuizView extends ConsumerWidget {
   const QuizView({super.key});
 
@@ -16,6 +19,10 @@ class QuizView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(quizPageProvider);
     final notifier = ref.read(quizPageProvider.notifier);
+    // ロード前は既定(en→ja)でフォールバック。
+    final direction =
+        ref.watch(settingsProvider).value?.quizDirection ??
+        const SettingsState().quizDirection;
 
     final Widget content = switch (state.phase) {
       QuizPhase.empty => const QuizEmptyState(),
@@ -23,7 +30,11 @@ class QuizView extends ConsumerWidget {
         okCount: state.okCount,
         forgotWords: state.forgotWords,
       ),
-      QuizPhase.active => _ActiveQuiz(state: state, notifier: notifier),
+      QuizPhase.active => _ActiveQuiz(
+        state: state,
+        notifier: notifier,
+        direction: direction,
+      ),
     };
 
     return SingleChildScrollView(
@@ -39,14 +50,21 @@ class QuizView extends ConsumerWidget {
 }
 
 class _ActiveQuiz extends StatelessWidget {
-  const _ActiveQuiz({required this.state, required this.notifier});
+  const _ActiveQuiz({
+    required this.state,
+    required this.notifier,
+    required this.direction,
+  });
 
   final QuizPageState state;
   final QuizPageNotifier notifier;
+  final QuizDirection direction;
 
   @override
   Widget build(BuildContext context) {
     final word = state.questions[state.index];
+    // en→ja: 表面=英単語 + IPA、裏面=訳。ja→en: 表面=訳(IPA なし)、裏面=英単語。
+    final isJaToEn = direction == QuizDirection.jaToEn;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -54,11 +72,10 @@ class _ActiveQuiz extends StatelessWidget {
       children: [
         QuizCard(
           progress: '${state.index + 1} / ${state.questions.length}',
-          // en→ja 固定: 表面=英単語 + IPA、裏面=日本語訳。
-          front: word.word,
-          ipa: word.ipa,
+          front: isJaToEn ? word.japanese : word.word,
+          ipa: isJaToEn ? '' : word.ipa,
           revealed: state.revealed,
-          back: word.japanese,
+          back: isJaToEn ? word.word : word.japanese,
           exampleEn: word.exampleEn,
           exampleJa: word.exampleJa,
           onReveal: notifier.reveal,

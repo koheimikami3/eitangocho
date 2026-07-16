@@ -1,5 +1,7 @@
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
@@ -16,6 +18,11 @@ class LearningWordsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final words = ref.watch(filteredLearningWordsProvider);
+    // 設定 showIpa はカードの IPA 表示のみに適用する(テーブルは常時表示)。
+    // ロード前は既定 true。
+    final showIpa =
+        ref.watch(settingsProvider).value?.showIpa ??
+        const SettingsState().showIpa;
 
     if (words.isEmpty) return const LearningEmptyState();
 
@@ -53,7 +60,7 @@ class LearningWordsView extends ConsumerWidget {
                       width: cardWidth,
                       child: WordCard(
                         word: word,
-                        showIpa: true,
+                        showIpa: showIpa,
                         onToggleLearned: (isLearned) => ref
                             .read(databaseProvider)
                             .wordDao
