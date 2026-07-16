@@ -1,20 +1,51 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
+import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
+import 'package:eitangocho/features/word_registration/domain/word_info.dart';
+import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
+import 'package:eitangocho/features/word_registration/domain/word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_notifier.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+/// autoFill のテスト用フェイク(実 API を呼ばない)。
+class _FakeWordInfoProvider implements WordInfoProvider {
+  _FakeWordInfoProvider(this._handler);
+
+  final Future<WordInfo?> Function(String word) _handler;
+
+  @override
+  Future<WordInfo?> fetch(String word) => _handler(word);
+}
 
 void main() {
   late AppDatabase db;
   late ProviderContainer container;
 
-  setUp(() {
-    db = AppDatabase.forTesting(NativeDatabase.memory());
-    container = ProviderContainer(
-      overrides: [databaseProvider.overrideWithValue(db)],
+  ProviderContainer buildContainer({WordInfoProvider? wordInfoProvider}) {
+    final c = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        if (wordInfoProvider != null)
+          wordInfoProviderProvider.overrideWithValue(wordInfoProvider),
+      ],
     );
+    // 自動破棄 Provider が autoFill の await 中に破棄されないよう購読しておく
+    final subscription = c.listen(wordRegistrationProvider, (_, _) {});
+    addTearDown(subscription.close);
+    return c;
+  }
+
+  setUp(() {
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
+    db = AppDatabase.forTesting(NativeDatabase.memory());
   });
 
   tearDown(() async {
@@ -23,6 +54,7 @@ void main() {
   });
 
   test('英単語が空だとエラーになり保存されない', () async {
+    container = buildContainer();
     final notifier = container.read(wordRegistrationProvider.notifier);
 
     final result = await notifier.save(
@@ -42,6 +74,7 @@ void main() {
   });
 
   test('日本語訳が空だとエラーになり保存されない', () async {
+    container = buildContainer();
     final notifier = container.read(wordRegistrationProvider.notifier);
 
     final result = await notifier.save(
@@ -60,6 +93,7 @@ void main() {
   });
 
   test('保存すると DAO に insert される', () async {
+    container = buildContainer();
     final notifier = container.read(wordRegistrationProvider.notifier);
 
     final result = await notifier.save(
@@ -79,6 +113,7 @@ void main() {
   });
 
   test('品詞を未選択のまま保存すると「その他」が補われる', () async {
+    container = buildContainer();
     final notifier = container.read(wordRegistrationProvider.notifier);
 
     await notifier.save(
@@ -94,6 +129,7 @@ void main() {
   });
 
   test('品詞を選択した場合はそれが保存される', () async {
+    container = buildContainer();
     final notifier = container.read(wordRegistrationProvider.notifier);
     notifier.togglePartOfSpeech(PartOfSpeech.noun);
 
@@ -107,5 +143,148 @@ void main() {
 
     final words = await db.wordDao.watchAll().first;
     expect(words.single.partsOfSpeech, [PartOfSpeech.noun]);
+  });
+
+  group('autoFill', () {
+    const fetchedInfo = WordInfo(
+      word: 'serendipity',
+      ipa: '/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/',
+      partsOfSpeech: [PartOfSpeech.noun],
+      japanese: '思わぬ発見',
+      exampleEn: 'A lucky find.',
+      exampleJa: '幸運な発見。',
+      audioUrl: 'https://example.com/a.mp3',
+    );
+
+    test('空入力はエラーを表示し input に留まる', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('   ');
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.input);
+      expect(state.errorMessage, '英単語を入力してください。');
+    });
+
+    test('成功すると form へ遷移し fetched と品詞が反映される', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('serendipity');
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.form);
+      expect(state.fetched, fetchedInfo);
+      expect(state.notFound, isFalse);
+      expect(state.selectedPartsOfSpeech, {PartOfSpeech.noun});
+      expect(state.translationFailed, isFalse);
+    });
+
+    test('未収録(null)なら form へ遷移し notFound が立つ', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => null),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('zzzzz');
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.form);
+      expect(state.notFound, isTrue);
+      expect(state.fetched, isNull);
+    });
+
+    test('WordInfoException なら input に戻しエラーを表示する', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider(
+          (_) async => throw const WordInfoException('offline'),
+        ),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('apple');
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.input);
+      expect(
+        state.errorMessage,
+        '辞書データの取得に失敗しました。通信環境を確認してください。',
+      );
+    });
+
+    test('キー設定済みで英例文ありなのに和訳が空なら translationFailed', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider(
+          (_) async => fetchedInfo.copyWith(exampleJa: ''),
+        ),
+      );
+      await container.read(settingsProvider.future);
+      await container
+          .read(settingsProvider.notifier)
+          .setDeeplApiKey('some-key');
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('serendipity');
+
+      expect(
+        container.read(wordRegistrationProvider).translationFailed,
+        isTrue,
+      );
+    });
+
+    test('自動入力後に保存すると audioUrl も書き込まれる', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
+      );
+      final notifier = container.read(wordRegistrationProvider.notifier);
+      await notifier.autoFill('serendipity');
+
+      await notifier.save(
+        word: 'serendipity',
+        ipa: fetchedInfo.ipa,
+        japanese: fetchedInfo.japanese,
+        exampleEn: fetchedInfo.exampleEn,
+        exampleJa: fetchedInfo.exampleJa,
+      );
+
+      final words = await db.wordDao.watchAll().first;
+      expect(words.single.audioUrl, 'https://example.com/a.mp3');
+    });
+
+    test('backToInput で取得結果と品詞選択が破棄される', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
+      );
+      final notifier = container.read(wordRegistrationProvider.notifier);
+      await notifier.autoFill('serendipity');
+
+      notifier.backToInput();
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.input);
+      expect(state.fetched, isNull);
+      expect(state.selectedPartsOfSpeech, isEmpty);
+    });
+
+    test('skipToManual は fetched なしで form へ遷移する', () async {
+      container = buildContainer();
+
+      container.read(wordRegistrationProvider.notifier).skipToManual();
+
+      final state = container.read(wordRegistrationProvider);
+      expect(state.step, RegistrationStep.form);
+      expect(state.fetched, isNull);
+      expect(state.notFound, isFalse);
+    });
   });
 }

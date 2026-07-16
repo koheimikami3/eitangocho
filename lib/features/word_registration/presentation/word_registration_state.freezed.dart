@@ -14,7 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WordRegistrationState {
 
- Set<PartOfSpeech> get selectedPartsOfSpeech; String? get errorMessage;
+ RegistrationStep get step;/// 自動入力の取得結果。手動入力(スキップ・未収録)のときは null。
+/// audioUrl はフォームに出さず、保存時にここから words へ書き込む。
+ WordInfo? get fetched;/// 自動入力したが辞書(FD・EJDict とも)未収録だった
+ bool get notFound;/// 例文の DeepL 翻訳に失敗した(exampleJa 空のまま続行し警告を出す)
+ bool get translationFailed; Set<PartOfSpeech> get selectedPartsOfSpeech; String? get errorMessage;
 /// Create a copy of WordRegistrationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +29,16 @@ $WordRegistrationStateCopyWith<WordRegistrationState> get copyWith => _$WordRegi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordRegistrationState&&const DeepCollectionEquality().equals(other.selectedPartsOfSpeech, selectedPartsOfSpeech)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordRegistrationState&&(identical(other.step, step) || other.step == step)&&(identical(other.fetched, fetched) || other.fetched == fetched)&&(identical(other.notFound, notFound) || other.notFound == notFound)&&(identical(other.translationFailed, translationFailed) || other.translationFailed == translationFailed)&&const DeepCollectionEquality().equals(other.selectedPartsOfSpeech, selectedPartsOfSpeech)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(selectedPartsOfSpeech),errorMessage);
+int get hashCode => Object.hash(runtimeType,step,fetched,notFound,translationFailed,const DeepCollectionEquality().hash(selectedPartsOfSpeech),errorMessage);
 
 @override
 String toString() {
-  return 'WordRegistrationState(selectedPartsOfSpeech: $selectedPartsOfSpeech, errorMessage: $errorMessage)';
+  return 'WordRegistrationState(step: $step, fetched: $fetched, notFound: $notFound, translationFailed: $translationFailed, selectedPartsOfSpeech: $selectedPartsOfSpeech, errorMessage: $errorMessage)';
 }
 
 
@@ -45,11 +49,11 @@ abstract mixin class $WordRegistrationStateCopyWith<$Res>  {
   factory $WordRegistrationStateCopyWith(WordRegistrationState value, $Res Function(WordRegistrationState) _then) = _$WordRegistrationStateCopyWithImpl;
 @useResult
 $Res call({
- Set<PartOfSpeech> selectedPartsOfSpeech, String? errorMessage
+ RegistrationStep step, WordInfo? fetched, bool notFound, bool translationFailed, Set<PartOfSpeech> selectedPartsOfSpeech, String? errorMessage
 });
 
 
-
+$WordInfoCopyWith<$Res>? get fetched;
 
 }
 /// @nodoc
@@ -62,14 +66,30 @@ class _$WordRegistrationStateCopyWithImpl<$Res>
 
 /// Create a copy of WordRegistrationState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedPartsOfSpeech = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? step = null,Object? fetched = freezed,Object? notFound = null,Object? translationFailed = null,Object? selectedPartsOfSpeech = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
-selectedPartsOfSpeech: null == selectedPartsOfSpeech ? _self.selectedPartsOfSpeech : selectedPartsOfSpeech // ignore: cast_nullable_to_non_nullable
+step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
+as RegistrationStep,fetched: freezed == fetched ? _self.fetched : fetched // ignore: cast_nullable_to_non_nullable
+as WordInfo?,notFound: null == notFound ? _self.notFound : notFound // ignore: cast_nullable_to_non_nullable
+as bool,translationFailed: null == translationFailed ? _self.translationFailed : translationFailed // ignore: cast_nullable_to_non_nullable
+as bool,selectedPartsOfSpeech: null == selectedPartsOfSpeech ? _self.selectedPartsOfSpeech : selectedPartsOfSpeech // ignore: cast_nullable_to_non_nullable
 as Set<PartOfSpeech>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
+/// Create a copy of WordRegistrationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WordInfoCopyWith<$Res>? get fetched {
+    if (_self.fetched == null) {
+    return null;
+  }
 
+  return $WordInfoCopyWith<$Res>(_self.fetched!, (value) {
+    return _then(_self.copyWith(fetched: value));
+  });
+}
 }
 
 
@@ -151,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( RegistrationStep step,  WordInfo? fetched,  bool notFound,  bool translationFailed,  Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WordRegistrationState() when $default != null:
-return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
+return $default(_that.step,_that.fetched,_that.notFound,_that.translationFailed,_that.selectedPartsOfSpeech,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -172,10 +192,10 @@ return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( RegistrationStep step,  WordInfo? fetched,  bool notFound,  bool translationFailed,  Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _WordRegistrationState():
-return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
+return $default(_that.step,_that.fetched,_that.notFound,_that.translationFailed,_that.selectedPartsOfSpeech,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +212,10 @@ return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( RegistrationStep step,  WordInfo? fetched,  bool notFound,  bool translationFailed,  Set<PartOfSpeech> selectedPartsOfSpeech,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _WordRegistrationState() when $default != null:
-return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
+return $default(_that.step,_that.fetched,_that.notFound,_that.translationFailed,_that.selectedPartsOfSpeech,_that.errorMessage);case _:
   return null;
 
 }
@@ -207,9 +227,17 @@ return $default(_that.selectedPartsOfSpeech,_that.errorMessage);case _:
 
 
 class _WordRegistrationState implements WordRegistrationState {
-  const _WordRegistrationState({final  Set<PartOfSpeech> selectedPartsOfSpeech = const <PartOfSpeech>{}, this.errorMessage}): _selectedPartsOfSpeech = selectedPartsOfSpeech;
+  const _WordRegistrationState({this.step = RegistrationStep.input, this.fetched, this.notFound = false, this.translationFailed = false, final  Set<PartOfSpeech> selectedPartsOfSpeech = const <PartOfSpeech>{}, this.errorMessage}): _selectedPartsOfSpeech = selectedPartsOfSpeech;
   
 
+@override@JsonKey() final  RegistrationStep step;
+/// 自動入力の取得結果。手動入力(スキップ・未収録)のときは null。
+/// audioUrl はフォームに出さず、保存時にここから words へ書き込む。
+@override final  WordInfo? fetched;
+/// 自動入力したが辞書(FD・EJDict とも)未収録だった
+@override@JsonKey() final  bool notFound;
+/// 例文の DeepL 翻訳に失敗した(exampleJa 空のまま続行し警告を出す)
+@override@JsonKey() final  bool translationFailed;
  final  Set<PartOfSpeech> _selectedPartsOfSpeech;
 @override@JsonKey() Set<PartOfSpeech> get selectedPartsOfSpeech {
   if (_selectedPartsOfSpeech is EqualUnmodifiableSetView) return _selectedPartsOfSpeech;
@@ -229,16 +257,16 @@ _$WordRegistrationStateCopyWith<_WordRegistrationState> get copyWith => __$WordR
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordRegistrationState&&const DeepCollectionEquality().equals(other._selectedPartsOfSpeech, _selectedPartsOfSpeech)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordRegistrationState&&(identical(other.step, step) || other.step == step)&&(identical(other.fetched, fetched) || other.fetched == fetched)&&(identical(other.notFound, notFound) || other.notFound == notFound)&&(identical(other.translationFailed, translationFailed) || other.translationFailed == translationFailed)&&const DeepCollectionEquality().equals(other._selectedPartsOfSpeech, _selectedPartsOfSpeech)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_selectedPartsOfSpeech),errorMessage);
+int get hashCode => Object.hash(runtimeType,step,fetched,notFound,translationFailed,const DeepCollectionEquality().hash(_selectedPartsOfSpeech),errorMessage);
 
 @override
 String toString() {
-  return 'WordRegistrationState(selectedPartsOfSpeech: $selectedPartsOfSpeech, errorMessage: $errorMessage)';
+  return 'WordRegistrationState(step: $step, fetched: $fetched, notFound: $notFound, translationFailed: $translationFailed, selectedPartsOfSpeech: $selectedPartsOfSpeech, errorMessage: $errorMessage)';
 }
 
 
@@ -249,11 +277,11 @@ abstract mixin class _$WordRegistrationStateCopyWith<$Res> implements $WordRegis
   factory _$WordRegistrationStateCopyWith(_WordRegistrationState value, $Res Function(_WordRegistrationState) _then) = __$WordRegistrationStateCopyWithImpl;
 @override @useResult
 $Res call({
- Set<PartOfSpeech> selectedPartsOfSpeech, String? errorMessage
+ RegistrationStep step, WordInfo? fetched, bool notFound, bool translationFailed, Set<PartOfSpeech> selectedPartsOfSpeech, String? errorMessage
 });
 
 
-
+@override $WordInfoCopyWith<$Res>? get fetched;
 
 }
 /// @nodoc
@@ -266,15 +294,31 @@ class __$WordRegistrationStateCopyWithImpl<$Res>
 
 /// Create a copy of WordRegistrationState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedPartsOfSpeech = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? step = null,Object? fetched = freezed,Object? notFound = null,Object? translationFailed = null,Object? selectedPartsOfSpeech = null,Object? errorMessage = freezed,}) {
   return _then(_WordRegistrationState(
-selectedPartsOfSpeech: null == selectedPartsOfSpeech ? _self._selectedPartsOfSpeech : selectedPartsOfSpeech // ignore: cast_nullable_to_non_nullable
+step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
+as RegistrationStep,fetched: freezed == fetched ? _self.fetched : fetched // ignore: cast_nullable_to_non_nullable
+as WordInfo?,notFound: null == notFound ? _self.notFound : notFound // ignore: cast_nullable_to_non_nullable
+as bool,translationFailed: null == translationFailed ? _self.translationFailed : translationFailed // ignore: cast_nullable_to_non_nullable
+as bool,selectedPartsOfSpeech: null == selectedPartsOfSpeech ? _self._selectedPartsOfSpeech : selectedPartsOfSpeech // ignore: cast_nullable_to_non_nullable
 as Set<PartOfSpeech>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
 
+/// Create a copy of WordRegistrationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WordInfoCopyWith<$Res>? get fetched {
+    if (_self.fetched == null) {
+    return null;
+  }
 
+  return $WordInfoCopyWith<$Res>(_self.fetched!, (value) {
+    return _then(_self.copyWith(fetched: value));
+  });
+}
 }
 
 // dart format on
