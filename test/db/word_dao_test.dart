@@ -86,4 +86,33 @@ void main() {
     words = await db.wordDao.watchAll().first;
     expect(words.single.isLearned, isFalse);
   });
+
+  test('recordQuizResult(knew:true) は correctCount+1・lastReviewedAt 付与し updatedAt は変えない', () async {
+    final id = await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+    );
+    final before = (await db.wordDao.watchAll().first).single;
+
+    await Future<void>.delayed(const Duration(seconds: 1));
+    await db.wordDao.recordQuizResult(id, knew: true);
+    await db.wordDao.recordQuizResult(id, knew: true);
+
+    final after = (await db.wordDao.watchAll().first).single;
+    expect(after.correctCount, 2);
+    expect(after.lastReviewedAt, isNotNull);
+    // 実績記録では updatedAt を更新しない(内容編集専用に予約)。
+    expect(after.updatedAt, before.updatedAt);
+  });
+
+  test('recordQuizResult(knew:false) は correctCount 据え置きで lastReviewedAt を更新する', () async {
+    final id = await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+    );
+
+    await db.wordDao.recordQuizResult(id, knew: false);
+
+    final after = (await db.wordDao.watchAll().first).single;
+    expect(after.correctCount, 0);
+    expect(after.lastReviewedAt, isNotNull);
+  });
 }

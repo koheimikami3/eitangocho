@@ -15,9 +15,15 @@ class MainToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final title = switch (view) {
+      MainView.learning => '学習中の単語',
       MainView.allWords => '全単語',
+      MainView.quiz => 'フラッシュクイズ',
       MainView.registration => '単語を登録',
+      MainView.settings => '設定',
     };
+    // 検索は学習中・全単語ビューのみ表示(プロトタイプの showSearch 準拠)。
+    final showSearch =
+        view == MainView.learning || view == MainView.allWords;
 
     return Container(
       height: AppDimensions.toolbarHeight,
@@ -36,7 +42,7 @@ class MainToolbar extends ConsumerWidget {
             ),
           ),
           const Spacer(),
-          if (view == MainView.allWords) ...[
+          if (showSearch) ...[
             const ToolbarSearchField(),
             const SizedBox(width: 10),
           ],

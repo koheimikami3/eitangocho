@@ -44,7 +44,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
       exampleJa: _exampleJaController.text,
     );
     if (saved && mounted) {
-      ref.read(mainPageProvider.notifier).selectView(MainView.allWords);
+      ref.read(mainPageProvider.notifier).selectView(MainView.learning);
     }
   }
 

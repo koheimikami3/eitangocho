@@ -207,7 +207,7 @@ return $default(_that.view,_that.searchQuery);case _:
 
 
 class _MainPageState implements MainPageState {
-  const _MainPageState({this.view = MainView.allWords, this.searchQuery = ''});
+  const _MainPageState({this.view = MainView.learning, this.searchQuery = ''});
   
 
 @override@JsonKey() final  MainView view;
