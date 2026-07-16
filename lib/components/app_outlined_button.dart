@@ -32,6 +32,7 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
         onTap: widget.onPressed,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverBackground : Colors.white,
             borderRadius: BorderRadius.circular(8),

@@ -32,6 +32,7 @@ class _AppFilledButtonState extends State<AppFilledButton> {
         onTap: widget.onPressed,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverColor : widget.color,
             borderRadius: BorderRadius.circular(7),

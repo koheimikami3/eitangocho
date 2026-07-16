@@ -1,4 +1,6 @@
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
+import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_table_header.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_table_row.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -27,8 +29,13 @@ class AllWordsView extends ConsumerWidget {
                     .read(databaseProvider)
                     .wordDao
                     .setLearned(word.id, isLearned: isLearned),
-                onTap: () {},
-                onSecondaryTapUp: (_) {},
+                onTap: () => showEditWordDialog(context, ref, word),
+                onSecondaryTapUp: (details) => showWordContextMenu(
+                  context,
+                  ref,
+                  word,
+                  details.globalPosition,
+                ),
               );
             },
           ),
