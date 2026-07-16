@@ -1,0 +1,23 @@
+import 'package:flutter/material.dart';
+
+/// 配色定数。値は docs/prototype/design/eitangocho.html から抽出したもの。
+abstract final class AppColors {
+  static const accent = Color(0xFF0A6EE0); // 主要アクション
+  static const accentHover = Color(0xFF0B63C6);
+  static const danger = Color(0xFFC03030); // 削除系
+  static const dangerHover = Color(0xFFA82828);
+  static const dangerHoverBackground = Color(0xFFFDF2F2);
+  static const textPrimary = Color(0xFF1D1D1F);
+  static const textSecondary = Color(0x99000000); // rgba(0,0,0,0.6)
+  static const textTertiary = Color(0x73000000); // rgba(0,0,0,0.45)
+  static const textDisabled = Color(0x4D000000); // rgba(0,0,0,0.3)
+  static const sidebarBackground = Color(0xFFF0F0F3);
+  static const sidebarSelected = Color(0x17000000); // rgba(0,0,0,0.09)
+  static const inputBackground = Color(0xFFF7F7F8);
+  static const tableHeaderBackground = Color(0xFFFAFAFB);
+  static const learnedRowBackground = Color(0xFFFAFAFB);
+  static const rowHoverBackground = Color(0xFFF2F6FC);
+  static const border = Color(0x14000000); // rgba(0,0,0,0.08)
+  static const borderStrong = Color(0x24000000); // rgba(0,0,0,0.14)
+  static const inputBorder = Color(0x26000000); // rgba(0,0,0,0.15)
+}
