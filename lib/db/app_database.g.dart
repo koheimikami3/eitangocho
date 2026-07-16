@@ -1250,6 +1250,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DictionaryCacheEntriesTable dictionaryCacheEntries =
       $DictionaryCacheEntriesTable(this);
   late final WordDao wordDao = WordDao(this as AppDatabase);
+  late final EjdictDao ejdictDao = EjdictDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

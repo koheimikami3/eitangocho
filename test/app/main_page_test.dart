@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/eitangocho_app.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,6 +15,8 @@ void main() {
       ProviderScope(
         overrides: [
           wordListProvider.overrideWith((ref) => Stream.value(const <Word>[])),
+          // MainPage が起動時にキックする EJDict 取込も DB に触れるため差し替える。
+          ejdictImportProvider.overrideWith((ref) async => 0),
         ],
         child: const EitangochoApp(),
       ),
