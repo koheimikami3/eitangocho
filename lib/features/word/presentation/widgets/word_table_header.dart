@@ -32,6 +32,8 @@ class WordTableHeader extends StatelessWidget {
           Expanded(flex: 2, child: Text('日本語訳', style: _headerStyle)),
           SizedBox(width: 12),
           Expanded(flex: 3, child: Text('例文', style: _headerStyle)),
+          SizedBox(width: 12),
+          SizedBox(width: 56, child: Text('発音', style: _headerStyle)),
         ],
       ),
     );
