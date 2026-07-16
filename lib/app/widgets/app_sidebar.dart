@@ -3,6 +3,7 @@ import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/sidebar_item.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,8 @@ class AppSidebar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final wordCount = ref.watch(wordListProvider).value?.length ?? 0;
+    final learningCount = ref.watch(learningWordsProvider).length;
+    final learnedCount = ref.watch(learnedWordsProvider).length;
 
     return Container(
       width: AppDimensions.sidebarWidth,
@@ -40,12 +43,28 @@ class AppSidebar extends ConsumerWidget {
             ),
           ),
           SidebarItem(
+            label: '学習中',
+            count: '$learningCount',
+            selected: view == MainView.learning,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.learning),
+          ),
+          SidebarItem(
             label: '全単語',
             count: '$wordCount',
             selected: view == MainView.allWords,
             onTap: () => ref
                 .read(mainPageProvider.notifier)
                 .selectView(MainView.allWords),
+          ),
+          SidebarItem(
+            label: 'フラッシュクイズ',
+            count: '$learnedCount',
+            selected: view == MainView.quiz,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.quiz),
           ),
           SidebarItem(
             label: '単語を登録',
@@ -55,6 +74,13 @@ class AppSidebar extends ConsumerWidget {
                 .selectView(MainView.registration),
           ),
           const Spacer(),
+          SidebarItem(
+            label: '設定',
+            selected: view == MainView.settings,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.settings),
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
             child: DecoratedBox(

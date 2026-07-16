@@ -24,11 +24,17 @@ void main() {
   testWidgets('サイドバーの項目とツールバーのタイトルが表示される', (tester) async {
     await pumpApp(tester);
 
+    // 既定は学習中ビュー。サイドバー項目が一通り並ぶ。
     expect(find.text('単語帳'), findsOneWidget);
-    expect(find.text('全単語'), findsNWidgets(2));
-    expect(find.text('単語を登録'), findsOneWidget);
+    expect(find.text('学習中'), findsOneWidget);
+    expect(find.text('全単語'), findsOneWidget);
+    expect(find.text('フラッシュクイズ'), findsOneWidget);
+    expect(find.text('設定'), findsOneWidget);
     expect(find.text('ローカル DB に保存済み'), findsOneWidget);
-    expect(find.text('＋ 単語を登録'), findsOneWidget);
+    // 単語を登録: サイドバー項目のみ(既定タイトルは「学習中の単語」)。
+    expect(find.text('単語を登録'), findsOneWidget);
+    // ＋ 単語を登録: ツールバーボタン + 学習中の空状態の登録導線。
+    expect(find.text('＋ 単語を登録'), findsNWidgets(2));
   });
 
   testWidgets('サイドバー項目クリックでビューが切り替わる', (tester) async {
@@ -37,6 +43,7 @@ void main() {
     await tester.tap(find.text('単語を登録').first);
     await tester.pumpAndSettle();
 
+    // 登録ビューに切り替わるとサイドバー項目 + ツールバータイトルの 2 箇所になる。
     expect(find.text('単語を登録'), findsNWidgets(2));
   });
 }
