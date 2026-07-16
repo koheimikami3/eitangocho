@@ -9,5 +9,9 @@ abstract class SettingsState with _$SettingsState {
   const factory SettingsState({
     @Default(QuizDirection.enToJa) QuizDirection quizDirection,
     @Default(true) bool showIpa,
+
+    /// DeepL API Free のキー。未設定(空)なら例文の和訳をスキップする。
+    /// ローカル個人アプリとして平文保存を許容する(確定済みの設計判断)。
+    @Default('') String deeplApiKey,
   }) = _SettingsState;
 }

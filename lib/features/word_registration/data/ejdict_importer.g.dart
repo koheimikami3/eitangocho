@@ -53,4 +53,4 @@ final class EjdictImportProvider
   }
 }
 
-String _$ejdictImportHash() => r'f879ccbd2fe5a587f6185e039bd737908eb745a5';
+String _$ejdictImportHash() => r'3c0893cd3f79f8163bee7e9ab9be98a4c14890b7';

@@ -42,7 +42,7 @@ final class SettingsNotifierProvider
   SettingsNotifier create() => SettingsNotifier();
 }
 
-String _$settingsNotifierHash() => r'7086af05e89dc124bc0cd318fd000c5cd0307203';
+String _$settingsNotifierHash() => r'07d825e262e8467bfc1f1a3bc0a7519535bb5a90';
 
 /// アプリ設定を shared_preferences に読み書きするラッパー。
 /// build で非同期に読み込むため、購読側は `AsyncValue<SettingsState>` を扱う

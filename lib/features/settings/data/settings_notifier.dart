@@ -12,6 +12,7 @@ part 'settings_notifier.g.dart';
 class SettingsNotifier extends _$SettingsNotifier {
   static const _keyQuizDirection = 'quizDirection';
   static const _keyShowIpa = 'showIpa';
+  static const _keyDeeplApiKey = 'deeplApiKey';
 
   final _prefs = SharedPreferencesAsync();
 
@@ -19,11 +20,13 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<SettingsState> build() async {
     final directionName = await _prefs.getString(_keyQuizDirection);
     final showIpa = await _prefs.getBool(_keyShowIpa);
+    final deeplApiKey = await _prefs.getString(_keyDeeplApiKey);
     return SettingsState(
       quizDirection:
           QuizDirection.values.asNameMap()[directionName] ??
           QuizDirection.enToJa,
       showIpa: showIpa ?? true,
+      deeplApiKey: deeplApiKey ?? '',
     );
   }
 
@@ -40,6 +43,15 @@ class SettingsNotifier extends _$SettingsNotifier {
     await _prefs.setBool(_keyShowIpa, value);
     state = AsyncData(
       (state.value ?? const SettingsState()).copyWith(showIpa: value),
+    );
+  }
+
+  Future<void> setDeeplApiKey(String value) async {
+    await _prefs.setString(_keyDeeplApiKey, value.trim());
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(
+        deeplApiKey: value.trim(),
+      ),
     );
   }
 }
