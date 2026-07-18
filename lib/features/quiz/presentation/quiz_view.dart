@@ -8,6 +8,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// フラッシュクイズのビュー。phase で空状態 / 出題 / 完了画面を出し分ける。
@@ -77,31 +78,53 @@ class _ActiveQuiz extends StatelessWidget {
     // en→ja: 表面=英単語 + IPA、裏面=訳。ja→en: 表面=訳(IPA なし)、裏面=英単語。
     final isJaToEn = direction == QuizDirection.jaToEn;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        QuizCard(
-          progress: '${state.index + 1} / ${state.questions.length}',
-          front: isJaToEn ? word.japanese : word.word,
-          ipa: isJaToEn ? '' : word.ipa,
-          revealed: state.revealed,
-          back: isJaToEn ? word.word : word.japanese,
-          exampleEn: word.exampleEn,
-          exampleJa: word.exampleJa,
-          onReveal: notifier.reveal,
-          englishWord: word.word,
-          audioUrl: word.audioUrl,
-          audioOnFront: !isJaToEn,
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        if (!state.revealed) ...{
+          const SingleActivator(LogicalKeyboardKey.space): notifier.reveal,
+          const SingleActivator(LogicalKeyboardKey.enter): notifier.reveal,
+          const SingleActivator(LogicalKeyboardKey.numpadEnter):
+              notifier.reveal,
+        } else ...{
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+              notifier.answerForgot(),
+          const SingleActivator(LogicalKeyboardKey.digit1): () =>
+              notifier.answerForgot(),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+              notifier.answerKnew(),
+          const SingleActivator(LogicalKeyboardKey.digit2): () =>
+              notifier.answerKnew(),
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            QuizCard(
+              progress: '${state.index + 1} / ${state.questions.length}',
+              front: isJaToEn ? word.japanese : word.word,
+              ipa: isJaToEn ? '' : word.ipa,
+              revealed: state.revealed,
+              back: isJaToEn ? word.word : word.japanese,
+              exampleEn: word.exampleEn,
+              exampleJa: word.exampleJa,
+              onReveal: notifier.reveal,
+              englishWord: word.word,
+              audioUrl: word.audioUrl,
+              audioOnFront: !isJaToEn,
+            ),
+            if (state.revealed) ...[
+              const SizedBox(height: 16),
+              QuizAnswerButtons(
+                onForgot: notifier.answerForgot,
+                onKnew: notifier.answerKnew,
+              ),
+            ],
+          ],
         ),
-        if (state.revealed) ...[
-          const SizedBox(height: 16),
-          QuizAnswerButtons(
-            onForgot: notifier.answerForgot,
-            onKnew: notifier.answerKnew,
-          ),
-        ],
-      ],
+      ),
     );
   }
 }

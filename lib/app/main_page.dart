@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/app_sidebar.dart';
 import 'package:eitangocho/app/widgets/main_toolbar.dart';
+import 'package:eitangocho/app/widgets/toolbar_search_field.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view.dart';
 import 'package:eitangocho/features/word/presentation/all_words_view.dart';
@@ -9,6 +10,7 @@ import 'package:eitangocho/features/word/presentation/learning_words_view.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// アプリシェル: サイドバー + ツールバー + コンテンツ切替。
@@ -21,31 +23,47 @@ class MainPage extends ConsumerWidget {
     // 自動入力側が完了を await するため、起動直後から開始しておく)。
     ref.watch(ejdictImportProvider);
     final view = ref.watch(mainPageProvider.select((s) => s.view));
+    final hasSearchField =
+        view == MainView.learning || view == MainView.allWords;
 
-    return Scaffold(
-      body: Row(
-        children: [
-          const AppSidebar(),
-          Expanded(
-            child: Column(
-              // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
-              // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const MainToolbar(),
-                Expanded(
-                  child: switch (view) {
-                    MainView.learning => const LearningWordsView(),
-                    MainView.allWords => const AllWordsView(),
-                    MainView.quiz => const QuizView(),
-                    MainView.registration => const WordRegistrationView(),
-                    MainView.settings => const SettingsView(),
-                  },
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyN, meta: true): () => ref
+            .read(mainPageProvider.notifier)
+            .selectView(MainView.registration),
+        // 検索フィールドが無いビューでは binding 自体を登録しない(無効化)。
+        if (hasSearchField)
+          const SingleActivator(LogicalKeyboardKey.keyF, meta: true): () =>
+              ref.read(toolbarSearchFocusProvider).requestFocus(),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          body: Row(
+            children: [
+              const AppSidebar(),
+              Expanded(
+                child: Column(
+                  // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
+                  // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const MainToolbar(),
+                    Expanded(
+                      child: switch (view) {
+                        MainView.learning => const LearningWordsView(),
+                        MainView.allWords => const AllWordsView(),
+                        MainView.quiz => const QuizView(),
+                        MainView.registration => const WordRegistrationView(),
+                        MainView.settings => const SettingsView(),
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
