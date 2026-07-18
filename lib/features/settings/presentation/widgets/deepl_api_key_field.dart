@@ -43,6 +43,8 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           decoration: InputDecoration(
             isDense: true,
             hintText: 'DeepL API キーを入力',
+            // LabeledTextField と同様、ヒント色は明示的に薄くする
+            hintStyle: const TextStyle(color: AppColors.textDisabled),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 8,

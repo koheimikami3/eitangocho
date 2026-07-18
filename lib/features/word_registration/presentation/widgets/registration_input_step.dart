@@ -35,7 +35,7 @@ class RegistrationInputStep extends StatelessWidget {
               child: LabeledTextField(
                 label: '英単語 *',
                 controller: wordController,
-                hintText: 'serendipity',
+                hintText: 'apple',
                 onSubmitted: (_) => onAutoFill(),
               ),
             ),

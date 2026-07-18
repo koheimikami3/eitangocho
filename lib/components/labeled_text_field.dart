@@ -53,6 +53,8 @@ class LabeledTextField extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
+            // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
+            hintStyle: const TextStyle(color: AppColors.textDisabled),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 8,
