@@ -1,6 +1,8 @@
 import 'package:eitangocho/app/eitangocho_app.dart';
+import 'package:flutter/material.dart' show Size;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,10 +12,17 @@ void main() {
   // flutter_test の "pending timer" 検査が衝突するため、シェルの表示のみを
   // 検証するこのテストでは静的な Stream に差し替えて DB に触れないようにする。
   Future<void> pumpApp(WidgetTester tester) async {
+    // 既定のテスト画面(800x600)は uiScale で拡大すると実質幅が狭く
+    // ツールバーが溢れるため、実際のウィンドウに近いサイズにする。
+    tester.view.physicalSize = const Size(1600, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           wordListProvider.overrideWith((ref) => Stream.value(const <Word>[])),
+          // MainPage が起動時にキックする EJDict 取込も DB に触れるため差し替える。
+          ejdictImportProvider.overrideWith((ref) async => 0),
         ],
         child: const EitangochoApp(),
       ),

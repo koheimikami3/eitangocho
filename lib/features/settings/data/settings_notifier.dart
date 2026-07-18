@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,6 +13,8 @@ part 'settings_notifier.g.dart';
 class SettingsNotifier extends _$SettingsNotifier {
   static const _keyQuizDirection = 'quizDirection';
   static const _keyShowIpa = 'showIpa';
+  static const _keyDeeplApiKey = 'deeplApiKey';
+  static const _keyUiScale = 'uiScale';
 
   final _prefs = SharedPreferencesAsync();
 
@@ -19,11 +22,15 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<SettingsState> build() async {
     final directionName = await _prefs.getString(_keyQuizDirection);
     final showIpa = await _prefs.getBool(_keyShowIpa);
+    final deeplApiKey = await _prefs.getString(_keyDeeplApiKey);
+    final uiScale = await _prefs.getDouble(_keyUiScale);
     return SettingsState(
       quizDirection:
           QuizDirection.values.asNameMap()[directionName] ??
           QuizDirection.enToJa,
       showIpa: showIpa ?? true,
+      deeplApiKey: deeplApiKey ?? '',
+      uiScale: uiScale ?? AppDimensions.defaultUiScale,
     );
   }
 
@@ -40,6 +47,26 @@ class SettingsNotifier extends _$SettingsNotifier {
     await _prefs.setBool(_keyShowIpa, value);
     state = AsyncData(
       (state.value ?? const SettingsState()).copyWith(showIpa: value),
+    );
+  }
+
+  Future<void> setDeeplApiKey(String value) async {
+    await _prefs.setString(_keyDeeplApiKey, value.trim());
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(
+        deeplApiKey: value.trim(),
+      ),
+    );
+  }
+
+  Future<void> setUiScale(double value) async {
+    final clamped = value.clamp(
+      AppDimensions.minUiScale,
+      AppDimensions.maxUiScale,
+    );
+    await _prefs.setDouble(_keyUiScale, clamped);
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(uiScale: clamped),
     );
   }
 }

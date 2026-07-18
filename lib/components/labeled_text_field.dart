@@ -10,12 +10,18 @@ class LabeledTextField extends StatelessWidget {
     super.key,
     this.trailing,
     this.maxLines = 1,
+    this.hintText = '手動で入力してください',
+    this.onSubmitted,
   });
 
   final String label;
   final TextEditingController controller;
   final Widget? trailing;
   final int maxLines;
+  final String hintText;
+
+  /// Enter キー確定時のコールバック(ステップ 1 の自動入力発火等)
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +48,13 @@ class LabeledTextField extends StatelessWidget {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          onSubmitted: onSubmitted,
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             isDense: true,
-            hintText: '手動で入力してください',
+            hintText: hintText,
+            // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
+            hintStyle: const TextStyle(color: AppColors.textDisabled),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 8,

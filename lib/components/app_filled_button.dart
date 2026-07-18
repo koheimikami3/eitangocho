@@ -30,9 +30,10 @@ class _AppFilledButtonState extends State<AppFilledButton> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onPressed,
+        // alignment を指定すると高さ制約のある場所(ツールバー等)で
+        // Container が上下いっぱいに広がるため、テキスト + padding に任せる。
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverColor : widget.color,
             borderRadius: BorderRadius.circular(7),
@@ -43,6 +44,9 @@ class _AppFilledButtonState extends State<AppFilledButton> {
               color: Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.w600,
+              // 日本語フォールバックフォントの行高が大きく、ボタンの上下が
+              // プロトタイプより太って見えるため行高を明示する
+              height: 1.4,
             ),
           ),
         ),

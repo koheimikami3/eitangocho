@@ -37,14 +37,25 @@ class QuizView extends ConsumerWidget {
       ),
     };
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: content,
-        ),
-      ),
+    // プロトタイプ準拠で画面全体の縦横中央に置く。コンテンツが画面より
+    // 高いとき(答え表示 + 長い例文等)はスクロールにフォールバックする。
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight - 40,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: content,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -79,6 +90,9 @@ class _ActiveQuiz extends StatelessWidget {
           exampleEn: word.exampleEn,
           exampleJa: word.exampleJa,
           onReveal: notifier.reveal,
+          englishWord: word.word,
+          audioUrl: word.audioUrl,
+          audioOnFront: !isJaToEn,
         ),
         if (state.revealed) ...[
           const SizedBox(height: 16),

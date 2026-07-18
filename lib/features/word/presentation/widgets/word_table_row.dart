@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
@@ -120,6 +121,19 @@ class _WordTableRowState extends State<WordTableRow> {
                           color: AppColors.textDisabled,
                         ),
                       ),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: 56,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: PronunciationButton(
+                    word: word.word,
+                    audioUrl: word.audioUrl,
+                    size: 26,
+                    compactLink: true,
+                  ),
+                ),
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,16 +13,34 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
   });
 
-  test('未設定のときは既定値(enToJa / showIpa=true)を返す', () async {
+  test('未設定のときは既定値(enToJa / showIpa=true / キー空 / 既定スケール)を返す', () async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
     final settings = await container.read(settingsProvider.future);
     expect(settings.quizDirection, QuizDirection.enToJa);
     expect(settings.showIpa, isTrue);
+    expect(settings.deeplApiKey, isEmpty);
+    expect(settings.uiScale, AppDimensions.defaultUiScale);
   });
 
-  test('setQuizDirection / setShowIpa で state が更新される', () async {
+  test('setUiScale は範囲外の値を min/max に丸めて保存する', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
+
+    final notifier = container.read(settingsProvider.notifier);
+    await notifier.setUiScale(1.3);
+    expect(container.read(settingsProvider).requireValue.uiScale, 1.3);
+
+    await notifier.setUiScale(99);
+    expect(
+      container.read(settingsProvider).requireValue.uiScale,
+      AppDimensions.maxUiScale,
+    );
+  });
+
+  test('setQuizDirection / setShowIpa / setDeeplApiKey で state が更新される', () async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
@@ -29,10 +48,13 @@ void main() {
     final notifier = container.read(settingsProvider.notifier);
     await notifier.setQuizDirection(QuizDirection.jaToEn);
     await notifier.setShowIpa(false);
+    await notifier.setDeeplApiKey(' my-key ');
 
     final settings = container.read(settingsProvider).requireValue;
     expect(settings.quizDirection, QuizDirection.jaToEn);
     expect(settings.showIpa, isFalse);
+    // 前後の空白は取り除いて保存する
+    expect(settings.deeplApiKey, 'my-key');
   });
 
   test('保存した設定は新しい container(再読込)でも保持される', () async {
@@ -44,6 +66,9 @@ void main() {
     await container1
         .read(settingsProvider.notifier)
         .setShowIpa(false);
+    await container1
+        .read(settingsProvider.notifier)
+        .setDeeplApiKey('persisted-key');
     container1.dispose();
 
     // 同じプラットフォーム(インメモリ)を共有した別 container で読み直す。
@@ -53,5 +78,6 @@ void main() {
 
     expect(settings.quizDirection, QuizDirection.jaToEn);
     expect(settings.showIpa, isFalse);
+    expect(settings.deeplApiKey, 'persisted-key');
   });
 }

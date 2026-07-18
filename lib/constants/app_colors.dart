@@ -20,4 +20,9 @@ abstract final class AppColors {
   static const border = Color(0x14000000); // rgba(0,0,0,0.08)
   static const borderStrong = Color(0x24000000); // rgba(0,0,0,0.14)
   static const inputBorder = Color(0x26000000); // rgba(0,0,0,0.15)
+  static const autoFillBadgeBackground = Color(0xFFE2F3E8); // 自動入力バッジ
+  static const autoFillBadgeForeground = Color(0xFF1C7A3F);
+  static const warningBannerBackground = Color(0xFFFDF6E3); // 辞書未収録バナー
+  static const warningBannerBorder = Color(0xFFECD9A0);
+  static const warningBannerForeground = Color(0xFF8A6D1A);
 }
