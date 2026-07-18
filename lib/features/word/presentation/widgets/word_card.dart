@@ -60,7 +60,7 @@ class _WordCardState extends State<WordCard> {
               BoxShadow(
                 color: Color(_isHovered ? 0x12000000 : 0x0A000000),
                 blurRadius: _isHovered ? 8 : 2,
-                offset: const Offset(0, 1),
+                offset: Offset(0, _isHovered ? 2 : 1),
               ),
             ],
           ),
@@ -180,7 +180,7 @@ class _WordCardState extends State<WordCard> {
 }
 
 /// 日本語訳の隠し/表示エリア。未表示は破線ボタン、表示は訳テキスト。
-class _RevealArea extends StatelessWidget {
+class _RevealArea extends StatefulWidget {
   const _RevealArea({
     required this.japanese,
     required this.revealed,
@@ -192,36 +192,53 @@ class _RevealArea extends StatelessWidget {
   final VoidCallback onToggle;
 
   @override
+  State<_RevealArea> createState() => _RevealAreaState();
+}
+
+class _RevealAreaState extends State<_RevealArea> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     // チェック操作と同様、訳トグルはカードクリック(編集)に伝播させない。
     return GestureDetector(
       onTap: () {},
-      child: InkWell(
-        onTap: onToggle,
-        borderRadius: BorderRadius.circular(7),
-        child: revealed
-            ? Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.inputBackground,
-                  borderRadius: BorderRadius.circular(7),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Text(
-                  japanese,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: InkWell(
+          onTap: widget.onToggle,
+          borderRadius: BorderRadius.circular(7),
+          child: widget.revealed
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBackground,
+                    borderRadius: BorderRadius.circular(7),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Text(
+                    widget.japanese,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                )
+              : DottedBorderBox(
+                  backgroundColor: _isHovered
+                      ? const Color(0x08000000)
+                      : null,
+                  child: const Text(
+                    '日本語訳を表示',
+                    style: TextStyle(fontSize: 12, color: Color(0x66000000)),
                   ),
                 ),
-              )
-            : DottedBorderBox(
-                child: const Text(
-                  '日本語訳を表示',
-                  style: TextStyle(fontSize: 12, color: Color(0x66000000)),
-                ),
-              ),
+        ),
       ),
     );
   }
@@ -230,9 +247,10 @@ class _RevealArea extends StatelessWidget {
 /// 破線 border のボックス(「日本語訳を表示」ボタン用)。
 /// Flutter 標準に破線 border がないため CustomPaint で描く。
 class DottedBorderBox extends StatelessWidget {
-  const DottedBorderBox({required this.child, super.key});
+  const DottedBorderBox({required this.child, super.key, this.backgroundColor});
 
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +259,7 @@ class DottedBorderBox extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        color: backgroundColor,
         child: child,
       ),
     );

@@ -26,11 +26,29 @@ Future<void> showWordContextMenu(
       local.dx,
       local.dy,
     ),
+    color: const Color.fromRGBO(250, 250, 251, 0.98),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: const BorderSide(color: Color(0x1F000000)),
+    ),
+    constraints: const BoxConstraints(minWidth: 140),
+    menuPadding: const EdgeInsets.all(4),
     items: const [
-      PopupMenuItem(value: _ContextMenuAction.edit, child: Text('編集...')),
+      PopupMenuItem(
+        value: _ContextMenuAction.edit,
+        padding: EdgeInsets.zero,
+        height: 0,
+        child: _HoverMenuItem(label: '編集...'),
+      ),
       PopupMenuItem(
         value: _ContextMenuAction.delete,
-        child: Text('削除...', style: TextStyle(color: AppColors.danger)),
+        padding: EdgeInsets.zero,
+        height: 0,
+        child: _HoverMenuItem(
+          label: '削除...',
+          color: AppColors.danger,
+          hoverColor: AppColors.danger,
+        ),
       ),
     ],
   );
@@ -47,3 +65,48 @@ Future<void> showWordContextMenu(
 }
 
 enum _ContextMenuAction { edit, delete }
+
+/// コンテキストメニューの項目(プロトタイプ準拠: 角丸 5、ホバーで背景色 +
+/// 白文字)。PopupMenuItem 側は padding/height を潰し、この Container が
+/// 項目全体の見た目を担う。
+class _HoverMenuItem extends StatefulWidget {
+  const _HoverMenuItem({
+    required this.label,
+    this.color = AppColors.textPrimary,
+    this.hoverColor = AppColors.accent,
+  });
+
+  final String label;
+  final Color color;
+  final Color hoverColor;
+
+  @override
+  State<_HoverMenuItem> createState() => _HoverMenuItemState();
+}
+
+class _HoverMenuItemState extends State<_HoverMenuItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: _isHovered ? widget.hoverColor : null,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          widget.label,
+          style: TextStyle(
+            fontSize: 13,
+            color: _isHovered ? Colors.white : widget.color,
+          ),
+        ),
+      ),
+    );
+  }
+}

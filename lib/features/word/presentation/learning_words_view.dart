@@ -3,6 +3,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/features/word/presentation/widgets/card_in.dart';
 import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
@@ -56,21 +57,31 @@ class LearningWordsView extends ConsumerWidget {
                 runSpacing: gap,
                 children: [
                   for (final word in words)
-                    SizedBox(
-                      width: cardWidth,
-                      child: WordCard(
-                        word: word,
-                        showIpa: showIpa,
-                        onToggleLearned: (isLearned) => ref
-                            .read(databaseProvider)
-                            .wordDao
-                            .setLearned(word.id, isLearned: isLearned),
-                        onTap: () => showEditWordDialog(context, ref, word),
-                        onSecondaryTapUp: (details) => showWordContextMenu(
-                          context,
-                          ref,
-                          word,
-                          details.globalPosition,
+                    // ValueKey(word.id) により、検索フィルタや削除での再構築では
+                    // 既存カードの State が保持され再アニメーションしない
+                    // (新規カードとビュー再入場時のみ cardIn が再生される)。
+                    KeyedSubtree(
+                      key: ValueKey(word.id),
+                      child: SizedBox(
+                        width: cardWidth,
+                        child: CardIn(
+                          child: WordCard(
+                            word: word,
+                            showIpa: showIpa,
+                            onToggleLearned: (isLearned) => ref
+                                .read(databaseProvider)
+                                .wordDao
+                                .setLearned(word.id, isLearned: isLearned),
+                            onTap: () =>
+                                showEditWordDialog(context, ref, word),
+                            onSecondaryTapUp: (details) =>
+                                showWordContextMenu(
+                                  context,
+                                  ref,
+                                  word,
+                                  details.globalPosition,
+                                ),
+                          ),
                         ),
                       ),
                     ),
