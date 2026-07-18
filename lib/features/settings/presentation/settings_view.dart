@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -55,6 +56,9 @@ class SettingsView extends ConsumerWidget {
                 activeThumbColor: AppColors.accent,
                 onChanged: notifier.setShowIpa,
               ),
+              const SizedBox(height: 20),
+              const _SectionLabel('表示サイズ'),
+              UiScaleSlider(value: settings.uiScale),
               const SizedBox(height: 20),
               const _SectionLabel('DeepL API キー(例文の自動和訳)'),
               DeeplApiKeyField(

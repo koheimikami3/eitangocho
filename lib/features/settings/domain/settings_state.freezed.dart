@@ -16,7 +16,8 @@ mixin _$SettingsState {
 
  QuizDirection get quizDirection; bool get showIpa;/// DeepL API Free のキー。未設定(空)なら例文の和訳をスキップする。
 /// ローカル個人アプリとして平文保存を許容する(確定済みの設計判断)。
- String get deeplApiKey;
+ String get deeplApiKey;/// UI 全体の拡大率(EitangochoApp がブラウザズーム相当で適用する)
+ double get uiScale;
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +28,16 @@ $SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey);
+int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale);
 
 @override
 String toString() {
-  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey)';
+  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale)';
 }
 
 
@@ -47,7 +48,7 @@ abstract mixin class $SettingsStateCopyWith<$Res>  {
   factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
 @useResult
 $Res call({
- QuizDirection quizDirection, bool showIpa, String deeplApiKey
+ QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale
 });
 
 
@@ -64,12 +65,13 @@ class _$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,}) {
   return _then(_self.copyWith(
 quizDirection: null == quizDirection ? _self.quizDirection : quizDirection // ignore: cast_nullable_to_non_nullable
 as QuizDirection,showIpa: null == showIpa ? _self.showIpa : showIpa // ignore: cast_nullable_to_non_nullable
 as bool,deeplApiKey: null == deeplApiKey ? _self.deeplApiKey : deeplApiKey // ignore: cast_nullable_to_non_nullable
-as String,
+as String,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 
@@ -154,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale);case _:
   return orElse();
 
 }
@@ -175,10 +177,10 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +197,10 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale);case _:
   return null;
 
 }
@@ -210,7 +212,7 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey);case _:
 
 
 class _SettingsState implements SettingsState {
-  const _SettingsState({this.quizDirection = QuizDirection.enToJa, this.showIpa = true, this.deeplApiKey = ''});
+  const _SettingsState({this.quizDirection = QuizDirection.enToJa, this.showIpa = true, this.deeplApiKey = '', this.uiScale = AppDimensions.defaultUiScale});
   
 
 @override@JsonKey() final  QuizDirection quizDirection;
@@ -218,6 +220,8 @@ class _SettingsState implements SettingsState {
 /// DeepL API Free のキー。未設定(空)なら例文の和訳をスキップする。
 /// ローカル個人アプリとして平文保存を許容する(確定済みの設計判断)。
 @override@JsonKey() final  String deeplApiKey;
+/// UI 全体の拡大率(EitangochoApp がブラウザズーム相当で適用する)
+@override@JsonKey() final  double uiScale;
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +233,16 @@ _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey);
+int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale);
 
 @override
 String toString() {
-  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey)';
+  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale)';
 }
 
 
@@ -249,7 +253,7 @@ abstract mixin class _$SettingsStateCopyWith<$Res> implements $SettingsStateCopy
   factory _$SettingsStateCopyWith(_SettingsState value, $Res Function(_SettingsState) _then) = __$SettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- QuizDirection quizDirection, bool showIpa, String deeplApiKey
+ QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale
 });
 
 
@@ -266,12 +270,13 @@ class __$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,}) {
   return _then(_SettingsState(
 quizDirection: null == quizDirection ? _self.quizDirection : quizDirection // ignore: cast_nullable_to_non_nullable
 as QuizDirection,showIpa: null == showIpa ? _self.showIpa : showIpa // ignore: cast_nullable_to_non_nullable
 as bool,deeplApiKey: null == deeplApiKey ? _self.deeplApiKey : deeplApiKey // ignore: cast_nullable_to_non_nullable
-as String,
+as String,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 

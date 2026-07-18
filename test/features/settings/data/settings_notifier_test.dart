@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,7 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
   });
 
-  test('未設定のときは既定値(enToJa / showIpa=true / キー空)を返す', () async {
+  test('未設定のときは既定値(enToJa / showIpa=true / キー空 / 既定スケール)を返す', () async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
@@ -20,6 +21,23 @@ void main() {
     expect(settings.quizDirection, QuizDirection.enToJa);
     expect(settings.showIpa, isTrue);
     expect(settings.deeplApiKey, isEmpty);
+    expect(settings.uiScale, AppDimensions.defaultUiScale);
+  });
+
+  test('setUiScale は範囲外の値を min/max に丸めて保存する', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
+
+    final notifier = container.read(settingsProvider.notifier);
+    await notifier.setUiScale(1.3);
+    expect(container.read(settingsProvider).requireValue.uiScale, 1.3);
+
+    await notifier.setUiScale(99);
+    expect(
+      container.read(settingsProvider).requireValue.uiScale,
+      AppDimensions.maxUiScale,
+    );
   });
 
   test('setQuizDirection / setShowIpa / setDeeplApiKey で state が更新される', () async {
