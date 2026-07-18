@@ -48,6 +48,9 @@ class MainToolbar extends ConsumerWidget {
           ],
           AppFilledButton(
             label: '＋ 単語を登録',
+            verticalPadding: 6,
+            fontSize: 13,
+            borderRadius: 7,
             onPressed: () => ref
                 .read(mainPageProvider.notifier)
                 .selectView(MainView.registration),

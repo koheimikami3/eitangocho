@@ -9,12 +9,20 @@ class AppOutlinedButton extends StatefulWidget {
     super.key,
     this.textColor = AppColors.textPrimary,
     this.hoverBackground = AppColors.rowHoverBackground,
+    this.verticalPadding = 9,
+    this.fontSize = 14,
+    this.borderRadius = 8,
   });
 
   final String label;
   final VoidCallback onPressed;
   final Color textColor;
   final Color hoverBackground;
+  // AppFilledButton と組み合わせて使う画面で高さを揃えるためのパラメータ。
+  // デフォルトはダイアログ・登録フォーム系(プロトタイプの標準ボタン)の値。
+  final double verticalPadding;
+  final double fontSize;
+  final double borderRadius;
 
   @override
   State<AppOutlinedButton> createState() => _AppOutlinedButtonState();
@@ -31,18 +39,21 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
       child: GestureDetector(
         onTap: widget.onPressed,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+          padding: EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: widget.verticalPadding,
+          ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverBackground : Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
             border: Border.all(color: AppColors.borderStrong),
           ),
           child: Text(
             widget.label,
             style: TextStyle(
               color: widget.textColor,
-              fontSize: 14,
+              fontSize: widget.fontSize,
               fontWeight: FontWeight.w600,
             ),
           ),

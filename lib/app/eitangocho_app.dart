@@ -21,6 +21,7 @@ class EitangochoApp extends ConsumerWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         colorSchemeSeed: AppColors.accent,
+        dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
       ),
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。
       // 縮小サイズでレイアウトしてから拡大描画する。Navigator ごと包むため
