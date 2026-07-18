@@ -28,6 +28,9 @@ class MainPage extends ConsumerWidget {
           const AppSidebar(),
           Expanded(
             child: Column(
+              // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
+              // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const MainToolbar(),
                 Expanded(

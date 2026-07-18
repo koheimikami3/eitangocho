@@ -12,13 +12,19 @@ Future<void> showWordContextMenu(
   Word word,
   Offset position,
 ) async {
+  // position はウィンドウのグローバル座標。Overlay は UI 全体拡大
+  // (EitangochoApp の uiScale)の内側にあるため、変換を挟まないと
+  // メニューが右下方向にずれる。globalToLocal が拡大の逆変換も行う。
+  final overlay =
+      Overlay.of(context).context.findRenderObject()! as RenderBox;
+  final local = overlay.globalToLocal(position);
   final selected = await showMenu<_ContextMenuAction>(
     context: context,
     position: RelativeRect.fromLTRB(
-      position.dx,
-      position.dy,
-      position.dx,
-      position.dy,
+      local.dx,
+      local.dy,
+      local.dx,
+      local.dy,
     ),
     items: const [
       PopupMenuItem(value: _ContextMenuAction.edit, child: Text('編集...')),
