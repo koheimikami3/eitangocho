@@ -10,11 +10,14 @@
 <helmet>
 <style>
   html, body { margin: 0; padding: 0; background: #c9cfda; }
-  a { color: #0a6ee0; text-decoration: none; }
+  a { color: #429ff0; text-decoration: none; }
   a:hover { text-decoration: underline; }
   @keyframes cardIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
   @keyframes spin { to { transform: rotate(360deg); } }
   input::placeholder, textarea::placeholder { color: rgba(0,0,0,0.3); }
+  input[type=range] { -webkit-appearance: none; appearance: none; outline: none; margin: 0; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 17px; height: 17px; border-radius: 50%; background: #fff; border: 0.5px solid rgba(0,0,0,0.12); box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 17px; height: 17px; border-radius: 50%; background: #fff; border: 0.5px solid rgba(0,0,0,0.12); box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: pointer; }
 </style>
 </helmet>
 
@@ -36,6 +39,9 @@
         </div>
       </sc-for>
       <div style="flex:1;"></div>
+      <div onClick="{{ goSettings }}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;margin:1px 10px 10px;border-radius:6px;background:{{ settingsBg }};font-size:13px;color:#1d1d1f;cursor:default;user-select:none;" style-hover="background:rgba(0,0,0,0.06)">
+        <span style="flex:1;font-weight:{{ settingsWeight }};">設定</span>
+      </div>
       <div style="padding:12px 18px;font-size:11px;color:rgba(0,0,0,0.35);border-top:1px solid rgba(0,0,0,0.06);">ローカル DB に保存済み</div>
     </div>
 
@@ -49,7 +55,7 @@
         <sc-if value="{{ showSearch }}" hint-placeholder-val="{{ true }}">
           <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="検索" style="width:200px;padding:6px 10px;border:1px solid rgba(0,0,0,0.14);border-radius:7px;font-size:13px;outline:none;background:#f7f7f8;box-sizing:border-box;" />
         </sc-if>
-        <button onClick="{{ goAdd }}" style="padding:6px 14px;border:none;border-radius:7px;background:#0a6ee0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">＋ 単語を登録</button>
+        <button onClick="{{ goAdd }}" style="padding:6px 14px;border:none;border-radius:7px;background:#429ff0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">＋ 単語を登録</button>
       </div>
 
       <!-- ===== 学習中 (cards) ===== -->
@@ -58,7 +64,7 @@
           <sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
             <div style="padding:80px 0;display:flex;flex-direction:column;align-items:center;gap:14px;">
               <div style="color:rgba(0,0,0,0.45);font-size:14px;text-align:center;line-height:1.7;">学習中の単語はありません。<br />単語を登録しましょう。</div>
-              <button onClick="{{ goAdd }}" style="padding:9px 20px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">＋ 単語を登録</button>
+              <button onClick="{{ goAdd }}" style="padding:9px 20px;border:none;border-radius:8px;background:#429ff0;color:#fff;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">＋ 単語を登録</button>
             </div>
           </sc-if>
           <sc-if value="{{ homeHasCards }}" hint-placeholder-val="{{ true }}">
@@ -66,7 +72,7 @@
           </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
             <sc-for list="{{ homeCards }}" as="c" hint-placeholder-count="6">
-              <div onClick="{{ c.openEdit }}" onContextMenu="{{ c.onContext }}" style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,0.04);animation:cardIn 0.25s ease;cursor:pointer;" style-hover="border-color:rgba(10,110,224,0.45);box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+              <div onClick="{{ c.openEdit }}" onContextMenu="{{ c.onContext }}" style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,0.04);animation:cardIn 0.25s ease;cursor:pointer;" style-hover="border-color:rgba(66,159,240,0.65);box-shadow:0 2px 8px rgba(0,0,0,0.07)">
                 <div style="display:flex;align-items:baseline;gap:8px;">
                   <div style="font-size:17px;font-weight:700;color:#1d1d1f;">{{ c.word }}</div>
                   <sc-if value="{{ c.showIpa }}" hint-placeholder-val="{{ true }}">
@@ -92,13 +98,13 @@
                 </sc-if>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:6px;border-top:1px solid rgba(0,0,0,0.06);">
                   <label onClick="{{ stopProp }}" style="display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(0,0,0,0.6);cursor:pointer;">
-                    <input type="checkbox" checked="{{ c.learned }}" onChange="{{ c.toggleLearned }}" style="width:14px;height:14px;accent-color:#0a6ee0;" />
+                    <span onClick="{{ c.toggleLearned }}" style="width:16px;height:16px;border-radius:4px;box-sizing:border-box;border:{{ c.cbBorder }};background:{{ c.cbBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s,border 0.15s;"><span style="width:4px;height:8px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg) translate(-0.5px,-1px);opacity:{{ c.cbOp }};"></span></span>
                     学習済みにする
                   </label>
                   <div style="flex:1;"></div>
                   <sc-if value="{{ c.hasAudio }}" hint-placeholder-val="{{ true }}">
                     <button onClick="{{ c.play }}" title="発音を再生" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;" style-hover="background:#eceef2">
-                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#429ff0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#429ff0" stroke-width="1.3" stroke-linecap="round"></path></svg>
                     </button>
                   </sc-if>
                   <sc-if value="{{ c.noAudio }}" hint-placeholder-val="{{ false }}">
@@ -120,7 +126,7 @@
           </div>
           <sc-for list="{{ allRows }}" as="r" hint-placeholder-count="8">
             <div onClick="{{ r.openEdit }}" onContextMenu="{{ r.onContext }}" style="display:grid;grid-template-columns:64px 140px 130px 100px 1fr 1.5fr 56px;gap:0 12px;padding:10px 20px;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13px;align-items:start;background:{{ r.rowBg }};cursor:pointer;" style-hover="background:#f2f6fc">
-              <div onClick="{{ stopProp }}"><input type="checkbox" checked="{{ r.learned }}" onChange="{{ r.toggleLearned }}" style="width:14px;height:14px;accent-color:#0a6ee0;" /></div>
+              <div onClick="{{ stopProp }}"><span onClick="{{ r.toggleLearned }}" style="width:16px;height:16px;border-radius:4px;box-sizing:border-box;border:{{ r.cbBorder }};background:{{ r.cbBg }};display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s,border 0.15s;"><span style="width:4px;height:8px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg) translate(-0.5px,-1px);opacity:{{ r.cbOp }};"></span></span></div>
               <div style="font-weight:600;color:#1d1d1f;">{{ r.word }}</div>
               <div style="color:rgba(0,0,0,0.5);font-family:ui-monospace,Menlo,monospace;font-size:12px;">{{ r.ipa }}</div>
               <div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:{{ r.pillBg }};color:{{ r.pillColor }};white-space:nowrap;">{{ r.category }}</span></div>
@@ -136,7 +142,7 @@
               <div>
                 <sc-if value="{{ r.hasAudio }}" hint-placeholder-val="{{ true }}">
                   <button onClick="{{ r.play }}" title="発音を再生" style="width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;" style-hover="background:#eceef2">
-                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#429ff0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#429ff0" stroke-width="1.3" stroke-linecap="round"></path></svg>
                   </button>
                 </sc-if>
                 <sc-if value="{{ r.noAudio }}" hint-placeholder-val="{{ false }}">
@@ -155,7 +161,7 @@
           <sc-if value="{{ quizEmpty }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
               <div style="text-align:center;color:rgba(0,0,0,0.45);font-size:14px;line-height:1.8;">復習対象の単語がまだありません。<br />単語を学習済みにするとここに表示されます。</div>
-              <button onClick="{{ goHome }}" style="padding:9px 20px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#0a6ee0;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#f5f8fd">学習中リストへ</button>
+              <button onClick="{{ goHome }}" style="padding:9px 20px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#429ff0;font-size:13px;font-weight:600;cursor:pointer;" style-hover="background:#f5f8fd">学習中リストへ</button>
             </div>
           </sc-if>
           <sc-if value="{{ quizActive }}" hint-placeholder-val="{{ false }}">
@@ -166,7 +172,7 @@
                   <div style="font-size:32px;font-weight:700;color:#1d1d1f;text-align:center;">{{ quizFront }}</div>
                   <sc-if value="{{ quizFrontAudio }}" hint-placeholder-val="{{ true }}">
                     <button onClick="{{ quizPlay }}" title="発音を再生" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;" style-hover="background:#eceef2">
-                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#429ff0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#429ff0" stroke-width="1.3" stroke-linecap="round"></path></svg>
                     </button>
                   </sc-if>
                 </div>
@@ -179,7 +185,7 @@
                     <div style="font-size:18px;color:#1d1d1f;text-align:center;">{{ quizBack }}</div>
                     <sc-if value="{{ quizBackAudio }}" hint-placeholder-val="{{ false }}">
                       <button onClick="{{ quizPlay }}" title="発音を再生" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:#f7f7f8;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;" style-hover="background:#eceef2">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#0a6ee0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#0a6ee0" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 6v4h2.6L9 12.6V3.4L5.6 6H3z" fill="#429ff0"></path><path d="M11 5.5c0.9 0.6 1.4 1.5 1.4 2.5s-0.5 1.9-1.4 2.5" stroke="#429ff0" stroke-width="1.3" stroke-linecap="round"></path></svg>
                       </button>
                     </sc-if>
                   </div>
@@ -187,12 +193,12 @@
                 </sc-if>
               </div>
               <sc-if value="{{ quizHiddenAnswer }}" hint-placeholder-val="{{ true }}">
-                <button onClick="{{ quizReveal }}" style="padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">答えを表示</button>
+                <button onClick="{{ quizReveal }}" style="padding:11px;border:none;border-radius:9px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">答えを表示</button>
               </sc-if>
               <sc-if value="{{ quizRevealed }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;gap:10px;">
                   <button onClick="{{ quizForgot }}" style="flex:1;padding:11px;border:1px solid rgba(0,0,0,0.14);border-radius:9px;background:#fff;color:#c03030;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#fdf2f2">忘れていた</button>
-                  <button onClick="{{ quizKnew }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">覚えている</button>
+                  <button onClick="{{ quizKnew }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">覚えている</button>
                 </div>
                 <div style="font-size:11px;color:rgba(0,0,0,0.38);text-align:center;">「忘れていた」を選ぶと学習中リストに戻ります</div>
               </sc-if>
@@ -216,7 +222,7 @@
                 </div>
               </sc-if>
               <div style="display:flex;gap:10px;">
-                <button onClick="{{ quizRestart }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">もう一度</button>
+                <button onClick="{{ quizRestart }}" style="flex:1;padding:11px;border:none;border-radius:9px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">もう一度</button>
                 <button onClick="{{ goHome }}" style="flex:1;padding:11px;border:1px solid rgba(0,0,0,0.14);border-radius:9px;background:#fff;color:#1d1d1f;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#f5f5f6">学習中リストへ</button>
               </div>
             </div>
@@ -235,14 +241,14 @@
               <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:rgba(0,0,0,0.6);">英単語 *
                 <div style="display:flex;gap:10px;">
                   <input value="{{ fWord }}" onChange="{{ onWord }}" onKeyDown="{{ onWordKey }}" placeholder="serendipity" style="flex:1;padding:9px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:14px;outline:none;box-sizing:border-box;font-weight:400;" />
-                  <button onClick="{{ autoFill }}" style="padding:9px 20px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;" style-hover="background:#0b63c6">自動入力</button>
+                  <button onClick="{{ autoFill }}" style="padding:9px 20px;border:none;border-radius:8px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;" style-hover="background:#2b8ee0">自動入力</button>
                 </div>
               </label>
               <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:12px;color:#c03030;">{{ formErrorMsg }}</div>
               </sc-if>
               <div style="display:flex;align-items:center;gap:10px;">
-                <button onClick="{{ goManual }}" style="padding:0;border:none;background:none;font-size:12px;color:#0a6ee0;cursor:pointer;" style-hover="text-decoration:underline">スキップして手動で入力する</button>
+                <button onClick="{{ goManual }}" style="padding:0;border:none;background:none;font-size:12px;color:#429ff0;cursor:pointer;" style-hover="text-decoration:underline">スキップして手動で入力する</button>
               </div>
               <div style="font-size:11px;color:rgba(0,0,0,0.32);border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;">プロトタイプ用デモ: serendipity / ephemeral / resilient は辞書ヒット、それ以外は「未収録」の挙動になります。</div>
             </div>
@@ -251,7 +257,7 @@
           <!-- ローディング -->
           <sc-if value="{{ addStepLoading }}" hint-placeholder-val="{{ false }}">
             <div style="width:560px;max-width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;padding:70px 0;">
-              <div style="width:28px;height:28px;border-radius:50%;border:3px solid rgba(0,0,0,0.1);border-top-color:#0a6ee0;animation:spin 0.8s linear infinite;"></div>
+              <div style="width:28px;height:28px;border-radius:50%;border:3px solid rgba(0,0,0,0.1);border-top-color:#429ff0;animation:spin 0.8s linear infinite;"></div>
               <div style="font-size:13px;color:rgba(0,0,0,0.5);">辞書データを取得中...</div>
             </div>
           </sc-if>
@@ -306,13 +312,65 @@
                 <div style="font-size:12px;color:#c03030;">{{ formErrorMsg }}</div>
               </sc-if>
               <div style="display:flex;gap:10px;margin-top:4px;">
-                <button onClick="{{ saveWord }}" style="padding:9px 22px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">登録する</button>
+                <button onClick="{{ saveWord }}" style="padding:9px 22px;border:none;border-radius:8px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">登録する</button>
                 <button onClick="{{ backToStep1 }}" style="padding:9px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:14px;cursor:pointer;" style-hover="background:#f5f5f6">戻る</button>
                 <button onClick="{{ cancelAdd }}" style="padding:9px 18px;border:none;background:none;color:rgba(0,0,0,0.5);font-size:14px;cursor:pointer;" style-hover="color:#1d1d1f">キャンセル</button>
               </div>
             </div>
           </sc-if>
 
+        </div>
+      </sc-if>
+
+      <!-- ===== 設定 ===== -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="設定" style="flex:1;overflow:auto;padding:28px;box-sizing:border-box;">
+          <div style="width:560px;max-width:100%;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:12px;font-weight:700;color:rgba(0,0,0,0.5);">クイズの出題方向</div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;overflow:hidden;">
+                <label onClick="{{ setDirEnJa }}" style="display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px;color:#1d1d1f;cursor:pointer;">
+                  <span style="width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:{{ rEnJaBorder }};background:{{ rEnJaBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s,border 0.15s;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:{{ rEnJaDot }};"></span></span>
+                  英語 → 日本語
+                </label>
+                <div style="height:1px;background:rgba(0,0,0,0.07);margin:0 14px;"></div>
+                <label onClick="{{ setDirJaEn }}" style="display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px;color:#1d1d1f;cursor:pointer;">
+                  <span style="width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:{{ rJaEnBorder }};background:{{ rJaEnBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s,border 0.15s;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:{{ rJaEnDot }};"></span></span>
+                  日本語 → 英語
+                </label>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:12px;font-weight:700;color:rgba(0,0,0,0.5);">表示</div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px;color:#1d1d1f;">
+                  <span style="flex:1;">発音記号(IPA)を表示</span>
+                  <div onClick="{{ toggleIpa }}" style="width:42px;height:26px;border-radius:99px;background:{{ ipaTrackBg }};position:relative;cursor:pointer;transition:background 0.15s;flex-shrink:0;">
+                    <div style="position:absolute;top:3px;left:{{ ipaKnobLeft }};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left 0.15s;"></div>
+                  </div>
+                </div>
+                <div style="height:1px;background:rgba(0,0,0,0.07);margin:0 14px;"></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;font-size:13px;color:#1d1d1f;">
+                  <span style="white-space:nowrap;">表示サイズ</span>
+                  <input type="range" min="1" max="2" step="0.1" value="{{ uiScale }}" onChange="{{ onUiScale }}" style="flex:1;height:4px;border-radius:2px;background:{{ sliderTrack }};" />
+                  <span style="font-size:12px;color:rgba(0,0,0,0.5);min-width:34px;text-align:right;">{{ uiScaleLabel }}</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:12px;font-weight:700;color:rgba(0,0,0,0.5);">DeepL API キー(例文の自動和訳)</div>
+              <input value="{{ deeplKey }}" onChange="{{ onDeeplKey }}" placeholder="DeepL API キーを入力" style="padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:7px;font-size:13px;outline:none;box-sizing:border-box;background:#fff;" />
+              <div style="font-size:11px;color:rgba(0,0,0,0.4);line-height:1.6;">DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を取得します。未設定の場合、例文の和訳はスキップされます。</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:12px;font-weight:700;color:rgba(0,0,0,0.5);">データ</div>
+              <div style="display:flex;gap:10px;">
+                <button style="padding:8px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:13px;cursor:pointer;" style-hover="background:#f5f5f6">エクスポート...</button>
+                <button style="padding:8px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:13px;cursor:pointer;" style-hover="background:#f5f5f6">インポート...</button>
+              </div>
+              <div style="font-size:11px;color:rgba(0,0,0,0.4);">単語帳を JSON ファイルとして書き出し / 読み込みます。</div>
+            </div>
+          </div>
         </div>
       </sc-if>
 
@@ -324,7 +382,7 @@
     <div>
       <div onClick="{{ ctxClose }}" onContextMenu="{{ ctxCloseCtx }}" style="position:fixed;inset:0;z-index:90;"></div>
       <div style="position:fixed;left:{{ ctxX }}px;top:{{ ctxY }}px;z-index:91;background:rgba(250,250,251,0.98);border:1px solid rgba(0,0,0,0.12);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.18);padding:4px;min-width:140px;">
-        <div onClick="{{ ctxEdit }}" style="padding:6px 12px;border-radius:5px;font-size:13px;color:#1d1d1f;cursor:default;user-select:none;" style-hover="background:#0a6ee0;color:#fff">編集...</div>
+        <div onClick="{{ ctxEdit }}" style="padding:6px 12px;border-radius:5px;font-size:13px;color:#1d1d1f;cursor:default;user-select:none;" style-hover="background:#429ff0;color:#fff">編集...</div>
         <div onClick="{{ ctxDelete }}" style="padding:6px 12px;border-radius:5px;font-size:13px;color:#c03030;cursor:default;user-select:none;" style-hover="background:#c03030;color:#fff">削除...</div>
       </div>
     </div>
@@ -363,7 +421,7 @@
           <div style="font-size:12px;color:#c03030;">英単語と日本語訳は必須です。</div>
         </sc-if>
         <div style="display:flex;gap:10px;margin-top:4px;align-items:center;">
-          <button onClick="{{ saveEdit }}" style="padding:9px 22px;border:none;border-radius:8px;background:#0a6ee0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#0b63c6">保存</button>
+          <button onClick="{{ saveEdit }}" style="padding:9px 22px;border:none;border-radius:8px;background:#429ff0;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#2b8ee0">保存</button>
           <button onClick="{{ closeEdit }}" style="padding:9px 18px;border:1px solid rgba(0,0,0,0.14);border-radius:8px;background:#fff;color:#1d1d1f;font-size:14px;cursor:pointer;" style-hover="background:#f5f5f6">キャンセル</button>
           <div style="flex:1;"></div>
           <button onClick="{{ askDelete }}" style="padding:9px 18px;border:1px solid rgba(192,48,48,0.35);border-radius:8px;background:#fff;color:#c03030;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#fdf2f2">削除...</button>
@@ -449,6 +507,7 @@ class Component extends DCLogic {
     editError: false,
     deleteId: null,
     ctx: null,
+    settings: { dir: null, showIpa: null, uiScale: 1, deeplKey: '' },
   };
 
   componentDidMount() {
@@ -459,6 +518,18 @@ class Component extends DCLogic {
         if (Array.isArray(parsed) && parsed.length) this.setState({ words: parsed });
       }
     } catch (e) {}
+    try {
+      const sraw = localStorage.getItem('eitango-settings-v1');
+      if (sraw) this.setState((st) => ({ settings: { ...st.settings, ...JSON.parse(sraw) } }));
+    } catch (e) {}
+  }
+
+  setSetting(patch) {
+    this.setState((s) => {
+      const settings = { ...s.settings, ...patch };
+      try { localStorage.setItem('eitango-settings-v1', JSON.stringify(settings)); } catch (e) {}
+      return { settings };
+    });
   }
 
   componentWillUnmount() {
@@ -573,9 +644,9 @@ class Component extends DCLogic {
       const selected = cats.includes(o);
       return {
         label: o,
-        bg: selected ? '#0a6ee0' : '#fff',
+        bg: selected ? '#429ff0' : '#fff',
         color: selected ? '#fff' : 'rgba(0,0,0,0.65)',
-        border: selected ? '#0a6ee0' : 'rgba(0,0,0,0.18)',
+        border: selected ? '#429ff0' : 'rgba(0,0,0,0.18)',
         toggle: (e) => { e.stopPropagation(); onToggle(o); },
       };
     });
@@ -652,7 +723,7 @@ class Component extends DCLogic {
   decorate(w) {
     const pill = this.pillFor(w.category);
     const revealed = !!this.state.revealed[w.id];
-    const showIpaProp = this.props.showIPA ?? true;
+    const showIpaProp = this.state.settings.showIpa ?? (this.props.showIPA ?? true);
     const hasAudio = !!w.hasAudio;
     const hasExample = !!(w.exEn && w.exEn.trim());
     return {
@@ -668,6 +739,9 @@ class Component extends DCLogic {
       hasExample,
       noExample: !hasExample,
       rowBg: w.learned ? '#fafafb' : '#ffffff',
+      cbBg: w.learned ? '#429ff0' : '#fff',
+      cbBorder: w.learned ? '1px solid #429ff0' : '1.5px solid rgba(0,0,0,0.25)',
+      cbOp: w.learned ? 1 : 0,
       play: (e) => { e.stopPropagation(); this.speak(w.word); },
       openEdit: () => this.openEdit(w.id),
       onContext: (e) => {
@@ -695,7 +769,7 @@ class Component extends DCLogic {
     const homeCards = learning.filter(match).map((w) => this.decorate(w));
     const allRows = words.filter(match).map((w) => this.decorate(w));
 
-    const titles = { home: '学習中の単語', all: '全単語', quiz: 'フラッシュクイズ', add: '単語を登録' };
+    const titles = { home: '学習中の単語', all: '全単語', quiz: 'フラッシュクイズ', add: '単語を登録', settings: '設定' };
     const navDefs = [
       { v: 'home', label: '学習中', count: String(learning.length) },
       { v: 'all', label: '全単語', count: String(words.length) },
@@ -715,7 +789,9 @@ class Component extends DCLogic {
 
     // Quiz vals
     const quiz = s.quiz;
-    const dir = this.props.quizDirection ?? 'en-ja';
+    const dir = s.settings.dir ?? (this.props.quizDirection ?? 'en-ja');
+    const ipaOn = s.settings.showIpa ?? (this.props.showIPA ?? true);
+    const scale = s.settings.uiScale ?? 1;
     let quizWord = null;
     if (quiz && !quiz.done && quiz.order.length) {
       const id = quiz.order[quiz.i];
@@ -743,6 +819,27 @@ class Component extends DCLogic {
       onSearch: (e) => this.setState({ search: e.target.value }),
       goAdd: () => this.setState({ ...this.resetAdd(), view: 'add' }),
       goHome: () => this.setState({ view: 'home' }),
+      goSettings: () => this.setState({ view: 'settings' }),
+      isSettings: s.view === 'settings',
+      settingsBg: s.view === 'settings' ? 'rgba(0,0,0,0.09)' : 'transparent',
+      settingsWeight: s.view === 'settings' ? 600 : 400,
+      rEnJaBorder: dir === 'en-ja' ? '1px solid #429ff0' : '1.5px solid rgba(0,0,0,0.25)',
+      rEnJaBg: dir === 'en-ja' ? '#429ff0' : '#fff',
+      rEnJaDot: dir === 'en-ja' ? 1 : 0,
+      rJaEnBorder: dir === 'ja-en' ? '1px solid #429ff0' : '1.5px solid rgba(0,0,0,0.25)',
+      rJaEnBg: dir === 'ja-en' ? '#429ff0' : '#fff',
+      rJaEnDot: dir === 'ja-en' ? 1 : 0,
+      setDirEnJa: () => this.setSetting({ dir: 'en-ja' }),
+      setDirJaEn: () => this.setSetting({ dir: 'ja-en' }),
+      ipaTrackBg: ipaOn ? '#429ff0' : 'rgba(0,0,0,0.18)',
+      ipaKnobLeft: ipaOn ? '19px' : '3px',
+      toggleIpa: () => this.setSetting({ showIpa: !ipaOn }),
+      uiScale: scale,
+      sliderTrack: 'linear-gradient(90deg,#429ff0 ' + ((scale - 1) * 100) + '%,rgba(0,0,0,0.12) ' + ((scale - 1) * 100) + '%)',
+      uiScaleLabel: scale.toFixed(1) + 'x',
+      onUiScale: (e) => this.setSetting({ uiScale: parseFloat(e.target.value) }),
+      deeplKey: s.settings.deeplKey || '',
+      onDeeplKey: (e) => this.setSetting({ deeplKey: e.target.value }),
       stopProp: (e) => e.stopPropagation(),
       navItems,
       homeCards,
