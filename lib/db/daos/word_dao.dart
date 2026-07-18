@@ -18,6 +18,15 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
         ]))
       .watch();
 
+  /// 登録日時の新しい順(watchAll と同じ並び)で全件取得する。
+  /// JSON エクスポート用の同期版(watchAll の Stream 版とは別に用意)。
+  Future<List<Word>> getAll() => (select(words)
+        ..orderBy([
+          (t) => OrderingTerm.desc(t.createdAt),
+          (t) => OrderingTerm.desc(t.id),
+        ]))
+      .get();
+
   Future<int> insertWord(WordsCompanion entry) {
     final now = DateTime.now();
     return into(words).insert(
@@ -56,5 +65,23 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
             )
           : WordsCompanion(lastReviewedAt: Value(now)),
     );
+  }
+
+  /// JSON インポートの適用。insertWord / updateWord と異なり、
+  /// createdAt / updatedAt を DAO 側で上書きせず、渡された Companion の値を
+  /// そのまま書き込む(ファイル側のタイムスタンプを維持するため)。
+  /// 全体を 1 トランザクションで実行し、途中失敗で中途半端な状態を残さない。
+  Future<void> importWords({
+    required List<WordsCompanion> inserts,
+    required List<(int, WordsCompanion)> updates,
+  }) {
+    return transaction(() async {
+      if (inserts.isNotEmpty) {
+        await batch((b) => b.insertAll(words, inserts));
+      }
+      for (final (id, entry) in updates) {
+        await (update(words)..where((t) => t.id.equals(id))).write(entry);
+      }
+    });
   }
 }

@@ -2,6 +2,7 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +68,9 @@ class SettingsView extends ConsumerWidget {
                 key: ValueKey(ref.watch(settingsProvider).hasValue),
                 initialValue: settings.deeplApiKey,
               ),
+              const SizedBox(height: 20),
+              const _SectionLabel('データ'),
+              const DataManagementSection(),
             ],
           ),
         ),
