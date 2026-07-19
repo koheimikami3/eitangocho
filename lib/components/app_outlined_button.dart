@@ -40,12 +40,14 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onPressed,
+        // alignment を指定すると loose 制約下(空状態の中央配置等)で
+        // Container が横いっぱいに広がるため、AppFilledButton と同じく
+        // テキスト + padding に幅を任せ、中央寄せは Text 側で行う。
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: 18,
             vertical: widget.verticalPadding,
           ),
-          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverBackground : Colors.white,
             borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -53,6 +55,7 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
           ),
           child: Text(
             widget.label,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: widget.textColor,
               fontSize: widget.fontSize,
