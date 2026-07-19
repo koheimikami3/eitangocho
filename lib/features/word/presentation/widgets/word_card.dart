@@ -69,33 +69,44 @@ class _WordCardState extends State<WordCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Flexible(
-                    child: Text(
-                      word.word,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
+                  // 単語 + IPA は左側で自然幅を取り、バッジを右端へ押し出す。
+                  // 幅が足りないときは折り返さず省略表示にする。
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            word.word,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        if (showIpa) ...[
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              word.ipa,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Menlo',
+                                color: AppColors.textTertiary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (showIpa) ...[
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        word.ipa,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Menlo',
-                          color: AppColors.textTertiary,
-                        ),
-                      ),
-                    ),
-                  ],
-                  const Spacer(),
                   const SizedBox(width: 8),
                   PosBadge(partsOfSpeech: word.partsOfSpeech),
                 ],

@@ -23,36 +23,42 @@ class LearnedCheckbox extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onChanged(!value),
-      // 標準 Checkbox 撤去で失われたヒット領域を padding で補償する。
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            color: value ? AppColors.accent : Colors.white,
-            borderRadius: BorderRadius.circular(4),
-            border: value
-                ? Border.all(color: AppColors.accent)
-                : Border.all(color: _uncheckedBorder, width: 1.5),
-          ),
-          child: Center(
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 150),
-              opacity: value ? 1 : 0,
-              child: Transform.translate(
-                offset: const Offset(-0.5, -1),
-                child: Transform.rotate(
-                  angle: math.pi / 4,
-                  // レ点は L 字(右+下の白ボーダー)を 45 度回転させて描く。
-                  child: Container(
-                    width: 4,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        right: BorderSide(color: Colors.white, width: 2),
-                        bottom: BorderSide(color: Colors.white, width: 2),
+      // 親から tight 制約が来ても既定サイズを保つよう Align で制約を吸収する。
+      child: Align(
+        alignment: Alignment.centerLeft,
+        widthFactor: 1,
+        heightFactor: 1,
+        // 標準 Checkbox 撤去で失われたヒット領域を padding で補償する。
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: value ? AppColors.accent : Colors.white,
+              borderRadius: BorderRadius.circular(4),
+              border: value
+                  ? Border.all(color: AppColors.accent)
+                  : Border.all(color: _uncheckedBorder, width: 1.5),
+            ),
+            child: Center(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
+                opacity: value ? 1 : 0,
+                child: Transform.translate(
+                  offset: const Offset(-0.5, -1.5),
+                  child: Transform.rotate(
+                    angle: math.pi / 4,
+                    // レ点は L 字(右+下の白ボーダー)を 45 度回転させて描く。
+                    child: Container(
+                      width: 6,
+                      height: 11,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          right: BorderSide(color: Colors.white, width: 2.5),
+                          bottom: BorderSide(color: Colors.white, width: 2.5),
+                        ),
                       ),
                     ),
                   ),
