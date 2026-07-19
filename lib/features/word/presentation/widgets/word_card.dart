@@ -53,7 +53,7 @@ class _WordCardState extends State<WordCard> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _isHovered
-                  ? const Color(0x730A6EE0)
+                  ? AppColors.cardHoverBorder
                   : const Color(0x1A000000),
             ),
             boxShadow: [

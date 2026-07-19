@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 /// 配色定数。値は docs/prototype/design/eitangocho.html から抽出したもの。
 abstract final class AppColors {
-  static const accent = Color(0xFF0A6EE0); // 主要アクション
-  static const accentHover = Color(0xFF0B63C6);
+  static const accent = Color(0xFF429FF0); // 主要アクション
+  static const accentHover = Color(0xFF2B8EE0);
+  static const cardHoverBorder = Color(0xA6429FF0); // rgba(66,159,240,0.65)
   static const danger = Color(0xFFC03030); // 削除系
   static const dangerHover = Color(0xFFA82828);
   static const dangerHoverBackground = Color(0xFFFDF2F2);
