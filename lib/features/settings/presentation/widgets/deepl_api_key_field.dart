@@ -39,7 +39,7 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           controller: _controller,
           onChanged: (value) =>
               ref.read(settingsProvider.notifier).setDeeplApiKey(value),
-          style: const TextStyle(fontSize: 14),
+          style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             isDense: true,
             hintText: 'DeepL API キーを入力',
@@ -62,8 +62,12 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
         const SizedBox(height: 6),
         const Text(
           'DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を'
-          '取得します(未設定なら例文の和訳はスキップ)',
-          style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
+          '取得します。未設定の場合、例文の和訳はスキップされます。',
+          style: TextStyle(
+            fontSize: 11,
+            height: 1.6,
+            color: AppColors.textQuaternary,
+          ),
         ),
       ],
     );

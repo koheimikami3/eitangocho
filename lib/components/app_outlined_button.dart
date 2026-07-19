@@ -11,6 +11,7 @@ class AppOutlinedButton extends StatefulWidget {
     this.hoverBackground = AppColors.rowHoverBackground,
     this.verticalPadding = 9,
     this.fontSize = 14,
+    this.fontWeight = FontWeight.w600,
     this.borderRadius = 8,
   });
 
@@ -22,6 +23,7 @@ class AppOutlinedButton extends StatefulWidget {
   // デフォルトはダイアログ・登録フォーム系(プロトタイプの標準ボタン)の値。
   final double verticalPadding;
   final double fontSize;
+  final FontWeight fontWeight;
   final double borderRadius;
 
   @override
@@ -54,7 +56,7 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
             style: TextStyle(
               color: widget.textColor,
               fontSize: widget.fontSize,
-              fontWeight: FontWeight.w600,
+              fontWeight: widget.fontWeight,
             ),
           ),
         ),

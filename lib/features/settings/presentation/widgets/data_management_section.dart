@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:eitangocho/components/app_outlined_button.dart';
+import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/data/word_export_service.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/import_result_dialog.dart';
 import 'package:file_selector/file_selector.dart';
@@ -8,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const _jsonTypeGroup = XTypeGroup(label: 'JSON', extensions: ['json']);
+
+/// ボタン hover 背景(プロトタイプの #f5f5f6)。
+const _hoverBackground = Color(0xFFF5F5F6);
 
 /// 設定画面の「データ」セクション。JSON エクスポート/インポートの導線。
 class DataManagementSection extends ConsumerStatefulWidget {
@@ -85,11 +89,38 @@ class _DataManagementSectionState
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppOutlinedButton(label: 'エクスポート...', onPressed: _export),
-        const SizedBox(width: 10),
-        AppOutlinedButton(label: 'インポート...', onPressed: _import),
+        Row(
+          children: [
+            AppOutlinedButton(
+              label: 'エクスポート...',
+              onPressed: _export,
+              verticalPadding: 8,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              hoverBackground: _hoverBackground,
+            ),
+            const SizedBox(width: 10),
+            AppOutlinedButton(
+              label: 'インポート...',
+              onPressed: _import,
+              verticalPadding: 8,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              hoverBackground: _hoverBackground,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          '単語帳を JSON ファイルとして書き出し / 読み込みます。',
+          style: TextStyle(
+            fontSize: 11,
+            color: AppColors.textQuaternary,
+          ),
+        ),
       ],
     );
   }

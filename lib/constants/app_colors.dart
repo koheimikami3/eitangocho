@@ -12,6 +12,8 @@ abstract final class AppColors {
   static const textSecondary = Color(0x99000000); // rgba(0,0,0,0.6)
   static const textTertiary = Color(0x73000000); // rgba(0,0,0,0.45)
   static const textDisabled = Color(0x4D000000); // rgba(0,0,0,0.3)
+  static const textMuted = Color(0x80000000); // rgba(0,0,0,0.5) 見出し・補助値
+  static const textQuaternary = Color(0x66000000); // rgba(0,0,0,0.4) 補足文
   static const sidebarBackground = Color(0xFFF0F0F3);
   static const sidebarSelected = Color(0x17000000); // rgba(0,0,0,0.09)
   static const inputBackground = Color(0xFFF7F7F8);
