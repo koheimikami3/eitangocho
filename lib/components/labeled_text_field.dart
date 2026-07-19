@@ -49,21 +49,32 @@ class LabeledTextField extends StatelessWidget {
           controller: controller,
           maxLines: maxLines,
           onSubmitted: onSubmitted,
+          // 既定のカーソルは行高いっぱい・太めで存在感が強いため、
+          // 少し低く・細くする。
+          cursorHeight: 16,
+          cursorWidth: 1,
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
             // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
+            // 自動入力ボタン等と高さを揃えつつ、上下に余裕を持たせる。
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 8,
+              vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
               borderSide: const BorderSide(color: AppColors.inputBorder),
             ),
             enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(7),
+              borderSide: const BorderSide(color: AppColors.inputBorder),
+            ),
+            // フォーカス時も枠色は変えず通常時と同じにする
+            // (Material 既定の太い黒枠が出るのを防ぐ)。
+            focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
               borderSide: const BorderSide(color: AppColors.inputBorder),
             ),

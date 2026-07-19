@@ -24,17 +24,28 @@ class ToolbarSearchField extends ConsumerWidget {
         onChanged: (value) => ref
             .read(mainPageProvider.notifier)
             .updateSearchQuery(value),
+        // 既定のカーソルは行高いっぱい・太めで存在感が強いため、
+        // 少し低く・細くする。
+        cursorHeight: 15,
+        cursorWidth: 1,
         style: const TextStyle(fontSize: 13),
         decoration: InputDecoration(
           isDense: true,
           hintText: '検索',
           filled: true,
           fillColor: AppColors.inputBackground,
+          // 上下に余裕を持たせる(ツールバー高さ 52 に収まる範囲)。
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
-            vertical: 8,
+            vertical: 10,
           ),
           border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(7),
+            borderSide: BorderSide.none,
+          ),
+          // 塗り潰し検索欄はフォーカス時も枠なしを維持する
+          // (既定の黒枠が出るのを防ぐ)。
+          focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
             borderSide: BorderSide.none,
           ),

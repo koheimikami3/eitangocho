@@ -22,6 +22,13 @@ class EitangochoApp extends ConsumerWidget {
         scaffoldBackgroundColor: Colors.white,
         colorSchemeSeed: AppColors.accent,
         dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        // カーソルは web の既定キャレット相当の黒(テキスト色)にする。
+        // 選択ハイライト・ハンドルはアクセント色を薄く敷く。
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: AppColors.textPrimary,
+          selectionHandleColor: AppColors.accent,
+          selectionColor: Color(0x33429FF0),
+        ),
       ),
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。
       // 縮小サイズでレイアウトしてから拡大描画する。Navigator ごと包むため
