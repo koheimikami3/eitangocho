@@ -1,7 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// 学習済みチェック。変更を呼び出し側の onChanged に流す。
+/// プロトタイプのカスタムチェックボックス意匠(16x16 角丸・白レ点)を再現する。
 class LearnedCheckbox extends StatelessWidget {
   const LearnedCheckbox({
     required this.value,
@@ -12,14 +15,52 @@ class LearnedCheckbox extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
+  /// 未チェック時の枠線色(プロトタイプの rgba(0,0,0,0.25))。
+  static const _uncheckedBorder = Color(0x40000000);
+
   @override
   Widget build(BuildContext context) {
-    return Transform.scale(
-      scale: 0.85,
-      child: Checkbox(
-        value: value,
-        activeColor: AppColors.accent,
-        onChanged: (checked) => onChanged(checked ?? false),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onChanged(!value),
+      // 標準 Checkbox 撤去で失われたヒット領域を padding で補償する。
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: value ? AppColors.accent : Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: value
+                ? Border.all(color: AppColors.accent)
+                : Border.all(color: _uncheckedBorder, width: 1.5),
+          ),
+          child: Center(
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 150),
+              opacity: value ? 1 : 0,
+              child: Transform.translate(
+                offset: const Offset(-0.5, -1),
+                child: Transform.rotate(
+                  angle: math.pi / 4,
+                  // レ点は L 字(右+下の白ボーダー)を 45 度回転させて描く。
+                  child: Container(
+                    width: 4,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        right: BorderSide(color: Colors.white, width: 2),
+                        bottom: BorderSide(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

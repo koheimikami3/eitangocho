@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/learning_words_view.dart';
+import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ void main() {
     );
 
     await runWithView(tester, () async {
-      await tester.tap(find.byType(Checkbox));
+      await tester.tap(find.byType(LearnedCheckbox));
       await Future<void>.delayed(const Duration(milliseconds: 10));
       await tester.pump();
 
