@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/app_filled_button.dart';
+import 'package:eitangocho/components/app_outlined_button.dart';
 import 'package:eitangocho/components/labeled_text_field.dart';
 import 'package:eitangocho/components/pos_chip_selector.dart';
 import 'package:eitangocho/constants/app_colors.dart';
@@ -171,7 +172,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
       children: [
         if (banner != null) ...[
           DictionaryWarningBanner(message: banner),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
         ],
         if (state.translationFailed) ...[
           const Text(
@@ -181,7 +182,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
               color: AppColors.warningBannerForeground,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
         ],
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,13 +203,13 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         LabeledTextField(
           label: '日本語訳 *',
           controller: _japaneseController,
           trailing: _autoJapanese ? const AutoFillBadge() : null,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -238,14 +239,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         LabeledTextField(
           label: '英例文',
           controller: _exampleEnController,
           maxLines: 2,
           trailing: _autoExampleEn ? const AutoFillBadge() : null,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         LabeledTextField(
           label: '日本語例文',
           controller: _exampleJaController,
@@ -253,7 +254,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           trailing: _autoExampleJa ? const AutoFillBadge() : null,
         ),
         if (state.errorMessage != null) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
             state.errorMessage!,
             style: const TextStyle(
@@ -262,14 +263,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
             ),
           ),
         ],
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         Row(
           children: [
             AppFilledButton(label: '登録する', onPressed: _save),
             const SizedBox(width: 10),
-            _TextActionButton(
+            AppOutlinedButton(
               label: '戻る',
-              onTap: () =>
+              onPressed: () =>
                   ref.read(wordRegistrationProvider.notifier).backToInput(),
             ),
             const SizedBox(width: 4),

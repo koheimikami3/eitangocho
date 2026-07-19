@@ -113,7 +113,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -132,12 +132,12 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 LabeledTextField(
                   label: '日本語訳 *',
                   controller: _japaneseController,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -163,20 +163,20 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 LabeledTextField(
                   label: '英例文',
                   controller: _exampleEnController,
                   maxLines: 2,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 LabeledTextField(
                   label: '日本語例文',
                   controller: _exampleJaController,
                   maxLines: 2,
                 ),
                 if (_errorMessage != null) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   Text(
                     _errorMessage!,
                     style: const TextStyle(
@@ -185,7 +185,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     AppFilledButton(label: '保存', onPressed: _save),
