@@ -123,7 +123,13 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
 /// (具象クラスを直接 new しない。将来の LLM 実装への差し替えポイント)。
 // 関数名を wordInfo にすると生成クラス名がドメインの WordInfoProvider 抽象と
 // 衝突するため、あえて wordInfoProvider(生成 Provider は wordInfoProviderProvider)とする。
-@riverpod
+//
+// keepAlive にするのは http.Client のライフサイクルを守るため。autoDispose だと、
+// Notifier が ref.read()(購読を保持しない)で取得した直後に破棄予約され、
+// fetch() の最初の await で制御を手放した隙に onDispose の httpClient.close() が走り、
+// 続く API 呼び出しが "Client is already closed" で失敗する。依存する databaseProvider も
+// keepAlive であり、http.Client はアプリ生存期間で 1 つ共有する(接続再利用の推奨形)。
+@Riverpod(keepAlive: true)
 WordInfoProvider wordInfoProvider(Ref ref) {
   final db = ref.watch(databaseProvider);
   final httpClient = http.Client();

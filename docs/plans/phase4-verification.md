@@ -104,6 +104,13 @@
       直接起動し、Release entitlements(sandbox + network.client +
       user-selected.read-write)下で以下が一通り動く:
   - [x] 単語登録 → 自動入力(Free Dictionary / EJDict / DeepL)
+    - この確認中に「自動入力が常に『辞書データの取得に失敗しました』になる」不具合を発見。
+      真因は `wordInfoProvider` が autoDispose で、Notifier が `ref.read`(購読を保持しない)で
+      取得した直後に破棄予約され、`fetch()` の await 中に `http.Client` が close されていたこと
+      (`ClientException: Client is already closed.`)。サンドボックス/entitlements は無関係。
+    - 修正: `wordInfoProvider` を `@Riverpod(keepAlive: true)` 化。回帰テストを
+      `word_registration_notifier_test.dart` に追加。**debug** ビルドで `apple` の自動入力が
+      Step2 へプレフィル遷移することを確認済み(release ビルドでの再確認は下記チェック項目に含む)。
   - [ ] 発音再生
   - [ ] クイズ一連 + キーボードショートカット
   - [ ] エクスポート → インポート

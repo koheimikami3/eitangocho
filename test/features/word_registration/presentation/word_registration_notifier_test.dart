@@ -145,6 +145,23 @@ void main() {
     expect(words.single.partsOfSpeech, [PartOfSpeech.noun]);
   });
 
+  test(
+      'wordInfoProvider は keepAlive で、リスナー無しの read 後もイベントループを'
+      '跨いで破棄されない(fetch 途中に http.Client が close される回帰を防ぐ)',
+      () async {
+    // フェイクを渡さず実 wordInfoProvider を使う(内部で http.Client を保持する)。
+    container = buildContainer();
+
+    final first = container.read(wordInfoProviderProvider);
+    // autoDispose だとリスナーの無い read 後、イベントループ一巡で破棄され、
+    // onDispose の httpClient.close() が走ってしまう。keepAlive なら破棄されない。
+    await Future<void>.delayed(Duration.zero);
+    final second = container.read(wordInfoProviderProvider);
+
+    // 破棄→再生成が起きていなければ同一インスタンス
+    expect(identical(first, second), isTrue);
+  });
+
   group('autoFill', () {
     const fetchedInfo = WordInfo(
       word: 'serendipity',
