@@ -1,2 +1,9 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
+
+// Debug ビルドは Bundle ID に ".dev" を付け、表示名に "(Dev)" を付ける。
+// これによりストア配布版とは別のサンドボックスコンテナ(別 DB)になり、
+// 開発中のビルドがインストール済み本番アプリのデータへ影響しないようにする。
+// AppInfo.xcconfig / Info.plist からこれらの変数を参照している。
+BUNDLE_ID_SUFFIX = .dev
+APP_DISPLAY_SUFFIX = (Dev)
