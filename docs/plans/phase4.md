@@ -138,8 +138,11 @@ Phase 3 で全体表示倍率(`AppDimensions.uiScale`。設定画面のスライ
 
 コード側:
 
+- **アプリ表示名は「シンプル英単語帳」で確定**(ユーザー決定)。
+  `macos/Runner/Info.plist` の `CFBundleDisplayName` / `CFBundleName` に反映済み。
+  `PRODUCT_NAME`(実行ファイル名)は `eitangocho` のまま。
 - `pubspec.yaml` の `version` を `1.0.0+1` で確定(以後の提出ごとに +N)
-- Bundle ID・表示名(`PRODUCT_NAME`)を `AppInfo.xcconfig` で確定
+- Bundle ID を `AppInfo.xcconfig` で確定
 - `flutter build macos --release` が通り、リリースビルドで全機能が動くことを確認
   (**App Sandbox + network.client は設定済み**。Phase 4 で追加した
   user-selected.read-write が Release にも入っていることを再確認)
