@@ -66,9 +66,9 @@ class AppMenuBar extends ConsumerWidget {
   }) {
     return [
       // 先頭メニューは macOS のアプリメニューになる。ラベルはシステムが
-      // バンドル名(eitangocho)に差し替える。
+      // バンドル名(CFBundleName = シンプル英単語帳)に差し替える。
       const PlatformMenu(
-        label: 'eitangocho',
+        label: 'シンプル英単語帳',
         menus: [
           PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.about),
           PlatformMenuItemGroup(
