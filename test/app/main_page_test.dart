@@ -1,9 +1,5 @@
 import 'package:eitangocho/app/eitangocho_app.dart';
-import 'package:eitangocho/app/main_page_notifier.dart';
-import 'package:eitangocho/app/main_page_state.dart';
-import 'package:eitangocho/app/widgets/toolbar_search_field.dart';
 import 'package:flutter/material.dart' show Size;
-import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
@@ -60,57 +56,7 @@ void main() {
     expect(find.text('単語を登録'), findsNWidgets(2));
   });
 
-  testWidgets('⌘N でどのビューからでも登録ビューへ切り替わる', (tester) async {
-    tester.view.physicalSize = const Size(1600, 1000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    late ProviderContainer container;
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          wordListProvider.overrideWith((ref) => Stream.value(const <Word>[])),
-          ejdictImportProvider.overrideWith((ref) async => 0),
-        ],
-        child: const EitangochoApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-    container = ProviderScope.containerOf(
-      tester.element(find.text('学習中')),
-    );
-
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
-    await tester.pumpAndSettle();
-
-    expect(container.read(mainPageProvider).view, MainView.registration);
-  });
-
-  testWidgets('⌘F で学習中ビューの検索フィールドにフォーカスが当たる', (tester) async {
-    tester.view.physicalSize = const Size(1600, 1000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    late ProviderContainer container;
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          wordListProvider.overrideWith((ref) => Stream.value(const <Word>[])),
-          ejdictImportProvider.overrideWith((ref) async => 0),
-        ],
-        child: const EitangochoApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-    container = ProviderScope.containerOf(
-      tester.element(find.text('学習中')),
-    );
-
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyF);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
-    await tester.pumpAndSettle();
-
-    expect(container.read(toolbarSearchFocusProvider).hasFocus, isTrue);
-  });
+  // ⌘N/⌘F は macOS のネイティブメニューバー(AppMenuBar / PlatformMenuBar)経由で
+  // 処理する。native ⌘ 発火は widget test の sendKeyEvent では再現できないため、
+  // メニューの配線・有効/無効・発火先の検証は app_menu_bar_test.dart で行う。
 }
