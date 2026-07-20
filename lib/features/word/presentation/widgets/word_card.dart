@@ -34,6 +34,12 @@ class _WordCardState extends State<WordCard> {
   bool _revealed = false;
   bool _isHovered = false;
 
+  // 英例文は行数差でカード高さがばらつくため、常に 2 行分の高さを確保する。
+  static const _exampleFontSize = 13.0;
+  static const _exampleLineHeight = 1.5;
+  static const _exampleAreaHeight =
+      _exampleFontSize * _exampleLineHeight * 2; // 2 行分 = 39.0
+
   @override
   Widget build(BuildContext context) {
     final word = widget.word;
@@ -117,34 +123,32 @@ class _WordCardState extends State<WordCard> {
                 revealed: _revealed,
                 onToggle: () => setState(() => _revealed = !_revealed),
               ),
-              if (hasExample) ...[
-                const SizedBox(height: 10),
-                Text(
-                  word.exampleEn,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xB3000000),
-                    height: 1.5,
+              const SizedBox(height: 10),
+              // カード高さを揃えるため英例文の領域は常に 2 行分を確保し、
+              // 超過分は末尾を … で省略する(全文は編集ダイアログで確認できる)。
+              SizedBox(
+                height: _exampleAreaHeight,
+                width: double.infinity,
+                child: Text(
+                  hasExample ? word.exampleEn : '例文なし',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: _exampleFontSize,
+                    color: hasExample
+                        ? const Color(0xB3000000)
+                        : AppColors.textDisabled,
+                    height: _exampleLineHeight,
                   ),
                 ),
-                if (_revealed) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    word.exampleJa,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0x80000000),
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ] else ...[
-                const SizedBox(height: 10),
-                const Text(
-                  '例文なし',
-                  style: TextStyle(
+              ),
+              if (hasExample && _revealed) ...[
+                const SizedBox(height: 4),
+                Text(
+                  word.exampleJa,
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: AppColors.textDisabled,
+                    color: Color(0x80000000),
                     height: 1.5,
                   ),
                 ),
