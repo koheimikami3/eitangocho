@@ -28,6 +28,7 @@ class QuizEmptyState extends ConsumerWidget {
           AppOutlinedButton(
             label: '学習中リストへ',
             textColor: AppColors.accent,
+            fontSize: 13,
             onPressed: () => ref
                 .read(mainPageProvider.notifier)
                 .selectView(MainView.learning),

@@ -162,7 +162,12 @@ class QuizCard extends StatelessWidget {
         ),
         if (!revealed) ...[
           const SizedBox(height: 16),
-          AppFilledButton(label: '答えを表示', onPressed: onReveal),
+          AppFilledButton(
+            label: '答えを表示',
+            verticalPadding: 11,
+            borderRadius: 9,
+            onPressed: onReveal,
+          ),
         ],
       ],
     );

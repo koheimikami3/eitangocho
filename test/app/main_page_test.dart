@@ -55,4 +55,8 @@ void main() {
     // 登録ビューに切り替わるとサイドバー項目 + ツールバータイトルの 2 箇所になる。
     expect(find.text('単語を登録'), findsNWidgets(2));
   });
+
+  // ⌘N/⌘F は macOS のネイティブメニューバー(AppMenuBar / PlatformMenuBar)経由で
+  // 処理する。native ⌘ 発火は widget test の sendKeyEvent では再現できないため、
+  // メニューの配線・有効/無効・発火先の検証は app_menu_bar_test.dart で行う。
 }

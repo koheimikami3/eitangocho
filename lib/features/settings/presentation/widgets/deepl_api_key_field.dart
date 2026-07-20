@@ -39,15 +39,21 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           controller: _controller,
           onChanged: (value) =>
               ref.read(settingsProvider.notifier).setDeeplApiKey(value),
-          style: const TextStyle(fontSize: 14),
+          // 既定のカーソルは行高いっぱい・太めで存在感が強いため、
+          // 少し低く・細くする。
+          cursorHeight: 15,
+          cursorWidth: 1,
+          style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             isDense: true,
             hintText: 'DeepL API キーを入力',
             // LabeledTextField と同様、ヒント色は明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
+            // 他の一行フィールドと同様に上下へ余裕を持たせる
+            // (プロトタイプの 8px から拡張)。
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 8,
+              vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
@@ -57,13 +63,23 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
               borderRadius: BorderRadius.circular(7),
               borderSide: const BorderSide(color: AppColors.inputBorder),
             ),
+            // フォーカス時も枠色は変えず通常時と同じにする
+            // (Material 既定の太い黒枠が出るのを防ぐ)。
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(7),
+              borderSide: const BorderSide(color: AppColors.inputBorder),
+            ),
           ),
         ),
         const SizedBox(height: 6),
         const Text(
           'DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を'
-          '取得します(未設定なら例文の和訳はスキップ)',
-          style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
+          '取得します。未設定の場合、例文の和訳はスキップされます。',
+          style: TextStyle(
+            fontSize: 11,
+            height: 1.6,
+            color: AppColors.textQuaternary,
+          ),
         ),
       ],
     );

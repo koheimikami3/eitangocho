@@ -1,14 +1,17 @@
-import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_radio_row.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_section.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// 設定画面(クイズ出題方向・IPA 表示)。変更は即保存。
-/// 見た目は Material 標準ウィジェットで実装し、磨き込みは Phase 4 に回す。
+/// 設定画面(クイズ出題方向・表示・DeepL API キー・データ)。変更は即保存。
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
@@ -29,67 +32,50 @@ class SettingsView extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _SectionLabel('クイズの出題方向'),
-              RadioGroup<QuizDirection>(
-                groupValue: settings.quizDirection,
-                onChanged: (value) {
-                  if (value != null) notifier.setQuizDirection(value);
-                },
-                child: Column(
+              SettingsSection(
+                title: 'クイズの出題方向',
+                child: SettingsCard(
                   children: [
                     for (final direction in QuizDirection.values)
-                      RadioListTile<QuizDirection>(
-                        contentPadding: EdgeInsets.zero,
-                        dense: true,
-                        title: Text(direction.label),
-                        value: direction,
-                        activeColor: AppColors.accent,
+                      SettingsRadioRow(
+                        label: direction.label,
+                        selected: settings.quizDirection == direction,
+                        onTap: () => notifier.setQuizDirection(direction),
                       ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('発音記号(IPA)を表示'),
-                value: settings.showIpa,
-                activeThumbColor: AppColors.accent,
-                onChanged: notifier.setShowIpa,
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: '表示',
+                child: SettingsCard(
+                  children: [
+                    SettingsToggleRow(
+                      label: '発音記号(IPA)を表示',
+                      value: settings.showIpa,
+                      onChanged: notifier.setShowIpa,
+                    ),
+                    UiScaleSlider(value: settings.uiScale),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-              const _SectionLabel('表示サイズ'),
-              UiScaleSlider(value: settings.uiScale),
-              const SizedBox(height: 20),
-              const _SectionLabel('DeepL API キー(例文の自動和訳)'),
-              DeeplApiKeyField(
-                // controller の初期値は初回 build でしか反映されないため、
-                // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
-                key: ValueKey(ref.watch(settingsProvider).hasValue),
-                initialValue: settings.deeplApiKey,
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: 'DeepL API キー(例文の自動和訳)',
+                child: DeeplApiKeyField(
+                  // controller の初期値は初回 build でしか反映されないため、
+                  // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
+                  key: ValueKey(ref.watch(settingsProvider).hasValue),
+                  initialValue: settings.deeplApiKey,
+                ),
+              ),
+              const SizedBox(height: 22),
+              const SettingsSection(
+                title: 'データ',
+                child: DataManagementSection(),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
         ),
       ),
     );

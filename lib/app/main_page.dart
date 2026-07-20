@@ -1,5 +1,6 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
+import 'package:eitangocho/app/widgets/app_menu_bar.dart';
 import 'package:eitangocho/app/widgets/app_sidebar.dart';
 import 'package:eitangocho/app/widgets/main_toolbar.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
@@ -22,30 +23,34 @@ class MainPage extends ConsumerWidget {
     ref.watch(ejdictImportProvider);
     final view = ref.watch(mainPageProvider.select((s) => s.view));
 
-    return Scaffold(
-      body: Row(
-        children: [
-          const AppSidebar(),
-          Expanded(
-            child: Column(
-              // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
-              // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const MainToolbar(),
-                Expanded(
-                  child: switch (view) {
-                    MainView.learning => const LearningWordsView(),
-                    MainView.allWords => const AllWordsView(),
-                    MainView.quiz => const QuizView(),
-                    MainView.registration => const WordRegistrationView(),
-                    MainView.settings => const SettingsView(),
-                  },
-                ),
-              ],
+    // ⌘N/⌘F は macOS のネイティブメニューバー(AppMenuBar)経由で処理する。
+    // Command 系は focus ベースの CallbackShortcuts には届かないため。
+    return AppMenuBar(
+      child: Scaffold(
+        body: Row(
+          children: [
+            const AppSidebar(),
+            Expanded(
+              child: Column(
+                // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
+                // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const MainToolbar(),
+                  Expanded(
+                    child: switch (view) {
+                      MainView.learning => const LearningWordsView(),
+                      MainView.allWords => const AllWordsView(),
+                      MainView.quiz => const QuizView(),
+                      MainView.registration => const WordRegistrationView(),
+                      MainView.settings => const SettingsView(),
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

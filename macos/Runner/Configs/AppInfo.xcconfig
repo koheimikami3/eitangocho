@@ -7,8 +7,11 @@
 // The application's name. By default this is also the title of the Flutter window.
 PRODUCT_NAME = eitangocho
 
-// The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho
+// The application's bundle identifier.
+// BUNDLE_ID_SUFFIX は Debug/Release の各 xcconfig(プロジェクトレベル)で定義する。
+// Debug ビルドのみ ".dev" が付き、サンドボックスコンテナ(= 単語 DB の保存先)が
+// ストア配布版と分離される。開発中の dev ビルドが本番データを触らないための対策。
+PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho$(BUNDLE_ID_SUFFIX)
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.kohei.mikami. All rights reserved.

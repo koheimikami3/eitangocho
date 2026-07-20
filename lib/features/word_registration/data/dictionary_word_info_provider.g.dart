@@ -12,6 +12,12 @@ part of 'dictionary_word_info_provider.dart';
 /// (具象クラスを直接 new しない。将来の LLM 実装への差し替えポイント)。
 // 関数名を wordInfo にすると生成クラス名がドメインの WordInfoProvider 抽象と
 // 衝突するため、あえて wordInfoProvider(生成 Provider は wordInfoProviderProvider)とする。
+//
+// keepAlive にするのは http.Client のライフサイクルを守るため。autoDispose だと、
+// Notifier が ref.read()(購読を保持しない)で取得した直後に破棄予約され、
+// fetch() の最初の await で制御を手放した隙に onDispose の httpClient.close() が走り、
+// 続く API 呼び出しが "Client is already closed" で失敗する。依存する databaseProvider も
+// keepAlive であり、http.Client はアプリ生存期間で 1 つ共有する(接続再利用の推奨形)。
 
 @ProviderFor(wordInfoProvider)
 final wordInfoProviderProvider = WordInfoProviderProvider._();
@@ -20,6 +26,12 @@ final wordInfoProviderProvider = WordInfoProviderProvider._();
 /// (具象クラスを直接 new しない。将来の LLM 実装への差し替えポイント)。
 // 関数名を wordInfo にすると生成クラス名がドメインの WordInfoProvider 抽象と
 // 衝突するため、あえて wordInfoProvider(生成 Provider は wordInfoProviderProvider)とする。
+//
+// keepAlive にするのは http.Client のライフサイクルを守るため。autoDispose だと、
+// Notifier が ref.read()(購読を保持しない)で取得した直後に破棄予約され、
+// fetch() の最初の await で制御を手放した隙に onDispose の httpClient.close() が走り、
+// 続く API 呼び出しが "Client is already closed" で失敗する。依存する databaseProvider も
+// keepAlive であり、http.Client はアプリ生存期間で 1 つ共有する(接続再利用の推奨形)。
 
 final class WordInfoProviderProvider
     extends
@@ -33,13 +45,19 @@ final class WordInfoProviderProvider
   /// (具象クラスを直接 new しない。将来の LLM 実装への差し替えポイント)。
   // 関数名を wordInfo にすると生成クラス名がドメインの WordInfoProvider 抽象と
   // 衝突するため、あえて wordInfoProvider(生成 Provider は wordInfoProviderProvider)とする。
+  //
+  // keepAlive にするのは http.Client のライフサイクルを守るため。autoDispose だと、
+  // Notifier が ref.read()(購読を保持しない)で取得した直後に破棄予約され、
+  // fetch() の最初の await で制御を手放した隙に onDispose の httpClient.close() が走り、
+  // 続く API 呼び出しが "Client is already closed" で失敗する。依存する databaseProvider も
+  // keepAlive であり、http.Client はアプリ生存期間で 1 つ共有する(接続再利用の推奨形)。
   WordInfoProviderProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'wordInfoProviderProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -66,4 +84,4 @@ final class WordInfoProviderProvider
   }
 }
 
-String _$wordInfoProviderHash() => r'44f5c719e846c5705f585950d3f075079354ad1b';
+String _$wordInfoProviderHash() => r'e0e4dc900d8831d645a338d72609783d95fafd95';

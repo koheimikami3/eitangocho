@@ -54,11 +54,15 @@ class _WordTableRowState extends State<WordTableRow> {
             children: [
               SizedBox(
                 width: 64,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: LearnedCheckbox(
-                    value: word.isLearned,
-                    onChanged: widget.onToggleLearned,
+                // 行上端の単語テキストと視覚的に揃うよう少し下げる。
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: LearnedCheckbox(
+                      value: word.isLearned,
+                      onChanged: widget.onToggleLearned,
+                    ),
                   ),
                 ),
               ),
@@ -89,7 +93,11 @@ class _WordTableRowState extends State<WordTableRow> {
               const SizedBox(width: 12),
               SizedBox(
                 width: 100,
-                child: PosBadge(partsOfSpeech: word.partsOfSpeech),
+                // ピルはテキスト幅に収める(列幅は整列のため確保)。
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: PosBadge(partsOfSpeech: word.partsOfSpeech),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(

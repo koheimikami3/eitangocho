@@ -27,6 +27,7 @@ class LearningEmptyState extends ConsumerWidget {
           const SizedBox(height: 14),
           AppFilledButton(
             label: '＋ 単語を登録',
+            fontSize: 13,
             onPressed: () => ref
                 .read(mainPageProvider.notifier)
                 .selectView(MainView.registration),

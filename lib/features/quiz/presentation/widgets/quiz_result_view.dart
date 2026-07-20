@@ -50,6 +50,8 @@ class QuizResultView extends ConsumerWidget {
             Expanded(
               child: AppFilledButton(
                 label: 'もう一度',
+                verticalPadding: 11,
+                borderRadius: 9,
                 onPressed: () =>
                     ref.read(quizPageProvider.notifier).startQuiz(),
               ),
@@ -58,6 +60,8 @@ class QuizResultView extends ConsumerWidget {
             Expanded(
               child: AppOutlinedButton(
                 label: '学習中リストへ',
+                verticalPadding: 11,
+                borderRadius: 9,
                 onPressed: () => ref
                     .read(mainPageProvider.notifier)
                     .selectView(MainView.learning),

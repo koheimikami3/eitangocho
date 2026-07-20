@@ -34,6 +34,12 @@ class _WordCardState extends State<WordCard> {
   bool _revealed = false;
   bool _isHovered = false;
 
+  // 英例文は行数差でカード高さがばらつくため、常に 2 行分の高さを確保する。
+  static const _exampleFontSize = 13.0;
+  static const _exampleLineHeight = 1.5;
+  static const _exampleAreaHeight =
+      _exampleFontSize * _exampleLineHeight * 2; // 2 行分 = 39.0
+
   @override
   Widget build(BuildContext context) {
     final word = widget.word;
@@ -53,14 +59,14 @@ class _WordCardState extends State<WordCard> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _isHovered
-                  ? const Color(0x730A6EE0)
+                  ? AppColors.cardHoverBorder
                   : const Color(0x1A000000),
             ),
             boxShadow: [
               BoxShadow(
                 color: Color(_isHovered ? 0x12000000 : 0x0A000000),
                 blurRadius: _isHovered ? 8 : 2,
-                offset: const Offset(0, 1),
+                offset: Offset(0, _isHovered ? 2 : 1),
               ),
             ],
           ),
@@ -69,33 +75,44 @@ class _WordCardState extends State<WordCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Flexible(
-                    child: Text(
-                      word.word,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
+                  // 単語 + IPA は左側で自然幅を取り、バッジを右端へ押し出す。
+                  // 幅が足りないときは折り返さず省略表示にする。
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            word.word,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        if (showIpa) ...[
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              word.ipa,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Menlo',
+                                color: AppColors.textTertiary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (showIpa) ...[
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        word.ipa,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Menlo',
-                          color: AppColors.textTertiary,
-                        ),
-                      ),
-                    ),
-                  ],
-                  const Spacer(),
                   const SizedBox(width: 8),
                   PosBadge(partsOfSpeech: word.partsOfSpeech),
                 ],
@@ -106,34 +123,32 @@ class _WordCardState extends State<WordCard> {
                 revealed: _revealed,
                 onToggle: () => setState(() => _revealed = !_revealed),
               ),
-              if (hasExample) ...[
-                const SizedBox(height: 10),
-                Text(
-                  word.exampleEn,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xB3000000),
-                    height: 1.5,
+              const SizedBox(height: 10),
+              // カード高さを揃えるため英例文の領域は常に 2 行分を確保し、
+              // 超過分は末尾を … で省略する(全文は編集ダイアログで確認できる)。
+              SizedBox(
+                height: _exampleAreaHeight,
+                width: double.infinity,
+                child: Text(
+                  hasExample ? word.exampleEn : '例文なし',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: _exampleFontSize,
+                    color: hasExample
+                        ? const Color(0xB3000000)
+                        : AppColors.textDisabled,
+                    height: _exampleLineHeight,
                   ),
                 ),
-                if (_revealed) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    word.exampleJa,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0x80000000),
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ] else ...[
-                const SizedBox(height: 10),
-                const Text(
-                  '例文なし',
-                  style: TextStyle(
+              ),
+              if (hasExample && _revealed) ...[
+                const SizedBox(height: 4),
+                Text(
+                  word.exampleJa,
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: AppColors.textDisabled,
+                    color: Color(0x80000000),
                     height: 1.5,
                   ),
                 ),
@@ -180,7 +195,7 @@ class _WordCardState extends State<WordCard> {
 }
 
 /// 日本語訳の隠し/表示エリア。未表示は破線ボタン、表示は訳テキスト。
-class _RevealArea extends StatelessWidget {
+class _RevealArea extends StatefulWidget {
   const _RevealArea({
     required this.japanese,
     required this.revealed,
@@ -192,36 +207,53 @@ class _RevealArea extends StatelessWidget {
   final VoidCallback onToggle;
 
   @override
+  State<_RevealArea> createState() => _RevealAreaState();
+}
+
+class _RevealAreaState extends State<_RevealArea> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     // チェック操作と同様、訳トグルはカードクリック(編集)に伝播させない。
     return GestureDetector(
       onTap: () {},
-      child: InkWell(
-        onTap: onToggle,
-        borderRadius: BorderRadius.circular(7),
-        child: revealed
-            ? Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.inputBackground,
-                  borderRadius: BorderRadius.circular(7),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Text(
-                  japanese,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: InkWell(
+          onTap: widget.onToggle,
+          borderRadius: BorderRadius.circular(7),
+          child: widget.revealed
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBackground,
+                    borderRadius: BorderRadius.circular(7),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Text(
+                    widget.japanese,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                )
+              : DottedBorderBox(
+                  backgroundColor: _isHovered
+                      ? const Color(0x08000000)
+                      : null,
+                  child: const Text(
+                    '日本語訳を表示',
+                    style: TextStyle(fontSize: 12, color: Color(0x66000000)),
                   ),
                 ),
-              )
-            : DottedBorderBox(
-                child: const Text(
-                  '日本語訳を表示',
-                  style: TextStyle(fontSize: 12, color: Color(0x66000000)),
-                ),
-              ),
+        ),
       ),
     );
   }
@@ -230,9 +262,10 @@ class _RevealArea extends StatelessWidget {
 /// 破線 border のボックス(「日本語訳を表示」ボタン用)。
 /// Flutter 標準に破線 border がないため CustomPaint で描く。
 class DottedBorderBox extends StatelessWidget {
-  const DottedBorderBox({required this.child, super.key});
+  const DottedBorderBox({required this.child, super.key, this.backgroundColor});
 
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -241,6 +274,7 @@ class DottedBorderBox extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        color: backgroundColor,
         child: child,
       ),
     );

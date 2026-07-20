@@ -11,12 +11,14 @@
 英単語帳アプリ (eitangocho)。macOS 向け Flutter デスクトップアプリ(将来 iOS 展開予定)。
 サーバレス構成で、データはすべてローカル DB(drift / SQLite)に保持する。
 
-- 機能仕様・外部 API・データ設計・開発フェーズの詳細: @docs/design.md
-- UI の詳細(レイアウト・配色・文言)は `docs/prototype/` の HTML プロトタイプが正
+- 機能仕様・外部 API・データ設計・確定済み設計判断の詳細: @docs/design.md
+- UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
+  `lib/constants/app_colors.dart` / `lib/constants/app_dimensions.dart` のトークンが正基準
+- リリース提出手順: `docs/app-store-submission.md`、提出前の手動 QA: `docs/release-checklist.md`
 
 ## 技術スタック
 
-- Flutter for macOS(ネイティブ UI は使わず、プロトタイプ準拠の独自デザイン)
+- Flutter for macOS(ネイティブ UI は使わず、独自デザイン)
 - Riverpod コード生成方式(`@riverpod` → `.g.dart`)+ Freezed(`@freezed` → `.freezed.dart`)
 - drift(SQLite)
 - 配布は Mac App Store のみ。App Sandbox 必須
