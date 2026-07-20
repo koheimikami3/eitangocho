@@ -1,17 +1,18 @@
-/// 寸法定数。値は docs/prototype/design/eitangocho.html から抽出したもの。
+/// 寸法定数。UI レイアウトの正基準となる値(当初は HTML プロトタイプから抽出したが、
+/// プロトタイプ廃止に伴い、これらの値自体が正基準)。
 abstract final class AppDimensions {
   static const sidebarWidth = 212.0;
   static const toolbarHeight = 52.0;
   static const contentPadding = 20.0;
   static const formWidth = 560.0; // 登録フォーム・編集モーダルの幅
-  static const cardMinWidth = 260.0; // Phase 2 のカードグリッド用
+  static const cardMinWidth = 260.0; // カードグリッド用
   static const gridGap = 14.0;
 
   /// 全単語テーブルの最小幅。これより狭いビューでは横スクロールになる
-  /// (プロトタイプの min-width:880px + overflow:auto 準拠)
+  /// (min-width:880px + overflow:auto 相当)
   static const tableMinWidth = 880.0;
 
-  /// UI 全体の拡大率(ブラウザのズーム相当)の既定値。プロトタイプの CSS px 値を
+  /// UI 全体の拡大率(ブラウザのズーム相当)の既定値。素の px 値を
   /// そのまま使うと実機では全体的に小さく感じる、というユーザー判断による。
   /// 実際の値は設定画面のスライダーで変更でき(SettingsState.uiScale)、
   /// これは未設定時のフォールバック。

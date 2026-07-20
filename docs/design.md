@@ -1,6 +1,8 @@
 # 設計ドキュメント
 
-CLAUDE.md から参照される詳細仕様。UI の見た目は `docs/prototype/` の HTML プロトタイプが正。
+CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・配色・寸法)は実装済みアプリと
+[app_colors.dart](../lib/constants/app_colors.dart) / [app_dimensions.dart](../lib/constants/app_dimensions.dart)
+のデザイントークンが正基準(当初は HTML プロトタイプを正としていたが、実装完了に伴い廃止)。
 
 ## 機能仕様(MVP スコープ)
 
@@ -46,6 +48,27 @@ CLAUDE.md から参照される詳細仕様。UI の見た目は `docs/prototype
 - **Phase 2**: 学習中/学習済みフィルタ、カードビュー、フラッシュクイズ
 - **Phase 3**: 自動入力(Free Dictionary API + EJDict + DeepL)、音声再生
 - **Phase 4**: JSON エクスポート/インポート、ショートカット、磨き込み、ストア提出
+
+## 確定済みの設計判断(ユーザー承認済み・変更しないこと)
+
+実装当初に確定し、コードだけからは意図が読み取りにくい判断を記録する。
+(パッケージ選定など pubspec / コードから自明なものは省略)
+
+- **品詞(複数)の保存**: `partsOfSpeech` は enum 名の CSV(例 `'verb,noun'`)を
+  TEXT カラムに保存し、TypeConverter で `List<PartOfSpeech>` に変換する。
+- **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
+  一括定義。以降マイグレーションは発生させない設計。
+- **クイズ実績**: 記録はするが UI 表示はしない。回答毎に `lastReviewedAt` を更新し、
+  「覚えている」で `correctCount` +1。出題は学習済み全件シャッフル。
+- **設定値の保存先**: `shared_preferences`。DeepL API キーも含め平文保存を許容する
+  (ローカル個人アプリのため。キーはコードには埋め込まない → 設定画面から入力)。
+- **ウィンドウ**: 透明タイトルバー(MainFlutterWindow.swift の
+  `titlebarAppearsTransparent` + `fullSizeContentView`)。
+- **EJDict 同梱**: テキストを 1 ファイルに結合して asset 同梱し、初回起動時に drift へ
+  バッチ INSERT する。
+- **Debug ビルドの分離**: debug のみ Bundle ID に `.dev` サフィックス・表示名に「(Dev)」を付け、
+  サンドボックスコンテナ(単語 DB)をストア配布版と分離する(開発ビルドが本番データを触らないため)。
+  設定は macos/Runner/Configs/{Debug,Release,AppInfo}.xcconfig。
 
 ## 将来構想(実装しないが設計で考慮)
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 配色定数。値は docs/prototype/design/eitangocho.html から抽出したもの。
+/// 配色定数。UI の正基準となる値(当初は HTML プロトタイプから抽出したが、
+/// プロトタイプ廃止に伴い、これらの値自体が正基準)。
 abstract final class AppColors {
   static const accent = Color(0xFF429FF0); // 主要アクション
   static const accentHover = Color(0xFF2B8EE0);
