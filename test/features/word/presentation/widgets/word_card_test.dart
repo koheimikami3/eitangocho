@@ -57,26 +57,18 @@ void main() {
     }
   }
 
-  // iOS には副ボタンタップ(右クリック)が無いため、長押しを配線しないと
-  // 削除への導線が完全に失われる。逆に macOS で長押しを有効にすると、
-  // ゆっくりしたクリックが編集モーダルではなくメニューになってしまう。
-  testWidgets('iOS では長押しでコンテキストメニューを要求する', (tester) async {
-    await runForPlatform(tester, TargetPlatform.iOS, (requests) async {
-      await tester.longPress(find.text('apple'));
-      await tester.pump();
+  // 削除導線は iOS では編集シート内の「この単語を削除...」に一本化した
+  // (デザイン準拠)。長押しメニューはどちらのプラットフォームでも持たない。
+  for (final platform in [TargetPlatform.macOS, TargetPlatform.iOS]) {
+    testWidgets('$platform では長押しではコンテキストメニューを要求しない', (tester) async {
+      await runForPlatform(tester, platform, (requests) async {
+        await tester.longPress(find.text('apple'));
+        await tester.pump();
 
-      expect(requests, hasLength(1));
+        expect(requests, isEmpty);
+      });
     });
-  });
-
-  testWidgets('macOS では長押しではコンテキストメニューを要求しない', (tester) async {
-    await runForPlatform(tester, TargetPlatform.macOS, (requests) async {
-      await tester.longPress(find.text('apple'));
-      await tester.pump();
-
-      expect(requests, isEmpty);
-    });
-  });
+  }
 
   for (final platform in [TargetPlatform.macOS, TargetPlatform.iOS]) {
     testWidgets('$platform では右クリックでコンテキストメニューを要求する', (tester) async {

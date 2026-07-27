@@ -5,6 +5,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -102,16 +103,15 @@ class MobileHeader extends ConsumerWidget {
   };
 }
 
-class _AddWordButton extends ConsumerWidget {
+class _AddWordButton extends StatelessWidget {
   const _AddWordButton();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final palette = context.palette;
     return GestureDetector(
-      onTap: () => ref
-          .read(mainPageProvider.notifier)
-          .selectView(MainView.registration),
+      // 登録はタブではなくシートで開く(デザインどおり)。
+      onTap: () => showWordRegistrationSheet(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
