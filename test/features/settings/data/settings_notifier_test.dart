@@ -1,5 +1,6 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,6 +56,26 @@ void main() {
     expect(settings.showIpa, isFalse);
     // 前後の空白は取り除いて保存する
     expect(settings.deeplApiKey, 'my-key');
+  });
+
+  test('appearance の既定はライトで、setAppearance で切り替わり永続化される', () async {
+    final container1 = ProviderContainer();
+    final initial = await container1.read(settingsProvider.future);
+    expect(initial.appearance, AppAppearance.light);
+
+    await container1
+        .read(settingsProvider.notifier)
+        .setAppearance(AppAppearance.dark);
+    expect(
+      container1.read(settingsProvider).requireValue.appearance,
+      AppAppearance.dark,
+    );
+    container1.dispose();
+
+    final container2 = ProviderContainer();
+    addTearDown(container2.dispose);
+    final reloaded = await container2.read(settingsProvider.future);
+    expect(reloaded.appearance, AppAppearance.dark);
   });
 
   test('保存した設定は新しい container(再読込)でも保持される', () async {
