@@ -8,6 +8,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_radio
 import 'package:eitangocho/features/settings/presentation/widgets/settings_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
+import 'package:eitangocho/features/sync/presentation/desktop_sync_section.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,6 +73,11 @@ class SettingsView extends ConsumerWidget {
                   key: ValueKey(ref.watch(settingsProvider).hasValue),
                   initialValue: settings.deeplApiKey,
                 ),
+              ),
+              const SizedBox(height: 22),
+              const SettingsSection(
+                title: 'iCloud 同期',
+                child: DesktopSyncSection(),
               ),
               const SizedBox(height: 22),
               const SettingsSection(

@@ -9,6 +9,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_a
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
+import 'package:eitangocho/features/sync/presentation/mobile_sync_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -95,6 +96,11 @@ class SettingsViewMobile extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: 22),
+        const MobileSettingsSection(
+          title: 'iCloud 同期',
+          child: MobileSyncSection(),
         ),
         const SizedBox(height: 22),
         const MobileSettingsSection(
