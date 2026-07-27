@@ -63,6 +63,8 @@ dev_dependencies:
   riverpod_generator: ^4.0.4
   # 設定テストで SharedPreferencesAsync のインメモリ実装を差し込むために直接参照する。
   shared_preferences_platform_interface: ^2.4.2
+  # マイグレーションテストで v1 相当のスキーマを素の sqlite3 で作るために直接参照する。
+  sqlite3: ^3.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

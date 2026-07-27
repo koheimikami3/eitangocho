@@ -5,16 +5,33 @@ part 'word_export.g.dart';
 
 /// エクスポート/インポートの JSON トップレベル。
 /// DB の `Word` を直接 toJson しない(スキーマ変更の影響を切り離すため)。
+///
+/// version 1 は `deletions` を持たない。読み込み側は v1 も受け付ける
+/// (`deletions` は空として扱う)。
 @freezed
 abstract class WordExportFile with _$WordExportFile {
   const factory WordExportFile({
     required int version,
     @UtcDateTimeConverter() required DateTime exportedAt,
     required List<WordExportEntry> words,
+    @Default(<WordDeletionEntry>[]) List<WordDeletionEntry> deletions,
   }) = _WordExportFile;
 
   factory WordExportFile.fromJson(Map<String, dynamic> json) =>
       _$WordExportFileFromJson(json);
+}
+
+/// 削除された 1 単語(トゥームストーン)。version 2 で追加。
+/// これが無いと、片方の端末で削除した単語がもう片方の同期で復活してしまう。
+@freezed
+abstract class WordDeletionEntry with _$WordDeletionEntry {
+  const factory WordDeletionEntry({
+    required String word,
+    @UtcDateTimeConverter() required DateTime deletedAt,
+  }) = _WordDeletionEntry;
+
+  factory WordDeletionEntry.fromJson(Map<String, dynamic> json) =>
+      _$WordDeletionEntryFromJson(json);
 }
 
 /// エクスポート/インポート対象の 1 単語。

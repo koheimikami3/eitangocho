@@ -34,7 +34,7 @@ void main() {
 
     final json = await service.exportJson();
     final decoded = jsonDecode(json) as Map<String, dynamic>;
-    expect(decoded['version'], 1);
+    expect(decoded['version'], 2);
     expect(decoded['exportedAt'], isNotNull);
     final words = decoded['words'] as List;
     expect(words, hasLength(1));
@@ -144,7 +144,7 @@ void main() {
 
   test('未知の version は例外を投げて中断する', () async {
     final json = jsonEncode({
-      'version': 2,
+      'version': 99,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'words': <dynamic>[],
     });
@@ -198,14 +198,173 @@ void main() {
     expect(words, hasLength(1));
     expect(words.single.japanese, '新しい訳');
   });
+
+  // 削除ログ(version 2)。既存の他テストは version 1 のファイルを使っており、
+  // 後方互換(v1 を deletions 無しとして取り込めること)もそこで担保している。
+  group('削除ログ', () {
+    Future<int> insertWord(String word, {required DateTime updatedAt}) async {
+      final id = await db.wordDao.insertWord(
+        WordsCompanion(word: Value(word), japanese: const Value('訳')),
+      );
+      // insertWord は updatedAt を now で上書きするため、狙った時刻に直す。
+      await (db.update(db.words)..where((t) => t.id.equals(id))).write(
+        WordsCompanion(updatedAt: Value(updatedAt)),
+      );
+      return id;
+    }
+
+    test('ローカルの単語より新しい削除ログはその単語を消す', () async {
+      await insertWord('apple', updatedAt: DateTime.utc(2026, 1, 1));
+
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [],
+          deletions: [_deletionJson('apple', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      expect(result.deleted, 1);
+      expect(await db.wordDao.getAll(), isEmpty);
+    });
+
+    test('削除ログより後にローカルで編集していれば消さない', () async {
+      await insertWord('apple', updatedAt: DateTime.utc(2026, 3, 1));
+
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [],
+          deletions: [_deletionJson('apple', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      expect(result.deleted, 0);
+      expect(await db.wordDao.getAll(), hasLength(1));
+    });
+
+    test('ローカルに無い単語の削除ログもログとして取り込む(第 3 の端末へ伝播させる)', () async {
+      await service.importJson(
+        _buildExportJsonV2(
+          words: [],
+          deletions: [_deletionJson('apple', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      final deletions = await db.wordDao.getDeletions();
+      expect(deletions.single.word, 'apple');
+    });
+
+    test('削除より新しい単語がファイルに載っていれば復活させ、ログは取り消す', () async {
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [
+            _entryJson(
+              word: 'apple',
+              japanese: 'りんご',
+              updatedAt: DateTime.utc(2026, 3, 1),
+            ),
+          ],
+          deletions: [_deletionJson('apple', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      expect(result.added, 1);
+      expect(result.deleted, 0);
+      expect((await db.wordDao.getAll()).single.word, 'apple');
+      expect(await db.wordDao.getDeletions(), isEmpty);
+    });
+
+    test('ローカルの編集が削除より新しくても、ファイル側の再登録がさらに新しければ残す', () async {
+      await insertWord('apple', updatedAt: DateTime.utc(2026, 3, 1));
+
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [
+            _entryJson(
+              word: 'apple',
+              japanese: '新しい訳',
+              updatedAt: DateTime.utc(2026, 4, 1),
+            ),
+          ],
+          deletions: [_deletionJson('apple', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      expect(result.updated, 1);
+      expect(result.deleted, 0);
+      expect((await db.wordDao.getAll()).single.japanese, '新しい訳');
+    });
+
+    test('削除ログは大文字小文字・前後空白を無視して突き合わせる', () async {
+      await insertWord('Apple', updatedAt: DateTime.utc(2026, 1, 1));
+
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [],
+          deletions: [_deletionJson('  APPLE ', DateTime.utc(2026, 2, 1))],
+        ),
+      );
+
+      expect(result.deleted, 1);
+      expect(await db.wordDao.getAll(), isEmpty);
+    });
+
+    test('壊れた削除ログの行は捨てて、単語本体の取り込みは続行する', () async {
+      final result = await service.importJson(
+        _buildExportJsonV2(
+          words: [
+            _entryJson(
+              word: 'apple',
+              japanese: 'りんご',
+              updatedAt: DateTime.utc(2026),
+            ),
+          ],
+          deletions: [
+            {'word': 'banana'}, // deletedAt 欠落
+            'not a map',
+          ],
+        ),
+      );
+
+      expect(result.added, 1);
+      expect(await db.wordDao.getDeletions(), isEmpty);
+    });
+
+    test('エクスポートには削除ログが含まれる', () async {
+      final id = await insertWord('apple', updatedAt: DateTime.utc(2026));
+      await db.wordDao.deleteWord(id);
+
+      final decoded =
+          jsonDecode(await service.exportJson()) as Map<String, dynamic>;
+      final deletions = decoded['deletions'] as List;
+      expect(deletions, hasLength(1));
+      expect((deletions.single as Map<String, dynamic>)['word'], 'apple');
+    });
+  });
 }
 
+/// version 1(deletions を持たない旧フォーマット)。後方互換の確認を兼ねる。
 String _buildExportJson(List<Map<String, dynamic>> words) {
   return jsonEncode({
     'version': 1,
     'exportedAt': DateTime.now().toUtc().toIso8601String(),
     'words': words,
   });
+}
+
+String _buildExportJsonV2({
+  required List<Map<String, dynamic>> words,
+  required List<Object> deletions,
+}) {
+  return jsonEncode({
+    'version': 2,
+    'exportedAt': DateTime.now().toUtc().toIso8601String(),
+    'words': words,
+    'deletions': deletions,
+  });
+}
+
+Map<String, dynamic> _deletionJson(String word, DateTime deletedAt) {
+  return {'word': word, 'deletedAt': deletedAt.toUtc().toIso8601String()};
 }
 
 Map<String, dynamic> _entryJson({
