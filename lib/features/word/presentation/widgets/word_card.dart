@@ -3,7 +3,6 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
-import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 
 /// 学習中リストの単語カード 1 枚(プロトタイプの学習中カード準拠)。
@@ -54,14 +53,8 @@ class _WordCardState extends State<WordCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        // 右クリック(macOS)と長押し(iOS)の両方からメニューを開く。
-        // macOS で長押しを有効にすると、ゆっくりしたクリックが onTap(編集)
-        // ではなくメニューになってしまうため、そちらでは無効にする。
         onSecondaryTapUp: (details) =>
             widget.onContextMenu(details.globalPosition),
-        onLongPressStart: AppPlatform.isMacOS
-            ? null
-            : (details) => widget.onContextMenu(details.globalPosition),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

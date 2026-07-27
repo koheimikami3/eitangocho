@@ -1,7 +1,8 @@
 import 'package:eitangocho/app/main_page.dart';
-import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,20 +20,22 @@ class EitangochoApp extends ConsumerWidget {
               AppDimensions.defaultUiScale
         : 1.0;
 
+    // 配色は iOS のみ設定で切り替えられる。macOS はライト固定
+    // (1.0 でリリース済みの外観を変えないため)。
+    final palette = AppPlatform.isMacOS
+        ? AppPalette.light
+        : AppPalette.of(
+            switch (ref.watch(
+              settingsProvider.select((s) => s.value?.appearance),
+            )) {
+              AppAppearance.dark => Brightness.dark,
+              AppAppearance.light || null => Brightness.light,
+            },
+          );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        colorSchemeSeed: AppColors.accent,
-        dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
-        // カーソルは web の既定キャレット相当の黒(テキスト色)にする。
-        // 選択ハイライト・ハンドルはアクセント色を薄く敷く。
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: AppColors.textPrimary,
-          selectionHandleColor: AppColors.accent,
-          selectionColor: Color(0x33429FF0),
-        ),
-      ),
+      theme: _buildTheme(palette),
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。
       // 縮小サイズでレイアウトしてから拡大描画する。Navigator ごと包むため
       // ダイアログ・メニューにも一律に適用される。
@@ -72,4 +75,21 @@ class EitangochoApp extends ConsumerWidget {
       home: const MainPage(),
     );
   }
+
+  /// パレットから ThemeData を組む。
+  /// ウィジェット側は `context.palette` で配色を引くため、ここで設定するのは
+  /// Flutter 側が握っている部分(地の色・カーソル・選択色)だけでよい。
+  ThemeData _buildTheme(AppPalette palette) => ThemeData(
+    brightness: palette.brightness,
+    scaffoldBackgroundColor: palette.background,
+    colorSchemeSeed: palette.accent,
+    dialogTheme: DialogThemeData(backgroundColor: palette.surface),
+    // カーソルは web の既定キャレット相当の本文色にする。
+    // 選択ハイライト・ハンドルはアクセント色を薄く敷く。
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: palette.text,
+      selectionHandleColor: palette.accent,
+      selectionColor: palette.accent.withValues(alpha: 0.2),
+    ),
+  );
 }

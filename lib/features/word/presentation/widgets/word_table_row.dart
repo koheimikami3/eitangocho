@@ -3,7 +3,6 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
-import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 
 /// 全単語テーブルの 1 行。
@@ -43,14 +42,8 @@ class _WordTableRowState extends State<WordTableRow> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        // 右クリック(macOS)と長押し(iOS)の両方からメニューを開く。
-        // macOS で長押しを有効にすると、ゆっくりしたクリックが onTap(編集)
-        // ではなくメニューになってしまうため、そちらでは無効にする。
         onSecondaryTapUp: (details) =>
             widget.onContextMenu(details.globalPosition),
-        onLongPressStart: AppPlatform.isMacOS
-            ? null
-            : (details) => widget.onContextMenu(details.globalPosition),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(

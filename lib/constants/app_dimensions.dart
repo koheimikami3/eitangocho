@@ -21,4 +21,16 @@ abstract final class AppDimensions {
   /// 設定スライダーで選べる拡大率の範囲(0.1 刻み)
   static const minUiScale = 1.0;
   static const maxUiScale = 2.0;
+
+  /// iOS のコンテンツ最大幅。iPad ではこの幅で中央に寄せ、iPhone 相当の
+  /// 縦長レイアウトをそのまま使う(デザインの iPhone フレーム幅 402pt)。
+  /// iPad 専用レイアウトを作る際はこの制約ごと差し替える。
+  static const mobileContentMaxWidth = 402.0;
+
+  /// iOS の画面外周パディング(デザインの padding:16px)
+  static const mobilePadding = 16.0;
+
+  /// iOS の学習中カードグリッドの列数と間隔
+  static const mobileCardColumns = 2;
+  static const mobileGridGap = 12.0;
 }
