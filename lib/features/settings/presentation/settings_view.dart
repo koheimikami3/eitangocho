@@ -8,6 +8,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_radio
 import 'package:eitangocho/features/settings/presentation/widgets/settings_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
+import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -55,7 +56,10 @@ class SettingsView extends ConsumerWidget {
                       value: settings.showIpa,
                       onChanged: notifier.setShowIpa,
                     ),
-                    UiScaleSlider(value: settings.uiScale),
+                    // 表示サイズは macOS 専用(EitangochoApp の uiScale)。
+                    // iOS では OS の文字サイズ設定に委ねるため出さない。
+                    if (AppPlatform.isMacOS)
+                      UiScaleSlider(value: settings.uiScale),
                   ],
                 ),
               ),

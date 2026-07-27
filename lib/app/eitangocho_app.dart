@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,9 +13,11 @@ class EitangochoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // 設定の拡大率(ロード前は既定値)。変更すると全体が即時リスケールされる。
-    final scale =
-        ref.watch(settingsProvider).value?.uiScale ??
-        AppDimensions.defaultUiScale;
+    // iOS では拡大を行わないため、設定を watch する必要もない。
+    final scale = AppPlatform.isMacOS
+        ? ref.watch(settingsProvider).value?.uiScale ??
+              AppDimensions.defaultUiScale
+        : 1.0;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -33,8 +36,13 @@ class EitangochoApp extends ConsumerWidget {
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。
       // 縮小サイズでレイアウトしてから拡大描画する。Navigator ごと包むため
       // ダイアログ・メニューにも一律に適用される。
+      //
+      // これは macOS 専用の機能。iOS では OS の文字サイズ設定に委ね、
+      // MediaQuery.size の差し替えも行わない(セーフエリアの計算と噛み合わず、
+      // ノッチ・ホームインジケータ周りのレイアウトが崩れるため)。
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
+        if (!AppPlatform.isMacOS) return child;
         return LayoutBuilder(
           builder: (context, constraints) {
             final size = Size(
