@@ -1,1 +1,7 @@
 #include "Generated.xcconfig"
+
+// Release / Profile はサフィックスなし。空で定義しておかないと
+// $(BUNDLE_ID_SUFFIX) が未定義のまま展開され、Bundle ID がずれる。
+// macos/Runner/Configs/Release.xcconfig と同じ方針。
+BUNDLE_ID_SUFFIX =
+APP_DISPLAY_SUFFIX =
