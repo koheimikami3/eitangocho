@@ -1,0 +1,95 @@
+import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart' show kSecondaryButton;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  final word = Word(
+    id: 1,
+    word: 'apple',
+    ipa: '/ˈæp.əl/',
+    japanese: 'りんご',
+    partsOfSpeech: const [],
+    exampleEn: '',
+    exampleJa: '',
+    audioUrl: '',
+    isLearned: false,
+    correctCount: 0,
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
+  );
+
+  /// [platform] を装ってカードを 1 枚描画し、[body] にコンテキストメニュー
+  /// 要求の記録先を渡す。
+  ///
+  /// `debugDefaultTargetPlatformOverride` は tearDown ではなくテスト本体の中で
+  /// 戻す必要がある(flutter_test はテスト本体の直後に debug 変数が未設定へ
+  /// 戻っていることを検証するため)。失敗時も必ず戻すよう finally で括る。
+  Future<void> runForPlatform(
+    WidgetTester tester,
+    TargetPlatform platform,
+    Future<void> Function(List<Offset> requests) body,
+  ) async {
+    debugDefaultTargetPlatformOverride = platform;
+    try {
+      final requests = <Offset>[];
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: WordCard(
+                word: word,
+                showIpa: true,
+                onToggleLearned: (_) {},
+                onTap: () {},
+                onContextMenu: requests.add,
+              ),
+            ),
+          ),
+        ),
+      );
+      await body(requests);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  }
+
+  // iOS には副ボタンタップ(右クリック)が無いため、長押しを配線しないと
+  // 削除への導線が完全に失われる。逆に macOS で長押しを有効にすると、
+  // ゆっくりしたクリックが編集モーダルではなくメニューになってしまう。
+  testWidgets('iOS では長押しでコンテキストメニューを要求する', (tester) async {
+    await runForPlatform(tester, TargetPlatform.iOS, (requests) async {
+      await tester.longPress(find.text('apple'));
+      await tester.pump();
+
+      expect(requests, hasLength(1));
+    });
+  });
+
+  testWidgets('macOS では長押しではコンテキストメニューを要求しない', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, (requests) async {
+      await tester.longPress(find.text('apple'));
+      await tester.pump();
+
+      expect(requests, isEmpty);
+    });
+  });
+
+  for (final platform in [TargetPlatform.macOS, TargetPlatform.iOS]) {
+    testWidgets('$platform では右クリックでコンテキストメニューを要求する', (tester) async {
+      await runForPlatform(tester, platform, (requests) async {
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.text('apple')),
+          buttons: kSecondaryButton,
+        );
+        await gesture.up();
+        await tester.pump();
+
+        expect(requests, hasLength(1));
+      });
+    });
+  }
+}

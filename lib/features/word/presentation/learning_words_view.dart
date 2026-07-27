@@ -9,6 +9,7 @@ import 'package:eitangocho/features/word/presentation/widgets/learning_empty_sta
 import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,12 +33,18 @@ class LearningWordsView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 14),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
             child: Text(
-              'チェックを入れると学習済みになり、このリストから消えます。'
-              'カードをクリックすると編集できます(右クリックでメニュー)。',
-              style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
+              AppPlatform.isMacOS
+                  ? 'チェックを入れると学習済みになり、このリストから消えます。'
+                        'カードをクリックすると編集できます(右クリックでメニュー)。'
+                  : 'チェックを入れると学習済みになり、このリストから消えます。'
+                        'カードをタップすると編集できます(長押しでメニュー)。',
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textTertiary,
+              ),
             ),
           ),
           LayoutBuilder(
@@ -74,13 +81,12 @@ class LearningWordsView extends ConsumerWidget {
                                 .setLearned(word.id, isLearned: isLearned),
                             onTap: () =>
                                 showEditWordDialog(context, ref, word),
-                            onSecondaryTapUp: (details) =>
-                                showWordContextMenu(
-                                  context,
-                                  ref,
-                                  word,
-                                  details.globalPosition,
-                                ),
+                            onContextMenu: (position) => showWordContextMenu(
+                              context,
+                              ref,
+                              word,
+                              position,
+                            ),
                           ),
                         ),
                       ),

@@ -5,7 +5,9 @@ import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.d
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// 右クリックで「編集...」「削除...」のコンテキストメニューを表示する。
+/// 「編集...」「削除...」のコンテキストメニューを表示する。
+/// 呼び出しは macOS の右クリックと iOS の長押しの両方から行われる
+/// (WordCard / WordTableRow の onContextMenu を参照)。
 Future<void> showWordContextMenu(
   BuildContext context,
   WidgetRef ref,
