@@ -96,7 +96,16 @@ class WordExportService {
   /// - 同じキーが words と deletions の両方にある場合はタイムスタンプの
   ///   新しい方を採用する
   /// - 全体を 1 トランザクションで実行する
-  Future<ImportResult> importJson(String source) async {
+  ///
+  /// [respectLocalDeletions] はこちらの削除ログを尊重するかどうか。
+  /// - 同期(SyncService)では true。自分が消した単語が、まだその削除を
+  ///   知らないクラウドのスナップショットから復活するのを防ぐ
+  /// - 手動インポート(バックアップの復元)では false。ファイルにある単語は
+  ///   後から消していても復元する、というのがユーザーの期待に沿う
+  Future<ImportResult> importJson(
+    String source, {
+    bool respectLocalDeletions = false,
+  }) async {
     final Object? decoded;
     try {
       decoded = jsonDecode(source);
@@ -127,6 +136,15 @@ class WordExportService {
     final existingByKey = {
       for (final row in existingRows) _mergeKey(row.word): row,
     };
+    // こちらで削除済みの単語。ファイルにその単語が残っていても、削除の方が
+    // 新しければ復活させない(削除直後の同期で、まだ削除を知らないクラウドの
+    // スナップショットから自分の削除を打ち消してしまうのを防ぐ)。
+    final localDeletions = respectLocalDeletions
+        ? {
+            for (final d in await _db.wordDao.getDeletions())
+              _mergeKey(d.word): d.deletedAt,
+          }
+        : const <String, DateTime>{};
 
     final inserts = <WordsCompanion>[];
     final updates = <(int, WordsCompanion)>[];
@@ -183,9 +201,10 @@ class WordExportService {
       final key = _mergeKey(plan.word);
       // 同じ単語が words と deletions の両方に載っていることがある
       // (別端末で削除された後、さらに別の端末で再登録された場合など)。
-      // 新しい方の操作を採用する。
-      final deletedAt = deletionsByKey[key];
-      if (deletedAt != null && deletedAt.isAfter(plan.updatedAt)) continue;
+      // 新しい方の操作を採用する。ファイル側の削除ログとローカルの削除ログの
+      // うち新しい方と、ファイル側の単語の updatedAt を比べる。
+      final deletedAt = _laterOf(deletionsByKey[key], localDeletions[key]);
+      if (deletedAt != null && !_wordWins(plan.updatedAt, deletedAt)) continue;
 
       final existing = existingByKey[key];
       if (existing == null) {
@@ -198,18 +217,18 @@ class WordExportService {
       }
     }
 
-    // 削除ログの適用。ローカルの単語より削除の方が新しいときだけ消す
-    // (削除後にこちらで編集していれば、その編集が勝つ)。
+    // 削除ログの適用。削除後にこちらで編集していれば、その編集が勝つ
+    // (同時刻は _wordWins のとおり削除の勝ち)。
     final deleteIds = <int>[];
     for (final MapEntry(key: key, value: deletedAt) in deletionsByKey.entries) {
       final existing = existingByKey[key];
       if (existing == null) continue;
-      if (!deletedAt.isAfter(existing.updatedAt)) continue;
+      if (_wordWins(existing.updatedAt, deletedAt)) continue;
       // ファイル側の words に、削除より新しい同じ単語が載っている場合
       // (削除 → 別端末で再登録・再編集)。上の words ループが採用済みなので、
       // ここで消してしまうとその追加・更新が打ち消される。
       final planned = plannedByKey[key];
-      if (planned != null && !deletedAt.isAfter(planned.updatedAt)) continue;
+      if (planned != null && _wordWins(planned.updatedAt, deletedAt)) continue;
       deleteIds.add(existing.id);
     }
 
@@ -239,6 +258,23 @@ class WordExportService {
   }
 
   String _mergeKey(String word) => word.trim().toLowerCase();
+
+  /// 単語の更新が削除に勝つか。
+  ///
+  /// 同時刻のときは削除を優先する(単語を残さない)。drift の DateTime は
+  /// 秒精度で保存されるため、「編集した直後に同じ秒で削除した」ケースで
+  /// updatedAt と deletedAt が一致しうる。その並びでは削除が後に行われた
+  /// 操作なので、引き分けは削除の勝ちにしないと消したはずの単語が
+  /// 次の同期で復活してしまう。
+  bool _wordWins(DateTime updatedAt, DateTime deletedAt) =>
+      updatedAt.isAfter(deletedAt);
+
+  /// 2 つの日時のうち新しい方(null は「無い」扱い)。
+  DateTime? _laterOf(DateTime? a, DateTime? b) {
+    if (a == null) return b;
+    if (b == null) return a;
+    return a.isAfter(b) ? a : b;
+  }
 
   /// 削除ログをマージキー → deletedAt の Map に畳み込む。
   /// 同一単語が複数あれば新しい方を採る。単語本体と同じく、不正な行は

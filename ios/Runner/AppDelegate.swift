@@ -12,5 +12,8 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // iCloud 同期は plugin ではなく自前の MethodChannel なので個別に登録する。
+    IcloudFileStorePlugin.register(
+      with: engineBridge.applicationRegistrar.messenger())
   }
 }
