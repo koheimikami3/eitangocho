@@ -99,37 +99,38 @@ class _MobileWordCardState extends State<MobileWordCard> {
               revealed: _revealed,
               onTap: () => setState(() => _revealed = !_revealed),
             ),
-            if (hasExample) ...[
-              const SizedBox(height: 8),
-              // 行数差で高さがばらつかないよう 2 行分を常に確保する。
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: _exampleFontSize * _exampleLineHeight * 2,
-                ),
+            const SizedBox(height: 8),
+            // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
+            // 常に 2 行分を確保する(child が無ければ空白のまま)。
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: _exampleFontSize * _exampleLineHeight * 2,
+              ),
+              child: hasExample
+                  ? Text(
+                      word.exampleEn,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: _exampleFontSize,
+                        height: _exampleLineHeight,
+                        color: palette.textAlpha(70),
+                      ),
+                    )
+                  : null,
+            ),
+            if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  word.exampleEn,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  word.exampleJa,
                   style: TextStyle(
-                    fontSize: _exampleFontSize,
-                    height: _exampleLineHeight,
-                    color: palette.textAlpha(70),
+                    fontSize: 11,
+                    height: 1.45,
+                    color: palette.textAlpha(50),
                   ),
                 ),
               ),
-              if (_revealed && word.exampleJa.trim().isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    word.exampleJa,
-                    style: TextStyle(
-                      fontSize: 11,
-                      height: 1.45,
-                      color: palette.textAlpha(50),
-                    ),
-                  ),
-                ),
-            ],
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.only(top: 8),
@@ -223,7 +224,8 @@ class _RevealToggle extends StatelessWidget {
               ),
               child: Text(
                 japanese,
-                textAlign: TextAlign.center,
+                // 訳が 2 行に折り返したときに 2 行目だけ中央に寄って見えるため、
+                // 左揃えにする(「訳を表示」の方は 1 行固定なので中央のまま)。
                 style: TextStyle(
                   fontSize: _japaneseFontSize,
                   height: _lineHeight,

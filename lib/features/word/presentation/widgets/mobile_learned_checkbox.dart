@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +29,37 @@ class MobileLearnedCheckbox extends StatelessWidget {
           width: 1.5,
         ),
       ),
-      child: value
-          ? const Icon(Icons.check, size: 15, color: Colors.white)
-          : null,
+      child: value ? const Center(child: _CheckMark()) : null,
+    );
+  }
+}
+
+/// チェックの ✓。
+///
+/// Icons.check は線が細く、22x22 の枠の中では小さく見える。デザインと同じ
+/// 作り方(縦長の枠の右辺・下辺だけを 2px で描いて 45 度回す)にして、
+/// 太さと大きさを揃える。
+class _CheckMark extends StatelessWidget {
+  const _CheckMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: math.pi / 4,
+      // 回転させると視覚的な重心が下がるため、回転後の座標系で少し戻す。
+      child: Transform.translate(
+        offset: const Offset(-0.5, -1),
+        child: Container(
+          width: 7,
+          height: 12,
+          decoration: const BoxDecoration(
+            border: Border(
+              right: BorderSide(color: Colors.white, width: 2),
+              bottom: BorderSide(color: Colors.white, width: 2),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
