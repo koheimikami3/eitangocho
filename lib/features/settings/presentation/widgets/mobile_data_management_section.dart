@@ -42,14 +42,14 @@ class _MobileDataManagementSectionState
           children: [
             Expanded(
               child: _DataButton(
-                label: 'エクスポート...',
+                label: 'エクスポート',
                 onTap: () => _run(exportWordsToFile),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: _DataButton(
-                label: 'インポート...',
+                label: 'インポート',
                 onTap: () => _run(importWordsFromFile),
               ),
             ),

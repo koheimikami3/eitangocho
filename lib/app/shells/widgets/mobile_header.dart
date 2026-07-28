@@ -46,29 +46,40 @@ class MobileHeader extends ConsumerWidget {
                 constraints: const BoxConstraints(minHeight: 44),
                 child: Row(
                   children: [
-                    Flexible(
-                      child: Text(
-                        _titleOf(view),
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: palette.text,
-                        ),
+                    // タイトルと件数を 1 つの Expanded にまとめる。Flexible な
+                    // タイトルと Spacer を並べると余った幅が両者に配分され、
+                    // 登録ボタンが右端まで寄らない。
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _titleOf(view),
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: palette.text,
+                              ),
+                            ),
+                          ),
+                          if (showSearchAndAdd) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              _countOf(ref, view),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: palette.textAlpha(40),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     if (showSearchAndAdd) ...[
                       const SizedBox(width: 8),
-                      Text(
-                        _countOf(ref, view),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: palette.textAlpha(40),
-                        ),
-                      ),
+                      const _AddWordButton(),
                     ],
-                    const Spacer(),
-                    if (showSearchAndAdd) const _AddWordButton(),
                   ],
                 ),
               ),

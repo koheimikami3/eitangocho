@@ -1,4 +1,5 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,8 @@ class MobileSearchField extends ConsumerWidget {
 
     return TextField(
       onChanged: ref.read(mainPageProvider.notifier).updateSearchQuery,
+      cursorWidth: AppDimensions.mobileCursorWidth,
+      cursorColor: palette.accent,
       style: TextStyle(fontSize: 15, color: palette.text),
       decoration: InputDecoration(
         isDense: true,

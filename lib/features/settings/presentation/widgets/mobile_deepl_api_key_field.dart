@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,8 @@ class _MobileDeeplApiKeyFieldState
     return TextField(
       controller: _controller,
       onChanged: ref.read(settingsProvider.notifier).setDeeplApiKey,
+      cursorWidth: AppDimensions.mobileCursorWidth,
+      cursorColor: palette.accent,
       style: TextStyle(fontSize: 14, color: palette.text),
       decoration: InputDecoration(
         isDense: true,

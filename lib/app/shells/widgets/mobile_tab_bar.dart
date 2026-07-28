@@ -49,7 +49,10 @@ class MobileTabBar extends ConsumerWidget {
           child: Row(
             children: [
               _TabItem(
-                icon: Icons.style_outlined,
+                // デザインは「カードが 2 枚重なった」線画。style(扇状に開いた
+                // カード)より、同じ大きさのカードが 2 枚ずれて重なる
+                // filter_none の方が近い。
+                icon: Icons.filter_none,
                 label: '学習中',
                 selected: view == MainView.learning,
                 onTap: () => ref

@@ -238,7 +238,7 @@ class _InputStep extends StatelessWidget {
         MobileLabeledField(
           label: '英単語 *',
           controller: controller,
-          hintText: 'serendipity',
+          hintText: 'apple',
           onSubmitted: (_) => onAutoFill(),
         ),
         const SizedBox(height: 14),

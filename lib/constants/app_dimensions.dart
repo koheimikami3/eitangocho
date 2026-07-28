@@ -33,4 +33,8 @@ abstract final class AppDimensions {
   /// iOS の学習中カードグリッドの列数と間隔
   static const mobileCardColumns = 2;
   static const mobileGridGap = 12.0;
+
+  /// iOS の入力カーソル幅。Material の既定 2.0 は細いフォームの中で太く見えるため、
+  /// UIKit の見え方に近い 1.5 に落とす(色はアクセント色を使う)。
+  static const mobileCursorWidth = 1.5;
 }

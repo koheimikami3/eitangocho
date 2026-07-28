@@ -173,7 +173,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
                 ),
               ),
               child: Text(
-                'この単語を削除...',
+                'この単語を削除',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,

@@ -66,7 +66,7 @@ void main() {
       expect(find.text('キャンセル'), findsOneWidget);
       expect(find.text('保存'), findsOneWidget);
       // iOS では削除はここからしか到達できない。
-      expect(find.text('この単語を削除...'), findsOneWidget);
+      expect(find.text('この単語を削除'), findsOneWidget);
     });
   });
 
@@ -86,9 +86,9 @@ void main() {
   testWidgets('削除を確定すると単語が消え、シートも閉じる', (tester) async {
     await runSheet(tester, (word) async {
       // 削除ボタンはシート下部にあり、初期表示では画面外にある。
-      await tester.ensureVisible(find.text('この単語を削除...'));
+      await tester.ensureVisible(find.text('この単語を削除'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('この単語を削除...'));
+      await tester.tap(find.text('この単語を削除'));
       await tester.pumpAndSettle();
 
       expect(find.text('「apple」を削除しますか?'), findsOneWidget);
@@ -103,9 +103,9 @@ void main() {
 
   testWidgets('削除をやめると単語は残り、シートも開いたまま', (tester) async {
     await runSheet(tester, (word) async {
-      await tester.ensureVisible(find.text('この単語を削除...'));
+      await tester.ensureVisible(find.text('この単語を削除'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('この単語を削除...'));
+      await tester.tap(find.text('この単語を削除'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('やめる'));
       await tester.pumpAndSettle();

@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -55,6 +56,8 @@ class MobileLabeledField extends StatelessWidget {
           controller: controller,
           maxLines: maxLines,
           onSubmitted: onSubmitted,
+          cursorWidth: AppDimensions.mobileCursorWidth,
+          cursorColor: palette.accent,
           // iOS で入力欄をタップしたときに拡大されないよう 16px 以上にする。
           style: TextStyle(fontSize: 16, color: palette.text),
           decoration: InputDecoration(
