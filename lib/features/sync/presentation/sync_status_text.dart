@@ -3,7 +3,7 @@ import 'package:eitangocho/features/sync/domain/sync_state.dart';
 /// 同期状態を 1 行の説明文にする。macOS 版 / iOS 版の設定画面で共通に使う。
 String syncStatusText(SyncState state) {
   if (!state.enabled) {
-    return 'iCloud を使う端末どうしで単語帳を同期します。';
+    return 'iCloud を使う端末同士で単語帳を同期します。';
   }
   if (state.syncing) return '同期中...';
   if (state.errorMessage != null) return state.errorMessage!;

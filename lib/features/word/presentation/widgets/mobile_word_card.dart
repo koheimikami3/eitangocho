@@ -190,6 +190,20 @@ class _RevealToggle extends StatelessWidget {
   final bool revealed;
   final VoidCallback onTap;
 
+  static const _padding = 9.0;
+  static const _lineHeight = 1.4;
+  static const _japaneseFontSize = 13.0;
+  static const _hintFontSize = 12.0;
+
+  /// 訳を 1 行表示したときの外形高さ(パディング + 1 行 + 枠線 1px×2)。
+  static const _boxHeight =
+      _padding * 2 + _japaneseFontSize * _lineHeight + 2;
+
+  /// 破線側のパディング。枠線を CustomPaint で描く(= 高さを取らない)ぶんと
+  /// 文字が小さいぶんをここで埋め、タップしても高さが変わらないようにする。
+  /// 訳が 2 行以上になったときは訳側が伸びる(それは許容)。
+  static const _hintPadding = (_boxHeight - _hintFontSize * _lineHeight) / 2;
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
@@ -201,7 +215,7 @@ class _RevealToggle extends StatelessWidget {
       child: revealed
           ? Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.all(_padding),
               decoration: BoxDecoration(
                 color: palette.surfaceAlt,
                 borderRadius: BorderRadius.circular(8),
@@ -211,8 +225,8 @@ class _RevealToggle extends StatelessWidget {
                 japanese,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 13,
-                  height: 1.4,
+                  fontSize: _japaneseFontSize,
+                  height: _lineHeight,
                   color: palette.text,
                 ),
               ),
@@ -220,12 +234,13 @@ class _RevealToggle extends StatelessWidget {
           : _DashedBox(
               color: palette.borderAlpha(18),
               child: Padding(
-                padding: const EdgeInsets.all(9),
+                padding: const EdgeInsets.all(_hintPadding),
                 child: Text(
                   '訳を表示',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: _hintFontSize,
+                    height: _lineHeight,
                     color: palette.textAlpha(40),
                   ),
                 ),

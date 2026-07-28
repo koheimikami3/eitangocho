@@ -1,5 +1,4 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
-import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -17,7 +16,6 @@ class LearningWordsViewMobile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final palette = context.palette;
     final words = ref.watch(filteredLearningWordsProvider);
     // 設定 showIpa はカードの IPA 表示のみに適用する(macOS 版と同じ)。
     final showIpa =
@@ -35,18 +33,8 @@ class LearningWordsViewMobile extends ConsumerWidget {
         AppDimensions.mobilePadding + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            'チェックを入れると学習済みになり、このリストから消えます。'
-            'カードをタップすると編集できます。',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.6,
-              color: palette.textAlpha(45),
-            ),
-          ),
-        ),
+        // 説明文は置かない(iOS では画面が狭く、操作もチェックとタップだけで
+        // 自明なため)。macOS 版はリスト上部に説明を出す。
         // GridView は行の高さを揃えてしまい、内容量の少ないカードに合わせて
         // 背の高いカードが切れる。デザインの grid(align-items:start)に
         // 合わせ、macOS 版と同じく Wrap で高さを内容なりにする。

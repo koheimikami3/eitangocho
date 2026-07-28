@@ -9,7 +9,6 @@ import 'package:eitangocho/features/word/presentation/widgets/learning_empty_sta
 import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
 import 'package:eitangocho/providers/database_provider.dart';
-import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,11 +35,9 @@ class LearningWordsView extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Text(
-              AppPlatform.isMacOS
-                  ? 'チェックを入れると学習済みになり、このリストから消えます。'
-                        'カードをクリックすると編集できます(右クリックでメニュー)。'
-                  : 'チェックを入れると学習済みになり、このリストから消えます。'
-                        'カードをタップすると編集できます(長押しでメニュー)。',
+              // このビューは macOS 専用(iOS は LearningWordsViewMobile)。
+              'チェックを入れると学習済みになり、このリストから消えます。'
+              'カードをクリックすると編集できます(右クリックでメニュー)。',
               style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textTertiary,
