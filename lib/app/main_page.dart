@@ -1,5 +1,6 @@
 import 'package:eitangocho/app/shells/sidebar_shell.dart';
 import 'package:eitangocho/app/shells/tab_bar_shell.dart';
+import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,9 @@ class MainPage extends ConsumerWidget {
     // EJDict の初回取込をバックグラウンドでキックする(UI はブロックしない。
     // 自動入力側が完了を await するため、起動直後から開始しておく)。
     ref.watch(ejdictImportProvider);
+    // 同期 Notifier をここで生成しておく。設定画面でしか watch していないと、
+    // 設定を開くまで起動時同期が走らない(Provider が遅延生成されるため)。
+    ref.watch(syncProvider);
 
     return AppPlatform.isMacOS ? const SidebarShell() : const TabBarShell();
   }
