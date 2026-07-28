@@ -59,14 +59,8 @@ public final class DocumentExportPlugin: NSObject {
       return
     }
 
-    let picker: UIDocumentPickerViewController
-    if #available(iOS 14.0, *) {
-      picker = UIDocumentPickerViewController(forExporting: [source], asCopy: true)
-    } else {
-      // iOS 13 には forExporting: が無い。exportToService も同じくコピーを作る。
-      picker = UIDocumentPickerViewController(url: source, in: .exportToService)
-    }
-
+    // asCopy: true なので、選択後は元の一時ファイルを消してよい。
+    let picker = UIDocumentPickerViewController(forExporting: [source], asCopy: true)
     let delegate = PickerDelegate { [weak self] saved in
       try? FileManager.default.removeItem(at: source)
       self?.pendingDelegate = nil

@@ -91,6 +91,17 @@ CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・
 - **ダークモードは iOS 専用**: `AppPalette`(ライト/ダーク)を `context.palette` で引く。
   macOS はリリース済みの外観を変えないため `AppColors` のライト固定のまま。
 - **iPad**: 当面は iPhone 相当の幅にコンテンツを固定して中央寄せ。縦向きのみ。
+- **最低 OS は iOS 15.0**: Flutter テンプレート既定の 13.0 から引き上げた。13 / 14 は
+  実機もシミュレータも手元に無く動作保証できないうえ、書き出しパネルに使う
+  `UIDocumentPickerViewController(forExporting:asCopy:)` が iOS 14 以降のため。
+  15 なら iPhone 6s 以降が対象になり、実質的に失うユーザーはいない。
+- **JSON の書き出しは自前の MethodChannel**: `file_selector_ios` は `openFile` /
+  `openFiles` しか実装しておらず、`getSaveLocation` を呼ぶと UnimplementedError に
+  なる。iCloud 同期と同じ方針で、書き出しパネルだけを
+  `ios/Runner/DocumentExportPlugin.swift` に持つ(macOS では不要なので `shared/` に
+  置かない)。読み込みは `file_selector` のままだが、iOS の document picker は
+  拡張子ではなく UTI で絞り込むため `XTypeGroup` に
+  `uniformTypeIdentifiers` が必須。
 
 ## iCloud 同期の設計判断
 
