@@ -228,22 +228,25 @@ class _CardHeader extends StatelessWidget {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // Wrap を横幅いっぱいにするため stretch にする(shrink-wrap すると
+      // spaceBetween に配れる余白が無くなり、バッジが右端に寄らない)。
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         wordText,
         const SizedBox(height: 3),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            // IPA があるときだけバッジが右端へ寄る(Expanded が空きを埋める)。
-            if (showIpa) ...[
-              Expanded(child: ipaText),
-              const SizedBox(width: _gap),
-            ],
-            badge,
-          ],
+        // Row ではなく Wrap にして、IPA とバッジが 1 行に収まらないときは
+        // バッジを次の行へ落とす(デザインの flex-wrap 相当)。Row で詰めると
+        // 品詞が多いカードで IPA 側の幅が潰れ、IPA が数行に折り返してしまう。
+        //
+        // spaceBetween により、同じ行に並ぶときは IPA が左・バッジが右へ、
+        // 行に 1 つしか無いとき(IPA 非表示・折り返し時)は左寄せになる。
+        Wrap(
+          spacing: _gap,
+          runSpacing: 3,
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [if (showIpa) ipaText, badge],
         ),
       ],
     );

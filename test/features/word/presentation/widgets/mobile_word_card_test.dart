@@ -25,6 +25,7 @@ void main() {
     WidgetTester tester, {
     required bool singleColumn,
     required bool showIpa,
+    List<PartOfSpeech> partsOfSpeech = const [PartOfSpeech.noun],
   }) => tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -32,7 +33,7 @@ void main() {
           child: SizedBox(
             width: singleColumn ? 370 : 185,
             child: MobileWordCard(
-              word: word,
+              word: word.copyWith(partsOfSpeech: partsOfSpeech),
               showIpa: showIpa,
               singleColumn: singleColumn,
               onToggleLearned: (_) {},
@@ -73,6 +74,30 @@ void main() {
     expect(badgeRect.top, greaterThan(wordRect.bottom - 1));
     // 単語と同じ左端から始まる(バッジの内側パディング 7px 分だけずれる)。
     expect(badgeRect.left, closeTo(wordRect.left + 7, 1));
+  });
+
+  testWidgets('2 列で品詞が長いと、IPA を潰さず品詞を次の行に落とす', (tester) async {
+    // 品詞 3 つ分のバッジは IPA と同じ行に収まらない幅になる。
+    await pumpCard(
+      tester,
+      singleColumn: false,
+      showIpa: true,
+      partsOfSpeech: const [
+        PartOfSpeech.noun,
+        PartOfSpeech.verb,
+        PartOfSpeech.adjective,
+      ],
+    );
+
+    final ipa = tester.renderObject<RenderBox>(find.text('/ˈæp.əl/'));
+    final ipaRect = tester.getRect(find.text('/ˈæp.əl/'));
+    final badgeRect = tester.getRect(find.text('名詞・動詞・形容詞'));
+
+    // IPA は 1 行のまま(幅を削られて折り返していない)。
+    expect(ipa.size.height, lessThan(20));
+    // 品詞は IPA の下の行に左寄せで並ぶ。
+    expect(badgeRect.top, greaterThan(ipaRect.bottom - 1));
+    expect(badgeRect.left, closeTo(ipaRect.left + 7, 1));
   });
 
   testWidgets('1 列では単語・IPA・品詞が同じ行に並ぶ', (tester) async {

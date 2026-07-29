@@ -37,7 +37,8 @@ class SettingsViewMobile extends ConsumerWidget {
         AppDimensions.mobilePadding,
         AppDimensions.mobilePadding,
         // タブバーが重なる分の余白(シェルが MediaQuery で渡している)。
-        AppDimensions.mobilePadding + MediaQuery.paddingOf(context).bottom,
+        // 最後の説明文がタブバーに近づきすぎないよう、設定画面だけ余分に空ける。
+        AppDimensions.mobilePadding * 2 + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
         MobileSettingsSection(
