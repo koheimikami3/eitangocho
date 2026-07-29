@@ -36,9 +36,13 @@ class MobileWordCard extends StatefulWidget {
 class _MobileWordCardState extends State<MobileWordCard> {
   bool _revealed = false;
 
-  // 英例文は行数差でカード高さがばらつくため、常に 2 行分の高さを確保する。
+  // 英例文は行数差でカード高さがばらつくため、常に固定行数分の高さを確保する。
+  // 2 列は幅が狭く 2 行では大半の例文が途中で切れるため 3 行、
+  // 1 列は 1 行あたりが長いので 2 行に収める。
   static const _exampleFontSize = 12.0;
   static const _exampleLineHeight = 1.45;
+  static const _exampleLinesInTwoColumns = 3;
+  static const _exampleLinesInSingleColumn = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +50,9 @@ class _MobileWordCardState extends State<MobileWordCard> {
     final word = widget.word;
     final showIpa = widget.showIpa && word.ipa.isNotEmpty;
     final hasExample = word.exampleEn.trim().isNotEmpty;
+    final exampleLines = widget.singleColumn
+        ? _exampleLinesInSingleColumn
+        : _exampleLinesInTwoColumns;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -80,15 +87,15 @@ class _MobileWordCardState extends State<MobileWordCard> {
             ),
             const SizedBox(height: 8),
             // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
-            // 常に 2 行分を確保する(child が無ければ空白のまま)。
+            // 常に固定行数分を確保する(child が無ければ空白のまま)。
             ConstrainedBox(
-              constraints: const BoxConstraints(
-                minHeight: _exampleFontSize * _exampleLineHeight * 2,
+              constraints: BoxConstraints(
+                minHeight: _exampleFontSize * _exampleLineHeight * exampleLines,
               ),
               child: hasExample
                   ? Text(
                       word.exampleEn,
-                      maxLines: 2,
+                      maxLines: exampleLines,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: _exampleFontSize,

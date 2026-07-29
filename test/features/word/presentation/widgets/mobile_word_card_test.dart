@@ -26,6 +26,7 @@ void main() {
     required bool singleColumn,
     required bool showIpa,
     List<PartOfSpeech> partsOfSpeech = const [PartOfSpeech.noun],
+    String exampleEn = '',
   }) => tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -33,7 +34,10 @@ void main() {
           child: SizedBox(
             width: singleColumn ? 370 : 185,
             child: MobileWordCard(
-              word: word.copyWith(partsOfSpeech: partsOfSpeech),
+              word: word.copyWith(
+                partsOfSpeech: partsOfSpeech,
+                exampleEn: exampleEn,
+              ),
               showIpa: showIpa,
               singleColumn: singleColumn,
               onToggleLearned: (_) {},
@@ -98,6 +102,29 @@ void main() {
     // 品詞は IPA の下の行に左寄せで並ぶ。
     expect(badgeRect.top, greaterThan(ipaRect.bottom - 1));
     expect(badgeRect.left, closeTo(ipaRect.left + 7, 1));
+  });
+
+  testWidgets('英例文の行数は 2 列で 3 行、1 列で 2 行に固定される', (tester) async {
+    const example =
+        'She ate an apple every morning before walking to the station '
+        'with her younger brother.';
+
+    for (final singleColumn in [false, true]) {
+      await pumpCard(
+        tester,
+        singleColumn: singleColumn,
+        showIpa: true,
+        exampleEn: example,
+      );
+
+      final text = tester.widget<Text>(find.text(example));
+      final rect = tester.getRect(find.text(example));
+      final lines = singleColumn ? 2 : 3;
+
+      expect(text.maxLines, lines);
+      // 行数分の高さ(12 * 1.45 * 行数)が確保される。
+      expect(rect.height, closeTo(12 * 1.45 * lines, 1));
+    }
   });
 
   testWidgets('1 列では単語・IPA・品詞が同じ行に並ぶ', (tester) async {
