@@ -12,10 +12,10 @@
 データはローカル DB(drift / SQLite)に保持し、端末間は iCloud 上の JSON
 スナップショット 1 個で同期する(自前サーバは持たない)。
 
-- 機能仕様・外部 API・データ設計・確定済み設計判断の詳細: @docs/design.md
-- UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
-  `lib/constants/app_colors.dart` / `lib/constants/app_dimensions.dart` のトークンが正基準
-- リリース提出手順: `docs/app-store-submission.md`、提出前の手動 QA: `docs/release-checklist.md`
+- 外部 API・確定済み設計判断の詳細: @docs/design.md
+- 機能仕様と UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
+  `lib/constants/app_colors.dart` / `lib/constants/app_palette.dart` /
+  `lib/constants/app_dimensions.dart` のトークンが正基準
 
 ## 技術スタック
 
