@@ -1,6 +1,7 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +24,28 @@ void main() {
     expect(settings.showIpa, isTrue);
     expect(settings.deeplApiKey, isEmpty);
     expect(settings.uiScale, AppDimensions.defaultUiScale);
+    // 学習中カードの既定は 2 列。
+    expect(settings.cardLayout, LearningCardLayout.twoColumns);
+  });
+
+  test('setCardLayout で state が更新され、次回読み込みでも復元される', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
+
+    await container
+        .read(settingsProvider.notifier)
+        .setCardLayout(LearningCardLayout.oneColumn);
+    expect(
+      container.read(settingsProvider).requireValue.cardLayout,
+      LearningCardLayout.oneColumn,
+    );
+
+    // 同じインメモリ prefs を共有した別 container で読み直す。
+    final container2 = ProviderContainer();
+    addTearDown(container2.dispose);
+    final restored = await container2.read(settingsProvider.future);
+    expect(restored.cardLayout, LearningCardLayout.oneColumn);
   });
 
   test('setUiScale は範囲外の値を min/max に丸めて保存する', () async {

@@ -1,5 +1,6 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -22,5 +23,8 @@ abstract class SettingsState with _$SettingsState {
 
     /// 配色(ライト / ダーク)。iOS 専用で、macOS は常にライト。
     @Default(AppAppearance.light) AppAppearance appearance,
+
+    /// 学習中カードの並び(1 列 / 2 列)。iOS 専用。
+    @Default(LearningCardLayout.twoColumns) LearningCardLayout cardLayout,
   }) = _SettingsState;
 }

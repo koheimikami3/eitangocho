@@ -30,8 +30,8 @@ abstract final class AppDimensions {
   /// iOS の画面外周パディング(デザインの padding:16px)
   static const mobilePadding = 16.0;
 
-  /// iOS の学習中カードグリッドの列数と間隔
-  static const mobileCardColumns = 2;
+  /// iOS の学習中カードグリッドの間隔
+  /// (列数は設定 LearningCardLayout が持つ)
   static const mobileGridGap = 12.0;
 
   /// iOS の入力カーソル幅。Material の既定 2.0 は細いフォームの中で太く見えるため、

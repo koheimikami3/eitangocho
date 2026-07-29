@@ -7,12 +7,16 @@ class MobileSettingsRadioRow extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.trailing,
     super.key,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+
+  /// 行の右端に置く補助表示(列数のプレビュー等)。無ければラベルだけ。
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +57,13 @@ class MobileSettingsRadioRow extends StatelessWidget {
                   : null,
             ),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(fontSize: 14, color: palette.text),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 14, color: palette.text),
+              ),
             ),
+            ?trailing,
           ],
         ),
       ),

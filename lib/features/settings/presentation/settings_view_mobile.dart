@@ -2,8 +2,10 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_management_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
@@ -58,6 +60,19 @@ class SettingsViewMobile extends ConsumerWidget {
                 label: direction.label,
                 selected: settings.quizDirection == direction,
                 onTap: () => notifier.setQuizDirection(direction),
+              ),
+          ],
+        ),
+        const SizedBox(height: 22),
+        MobileSettingsSection(
+          title: '学習中カードの並び',
+          rows: [
+            for (final layout in LearningCardLayout.values)
+              MobileSettingsRadioRow(
+                label: layout.label,
+                selected: settings.cardLayout == layout,
+                onTap: () => notifier.setCardLayout(layout),
+                trailing: MobileCardLayoutPreview(layout: layout),
               ),
           ],
         ),
