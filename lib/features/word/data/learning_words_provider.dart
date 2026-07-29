@@ -19,14 +19,22 @@ final learnedWordsProvider = Provider<List<Word>>((ref) {
 
 /// ツールバー検索でフィルタした学習中一覧(学習中カードビュー用)。
 /// 検索ロジックは filteredWordListProvider と同一(英=大文字小文字無視の部分一致、日=部分一致)。
+///
+/// learningWordsProvider ではなく wordListProvider から直接算出する。派生を
+/// 2 段に重ねると、チェーン全体がリスナー 0 の間(iOS で学習中タブを離れている間)
+/// に元データが更新されたとき、次にビューが build する瞬間に riverpod が
+/// 祖先の再計算 → 子の無効化を同期的に行い、「build 中の setState」で例外になる。
 final filteredLearningWordsProvider = Provider<List<Word>>((ref) {
-  final words = ref.watch(learningWordsProvider);
+  final words = ref.watch(wordListProvider).value ?? const <Word>[];
   final query = ref.watch(mainPageProvider.select((s) => s.searchQuery)).trim();
-  if (query.isEmpty) return words;
   final lower = query.toLowerCase();
   return words
       .where(
-        (w) => w.word.toLowerCase().contains(lower) || w.japanese.contains(query),
+        (w) =>
+            !w.isLearned &&
+            (query.isEmpty ||
+                w.word.toLowerCase().contains(lower) ||
+                w.japanese.contains(query)),
       )
       .toList();
 });
