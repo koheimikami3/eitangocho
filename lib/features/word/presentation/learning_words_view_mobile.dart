@@ -3,7 +3,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/card_in.dart';
-import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
+import 'package:eitangocho/features/word/presentation/widgets/mobile_learning_empty_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -22,7 +22,7 @@ class LearningWordsViewMobile extends ConsumerWidget {
         ref.watch(settingsProvider).value?.showIpa ??
         const SettingsState().showIpa;
 
-    if (words.isEmpty) return const LearningEmptyState();
+    if (words.isEmpty) return const MobileLearningEmptyState();
 
     return ListView(
       padding: EdgeInsets.fromLTRB(
