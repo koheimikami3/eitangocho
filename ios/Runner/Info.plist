@@ -53,16 +53,15 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<!-- iPad でも iPhone 相当の縦長レイアウトを流用するため、縦向きのみに固定する。
-	     iPad 専用レイアウトを実装するまで横向きは許可しない。 -->
+	<!-- 縦向きのみに固定する(横向きのレイアウトは持たない)。
+	     iPad は対象外(TARGETED_DEVICE_FAMILY = 1)なので ~ipad の指定は持たない。 -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-	</array>
+	<!-- 暗号は OS の HTTPS / iCloud だけを使い、独自実装を持たないため輸出規制の対象外。
+	     この宣言があるとアップロードごとの輸出コンプライアンス回答が不要になる。 -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

@@ -75,7 +75,13 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   MediaQuery.size の差し替えはセーフエリア計算と噛み合わない。
 - **ダークモードは iOS 専用**: `AppPalette`(ライト/ダーク)を `context.palette` で引く。
   macOS はリリース済みの外観を変えないため `AppColors` のライト固定のまま。
-- **iPad**: 当面は iPhone 相当の幅にコンテンツを固定して中央寄せ。縦向きのみ。
+- **iPad**: ストアの対象デバイスは iPhone のみ(`TARGETED_DEVICE_FAMILY = 1`)。
+  iPad 専用レイアウトが無く、対象に含めると 13 インチのスクリーンショットが必須に
+  なるため。コード側は iPhone 相当の幅にコンテンツを固定して中央寄せしてあるので、
+  iPad で動かす場合(互換モード)も破綻しない。向きは縦のみ。
+- **輸出コンプライアンス**: `ITSAppUsesNonExemptEncryption = false` を Info.plist に
+  持つ。暗号は OS の HTTPS / iCloud だけで独自実装が無く規制対象外のため、
+  アップロードごとの回答を省ける。
 - **学習中カードの並びは設定で 1 列 / 2 列**(既定 2 列、iOS のみ)。列数は
   `LearningCardLayout`(設定 enum)が持ち、`AppDimensions` には定数を置かない。
   カードヘッダの組み方も列数で変える: 2 列は単語が 1 行を占有して次の行に
