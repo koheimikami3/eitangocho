@@ -17,10 +17,12 @@ class LearningWordsViewMobile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final words = ref.watch(filteredLearningWordsProvider);
-    // 設定 showIpa はカードの IPA 表示のみに適用する(macOS 版と同じ)。
-    final showIpa =
-        ref.watch(settingsProvider).value?.showIpa ??
-        const SettingsState().showIpa;
+    // ロード前は既定値でフォールバックする。
+    // showIpa はカードの IPA 表示のみに適用する(macOS 版と同じ)。
+    final settings =
+        ref.watch(settingsProvider).value ?? const SettingsState();
+    final showIpa = settings.showIpa;
+    final columns = settings.cardLayout.columns;
 
     if (words.isEmpty) return const MobileLearningEmptyState();
 
@@ -40,7 +42,6 @@ class LearningWordsViewMobile extends ConsumerWidget {
         // 合わせ、macOS 版と同じく Wrap で高さを内容なりにする。
         LayoutBuilder(
           builder: (context, constraints) {
-            const columns = AppDimensions.mobileCardColumns;
             const gap = AppDimensions.mobileGridGap;
             final cardWidth =
                 (constraints.maxWidth - gap * (columns - 1)) / columns;
@@ -60,6 +61,7 @@ class LearningWordsViewMobile extends ConsumerWidget {
                         child: MobileWordCard(
                           word: word,
                           showIpa: showIpa,
+                          singleColumn: columns == 1,
                           onToggleLearned: (isLearned) => ref
                               .read(databaseProvider)
                               .wordDao

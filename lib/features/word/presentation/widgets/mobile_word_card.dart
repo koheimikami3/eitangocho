@@ -5,7 +5,7 @@ import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_che
 import 'package:eitangocho/features/word/presentation/widgets/mobile_pos_badge.dart';
 import 'package:flutter/material.dart';
 
-/// iOS 版の学習中カード 1 枚(2 列グリッドに並ぶ)。
+/// iOS 版の学習中カード 1 枚(設定に応じて 1 列 / 2 列グリッドに並ぶ)。
 ///
 /// 訳はタップで表示 / 非表示を切り替える。状態はカードのローカルに持つ
 /// (画面切替で揮発してよい。macOS 版の [WordCard] と同じ方針)。
@@ -15,6 +15,7 @@ class MobileWordCard extends StatefulWidget {
     required this.showIpa,
     required this.onToggleLearned,
     required this.onTap,
+    this.singleColumn = false,
     super.key,
   });
 
@@ -22,6 +23,9 @@ class MobileWordCard extends StatefulWidget {
 
   /// IPA を表示するか(設定 showIpa。word.ipa が空なら本値に関わらず非表示)。
   final bool showIpa;
+
+  /// 1 列表示か。ヘッダの組み方だけが変わる(_CardHeader 参照)。
+  final bool singleColumn;
   final ValueChanged<bool> onToggleLearned;
   final VoidCallback onTap;
 
@@ -63,36 +67,11 @@ class _MobileWordCardState extends State<MobileWordCard> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    word.word,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      height: 1.25,
-                      color: palette.text,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                MobilePosBadge(partsOfSpeech: word.partsOfSpeech),
-              ],
+            _CardHeader(
+              word: word,
+              showIpa: showIpa,
+              singleColumn: widget.singleColumn,
             ),
-            if (showIpa)
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Text(
-                  word.ipa,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontFamily: 'Menlo',
-                    color: palette.textAlpha(45),
-                  ),
-                ),
-              ),
             const SizedBox(height: 8),
             _RevealToggle(
               japanese: word.japanese,
@@ -175,6 +154,98 @@ class _MobileWordCardState extends State<MobileWordCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// カード上部(単語 + IPA + 品詞バッジ)。列数で組み方が変わる。
+///
+/// - 2 列: 単語が 1 行を占有し、その下に IPA(左)とバッジ(右)。
+///   IPA が無いときはバッジが左寄せになる(デザインどおり)。
+/// - 1 列: 幅に余裕があるので単語・IPA・バッジを 1 行に並べ、バッジだけ右端。
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({
+    required this.word,
+    required this.showIpa,
+    required this.singleColumn,
+  });
+
+  final Word word;
+  final bool showIpa;
+  final bool singleColumn;
+
+  /// 単語と IPA の間隔(デザインの column-gap)。
+  static const _gap = 7.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+
+    final wordText = Text(
+      word.word,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        height: 1.25,
+        color: palette.text,
+      ),
+    );
+    final ipaText = Text(
+      word.ipa,
+      style: TextStyle(
+        fontSize: 11,
+        fontFamily: 'Menlo',
+        color: palette.textAlpha(45),
+      ),
+    );
+    final badge = MobilePosBadge(partsOfSpeech: word.partsOfSpeech);
+
+    if (singleColumn) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          // 単語 + IPA を Expanded で包み、バッジを右端に押し出す。
+          // Flexible と Spacer を並べると空きを両者で折半してしまい、
+          // 幅に余裕があっても長い単語が折り返す。
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Flexible(child: wordText),
+                if (showIpa) ...[
+                  const SizedBox(width: _gap),
+                  Flexible(child: ipaText),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: _gap),
+          badge,
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        wordText,
+        const SizedBox(height: 3),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            // IPA があるときだけバッジが右端へ寄る(Expanded が空きを埋める)。
+            if (showIpa) ...[
+              Expanded(child: ipaText),
+              const SizedBox(width: _gap),
+            ],
+            badge,
+          ],
+        ),
+      ],
     );
   }
 }
