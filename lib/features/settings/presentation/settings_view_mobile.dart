@@ -20,6 +20,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// macOS 版との差分は 2 つ:
 /// - 「外観」(ライト / ダーク)を持つ。macOS はライト固定
 /// - 「表示サイズ」(uiScale)を持たない。iOS は OS の文字サイズ設定に委ねる
+///
+/// 並びは「見た目 → 学習 → 外部連携 → データ」。見た目は効く範囲の広い順に
+/// アプリ全体(外観)→ 一覧全体(IPA)→ 学習中のみ(カードの並び)と置く。
 class SettingsViewMobile extends ConsumerWidget {
   const SettingsViewMobile({super.key});
 
@@ -54,14 +57,13 @@ class SettingsViewMobile extends ConsumerWidget {
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(
-          title: 'クイズの出題方向',
+          title: '表示',
           rows: [
-            for (final direction in QuizDirection.values)
-              MobileSettingsRadioRow(
-                label: direction.label,
-                selected: settings.quizDirection == direction,
-                onTap: () => notifier.setQuizDirection(direction),
-              ),
+            MobileSettingsToggleRow(
+              label: '発音記号(IPA)を表示',
+              value: settings.showIpa,
+              onChanged: notifier.setShowIpa,
+            ),
           ],
         ),
         const SizedBox(height: 22),
@@ -79,13 +81,14 @@ class SettingsViewMobile extends ConsumerWidget {
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(
-          title: '表示',
+          title: 'クイズの出題方向',
           rows: [
-            MobileSettingsToggleRow(
-              label: '発音記号(IPA)を表示',
-              value: settings.showIpa,
-              onChanged: notifier.setShowIpa,
-            ),
+            for (final direction in QuizDirection.values)
+              MobileSettingsRadioRow(
+                label: direction.label,
+                selected: settings.quizDirection == direction,
+                onTap: () => notifier.setQuizDirection(direction),
+              ),
           ],
         ),
         const SizedBox(height: 22),
