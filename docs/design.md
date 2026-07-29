@@ -70,10 +70,11 @@ CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・
   `titlebarAppearsTransparent` + `fullSizeContentView`)。
 - **EJDict 同梱**: テキストを 1 ファイルに結合して asset 同梱し、初回起動時に drift へ
   バッチ INSERT する。
-- **Debug ビルドの分離**: debug のみ Bundle ID に `.dev` サフィックス・表示名に「(Dev)」を付け、
-  サンドボックスコンテナ(単語 DB)と iCloud コンテナをストア配布版と分離する
-  (開発ビルドが本番データを触らないため)。設定は
-  macos/Runner/Configs/{Debug,Release,AppInfo}.xcconfig と ios/Flutter/{Debug,Release}.xcconfig。
+- **Debug ビルドの分離**: debug のみ Bundle ID に `.dev` サフィックスを付け、表示名も
+  変えて(macOS は「(Dev)」、iOS は「 dev」)、サンドボックスコンテナ(単語 DB)と
+  iCloud コンテナをストア配布版と分離する(開発ビルドが本番データを触らないため)。
+  設定は macos/Runner/Configs/{Debug,Release,AppInfo}.xcconfig と
+  ios/Flutter/{Debug,Release}.xcconfig。
   entitlements のコンテナ ID にも `$(BUNDLE_ID_SUFFIX)` を埋めて構成ごとに切り替える。
 
 ## iOS 版の設計判断
@@ -91,6 +92,12 @@ CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・
 - **ダークモードは iOS 専用**: `AppPalette`(ライト/ダーク)を `context.palette` で引く。
   macOS はリリース済みの外観を変えないため `AppColors` のライト固定のまま。
 - **iPad**: 当面は iPhone 相当の幅にコンテンツを固定して中央寄せ。縦向きのみ。
+- **iOS の表示名は「英単語帳」**(Debug は「英単語帳 dev」)。ホーム画面のアイコン
+  ラベルは全角 6〜7 文字を超えると省略されるため、macOS の「シンプル英単語帳」より
+  短くした。App Store の掲載名は App Store Connect 側で別に決められるので、
+  ストア上の名前は揃えられる。iOS だけ Info.plist に表示名そのもの
+  (`$(APP_DISPLAY_NAME)`)を持たせているのは、xcconfig が値の先頭空白を捨てるため、
+  macOS と同じサフィックス方式では名前と「dev」の間に空白を入れられないから。
 - **最低 OS は iOS 15.0**: Flutter テンプレート既定の 13.0 から引き上げた。13 / 14 は
   実機もシミュレータも手元に無く動作保証できないうえ、書き出しパネルに使う
   `UIDocumentPickerViewController(forExporting:asCopy:)` が iOS 14 以降のため。
