@@ -1,6 +1,11 @@
+import 'dart:async';
+
+import 'package:drift/drift.dart';
 import 'package:eitangocho/features/sync/data/sync_service.dart';
 import 'package:eitangocho/features/sync/domain/cloud_file_store.dart';
 import 'package:eitangocho/features/sync/domain/sync_state.dart';
+import 'package:eitangocho/providers/database_provider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,11 +13,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// 設定と同じく shared_preferences に永続化する。同期そのものは
 /// [SyncService] が行い、ここは「いつ走らせるか」と結果の保持だけを担う。
+///
+/// 走らせる契機は 4 つ: 起動時 / フォアグラウンド復帰時 / ローカル変更後
+/// (デバウンス)/ 設定画面の「今すぐ同期」。
 class SyncNotifier extends Notifier<SyncState> {
+  /// [debounce] と [resumeMinInterval] は既定値が本番値で、テストからだけ縮める。
+  SyncNotifier({
+    this.debounce = const Duration(seconds: 5),
+    this.resumeMinInterval = const Duration(seconds: 60),
+  });
+
   static const _keyEnabled = 'syncEnabled';
   static const _keyLastSyncedAt = 'syncLastSyncedAt';
 
+  /// ローカル変更を検知してから同期するまでの待ち時間。
+  /// 連続した編集やクイズの連続回答を 1 回の書き戻しに畳むために置く。
+  final Duration debounce;
+
+  /// フォアグラウンド復帰で同期する最短間隔。
+  /// macOS はウィンドウを行き来する度に resumed が来るため、これが無いと
+  /// フォーカスを移すだけで iCloud への書き戻しが走ってしまう。
+  final Duration resumeMinInterval;
+
   final _prefs = SharedPreferencesAsync();
+
+  Timer? _debounceTimer;
+  StreamSubscription<Set<TableUpdate>>? _localChanges;
 
   late final Future<void> _restored;
 
@@ -31,9 +57,69 @@ class SyncNotifier extends Notifier<SyncState> {
     // (syncNow 自身が _restored を待つため、ここで待ってから呼ぶ)。
     _restored.then((_) {
       if (!ref.mounted) return;
-      if (state.enabled) syncNow();
+      if (!state.enabled) return;
+      _watchLocalChanges();
+      syncNow();
     });
+
+    // iOS はアプリを終了させずサスペンドするため、ホームに戻して開き直しても
+    // 起動時同期は走らない。復帰トリガが無いと他端末の変更を受け取れない。
+    final lifecycle = AppLifecycleListener(onResume: _onResume);
+
+    ref.onDispose(() {
+      _unwatchLocalChanges();
+      lifecycle.dispose();
+    });
+
     return const SyncState();
+  }
+
+  /// ローカル変更の監視を始める。
+  ///
+  /// 検知は DAO の呼び出し元(登録・編集・削除・学習済み切替の 9 箇所)ではなく、
+  /// drift の更新通知 1 本にまとめる。呼び出し元に散らすと、単語を変更する導線を
+  /// 足すたびに書き漏らすため。
+  ///
+  /// 同期が有効な間だけ購読する。無効なら DB に触れる必要がないうえ、
+  /// 起動直後に DB インスタンスを生成してしまうのを避けられる。
+  void _watchLocalChanges() {
+    if (_localChanges != null) return;
+    final db = ref.read(databaseProvider);
+    _localChanges = db
+        .tableUpdates(TableUpdateQuery.onAllTables([db.words, db.deletedWords]))
+        .listen((_) => _onLocalChange());
+  }
+
+  void _unwatchLocalChanges() {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    _localChanges?.cancel();
+    _localChanges = null;
+  }
+
+  /// words / deleted_words が変わったとき。デバウンスして同期を予約する。
+  ///
+  /// クイズの回答も words の更新なのでここに来る。実績は updatedAt を動かさず
+  /// 受信側では何も起きないが、書き戻し自体はバックアップとして意味があり、
+  /// 連続回答はデバウンスで 1 回に畳まれるため除外しない。
+  void _onLocalChange() {
+    if (!state.enabled) return;
+    // 同期自身の取り込みで再トリガしないよう、実行中の通知は捨てる
+    // (取り込んだ内容はその同期が最後に書き戻すので取りこぼしにならない)。
+    if (state.syncing) return;
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(debounce, syncNow);
+  }
+
+  /// フォアグラウンドに戻ったとき。前回同期から時間が経っていれば同期する。
+  void _onResume() {
+    if (!state.enabled || state.syncing) return;
+    final lastSyncedAt = state.lastSyncedAt;
+    if (lastSyncedAt != null &&
+        DateTime.now().difference(lastSyncedAt) < resumeMinInterval) {
+      return;
+    }
+    syncNow();
   }
 
   Future<void> _restore() async {
@@ -55,7 +141,12 @@ class SyncNotifier extends Notifier<SyncState> {
     await _prefs.setBool(_keyEnabled, enabled);
     if (!ref.mounted) return;
     state = state.copyWith(enabled: enabled, errorMessage: null);
-    if (enabled) await syncNow();
+    if (enabled) {
+      _watchLocalChanges();
+      await syncNow();
+    } else {
+      _unwatchLocalChanges();
+    }
   }
 
   /// 同期を 1 回実行する。無効時・実行中は何もしない。
