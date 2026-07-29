@@ -33,8 +33,8 @@ CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・
 | 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | audio が無い場合のフォールバック |
 
 - 取得チェーン: Free Dictionary API → (未収録なら)手動入力フォールバック
-- 品詞は enum(verb / noun / adjective / adverb / other)で保持し、表示時に日本語変換。
-  複数品詞は「動詞・名詞」のように連結表示。バッジ色: 動詞=青、形容詞=赤、名詞=紫
+- 品詞は enum(noun / verb / adjective / adverb / other)で保持し、表示時に日本語変換。
+  複数品詞は「名詞・動詞」のように連結表示。バッジ色: 名詞=紫、動詞=青、形容詞=赤
 
 ## データ設計の要点
 
@@ -56,8 +56,13 @@ CLAUDE.md から参照される詳細仕様。UI の見た目(レイアウト・
 実装当初に確定し、コードだけからは意図が読み取りにくい判断を記録する。
 (パッケージ選定など pubspec / コードから自明なものは省略)
 
-- **品詞(複数)の保存**: `partsOfSpeech` は enum 名の CSV(例 `'verb,noun'`)を
+- **品詞(複数)の保存**: `partsOfSpeech` は enum 名の CSV(例 `'noun,verb'`)を
   TEXT カラムに保存し、TypeConverter で `List<PartOfSpeech>` に変換する。
+- **品詞の並び順には意味がある**: バッジ色は先頭の品詞で決まる。自動入力では
+  Free Dictionary API が返した語義順(= その語の主用法が先頭。`run` なら動詞が先)
+  をそのまま保存する。手動で選んだ分だけ enum の宣言順で後ろに足す
+  (`PartOfSpeechSelection.ordered`)。チップのタップ順で保存すると、
+  付け外ししただけでバッジ色が変わってしまうため。
 - **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
   一括定義。iCloud 同期の削除ログ(deleted_words)追加で schemaVersion 2 になった
   (当初は「マイグレーションを発生させない」方針だったが、削除の伝播に必要と判断して改訂)。

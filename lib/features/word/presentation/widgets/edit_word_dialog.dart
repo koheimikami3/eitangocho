@@ -74,7 +74,11 @@ class _EditWordDialogState extends State<_EditWordDialog> {
         word: Value(word),
         ipa: Value(_ipaController.text.trim()),
         japanese: Value(japanese),
-        partsOfSpeech: Value(_selectedPartsOfSpeech.toList()),
+        // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
+        // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
+        partsOfSpeech: Value(
+          _selectedPartsOfSpeech.ordered(basedOn: widget.word.partsOfSpeech),
+        ),
         exampleEn: Value(_exampleEnController.text.trim()),
         exampleJa: Value(_exampleJaController.text.trim()),
       ),
