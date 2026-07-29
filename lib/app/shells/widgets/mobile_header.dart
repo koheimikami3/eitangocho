@@ -26,9 +26,7 @@ class MobileHeader extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: palette.surface,
-        border: Border(
-          bottom: BorderSide(color: palette.borderAlpha(8)),
-        ),
+        border: Border(bottom: BorderSide(color: palette.borderAlpha(8))),
       ),
       child: SafeArea(
         bottom: false,
@@ -108,8 +106,7 @@ class MobileHeader extends ConsumerWidget {
   /// 件数はタイトルの脇に小さく出す(学習中 / 全単語のみ)。
   String _countOf(WidgetRef ref, MainView view) => switch (view) {
     MainView.learning => '${ref.watch(learningWordsProvider).length}語',
-    MainView.allWords =>
-      '${ref.watch(wordListProvider).value?.length ?? 0}語',
+    MainView.allWords => '${ref.watch(wordListProvider).value?.length ?? 0}語',
     _ => '',
   };
 }
@@ -133,7 +130,7 @@ class _AddWordButton extends StatelessWidget {
           '＋ 登録',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
