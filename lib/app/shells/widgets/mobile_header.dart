@@ -132,7 +132,7 @@ class _AddWordButton extends StatelessWidget {
         child: const Text(
           '＋ 登録',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
