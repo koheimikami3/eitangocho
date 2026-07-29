@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +40,48 @@ void main() {
       final (darkBg, darkFg) = AppPalette.dark.posBadge(pos);
       expect(lightBg, isNot(darkBg), reason: '${pos.name} の背景');
       expect(lightFg, isNot(darkFg), reason: '${pos.name} の文字色');
+    }
+  });
+
+  test('品詞バッジのライト配色は enum の定数と一致する(macOS が直接引くため)', () {
+    for (final pos in PartOfSpeech.values) {
+      expect(
+        AppPalette.light.posBadge(pos),
+        (pos.badgeBackground, pos.badgeForeground),
+        reason: pos.name,
+      );
+    }
+  });
+
+  test('品詞バッジの文字は背景に対して 4.5:1 以上ある(10px の小さな文字のため)', () {
+    /// WCAG の相対輝度。半透明の色は重ねる先と合成してから測る。
+    double luminance(Color c, Color under) {
+      double channel(double fg, double bg) {
+        final v = fg * c.a + bg * (1 - c.a);
+        return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4) as double;
+      }
+
+      return 0.2126 * channel(c.r, under.r) +
+          0.7152 * channel(c.g, under.g) +
+          0.0722 * channel(c.b, under.b);
+    }
+
+    for (final palette in [AppPalette.light, AppPalette.dark]) {
+      for (final pos in PartOfSpeech.values) {
+        final (bg, fg) = palette.posBadge(pos);
+        // チップはカードの上に乗るため、半透明の背景はカード面と合成する。
+        final onCard = palette.surface;
+        final bgLum = luminance(bg, onCard);
+        final composited = Color.lerp(onCard, bg.withValues(alpha: 1), bg.a)!;
+        final fgLum = luminance(fg, composited);
+        final ratio =
+            (math.max(bgLum, fgLum) + 0.05) / (math.min(bgLum, fgLum) + 0.05);
+        expect(
+          ratio,
+          greaterThanOrEqualTo(4.5),
+          reason: '${palette.isDark ? 'dark' : 'light'} / ${pos.name}',
+        );
+      }
     }
   });
 

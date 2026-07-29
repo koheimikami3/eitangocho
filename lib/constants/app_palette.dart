@@ -114,48 +114,35 @@ class AppPalette {
       (isDark ? Colors.white : Colors.black).withValues(alpha: percent / 100);
 
   /// 品詞バッジの配色(背景色, 文字色)。
-  (Color, Color) posBadge(PartOfSpeech pos) => switch ((pos, isDark)) {
-    (PartOfSpeech.verb, false) => (
-      const Color(0xFFE3EDFB),
-      const Color(0xFF1C56A8),
-    ),
-    (PartOfSpeech.verb, true) => (
-      const Color(0x3D3C82DC), // rgba(60,130,220,0.24)
-      const Color(0xFF9CC4F5),
-    ),
-    (PartOfSpeech.noun, false) => (
-      const Color(0xFFEEE7FA),
-      const Color(0xFF5B3BA8),
-    ),
-    (PartOfSpeech.noun, true) => (
-      const Color(0x42966EDC), // rgba(150,110,220,0.26)
-      const Color(0xFFC7AEF2),
-    ),
-    (PartOfSpeech.adjective, false) => (
-      const Color(0xFFFBE7E7),
-      const Color(0xFFA83B3B),
-    ),
-    (PartOfSpeech.adjective, true) => (
-      const Color(0x3DD25A5A), // rgba(210,90,90,0.24)
-      const Color(0xFFF0A6A6),
-    ),
-    (PartOfSpeech.adverb, false) => (
-      const Color(0xFFDFF1EC),
-      const Color(0xFF1F6F5C),
-    ),
-    (PartOfSpeech.adverb, true) => (
-      const Color(0x3D32AA87), // rgba(50,170,135,0.24)
-      const Color(0xFF84D8BE),
-    ),
-    (PartOfSpeech.other, false) => (
-      const Color(0xFFECECEF),
-      const Color(0x8C000000), // rgba(0,0,0,0.55)
-    ),
-    (PartOfSpeech.other, true) => (
-      const Color(0x1FFFFFFF), // rgba(255,255,255,0.12)
-      const Color(0x9EFFFFFF), // rgba(255,255,255,0.62)
-    ),
-  };
+  ///
+  /// ライトは enum が持つ定数をそのまま使う(macOS の PosBadge も同じ定数を
+  /// 直接引くため、二重に持つと片方だけ直す事故になる)。
+  /// ダークは同じ色相を明るい文字 + 半透明の地に振り直したもので、
+  /// 色相の間隔・明度差・コントラストの根拠は PartOfSpeech のコメントを参照。
+  (Color, Color) posBadge(PartOfSpeech pos) => isDark
+      ? switch (pos) {
+          PartOfSpeech.noun => (
+            const Color(0x3D0A8FD1), // rgba(10,143,209,0.24)
+            const Color(0xFFA4D8FE),
+          ),
+          PartOfSpeech.verb => (
+            const Color(0x3D479C4D), // rgba(71,156,77,0.24)
+            const Color(0xFFA1F7A3),
+          ),
+          PartOfSpeech.adjective => (
+            const Color(0x3DCD605A), // rgba(205,96,90,0.24)
+            const Color(0xFFFF958E),
+          ),
+          PartOfSpeech.adverb => (
+            const Color(0x3DA06CC4), // rgba(160,108,196,0.24)
+            const Color(0xFFD39DFA),
+          ),
+          PartOfSpeech.other => (
+            const Color(0x1FFFFFFF), // rgba(255,255,255,0.12)
+            const Color(0xFFB7B7BA),
+          ),
+        }
+      : (pos.badgeBackground, pos.badgeForeground);
 }
 
 /// ウィジェットから `context.palette.surface` の形で配色を引くための糖衣。
