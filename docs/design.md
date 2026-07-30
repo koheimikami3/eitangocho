@@ -60,11 +60,11 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   設定は macos/Runner/Configs/{Debug,Release,AppInfo}.xcconfig と
   ios/Flutter/{Debug,Release}.xcconfig。
   entitlements のコンテナ ID にも `$(BUNDLE_ID_SUFFIX)` を埋めて構成ごとに切り替える。
-- **バージョンは両プラットフォームで共通**(`pubspec.yaml` の 1 つを macOS / iOS の
+- **バージョン番号は両プラットフォームで共通**(`pubspec.yaml` の 1 つを macOS / iOS の
   両方が読む)。1.0.0 は macOS のみ、**1.1.0 = iCloud 同期対応で macOS の 2 本目 /
-  iOS の 1 本目**。ビルド番号は共通なので、どちらかに提出した番号は再利用せず
-  単調増加させる(1.0.0(1)を macOS で提出済みのため 1.1.0 は +2 から)。
-  片方だけ差し替えたいときは `--build-number` で明示する。
+  iOS の 1 本目**。ビルド番号は App Store 側ではプラットフォームごとに独立して
+  採番できるが、pubspec が 1 つしか持てないため、片方だけ出し直したいときは
+  `--build-number` で明示する。
 
 ## iOS 版の設計判断
 
