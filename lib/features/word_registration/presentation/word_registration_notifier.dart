@@ -99,16 +99,20 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
       return false;
     }
 
+    // 自動取得できた並び(辞書の主用法が先頭)を保ち、手動で足した品詞は
+    // 規定順で後ろに置く。チップのタップ順には依存させない。
     final partsOfSpeech = state.selectedPartsOfSpeech.isEmpty
-        ? const {PartOfSpeech.other}
-        : state.selectedPartsOfSpeech;
+        ? const [PartOfSpeech.other]
+        : state.selectedPartsOfSpeech.ordered(
+            basedOn: state.fetched?.partsOfSpeech ?? const [],
+          );
 
     await ref.read(databaseProvider).wordDao.insertWord(
       WordsCompanion(
         word: Value(word.trim()),
         ipa: Value(ipa.trim()),
         japanese: Value(japanese.trim()),
-        partsOfSpeech: Value(partsOfSpeech.toList()),
+        partsOfSpeech: Value(partsOfSpeech),
         exampleEn: Value(exampleEn.trim()),
         exampleJa: Value(exampleJa.trim()),
         // audioUrl はフォームに出さず、自動取得できたときだけ保存する

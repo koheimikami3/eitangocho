@@ -1,18 +1,15 @@
-import 'package:eitangocho/app/main_page_notifier.dart';
-import 'package:eitangocho/app/main_page_state.dart';
-import 'package:eitangocho/app/widgets/app_menu_bar.dart';
-import 'package:eitangocho/app/widgets/app_sidebar.dart';
-import 'package:eitangocho/app/widgets/main_toolbar.dart';
-import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
-import 'package:eitangocho/features/settings/presentation/settings_view.dart';
-import 'package:eitangocho/features/word/presentation/all_words_view.dart';
-import 'package:eitangocho/features/word/presentation/learning_words_view.dart';
+import 'package:eitangocho/app/shells/sidebar_shell.dart';
+import 'package:eitangocho/app/shells/tab_bar_shell.dart';
+import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
-import 'package:eitangocho/features/word_registration/presentation/word_registration_view.dart';
+import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// アプリシェル: サイドバー + ツールバー + コンテンツ切替。
+/// アプリシェル。プラットフォームに応じてサイドバー版 / タブバー版を選ぶ。
+///
+/// 画面幅では分岐しない。uiScale(既定 1.5)により macOS の論理幅は実測の
+/// 2/3 になり、幅を基準にすると macOS でタブバー版に落ちてしまうため。
 class MainPage extends ConsumerWidget {
   const MainPage({super.key});
 
@@ -21,37 +18,10 @@ class MainPage extends ConsumerWidget {
     // EJDict の初回取込をバックグラウンドでキックする(UI はブロックしない。
     // 自動入力側が完了を await するため、起動直後から開始しておく)。
     ref.watch(ejdictImportProvider);
-    final view = ref.watch(mainPageProvider.select((s) => s.view));
+    // 同期 Notifier をここで生成しておく。設定画面でしか watch していないと、
+    // 設定を開くまで起動時同期が走らない(Provider が遅延生成されるため)。
+    ref.watch(syncProvider);
 
-    // ⌘N/⌘F は macOS のネイティブメニューバー(AppMenuBar)経由で処理する。
-    // Command 系は focus ベースの CallbackShortcuts には届かないため。
-    return AppMenuBar(
-      child: Scaffold(
-        body: Row(
-          children: [
-            const AppSidebar(),
-            Expanded(
-              child: Column(
-                // 各ビューをコンテンツ幅に関わらず全幅に広げる(既定の center だと
-                // カードが少ないときなどにコンテンツごと中央寄せになってしまう)。
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const MainToolbar(),
-                  Expanded(
-                    child: switch (view) {
-                      MainView.learning => const LearningWordsView(),
-                      MainView.allWords => const AllWordsView(),
-                      MainView.quiz => const QuizView(),
-                      MainView.registration => const WordRegistrationView(),
-                      MainView.settings => const SettingsView(),
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return AppPlatform.isMacOS ? const SidebarShell() : const TabBarShell();
   }
 }

@@ -1,1 +1,13 @@
 #include "Generated.xcconfig"
+
+// Debug ビルドは Bundle ID に ".dev" を付け、表示名の末尾に " dev" を付ける。
+// これによりストア配布版とは別のアプリ(別 DB・別 iCloud コンテナ)になり、
+// 開発中のビルドがインストール済み本番アプリのデータへ影響しないようにする。
+// macos/Runner/Configs/Debug.xcconfig と同じ方針。
+// project.pbxproj の PRODUCT_BUNDLE_IDENTIFIER / Info.plist からこれらを参照している。
+//
+// macOS 側はサフィックスだけを変数にしているが、iOS は表示名を丸ごと持つ。
+// xcconfig は値の先頭空白を捨てるため、サフィックス方式では名前と "dev" の間に
+// 空白を入れられない。
+BUNDLE_ID_SUFFIX = .dev
+APP_DISPLAY_NAME = 英単語帳 dev

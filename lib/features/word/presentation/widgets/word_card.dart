@@ -14,7 +14,7 @@ class WordCard extends StatefulWidget {
     required this.showIpa,
     required this.onToggleLearned,
     required this.onTap,
-    required this.onSecondaryTapUp,
+    required this.onContextMenu,
     super.key,
   });
 
@@ -24,7 +24,9 @@ class WordCard extends StatefulWidget {
   final bool showIpa;
   final ValueChanged<bool> onToggleLearned;
   final VoidCallback onTap;
-  final void Function(TapUpDetails details) onSecondaryTapUp;
+
+  /// コンテキストメニューを開く。引数はメニューを出すグローバル座標。
+  final ValueChanged<Offset> onContextMenu;
 
   @override
   State<WordCard> createState() => _WordCardState();
@@ -51,7 +53,8 @@ class _WordCardState extends State<WordCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        onSecondaryTapUp: widget.onSecondaryTapUp,
+        onSecondaryTapUp: (details) =>
+            widget.onContextMenu(details.globalPosition),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

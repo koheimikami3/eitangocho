@@ -15,6 +15,13 @@ _WordExportFile _$WordExportFileFromJson(Map<String, dynamic> json) =>
       words: (json['words'] as List<dynamic>)
           .map((e) => WordExportEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
+      deletions:
+          (json['deletions'] as List<dynamic>?)
+              ?.map(
+                (e) => WordDeletionEntry.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <WordDeletionEntry>[],
     );
 
 Map<String, dynamic> _$WordExportFileToJson(_WordExportFile instance) =>
@@ -22,6 +29,21 @@ Map<String, dynamic> _$WordExportFileToJson(_WordExportFile instance) =>
       'version': instance.version,
       'exportedAt': const UtcDateTimeConverter().toJson(instance.exportedAt),
       'words': instance.words,
+      'deletions': instance.deletions,
+    };
+
+_WordDeletionEntry _$WordDeletionEntryFromJson(Map<String, dynamic> json) =>
+    _WordDeletionEntry(
+      word: json['word'] as String,
+      deletedAt: const UtcDateTimeConverter().fromJson(
+        json['deletedAt'] as String,
+      ),
+    );
+
+Map<String, dynamic> _$WordDeletionEntryToJson(_WordDeletionEntry instance) =>
+    <String, dynamic>{
+      'word': instance.word,
+      'deletedAt': const UtcDateTimeConverter().toJson(instance.deletedAt),
     };
 
 _WordExportEntry _$WordExportEntryFromJson(Map<String, dynamic> json) =>

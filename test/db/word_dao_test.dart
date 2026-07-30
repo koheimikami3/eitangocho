@@ -73,6 +73,62 @@ void main() {
     expect(words, isEmpty);
   });
 
+  // 削除ログ(iCloud 同期で削除を伝播させるためのトゥームストーン)。
+  group('削除ログ', () {
+    test('deleteWord は削除ログを残す(キーは小文字化する)', () async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('Apple'), japanese: Value('りんご')),
+      );
+
+      await db.wordDao.deleteWord(id);
+
+      final deletions = await db.wordDao.getDeletions();
+      expect(deletions, hasLength(1));
+      expect(deletions.single.word, 'apple');
+    });
+
+    test('存在しない id の deleteWord は削除ログを残さない', () async {
+      await db.wordDao.deleteWord(999);
+
+      expect(await db.wordDao.getDeletions(), isEmpty);
+    });
+
+    test('削除した単語を再登録すると削除ログは取り消される', () async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+      await db.wordDao.deleteWord(id);
+      expect(await db.wordDao.getDeletions(), hasLength(1));
+
+      await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+
+      expect(await db.wordDao.getDeletions(), isEmpty);
+    });
+
+    test('pruneDeletions は指定日時より古いログだけ消す', () async {
+      final oldId = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('old'), japanese: Value('古い')),
+      );
+      await db.wordDao.deleteWord(oldId);
+      // deleteWord は deletedAt に now を入れるため、古い日時へ直す。
+      await (db.update(db.deletedWords)
+            ..where((t) => t.word.equals('old')))
+          .write(DeletedWordsCompanion(deletedAt: Value(DateTime.utc(2020))));
+
+      final recentId = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('recent'), japanese: Value('新しい')),
+      );
+      await db.wordDao.deleteWord(recentId);
+
+      await db.wordDao.pruneDeletions(DateTime.utc(2021));
+
+      final remaining = await db.wordDao.getDeletions();
+      expect(remaining.map((d) => d.word), ['recent']);
+    });
+  });
+
   test('setLearned で isLearned をトグルできる', () async {
     final id = await db.wordDao.insertWord(
       const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),

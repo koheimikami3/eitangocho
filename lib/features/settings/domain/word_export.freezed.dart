@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WordExportFile {
 
- int get version;@UtcDateTimeConverter() DateTime get exportedAt; List<WordExportEntry> get words;
+ int get version;@UtcDateTimeConverter() DateTime get exportedAt; List<WordExportEntry> get words; List<WordDeletionEntry> get deletions;
 /// Create a copy of WordExportFile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WordExportFileCopyWith<WordExportFile> get copyWith => _$WordExportFileCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordExportFile&&(identical(other.version, version) || other.version == version)&&(identical(other.exportedAt, exportedAt) || other.exportedAt == exportedAt)&&const DeepCollectionEquality().equals(other.words, words));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordExportFile&&(identical(other.version, version) || other.version == version)&&(identical(other.exportedAt, exportedAt) || other.exportedAt == exportedAt)&&const DeepCollectionEquality().equals(other.words, words)&&const DeepCollectionEquality().equals(other.deletions, deletions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,version,exportedAt,const DeepCollectionEquality().hash(words));
+int get hashCode => Object.hash(runtimeType,version,exportedAt,const DeepCollectionEquality().hash(words),const DeepCollectionEquality().hash(deletions));
 
 @override
 String toString() {
-  return 'WordExportFile(version: $version, exportedAt: $exportedAt, words: $words)';
+  return 'WordExportFile(version: $version, exportedAt: $exportedAt, words: $words, deletions: $deletions)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WordExportFileCopyWith<$Res>  {
   factory $WordExportFileCopyWith(WordExportFile value, $Res Function(WordExportFile) _then) = _$WordExportFileCopyWithImpl;
 @useResult
 $Res call({
- int version,@UtcDateTimeConverter() DateTime exportedAt, List<WordExportEntry> words
+ int version,@UtcDateTimeConverter() DateTime exportedAt, List<WordExportEntry> words, List<WordDeletionEntry> deletions
 });
 
 
@@ -65,12 +65,13 @@ class _$WordExportFileCopyWithImpl<$Res>
 
 /// Create a copy of WordExportFile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? version = null,Object? exportedAt = null,Object? words = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? version = null,Object? exportedAt = null,Object? words = null,Object? deletions = null,}) {
   return _then(_self.copyWith(
 version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,exportedAt: null == exportedAt ? _self.exportedAt : exportedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,words: null == words ? _self.words : words // ignore: cast_nullable_to_non_nullable
-as List<WordExportEntry>,
+as List<WordExportEntry>,deletions: null == deletions ? _self.deletions : deletions // ignore: cast_nullable_to_non_nullable
+as List<WordDeletionEntry>,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words,  List<WordDeletionEntry> deletions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WordExportFile() when $default != null:
-return $default(_that.version,_that.exportedAt,_that.words);case _:
+return $default(_that.version,_that.exportedAt,_that.words,_that.deletions);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.version,_that.exportedAt,_that.words);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words,  List<WordDeletionEntry> deletions)  $default,) {final _that = this;
 switch (_that) {
 case _WordExportFile():
-return $default(_that.version,_that.exportedAt,_that.words);case _:
+return $default(_that.version,_that.exportedAt,_that.words,_that.deletions);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.version,_that.exportedAt,_that.words);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int version, @UtcDateTimeConverter()  DateTime exportedAt,  List<WordExportEntry> words,  List<WordDeletionEntry> deletions)?  $default,) {final _that = this;
 switch (_that) {
 case _WordExportFile() when $default != null:
-return $default(_that.version,_that.exportedAt,_that.words);case _:
+return $default(_that.version,_that.exportedAt,_that.words,_that.deletions);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.version,_that.exportedAt,_that.words);case _:
 @JsonSerializable()
 
 class _WordExportFile implements WordExportFile {
-  const _WordExportFile({required this.version, @UtcDateTimeConverter() required this.exportedAt, required final  List<WordExportEntry> words}): _words = words;
+  const _WordExportFile({required this.version, @UtcDateTimeConverter() required this.exportedAt, required final  List<WordExportEntry> words, final  List<WordDeletionEntry> deletions = const <WordDeletionEntry>[]}): _words = words,_deletions = deletions;
   factory _WordExportFile.fromJson(Map<String, dynamic> json) => _$WordExportFileFromJson(json);
 
 @override final  int version;
@@ -221,6 +222,13 @@ class _WordExportFile implements WordExportFile {
   if (_words is EqualUnmodifiableListView) return _words;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_words);
+}
+
+ final  List<WordDeletionEntry> _deletions;
+@override@JsonKey() List<WordDeletionEntry> get deletions {
+  if (_deletions is EqualUnmodifiableListView) return _deletions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_deletions);
 }
 
 
@@ -237,16 +245,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordExportFile&&(identical(other.version, version) || other.version == version)&&(identical(other.exportedAt, exportedAt) || other.exportedAt == exportedAt)&&const DeepCollectionEquality().equals(other._words, _words));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordExportFile&&(identical(other.version, version) || other.version == version)&&(identical(other.exportedAt, exportedAt) || other.exportedAt == exportedAt)&&const DeepCollectionEquality().equals(other._words, _words)&&const DeepCollectionEquality().equals(other._deletions, _deletions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,version,exportedAt,const DeepCollectionEquality().hash(_words));
+int get hashCode => Object.hash(runtimeType,version,exportedAt,const DeepCollectionEquality().hash(_words),const DeepCollectionEquality().hash(_deletions));
 
 @override
 String toString() {
-  return 'WordExportFile(version: $version, exportedAt: $exportedAt, words: $words)';
+  return 'WordExportFile(version: $version, exportedAt: $exportedAt, words: $words, deletions: $deletions)';
 }
 
 
@@ -257,7 +265,7 @@ abstract mixin class _$WordExportFileCopyWith<$Res> implements $WordExportFileCo
   factory _$WordExportFileCopyWith(_WordExportFile value, $Res Function(_WordExportFile) _then) = __$WordExportFileCopyWithImpl;
 @override @useResult
 $Res call({
- int version,@UtcDateTimeConverter() DateTime exportedAt, List<WordExportEntry> words
+ int version,@UtcDateTimeConverter() DateTime exportedAt, List<WordExportEntry> words, List<WordDeletionEntry> deletions
 });
 
 
@@ -274,12 +282,279 @@ class __$WordExportFileCopyWithImpl<$Res>
 
 /// Create a copy of WordExportFile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? version = null,Object? exportedAt = null,Object? words = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? version = null,Object? exportedAt = null,Object? words = null,Object? deletions = null,}) {
   return _then(_WordExportFile(
 version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,exportedAt: null == exportedAt ? _self.exportedAt : exportedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,words: null == words ? _self._words : words // ignore: cast_nullable_to_non_nullable
-as List<WordExportEntry>,
+as List<WordExportEntry>,deletions: null == deletions ? _self._deletions : deletions // ignore: cast_nullable_to_non_nullable
+as List<WordDeletionEntry>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WordDeletionEntry {
+
+ String get word;@UtcDateTimeConverter() DateTime get deletedAt;
+/// Create a copy of WordDeletionEntry
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WordDeletionEntryCopyWith<WordDeletionEntry> get copyWith => _$WordDeletionEntryCopyWithImpl<WordDeletionEntry>(this as WordDeletionEntry, _$identity);
+
+  /// Serializes this WordDeletionEntry to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordDeletionEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,word,deletedAt);
+
+@override
+String toString() {
+  return 'WordDeletionEntry(word: $word, deletedAt: $deletedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WordDeletionEntryCopyWith<$Res>  {
+  factory $WordDeletionEntryCopyWith(WordDeletionEntry value, $Res Function(WordDeletionEntry) _then) = _$WordDeletionEntryCopyWithImpl;
+@useResult
+$Res call({
+ String word,@UtcDateTimeConverter() DateTime deletedAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$WordDeletionEntryCopyWithImpl<$Res>
+    implements $WordDeletionEntryCopyWith<$Res> {
+  _$WordDeletionEntryCopyWithImpl(this._self, this._then);
+
+  final WordDeletionEntry _self;
+  final $Res Function(WordDeletionEntry) _then;
+
+/// Create a copy of WordDeletionEntry
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? word = null,Object? deletedAt = null,}) {
+  return _then(_self.copyWith(
+word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
+as String,deletedAt: null == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WordDeletionEntry].
+extension WordDeletionEntryPatterns on WordDeletionEntry {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WordDeletionEntry value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WordDeletionEntry() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WordDeletionEntry value)  $default,){
+final _that = this;
+switch (_that) {
+case _WordDeletionEntry():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WordDeletionEntry value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WordDeletionEntry() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String word, @UtcDateTimeConverter()  DateTime deletedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WordDeletionEntry() when $default != null:
+return $default(_that.word,_that.deletedAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String word, @UtcDateTimeConverter()  DateTime deletedAt)  $default,) {final _that = this;
+switch (_that) {
+case _WordDeletionEntry():
+return $default(_that.word,_that.deletedAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String word, @UtcDateTimeConverter()  DateTime deletedAt)?  $default,) {final _that = this;
+switch (_that) {
+case _WordDeletionEntry() when $default != null:
+return $default(_that.word,_that.deletedAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WordDeletionEntry implements WordDeletionEntry {
+  const _WordDeletionEntry({required this.word, @UtcDateTimeConverter() required this.deletedAt});
+  factory _WordDeletionEntry.fromJson(Map<String, dynamic> json) => _$WordDeletionEntryFromJson(json);
+
+@override final  String word;
+@override@UtcDateTimeConverter() final  DateTime deletedAt;
+
+/// Create a copy of WordDeletionEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WordDeletionEntryCopyWith<_WordDeletionEntry> get copyWith => __$WordDeletionEntryCopyWithImpl<_WordDeletionEntry>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WordDeletionEntryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordDeletionEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.deletedAt, deletedAt) || other.deletedAt == deletedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,word,deletedAt);
+
+@override
+String toString() {
+  return 'WordDeletionEntry(word: $word, deletedAt: $deletedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WordDeletionEntryCopyWith<$Res> implements $WordDeletionEntryCopyWith<$Res> {
+  factory _$WordDeletionEntryCopyWith(_WordDeletionEntry value, $Res Function(_WordDeletionEntry) _then) = __$WordDeletionEntryCopyWithImpl;
+@override @useResult
+$Res call({
+ String word,@UtcDateTimeConverter() DateTime deletedAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$WordDeletionEntryCopyWithImpl<$Res>
+    implements _$WordDeletionEntryCopyWith<$Res> {
+  __$WordDeletionEntryCopyWithImpl(this._self, this._then);
+
+  final _WordDeletionEntry _self;
+  final $Res Function(_WordDeletionEntry) _then;
+
+/// Create a copy of WordDeletionEntry
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? word = null,Object? deletedAt = null,}) {
+  return _then(_WordDeletionEntry(
+word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
+as String,deletedAt: null == deletedAt ? _self.deletedAt : deletedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 

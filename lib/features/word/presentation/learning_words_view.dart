@@ -32,12 +32,16 @@ class LearningWordsView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 14),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
             child: Text(
+              // このビューは macOS 専用(iOS は LearningWordsViewMobile)。
               'チェックを入れると学習済みになり、このリストから消えます。'
               'カードをクリックすると編集できます(右クリックでメニュー)。',
-              style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textTertiary,
+              ),
             ),
           ),
           LayoutBuilder(
@@ -74,13 +78,12 @@ class LearningWordsView extends ConsumerWidget {
                                 .setLearned(word.id, isLearned: isLearned),
                             onTap: () =>
                                 showEditWordDialog(context, ref, word),
-                            onSecondaryTapUp: (details) =>
-                                showWordContextMenu(
-                                  context,
-                                  ref,
-                                  word,
-                                  details.globalPosition,
-                                ),
+                            onContextMenu: (position) => showWordContextMenu(
+                              context,
+                              ref,
+                              word,
+                              position,
+                            ),
                           ),
                         ),
                       ),

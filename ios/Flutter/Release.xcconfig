@@ -1,1 +1,10 @@
 #include "Generated.xcconfig"
+
+// Release / Profile はサフィックスなし。空で定義しておかないと
+// $(BUNDLE_ID_SUFFIX) が未定義のまま展開され、Bundle ID がずれる。
+// macos/Runner/Configs/Release.xcconfig と同じ方針。
+//
+// 表示名はホーム画面のアイコンラベル。全角 6〜7 文字を超えると省略されるため
+// 短く保つ(App Store の掲載名は App Store Connect 側で別に決める)。
+BUNDLE_ID_SUFFIX =
+APP_DISPLAY_NAME = 英単語帳

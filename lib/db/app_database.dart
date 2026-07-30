@@ -10,7 +10,7 @@ import 'package:eitangocho/enums/part_of_speech.dart';
 part 'app_database.g.dart';
 
 @DriftDatabase(
-  tables: [Words, EjdictEntries, DictionaryCacheEntries],
+  tables: [Words, DeletedWords, EjdictEntries, DictionaryCacheEntries],
   daos: [WordDao, EjdictDao, DictionaryCacheDao],
 )
 class AppDatabase extends _$AppDatabase {
@@ -19,6 +19,16 @@ class AppDatabase extends _$AppDatabase {
   /// テスト用(NativeDatabase.memory() を渡す)
   AppDatabase.forTesting(super.executor);
 
+  /// v1: words / ejdict_entries / dictionary_cache_entries
+  /// v2: deleted_words を追加(iCloud 同期で削除を伝播させるため)
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      // v1 → v2 はテーブル追加のみ。既存 3 テーブルには一切触れない。
+      if (from < 2) await m.createTable(deletedWords);
+    },
+  );
 }

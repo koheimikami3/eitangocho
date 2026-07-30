@@ -26,6 +26,25 @@ class Words extends Table {
   DateTimeColumn get updatedAt => dateTime()();
 }
 
+/// 削除済み単語のログ(トゥームストーン)。iCloud 同期で削除を伝播させるために持つ。
+///
+/// スナップショット同期は「相手にあって自分に無い単語は追加」でマージするため、
+/// 単に words から物理削除しただけでは、次の同期で相手のスナップショットから
+/// その単語が復活してしまう(削除したのか相手が新規登録したのか区別できない)。
+/// 削除した事実をここに残し、[deletedAt] と相手の updatedAt を比べて判断する。
+///
+/// words 側は物理削除のまま(論理削除にすると一覧・クイズ・検索の全クエリに
+/// 除外条件を入れる必要があり、入れ忘れが即バグになる)。
+class DeletedWords extends Table {
+  /// 削除された単語。words.word と同じ表記で保持する
+  /// (マージ時は WordExportService と同じく trim + 小文字化して突き合わせる)。
+  TextColumn get word => text()();
+  DateTimeColumn get deletedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {word};
+}
+
 /// EJDict-hand(英和辞書)。Phase 3 の初回起動時取込で投入する。
 class EjdictEntries extends Table {
   TextColumn get word => text()();

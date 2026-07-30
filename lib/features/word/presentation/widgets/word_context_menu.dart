@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 右クリックで「編集...」「削除...」のコンテキストメニューを表示する。
+/// macOS 専用。iOS は編集シート内の「この単語を削除...」を削除導線にしており、
+/// 長押しメニューは持たない(デザイン準拠)。
 Future<void> showWordContextMenu(
   BuildContext context,
   WidgetRef ref,

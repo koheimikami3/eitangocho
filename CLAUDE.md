@@ -8,21 +8,24 @@
 
 ## プロジェクト概要
 
-英単語帳アプリ (eitangocho)。macOS 向け Flutter デスクトップアプリ(将来 iOS 展開予定)。
-サーバレス構成で、データはすべてローカル DB(drift / SQLite)に保持する。
+英単語帳アプリ (eitangocho)。macOS / iOS 向けの Flutter アプリ。
+データはローカル DB(drift / SQLite)に保持し、端末間は iCloud 上の JSON
+スナップショット 1 個で同期する(自前サーバは持たない)。
 
-- 機能仕様・外部 API・データ設計・確定済み設計判断の詳細: @docs/design.md
-- UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
-  `lib/constants/app_colors.dart` / `lib/constants/app_dimensions.dart` のトークンが正基準
-- リリース提出手順: `docs/app-store-submission.md`、提出前の手動 QA: `docs/release-checklist.md`
+- 外部 API・確定済み設計判断の詳細: @docs/design.md
+- 機能仕様と UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
+  `lib/constants/app_colors.dart` / `lib/constants/app_palette.dart` /
+  `lib/constants/app_dimensions.dart` のトークンが正基準
 
 ## 技術スタック
 
-- Flutter for macOS(ネイティブ UI は使わず、独自デザイン)
+- Flutter for macOS / iOS(ネイティブ UI は使わず、独自デザイン)
 - Riverpod コード生成方式(`@riverpod` → `.g.dart`)+ Freezed(`@freezed` → `.freezed.dart`)
 - drift(SQLite)
-- 配布は Mac App Store のみ。App Sandbox 必須
+- 配布は Mac App Store / App Store。macOS は App Sandbox 必須
   (`com.apple.security.network.client` を Debug / Release 両方の entitlements に設定)
+- iCloud 同期のネイティブ実装は `shared/IcloudFileStorePlugin.swift` に置き、
+  macOS / iOS 両方の Xcode プロジェクトから同じファイルを参照する(片方だけ直す事故を防ぐ)
 
 ## アーキテクチャ
 
@@ -36,7 +39,7 @@ lib/
 ├── utils/        # ヘルパー
 ├── providers/    # グローバル Provider(DB インスタンス等)
 ├── db/           # drift のテーブル定義・DAO・Database クラス
-└── features/     # 機能別: word / quiz / word_registration / settings
+└── features/     # 機能別: word / quiz / word_registration / settings / sync
     └── <feature>/
         ├── data/          # DAO・外部 API と連携する Riverpod Provider
         ├── domain/        # Freezed モデル・機能固有 enum
@@ -56,6 +59,10 @@ lib/
 - **LLM 機能は `--dart-define=ENABLE_AI=true` で切り替え**。ストア配布ビルドには
   AI 関連コードを含めない。別リポジトリには絶対に分けない
 - **API キーをコードに埋め込まない**(DeepL キーは設定画面から入力しローカル保存)
+- **プラットフォーム分岐は `AppPlatform`(`lib/utils/app_platform.dart`)に集約**。
+  画面幅では分岐しない(macOS は uiScale で論理幅が縮むため)
+- **iOS 専用ウィジェットは `mobile_` プレフィックス**で同じディレクトリに置く。
+  配色は macOS が `AppColors`(ライト固定)、iOS は `context.palette`(`AppPalette`)
 - **外部 API のレスポンスモデルで、存在が保証されないフィールドを `required` にしない**
   (Free Dictionary API の `phonetics` / `example` 等は欠落しうる。安易な required は
   欠落時にデシリアライズごと失敗する)
@@ -88,6 +95,7 @@ lib/
 
 ```bash
 flutter run -d macos                                    # macOS で実行
+flutter run -d <simulator-id>                           # iOS で実行
 dart run build_runner build --delete-conflicting-outputs # コード生成
 flutter test                                            # 全テスト実行
 flutter test test/path/to/specific_test.dart            # 個別テスト実行

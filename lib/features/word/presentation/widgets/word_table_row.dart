@@ -11,14 +11,16 @@ class WordTableRow extends StatefulWidget {
     required this.word,
     required this.onToggleLearned,
     required this.onTap,
-    required this.onSecondaryTapUp,
+    required this.onContextMenu,
     super.key,
   });
 
   final Word word;
   final ValueChanged<bool> onToggleLearned;
   final VoidCallback onTap;
-  final void Function(TapUpDetails details) onSecondaryTapUp;
+
+  /// コンテキストメニューを開く。引数はメニューを出すグローバル座標。
+  final ValueChanged<Offset> onContextMenu;
 
   @override
   State<WordTableRow> createState() => _WordTableRowState();
@@ -40,7 +42,8 @@ class _WordTableRowState extends State<WordTableRow> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        onSecondaryTapUp: widget.onSecondaryTapUp,
+        onSecondaryTapUp: (details) =>
+            widget.onContextMenu(details.globalPosition),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(

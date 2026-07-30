@@ -1,4 +1,6 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,6 +17,8 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyShowIpa = 'showIpa';
   static const _keyDeeplApiKey = 'deeplApiKey';
   static const _keyUiScale = 'uiScale';
+  static const _keyAppearance = 'appearance';
+  static const _keyCardLayout = 'cardLayout';
 
   final _prefs = SharedPreferencesAsync();
 
@@ -24,6 +28,8 @@ class SettingsNotifier extends _$SettingsNotifier {
     final showIpa = await _prefs.getBool(_keyShowIpa);
     final deeplApiKey = await _prefs.getString(_keyDeeplApiKey);
     final uiScale = await _prefs.getDouble(_keyUiScale);
+    final appearanceName = await _prefs.getString(_keyAppearance);
+    final cardLayoutName = await _prefs.getString(_keyCardLayout);
     return SettingsState(
       quizDirection:
           QuizDirection.values.asNameMap()[directionName] ??
@@ -31,6 +37,12 @@ class SettingsNotifier extends _$SettingsNotifier {
       showIpa: showIpa ?? true,
       deeplApiKey: deeplApiKey ?? '',
       uiScale: uiScale ?? AppDimensions.defaultUiScale,
+      appearance:
+          AppAppearance.values.asNameMap()[appearanceName] ??
+          AppAppearance.light,
+      cardLayout:
+          LearningCardLayout.values.asNameMap()[cardLayoutName] ??
+          LearningCardLayout.twoColumns,
     );
   }
 
@@ -56,6 +68,20 @@ class SettingsNotifier extends _$SettingsNotifier {
       (state.value ?? const SettingsState()).copyWith(
         deeplApiKey: value.trim(),
       ),
+    );
+  }
+
+  Future<void> setAppearance(AppAppearance appearance) async {
+    await _prefs.setString(_keyAppearance, appearance.name);
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(appearance: appearance),
+    );
+  }
+
+  Future<void> setCardLayout(LearningCardLayout layout) async {
+    await _prefs.setString(_keyCardLayout, layout.name);
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(cardLayout: layout),
     );
   }
 

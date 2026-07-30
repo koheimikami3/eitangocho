@@ -756,6 +756,223 @@ class WordsCompanion extends UpdateCompanion<Word> {
   }
 }
 
+class $DeletedWordsTable extends DeletedWords
+    with TableInfo<$DeletedWordsTable, DeletedWord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DeletedWordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<String> word = GeneratedColumn<String>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [word, deletedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'deleted_words';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeletedWord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deletedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {word};
+  @override
+  DeletedWord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeletedWord(
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DeletedWordsTable createAlias(String alias) {
+    return $DeletedWordsTable(attachedDatabase, alias);
+  }
+}
+
+class DeletedWord extends DataClass implements Insertable<DeletedWord> {
+  /// 削除された単語。words.word と同じ表記で保持する
+  /// (マージ時は WordExportService と同じく trim + 小文字化して突き合わせる)。
+  final String word;
+  final DateTime deletedAt;
+  const DeletedWord({required this.word, required this.deletedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['word'] = Variable<String>(word);
+    map['deleted_at'] = Variable<DateTime>(deletedAt);
+    return map;
+  }
+
+  DeletedWordsCompanion toCompanion(bool nullToAbsent) {
+    return DeletedWordsCompanion(
+      word: Value(word),
+      deletedAt: Value(deletedAt),
+    );
+  }
+
+  factory DeletedWord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeletedWord(
+      word: serializer.fromJson<String>(json['word']),
+      deletedAt: serializer.fromJson<DateTime>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'word': serializer.toJson<String>(word),
+      'deletedAt': serializer.toJson<DateTime>(deletedAt),
+    };
+  }
+
+  DeletedWord copyWith({String? word, DateTime? deletedAt}) => DeletedWord(
+    word: word ?? this.word,
+    deletedAt: deletedAt ?? this.deletedAt,
+  );
+  DeletedWord copyWithCompanion(DeletedWordsCompanion data) {
+    return DeletedWord(
+      word: data.word.present ? data.word.value : this.word,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeletedWord(')
+          ..write('word: $word, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(word, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeletedWord &&
+          other.word == this.word &&
+          other.deletedAt == this.deletedAt);
+}
+
+class DeletedWordsCompanion extends UpdateCompanion<DeletedWord> {
+  final Value<String> word;
+  final Value<DateTime> deletedAt;
+  final Value<int> rowid;
+  const DeletedWordsCompanion({
+    this.word = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DeletedWordsCompanion.insert({
+    required String word,
+    required DateTime deletedAt,
+    this.rowid = const Value.absent(),
+  }) : word = Value(word),
+       deletedAt = Value(deletedAt);
+  static Insertable<DeletedWord> custom({
+    Expression<String>? word,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (word != null) 'word': word,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DeletedWordsCompanion copyWith({
+    Value<String>? word,
+    Value<DateTime>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return DeletedWordsCompanion(
+      word: word ?? this.word,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (word.present) {
+      map['word'] = Variable<String>(word.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeletedWordsCompanion(')
+          ..write('word: $word, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $EjdictEntriesTable extends EjdictEntries
     with TableInfo<$EjdictEntriesTable, EjdictEntry> {
   @override
@@ -1246,6 +1463,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $WordsTable words = $WordsTable(this);
+  late final $DeletedWordsTable deletedWords = $DeletedWordsTable(this);
   late final $EjdictEntriesTable ejdictEntries = $EjdictEntriesTable(this);
   late final $DictionaryCacheEntriesTable dictionaryCacheEntries =
       $DictionaryCacheEntriesTable(this);
@@ -1260,6 +1478,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     words,
+    deletedWords,
     ejdictEntries,
     dictionaryCacheEntries,
   ];
@@ -1612,6 +1831,149 @@ typedef $$WordsTableProcessedTableManager =
       Word,
       PrefetchHooks Function()
     >;
+typedef $$DeletedWordsTableCreateCompanionBuilder =
+    DeletedWordsCompanion Function({
+      required String word,
+      required DateTime deletedAt,
+      Value<int> rowid,
+    });
+typedef $$DeletedWordsTableUpdateCompanionBuilder =
+    DeletedWordsCompanion Function({
+      Value<String> word,
+      Value<DateTime> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$DeletedWordsTableFilterComposer
+    extends Composer<_$AppDatabase, $DeletedWordsTable> {
+  $$DeletedWordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DeletedWordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DeletedWordsTable> {
+  $$DeletedWordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DeletedWordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DeletedWordsTable> {
+  $$DeletedWordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$DeletedWordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DeletedWordsTable,
+          DeletedWord,
+          $$DeletedWordsTableFilterComposer,
+          $$DeletedWordsTableOrderingComposer,
+          $$DeletedWordsTableAnnotationComposer,
+          $$DeletedWordsTableCreateCompanionBuilder,
+          $$DeletedWordsTableUpdateCompanionBuilder,
+          (
+            DeletedWord,
+            BaseReferences<_$AppDatabase, $DeletedWordsTable, DeletedWord>,
+          ),
+          DeletedWord,
+          PrefetchHooks Function()
+        > {
+  $$DeletedWordsTableTableManager(_$AppDatabase db, $DeletedWordsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DeletedWordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DeletedWordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DeletedWordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> word = const Value.absent(),
+                Value<DateTime> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DeletedWordsCompanion(
+                word: word,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String word,
+                required DateTime deletedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DeletedWordsCompanion.insert(
+                word: word,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DeletedWordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DeletedWordsTable,
+      DeletedWord,
+      $$DeletedWordsTableFilterComposer,
+      $$DeletedWordsTableOrderingComposer,
+      $$DeletedWordsTableAnnotationComposer,
+      $$DeletedWordsTableCreateCompanionBuilder,
+      $$DeletedWordsTableUpdateCompanionBuilder,
+      (
+        DeletedWord,
+        BaseReferences<_$AppDatabase, $DeletedWordsTable, DeletedWord>,
+      ),
+      DeletedWord,
+      PrefetchHooks Function()
+    >;
 typedef $$EjdictEntriesTableCreateCompanionBuilder =
     EjdictEntriesCompanion Function({
       required String word,
@@ -1944,6 +2306,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$WordsTableTableManager get words =>
       $$WordsTableTableManager(_db, _db.words);
+  $$DeletedWordsTableTableManager get deletedWords =>
+      $$DeletedWordsTableTableManager(_db, _db.deletedWords);
   $$EjdictEntriesTableTableManager get ejdictEntries =>
       $$EjdictEntriesTableTableManager(_db, _db.ejdictEntries);
   $$DictionaryCacheEntriesTableTableManager get dictionaryCacheEntries =>

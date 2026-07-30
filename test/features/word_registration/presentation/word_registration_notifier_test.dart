@@ -145,6 +145,30 @@ void main() {
     expect(words.single.partsOfSpeech, [PartOfSpeech.noun]);
   });
 
+  test('手動で選んだ品詞はタップ順ではなく規定順で保存される', () async {
+    container = buildContainer();
+    final notifier = container.read(wordRegistrationProvider.notifier);
+    // 形容詞 → 名詞 の順にタップする。
+    notifier
+      ..togglePartOfSpeech(PartOfSpeech.adjective)
+      ..togglePartOfSpeech(PartOfSpeech.noun);
+
+    await notifier.save(
+      word: 'light',
+      ipa: '',
+      japanese: '光',
+      exampleEn: '',
+      exampleJa: '',
+    );
+
+    final words = await db.wordDao.watchAll().first;
+    // 先頭の品詞でバッジ色が決まるため、タップ順に引きずられないこと。
+    expect(words.single.partsOfSpeech, [
+      PartOfSpeech.noun,
+      PartOfSpeech.adjective,
+    ]);
+  });
+
   test(
       'wordInfoProvider は keepAlive で、リスナー無しの read 後もイベントループを'
       '跨いで破棄されない(fetch 途中に http.Client が close される回帰を防ぐ)',
@@ -276,6 +300,46 @@ void main() {
 
       final words = await db.wordDao.watchAll().first;
       expect(words.single.audioUrl, 'https://example.com/a.mp3');
+    });
+
+    test('自動取得の品詞順は保たれ、手動で足した品詞は後ろに付く', () async {
+      // 辞書は動詞を先に返す語(run など)を想定する。
+      const verbFirst = WordInfo(
+        word: 'run',
+        ipa: '/ɹʌn/',
+        partsOfSpeech: [PartOfSpeech.verb, PartOfSpeech.noun],
+        japanese: '走る',
+        exampleEn: '',
+        exampleJa: '',
+        audioUrl: '',
+      );
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => verbFirst),
+      );
+      final notifier = container.read(wordRegistrationProvider.notifier);
+      await notifier.autoFill('run');
+
+      // 動詞を外して付け直し、形容詞を足す。
+      notifier
+        ..togglePartOfSpeech(PartOfSpeech.verb)
+        ..togglePartOfSpeech(PartOfSpeech.verb)
+        ..togglePartOfSpeech(PartOfSpeech.adjective);
+
+      await notifier.save(
+        word: 'run',
+        ipa: verbFirst.ipa,
+        japanese: verbFirst.japanese,
+        exampleEn: '',
+        exampleJa: '',
+      );
+
+      final words = await db.wordDao.watchAll().first;
+      // 辞書の主用法(動詞)が先頭のままで、バッジは動詞色になる。
+      expect(words.single.partsOfSpeech, [
+        PartOfSpeech.verb,
+        PartOfSpeech.noun,
+        PartOfSpeech.adjective,
+      ]);
     });
 
     test('backToInput で取得結果と品詞選択が破棄される', () async {
