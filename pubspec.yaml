@@ -43,7 +43,6 @@ dependencies:
   freezed_annotation: ^3.1.0
   http: ^1.6.0
   json_annotation: ^4.12.0
-  just_audio: ^0.10.6
   riverpod_annotation: ^4.0.3
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
