@@ -11,10 +11,10 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
 
 | データ | ソース | 備考 |
 |---|---|---|
-| IPA・品詞・英例文・発音音声 URL | Free Dictionary API (`api.dictionaryapi.dev/api/v2/entries/en/<word>`) | キー不要・無料。取得結果はローカル DB にキャッシュし再フェッチしない |
+| IPA・品詞・英例文・発音音声 URL | Free Dictionary API (`api.dictionaryapi.dev/api/v2/entries/en/<word>`) | キー不要・無料。取得結果はローカル DB にキャッシュし再フェッチしない。音声 URL は保存するだけで再生には使わない(下記) |
 | 単語の日本語訳(語義) | EJDict-hand(パブリックドメイン英和辞書)をアプリに同梱、初回起動時に DB へ取込 | 複数語義の列挙に対応 |
 | 例文の日本語訳 | DeepL API Free(月 50 万文字、超過時は停止で課金なし) | 文の翻訳のみに使う。単語訳には使わない |
-| 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | audio が無い場合のフォールバック |
+| 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | 発音確認の唯一の導線。全単語で外部ブラウザに開く |
 
 - 取得チェーン: Free Dictionary API → (未収録なら)手動入力フォールバック
 - 品詞は enum(noun / verb / adjective / adverb / other)で保持し、表示時に日本語変換。
@@ -40,6 +40,13 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   をそのまま保存する。手動で選んだ分だけ enum の宣言順で後ろに足す
   (`PartOfSpeechSelection.ordered`)。チップのタップ順で保存すると、
   付け外ししただけでバッジ色が変わってしまうため。
+- **発音は音声再生をやめて Google 翻訳リンクに一本化した**: Free Dictionary API の
+  音声配信(`api.dictionaryapi.dev/media/...`)のオリジンが落ちており、mp3 の代わりに
+  502 が返る。鳴る単語は Cloudflare が期限切れコピーを返しているだけで(`cf-cache-status:
+  STALE`)、同じ URL が数十分で 200 → 502 に変わる。単語ごとにファイルが有る / 無いの
+  差ではないため、登録時に生存確認して URL を選び直しても意味がない。
+  `audioUrl` の取得・保存・同期は将来に備えて残す(再生に使わないだけ)。
+  復活させるなら端末内蔵の TTS(`AVSpeechSynthesizer`)が第一候補。
 - **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
   一括定義。iCloud 同期の削除ログ(deleted_words)追加で schemaVersion 2 になった
   (当初は「マイグレーションを発生させない」方針だったが、削除の伝播に必要と判断して改訂)。
