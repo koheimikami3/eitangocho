@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/components/mobile_pronunciation_link.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
@@ -96,10 +96,7 @@ class MobileWordRow extends StatelessWidget {
             // 発音操作も行のタップに伝播させない。
             GestureDetector(
               onTap: () {},
-              child: MobilePronunciationButton(
-                word: word.word,
-                audioUrl: word.audioUrl,
-              ),
+              child: MobilePronunciationLink(word: word.word, compact: true),
             ),
           ],
         ),

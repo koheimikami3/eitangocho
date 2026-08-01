@@ -1,11 +1,12 @@
 import 'package:eitangocho/components/app_filled_button.dart';
-import 'package:eitangocho/components/pronunciation_button.dart';
+import 'package:eitangocho/components/pronunciation_link.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// クイズの出題カード(幅 480 中央)。進捗・表面・IPA・答え表示ボタン、
 /// 答え表示後は区切り線 + 裏面 + 例文を表示する。
-/// 発音ボタンは英単語の横にのみ置く(en→ja は表面、ja→en は答え面)。
+/// 発音リンクは答えがバレないよう、英単語が出ている側にだけ置く
+/// (en→ja は表面、ja→en は答え面)。
 class QuizCard extends StatelessWidget {
   const QuizCard({
     required this.progress,
@@ -17,8 +18,7 @@ class QuizCard extends StatelessWidget {
     required this.exampleJa,
     required this.onReveal,
     required this.englishWord,
-    required this.audioUrl,
-    required this.audioOnFront,
+    required this.pronunciationOnFront,
     super.key,
   });
 
@@ -33,12 +33,11 @@ class QuizCard extends StatelessWidget {
   final String exampleJa;
   final VoidCallback onReveal;
 
-  /// 発音対象の英単語(audio なしのときの Google 翻訳リンクにも使う)
+  /// 発音の対象(表裏に関わらず常に英単語)
   final String englishWord;
-  final String audioUrl;
 
-  /// true なら表面(en→ja)、false なら答え面(ja→en)に発音ボタンを置く
-  final bool audioOnFront;
+  /// true なら表面(en→ja)、false なら答え面(ja→en)に発音リンクを置く
+  final bool pronunciationOnFront;
 
   @override
   Widget build(BuildContext context) {
@@ -73,29 +72,14 @@ class QuizCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      front,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (audioUrl.isNotEmpty && audioOnFront) ...[
-                    const SizedBox(width: 12),
-                    PronunciationButton(
-                      word: englishWord,
-                      audioUrl: audioUrl,
-                      size: 32,
-                    ),
-                  ],
-                ],
+              Text(
+                front,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
               if (ipa.isNotEmpty) ...[
                 const SizedBox(height: 14),
@@ -109,41 +93,33 @@ class QuizCard extends StatelessWidget {
                   ),
                 ),
               ],
-              if (audioUrl.isEmpty) ...[
-                // audio なしのフォールバック(Google 翻訳リンク)は表面下に出す
+              if (pronunciationOnFront) ...[
                 const SizedBox(height: 10),
-                PronunciationButton(word: englishWord, audioUrl: ''),
+                PronunciationLink(word: englishWord),
               ],
               if (revealed) ...[
                 const SizedBox(height: 14),
                 Container(
+                  // 区切り線をカード幅いっぱいに引く(Row をやめた分、
+                  // 明示的に広げないとテキスト幅まで縮む)。
+                  width: double.infinity,
                   padding: const EdgeInsets.only(top: 14),
                   decoration: const BoxDecoration(
                     border: Border(top: BorderSide(color: Color(0x14000000))),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          back,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      if (audioUrl.isNotEmpty && !audioOnFront) ...[
-                        const SizedBox(width: 12),
-                        PronunciationButton(
-                          word: englishWord,
-                          audioUrl: audioUrl,
-                        ),
-                      ],
-                    ],
+                  child: Text(
+                    back,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
+                if (!pronunciationOnFront) ...[
+                  const SizedBox(height: 10),
+                  PronunciationLink(word: englishWord),
+                ],
                 if (hasExample) ...[
                   const SizedBox(height: 10),
                   Text(

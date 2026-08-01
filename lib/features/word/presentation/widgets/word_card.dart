@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/pronunciation_button.dart';
+import 'package:eitangocho/components/pronunciation_link.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
@@ -185,7 +185,7 @@ class _WordCardState extends State<WordCard> {
                       ),
                     ),
                     const Spacer(),
-                    PronunciationButton(word: word.word, audioUrl: word.audioUrl),
+                    PronunciationLink(word: word.word),
                   ],
                 ),
               ),

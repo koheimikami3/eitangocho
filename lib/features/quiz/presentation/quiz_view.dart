@@ -112,8 +112,7 @@ class _ActiveQuiz extends StatelessWidget {
               exampleJa: word.exampleJa,
               onReveal: notifier.reveal,
               englishWord: word.word,
-              audioUrl: word.audioUrl,
-              audioOnFront: !isJaToEn,
+              pronunciationOnFront: !isJaToEn,
             ),
             if (state.revealed) ...[
               const SizedBox(height: 16),
