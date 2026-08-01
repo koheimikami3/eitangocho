@@ -65,10 +65,6 @@ class MobileQuizCard extends StatelessWidget {
               color: palette.text,
             ),
           ),
-          if (pronunciationOnFront) ...[
-            const SizedBox(height: 8),
-            MobilePronunciationLink(word: englishWord),
-          ],
           if (ipa.isNotEmpty) ...[
             const SizedBox(height: 14),
             Text(
@@ -79,6 +75,11 @@ class MobileQuizCard extends StatelessWidget {
                 color: palette.textAlpha(45),
               ),
             ),
+          ],
+          // 発音リンクは IPA の下に置く(macOS 版の QuizCard と揃える)。
+          if (pronunciationOnFront) ...[
+            const SizedBox(height: 8),
+            MobilePronunciationLink(word: englishWord),
           ],
           if (revealed) ...[
             const SizedBox(height: 14),
