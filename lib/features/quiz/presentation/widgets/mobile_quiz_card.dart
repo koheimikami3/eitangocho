@@ -1,13 +1,11 @@
-import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/components/mobile_pronunciation_link.dart';
 import 'package:eitangocho/constants/app_palette.dart';
-import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// iOS 版のクイズカード(表面 + 答え面)。
 ///
-/// 発音ボタンは答えがバレないよう、英単語が出ている側にだけ置く
-/// ([audioOnFront] が表面 = 英単語かどうか)。
+/// 発音リンクは答えがバレないよう、英単語が出ている側にだけ置く
+/// ([pronunciationOnFront] が表面 = 英単語かどうか)。
 class MobileQuizCard extends StatelessWidget {
   const MobileQuizCard({
     required this.front,
@@ -17,8 +15,7 @@ class MobileQuizCard extends StatelessWidget {
     required this.exampleEn,
     required this.exampleJa,
     required this.englishWord,
-    required this.audioUrl,
-    required this.audioOnFront,
+    required this.pronunciationOnFront,
     super.key,
   });
 
@@ -31,16 +28,14 @@ class MobileQuizCard extends StatelessWidget {
 
   /// 発音の対象(表裏に関わらず常に英単語)
   final String englishWord;
-  final String audioUrl;
 
-  /// 表面が英単語側か(false なら答え面に発音ボタンを置く)
-  final bool audioOnFront;
+  /// 表面が英単語側か(false なら答え面に発音リンクを置く)
+  final bool pronunciationOnFront;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final showAudioOnFront = audioOnFront;
-    final showAudioOnBack = !audioOnFront && revealed;
+    final showLinkOnBack = !pronunciationOnFront && revealed;
 
     return Container(
       constraints: const BoxConstraints(minHeight: 220),
@@ -61,35 +56,15 @@ class MobileQuizCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  front,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: palette.text,
-                  ),
-                ),
-              ),
-              if (showAudioOnFront && audioUrl.isNotEmpty) ...[
-                const SizedBox(width: 12),
-                MobilePronunciationButton(
-                  word: englishWord,
-                  audioUrl: audioUrl,
-                  size: 36,
-                ),
-              ],
-            ],
+          Text(
+            front,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: palette.text,
+            ),
           ),
-          // 音声が無い英単語側では外部リンクにフォールバックする。
-          if (showAudioOnFront && audioUrl.isEmpty) ...[
-            const SizedBox(height: 8),
-            _TranslateLink(word: englishWord),
-          ],
           if (ipa.isNotEmpty) ...[
             const SizedBox(height: 14),
             Text(
@@ -101,6 +76,11 @@ class MobileQuizCard extends StatelessWidget {
               ),
             ),
           ],
+          // 発音リンクは IPA の下に置く(macOS 版の QuizCard と揃える)。
+          if (pronunciationOnFront) ...[
+            const SizedBox(height: 8),
+            MobilePronunciationLink(word: englishWord),
+          ],
           if (revealed) ...[
             const SizedBox(height: 14),
             Container(
@@ -111,29 +91,15 @@ class MobileQuizCard extends StatelessWidget {
                   top: BorderSide(color: palette.borderAlpha(8)),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      back,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 17, color: palette.text),
-                    ),
-                  ),
-                  if (showAudioOnBack && audioUrl.isNotEmpty) ...[
-                    const SizedBox(width: 10),
-                    MobilePronunciationButton(
-                      word: englishWord,
-                      audioUrl: audioUrl,
-                    ),
-                  ],
-                ],
+              child: Text(
+                back,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 17, color: palette.text),
               ),
             ),
-            if (showAudioOnBack && audioUrl.isEmpty) ...[
+            if (showLinkOnBack) ...[
               const SizedBox(height: 8),
-              _TranslateLink(word: englishWord),
+              MobilePronunciationLink(word: englishWord),
             ],
             if (exampleEn.trim().isNotEmpty) ...[
               const SizedBox(height: 14),
@@ -151,23 +117,6 @@ class MobileQuizCard extends StatelessWidget {
             ],
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _TranslateLink extends StatelessWidget {
-  const _TranslateLink({required this.word});
-
-  final String word;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => launchUrl(googleTranslateUrl(word)),
-      child: Text(
-        '発音を確認 ↗',
-        style: TextStyle(fontSize: 12, color: context.palette.accent),
       ),
     );
   }

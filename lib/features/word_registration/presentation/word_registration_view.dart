@@ -288,11 +288,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
       return '辞書に見つかりませんでした。手動で入力できます。';
     }
     final fetched = state.fetched;
+    // audioUrl は画面に出さないので、文言どおり IPA と例文だけで判定する。
     if (fetched != null &&
         fetched.japanese.isNotEmpty &&
         fetched.ipa.isEmpty &&
-        fetched.exampleEn.isEmpty &&
-        fetched.audioUrl.isEmpty) {
+        fetched.exampleEn.isEmpty) {
       return '発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)';
     }
     return null;

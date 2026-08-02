@@ -15,7 +15,8 @@ class Words extends Table {
   TextColumn get exampleEn => text().withDefault(const Constant(''))();
   TextColumn get exampleJa => text().withDefault(const Constant(''))();
 
-  /// 辞書 API の発音 mp3 URL。空なら Google 翻訳リンクにフォールバック(Phase 3)
+  /// 辞書 API の発音 mp3 URL。配信元が不安定で再生には使っていない(docs/design.md)。
+  /// 将来 UI を戻せるよう取得・保存・同期だけ続けている。
   TextColumn get audioUrl => text().withDefault(const Constant(''))();
   BoolColumn get isLearned => boolean().withDefault(const Constant(false))();
 
