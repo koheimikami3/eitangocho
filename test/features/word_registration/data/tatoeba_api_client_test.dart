@@ -72,6 +72,41 @@ void main() {
     });
   });
 
+  // 最短だけで選ぶと monster に「Monster!」が付いてしまう。
+  test('1〜2 語の文より、3 語以上の文を優先する', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        responseOf([
+          ('Monster!', '化け物！'),
+          ("There's a monster in my closet.", '押し入れに怪物がいる。'),
+          ('I saw a monster in the woods last night.', '昨夜森で怪物を見た。'),
+        ]),
+        200,
+      ),
+    );
+
+    final example = await mock.client.findExample('monster');
+
+    expect(example!.en, "There's a monster in my closet.");
+  });
+
+  // 語数で足切りすると、短文しか無い語で和訳付きの例文を丸ごと失う。
+  test('3 語以上の候補が無ければ、短い中でいちばん語数の多い文に降りる', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        responseOf([
+          ('Ghosts!', '幽霊だ！'),
+          ('Ghosts exist.', '幽霊は存在する。'),
+        ]),
+        200,
+      ),
+    );
+
+    final example = await mock.client.findExample('ghost');
+
+    expect(example!.en, 'Ghosts exist.');
+  });
+
   test('条件を満たす中では最短の文を選ぶ', () async {
     final mock = buildClient(
       () => utf8Response(

@@ -24,6 +24,18 @@ class TatoebaApiClient {
   /// 多めに取り、クライアント側で選ぶ。
   static const _limit = 10;
 
+  /// 優先する最低語数。最短を採るだけだと `monster` に「Monster!」のような
+  /// 感嘆詞 1 語の文が選ばれてしまうため、これを下回る文は後回しにする。
+  ///
+  /// 3 に留めているのは、実測 20 語で 4 にすると `apple` の候補
+  /// (`Want an apple?`)が全滅し、`Eat a banana!` が `You are a banana.` に
+  /// 変わるなど副作用のほうが大きかったため。3 なら差し替わるのは
+  /// 1〜2 語の文だけで、`He is diligent.` のような良い短文は残る。
+  ///
+  /// なお辞書側(kaikki)の下限は 4 語だが、あちらは `obtain permission` のような
+  /// 句の断片を除くためのもので目的が違う。
+  static const _preferredMinWords = 3;
+
   /// [word] を含む英文と和訳の組を 1 つ返す。見つからなければ null。
   Future<ExampleSentence?> findExample(String word) async {
     final normalized = word.trim();
@@ -58,6 +70,10 @@ class TatoebaApiClient {
   /// `negligence` の文しか返らないことがある。語形フィルタを通さないと
   /// 別の単語の例文を登録してしまう。短い文ほど単語帳では覚えやすいので、
   /// 条件を満たす中では最短を採る。
+  ///
+  /// ただし [_preferredMinWords] 語以上を先に見て、そこに候補が無いときだけ
+  /// 短い文に降りる。語数で足切りしてしまうと、短文しか無い語で和訳付きの
+  /// 例文を丸ごと失う(辞書側の和訳なし例文に落ちる)ため。
   ExampleSentence? _select(List<TatoebaSentence> sentences, String word) {
     final candidates = <ExampleSentence>[];
     for (final sentence in sentences) {
@@ -72,7 +88,19 @@ class TatoebaApiClient {
       candidates.add(ExampleSentence(en: en, ja: ja));
     }
     if (candidates.isEmpty) return null;
-    candidates.sort((a, b) => a.en.length.compareTo(b.en.length));
+    final qualified = candidates
+        .where((c) => _wordCount(c.en) >= _preferredMinWords)
+        .toList();
+    if (qualified.isNotEmpty) {
+      qualified.sort((a, b) => a.en.length.compareTo(b.en.length));
+      return qualified.first;
+    }
+    // 全部が短すぎるときは、その中でいちばん語数の多いものを採る
+    // (ここで最短を採ると「Ghosts exist.」より「Ghosts!」が勝ってしまう)。
+    candidates.sort((a, b) => b.en.length.compareTo(a.en.length));
     return candidates.first;
   }
+
+  static int _wordCount(String sentence) =>
+      sentence.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).length;
 }
