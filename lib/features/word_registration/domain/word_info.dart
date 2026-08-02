@@ -13,6 +13,9 @@ abstract class WordInfo with _$WordInfo {
     @Default('') String japanese,
     @Default('') String exampleEn,
     @Default('') String exampleJa,
+
+    /// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
+    /// (docs/design.md)。words の同名カラムを埋める経路だけ残している。
     @Default('') String audioUrl,
   }) = _WordInfo;
 }

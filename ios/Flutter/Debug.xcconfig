@@ -11,3 +11,8 @@
 // 空白を入れられない。
 BUNDLE_ID_SUFFIX = .dev
 APP_DISPLAY_NAME = 英単語帳 dev
+
+// アイコンも配色を反転した dev 用に差し替える。ホーム画面に本番版と dev 版が
+// 並ぶため、ラベルだけでなく見た目でも一目で区別できるようにする。
+// project.pbxproj の ASSETCATALOG_COMPILER_APPICON_NAME から参照している。
+APP_ICON_NAME = AppIcon-dev

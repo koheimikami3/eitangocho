@@ -1,5 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/settings/data/app_version_provider.dart';
+import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -28,11 +30,23 @@ void main() {
     TargetPlatform platform,
     Future<void> Function() body,
   ) async {
+    // 情報セクションは最下部にあり、既定の 800x600 では画面外に出て
+    // タップが当たらない。全セクションが収まる高さにしておく。
+    tester.view
+      ..physicalSize = const Size(700, 1600)
+      ..devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     debugDefaultTargetPlatformOverride = platform;
     try {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [databaseProvider.overrideWithValue(db)],
+          overrides: [
+            databaseProvider.overrideWithValue(db),
+            // 実機のバンドルを読むため、テストでは固定値に差し替える。
+            appVersionProvider.overrideWith((ref) async => '1.1.0'),
+            licenseListProvider.overrideWith((ref) async => []),
+          ],
           child: const MaterialApp(home: Scaffold(body: SettingsView())),
         ),
       );
@@ -56,6 +70,36 @@ void main() {
       expect(find.byType(UiScaleSlider), findsNothing);
       // 同じ「表示」セクションの他項目は残っていること。
       expect(find.text('発音記号(IPA)を表示'), findsOneWidget);
+    });
+  });
+
+  testWidgets('情報セクションにバージョンとライセンスを出す', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      expect(find.text('情報'), findsOneWidget);
+      expect(find.text('バージョン'), findsOneWidget);
+      expect(find.text('1.1.0'), findsOneWidget);
+      expect(find.text('ライセンス'), findsOneWidget);
+      expect(
+        find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'),
+        findsOneWidget,
+      );
+    });
+  });
+
+  testWidgets('ライセンス行のクリックでモーダルが開く', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      await tester.tap(find.text('ライセンス'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('閉じる'), findsOneWidget);
+      expect(find.text('この一覧はビルド時に自動生成されます。'), findsOneWidget);
+    });
+  });
+
+  // 欄そのものは残してあり(コメントアウト)、UI にだけ出さない。
+  testWidgets('DeepL API キーの欄は表示しない', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      expect(find.textContaining('DeepL'), findsNothing);
     });
   });
 }

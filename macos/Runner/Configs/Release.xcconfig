@@ -5,3 +5,4 @@
 // Debug.xcconfig 側で上書きされる変数を、ここで明示的に空に定義しておく。
 BUNDLE_ID_SUFFIX =
 APP_DISPLAY_SUFFIX =
+APP_ICON_NAME = AppIcon

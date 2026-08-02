@@ -15,8 +15,9 @@ class Words extends Table {
   TextColumn get exampleEn => text().withDefault(const Constant(''))();
   TextColumn get exampleJa => text().withDefault(const Constant(''))();
 
-  /// 辞書 API の発音 mp3 URL。配信元が不安定で再生には使っていない(docs/design.md)。
-  /// 将来 UI を戻せるよう取得・保存・同期だけ続けている。
+  /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
+  /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、
+  /// 既存データと iCloud 同期の JSON フォーマットを壊さないため残している。
   TextColumn get audioUrl => text().withDefault(const Constant(''))();
   BoolColumn get isLearned => boolean().withDefault(const Constant(false))();
 
@@ -57,8 +58,10 @@ class EjdictEntries extends Table {
   Set<Column<Object>> get primaryKey => {word};
 }
 
-/// Free Dictionary API のレスポンスキャッシュ(成功時のみ保存し再フェッチしない)。
-/// Phase 3 で利用する。
+/// 辞書(kaikki)のレスポンスキャッシュ(成功時のみ保存し再フェッチしない)。
+///
+/// [responseJson] に入るのは生の JSONL ではなく、使う項目だけに絞って詰め直した
+/// JSON 配列(KaikkiApiClient 参照)。生のままだと 1 語 20〜170KB ある。
 class DictionaryCacheEntries extends Table {
   TextColumn get word => text()();
   TextColumn get responseJson => text()();

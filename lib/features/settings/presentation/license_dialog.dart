@@ -1,0 +1,257 @@
+import 'package:eitangocho/components/app_outlined_button.dart';
+import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/features/settings/data/license_list_provider.dart';
+import 'package:eitangocho/features/settings/domain/license_item.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// macOS 版のライセンス一覧モーダルを開く。
+///
+/// iOS はプッシュ遷移だが macOS はダイアログ(デザインどおり)。全文は別画面に
+/// せず、同じダイアログ内で一覧と入れ替える(ウィンドウ全体を覆う遷移を挟むと
+/// 設定画面から遠くなるため)。
+Future<void> showLicenseDialog(BuildContext context) => showDialog<void>(
+      context: context,
+      builder: (_) => const _LicenseDialog(),
+    );
+
+class _LicenseDialog extends ConsumerStatefulWidget {
+  const _LicenseDialog();
+
+  @override
+  ConsumerState<_LicenseDialog> createState() => _LicenseDialogState();
+}
+
+class _LicenseDialogState extends ConsumerState<_LicenseDialog> {
+  /// 全文を表示中の項目。null なら一覧。
+  LicenseItem? _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _selected;
+
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(13),
+      ),
+      clipBehavior: Clip.antiAlias,
+      insetPadding: const EdgeInsets.all(40),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _Header(
+              title: selected?.name ?? 'ライセンス',
+              onBack: selected == null
+                  ? null
+                  : () => setState(() => _selected = null),
+            ),
+            Flexible(
+              child: selected != null
+                  ? _LicenseText(item: selected)
+                  : _LicenseList(
+                      onSelect: (item) => setState(() => _selected = item),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.title, this.onBack});
+
+  final String title;
+
+  /// 全文表示中だけ「戻る」を出す。
+  final VoidCallback? onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          if (onBack != null) ...[
+            AppOutlinedButton(
+              label: '戻る',
+              verticalPadding: 6,
+              fontSize: 13,
+              fontWeight: FontWeight.normal,
+              borderRadius: 7,
+              onPressed: onBack!,
+            ),
+            const SizedBox(width: 8),
+          ],
+          AppOutlinedButton(
+            label: '閉じる',
+            verticalPadding: 6,
+            fontSize: 13,
+            fontWeight: FontWeight.normal,
+            borderRadius: 7,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LicenseList extends ConsumerWidget {
+  const _LicenseList({required this.onSelect});
+
+  final ValueChanged<LicenseItem> onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return switch (ref.watch(licenseListProvider)) {
+      AsyncData(:final value) => ListView.builder(
+          shrinkWrap: true,
+          itemCount: value.length + 1,
+          itemBuilder: (context, index) => index == value.length
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  child: Text(
+                    'この一覧はビルド時に自動生成されます。',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textQuaternary,
+                    ),
+                  ),
+                )
+              : _LicenseRow(item: value[index], onTap: onSelect),
+        ),
+      AsyncError() => const Padding(
+          padding: EdgeInsets.all(18),
+          child: Text(
+            'ライセンス情報を読み込めませんでした。',
+            style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
+          ),
+        ),
+      _ => const Padding(
+          padding: EdgeInsets.all(40),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+    };
+  }
+}
+
+class _LicenseRow extends StatefulWidget {
+  const _LicenseRow({required this.item, required this.onTap});
+
+  final LicenseItem item;
+  final ValueChanged<LicenseItem> onTap;
+
+  @override
+  State<_LicenseRow> createState() => _LicenseRowState();
+}
+
+class _LicenseRowState extends State<_LicenseRow> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => widget.onTap(widget.item),
+        child: Container(
+          decoration: BoxDecoration(
+            color: _hovered ? AppColors.inputBackground : null,
+            border: const Border(
+              bottom: BorderSide(color: AppColors.border),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.item.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.item.summary,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Text(
+                '›',
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1,
+                  color: AppColors.textDisabled,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LicenseText extends StatelessWidget {
+  const _LicenseText({required this.item});
+
+  final LicenseItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(18),
+      shrinkWrap: true,
+      children: [
+        for (var i = 0; i < item.texts.length; i++) ...[
+          if (i > 0) ...[
+            const SizedBox(height: 18),
+            const Divider(height: 1, color: AppColors.border),
+            const SizedBox(height: 18),
+          ],
+          SelectableText(
+            item.texts[i],
+            style: const TextStyle(
+              fontSize: 12,
+              height: 1.7,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}

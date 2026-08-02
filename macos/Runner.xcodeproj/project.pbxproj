@@ -401,7 +401,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Debug;
 		};
@@ -415,7 +415,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Release;
 		};
@@ -429,7 +429,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Profile;
 		};
@@ -486,7 +486,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "$(APP_ICON_NAME)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/DebugProfile.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -619,7 +619,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "$(APP_ICON_NAME)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/DebugProfile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -641,7 +641,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "$(APP_ICON_NAME)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Release.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

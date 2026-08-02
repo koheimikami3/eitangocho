@@ -1,0 +1,148 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/data/license_list_provider.dart';
+import 'package:eitangocho/features/settings/domain/license_item.dart';
+import 'package:eitangocho/features/settings/presentation/license_detail_view_mobile.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_push_header.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// iOS 版のライセンス一覧(設定からプッシュ遷移)。
+///
+/// 一覧の中身は [LicenseRegistry] から組み立てる。pub パッケージの分は
+/// Flutter が自動収集し、辞書・例文データの出典は registerDataSourceLicenses が
+/// 足している(帰属表示はストア配布の必須要件。docs/design.md)。
+class LicenseViewMobile extends ConsumerWidget {
+  const LicenseViewMobile({super.key});
+
+  /// 設定画面から開く。
+  static Future<void> push(BuildContext context) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const LicenseViewMobile()),
+      );
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
+    final licenses = ref.watch(licenseListProvider);
+
+    return Scaffold(
+      backgroundColor: palette.background,
+      body: Center(
+        // タブバー版シェルと同じく iPad でも iPhone 相当の幅に収める。
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppDimensions.mobileContentMaxWidth,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const MobilePushHeader(title: 'ライセンス', backLabel: '設定'),
+              Expanded(
+                child: switch (licenses) {
+                  AsyncData(:final value) => _LicenseList(items: value),
+                  AsyncError() => Center(
+                      child: Text(
+                        'ライセンス情報を読み込めませんでした。',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: palette.textAlpha(45),
+                        ),
+                      ),
+                    ),
+                  _ => const Center(child: CircularProgressIndicator()),
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LicenseList extends StatelessWidget {
+  const _LicenseList({required this.items});
+
+  final List<LicenseItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+
+    return ListView.builder(
+      padding: EdgeInsets.only(
+        bottom: 40 + MediaQuery.paddingOf(context).bottom,
+      ),
+      itemCount: items.length + 1,
+      itemBuilder: (context, index) {
+        if (index == items.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Text(
+              'この一覧はビルド時に自動生成されます。',
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.6,
+                color: palette.textAlpha(40),
+              ),
+            ),
+          );
+        }
+        return _LicenseRow(item: items[index]);
+      },
+    );
+  }
+}
+
+class _LicenseRow extends StatelessWidget {
+  const _LicenseRow({required this.item});
+
+  final LicenseItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => LicenseDetailViewMobile.push(context, item),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: palette.borderAlpha(6))),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: TextStyle(fontSize: 15, color: palette.text),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    item.summary,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: palette.textAlpha(45),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              '›',
+              style: TextStyle(
+                fontSize: 16,
+                height: 1,
+                color: palette.textAlpha(30),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

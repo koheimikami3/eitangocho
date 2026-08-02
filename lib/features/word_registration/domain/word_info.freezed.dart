@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WordInfo {
 
- String get word; String get ipa; List<PartOfSpeech> get partsOfSpeech; String get japanese; String get exampleEn; String get exampleJa; String get audioUrl;
+ String get word; String get ipa; List<PartOfSpeech> get partsOfSpeech; String get japanese; String get exampleEn; String get exampleJa;/// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
+/// (docs/design.md)。words の同名カラムを埋める経路だけ残している。
+ String get audioUrl;
 /// Create a copy of WordInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -227,6 +229,8 @@ class _WordInfo implements WordInfo {
 @override@JsonKey() final  String japanese;
 @override@JsonKey() final  String exampleEn;
 @override@JsonKey() final  String exampleJa;
+/// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
+/// (docs/design.md)。words の同名カラムを埋める経路だけ残している。
 @override@JsonKey() final  String audioUrl;
 
 /// Create a copy of WordInfo

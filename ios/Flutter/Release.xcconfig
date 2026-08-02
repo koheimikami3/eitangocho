@@ -8,3 +8,4 @@
 // 短く保つ(App Store の掲載名は App Store Connect 側で別に決める)。
 BUNDLE_ID_SUFFIX =
 APP_DISPLAY_NAME = 英単語帳
+APP_ICON_NAME = AppIcon
