@@ -2,6 +2,8 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
+// DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
+// ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_radio_row.dart';
@@ -64,16 +66,20 @@ class SettingsView extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 22),
-              SettingsSection(
-                title: 'DeepL API キー(例文の自動和訳)',
-                child: DeeplApiKeyField(
-                  // controller の初期値は初回 build でしか反映されないため、
-                  // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
-                  key: ValueKey(ref.watch(settingsProvider).hasValue),
-                  initialValue: settings.deeplApiKey,
-                ),
-              ),
+              // DeepL API キーの欄は様子見で隠している。例文の和訳は Tatoeba が
+              // 対で返すようになり、キーを用意できる利用者もほぼいないため
+              // (欄があるだけで何のことか分からず混乱を招く)。設定値と
+              // DeeplClient は残してあるので、戻すならここを外すだけでよい。
+              // const SizedBox(height: 22),
+              // SettingsSection(
+              //   title: 'DeepL API キー(例文の自動和訳)',
+              //   child: DeeplApiKeyField(
+              //     // controller の初期値は初回 build でしか反映されないため、
+              //     // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
+              //     key: ValueKey(ref.watch(settingsProvider).hasValue),
+              //     initialValue: settings.deeplApiKey,
+              //   ),
+              // ),
               const SizedBox(height: 22),
               const SettingsSection(
                 title: 'iCloud 同期',

@@ -7,6 +7,8 @@ import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_management_section.dart';
+// DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
+// ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_section.dart';
@@ -28,6 +30,8 @@ class SettingsViewMobile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // DeepL の欄を隠している間は palette を使う箇所が無くなる。
+    // ignore: unused_local_variable
     final palette = context.palette;
     // ロード前は既定値でフォールバックする。
     final settings =
@@ -91,31 +95,35 @@ class SettingsViewMobile extends ConsumerWidget {
               ),
           ],
         ),
-        const SizedBox(height: 22),
-        MobileSettingsSection(
-          title: 'DeepL API キー(例文の自動和訳)',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              MobileDeeplApiKeyField(
-                // controller の初期値は初回 build でしか反映されないため、
-                // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
-                key: ValueKey(ref.watch(settingsProvider).hasValue),
-                initialValue: settings.deeplApiKey,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を'
-                '取得します。未設定の場合、例文の和訳はスキップされます。',
-                style: TextStyle(
-                  fontSize: 11,
-                  height: 1.6,
-                  color: palette.textAlpha(40),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // DeepL API キーの欄は様子見で隠している。例文の和訳は Tatoeba が
+        // 対で返すようになり、キーを用意できる利用者もほぼいないため
+        // (欄があるだけで何のことか分からず混乱を招く)。設定値と
+        // DeeplClient は残してあるので、戻すならここを外すだけでよい。
+        // const SizedBox(height: 22),
+        // MobileSettingsSection(
+        //   title: 'DeepL API キー(例文の自動和訳)',
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.stretch,
+        //     children: [
+        //       MobileDeeplApiKeyField(
+        //         // controller の初期値は初回 build でしか反映されないため、
+        //         // 設定のロード完了(hasValue の変化)で作り直して保存値を映す。
+        //         key: ValueKey(ref.watch(settingsProvider).hasValue),
+        //         initialValue: settings.deeplApiKey,
+        //       ),
+        //       const SizedBox(height: 8),
+        //       Text(
+        //         'DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を'
+        //         '取得します。未設定の場合、例文の和訳はスキップされます。',
+        //         style: TextStyle(
+        //           fontSize: 11,
+        //           height: 1.6,
+        //           color: palette.textAlpha(40),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         const SizedBox(height: 22),
         const MobileSettingsSection(
           title: 'iCloud 同期',

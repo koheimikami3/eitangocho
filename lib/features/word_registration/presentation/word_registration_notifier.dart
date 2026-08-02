@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
-import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
@@ -31,19 +30,17 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         state = state.copyWith(step: RegistrationStep.form, notFound: true);
         return;
       }
-      // WordInfoProvider 抽象は翻訳失敗を返せないため、「キー設定済みかつ
-      // 英例文ありなのに和訳が空」をヒューリスティックに失敗とみなす
-      // (翻訳成功で空文字になることは実質ない)。
-      final deeplKeySet =
-          (await ref.read(settingsProvider.future)).deeplApiKey.isNotEmpty;
-      if (!ref.mounted) return;
+      // WordInfoProvider 抽象は翻訳失敗を返せないため、「英例文はあるのに
+      // 和訳が空」をヒューリスティックに失敗とみなす(取得成功で空文字に
+      // なることは実質ない)。辞書側(kaikki)の例文を採ったときは対訳が
+      // 無いのでここに該当する。
       state = state.copyWith(
         step: RegistrationStep.form,
         fetched: info,
         notFound: false,
         selectedPartsOfSpeech: info.partsOfSpeech.toSet(),
         translationFailed:
-            deeplKeySet && info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
+            info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
       );
     } on WordInfoException {
       if (!ref.mounted) return;
@@ -115,7 +112,8 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         partsOfSpeech: Value(partsOfSpeech),
         exampleEn: Value(exampleEn.trim()),
         exampleJa: Value(exampleJa.trim()),
-        // audioUrl はフォームに出さず、自動取得できたときだけ保存する
+        // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
+        // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
         audioUrl: Value(state.fetched?.audioUrl ?? ''),
       ),
     );

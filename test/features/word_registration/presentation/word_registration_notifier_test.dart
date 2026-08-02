@@ -1,7 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
-import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
@@ -262,16 +261,14 @@ void main() {
       );
     });
 
-    test('キー設定済みで英例文ありなのに和訳が空なら translationFailed', () async {
+    // DeepL のキーは条件に含めない。設定 UI を隠したいま、キーを条件にすると
+    // 辞書側の例文を採って和訳が無い場合に警告が一切出なくなる。
+    test('英例文ありなのに和訳が空なら translationFailed(DeepL キーは無関係)', () async {
       container = buildContainer(
         wordInfoProvider: _FakeWordInfoProvider(
           (_) async => fetchedInfo.copyWith(exampleJa: ''),
         ),
       );
-      await container.read(settingsProvider.future);
-      await container
-          .read(settingsProvider.notifier)
-          .setDeeplApiKey('some-key');
 
       await container
           .read(wordRegistrationProvider.notifier)
@@ -280,6 +277,23 @@ void main() {
       expect(
         container.read(wordRegistrationProvider).translationFailed,
         isTrue,
+      );
+    });
+
+    test('英例文が無ければ translationFailed は立たない', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider(
+          (_) async => fetchedInfo.copyWith(exampleEn: '', exampleJa: ''),
+        ),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('serendipity');
+
+      expect(
+        container.read(wordRegistrationProvider).translationFailed,
+        isFalse,
       );
     });
 
