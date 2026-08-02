@@ -5,7 +5,16 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = eitangocho
+//
+// macOS の Dock・Finder・⌘Tab は CFBundleDisplayName ではなく .app のファイル名を
+// ラベルにするため、表示名をここに持たせる(iOS は CFBundleDisplayName が効くので
+// 事情が違う。docs/design.md)。Info.plist の CFBundleName / CFBundleDisplayName も
+// この値を参照し、名前の定義箇所を 1 つにしている。
+PRODUCT_NAME = シンプル英単語帳$(APP_DISPLAY_SUFFIX)
+
+// 実行ファイル名は ASCII で固定する。既定では PRODUCT_NAME がそのまま使われるが、
+// クラッシュログや配布ツールのログに日本語のプロセス名が出ると扱いにくい。
+EXECUTABLE_NAME = eitangocho
 
 // The application's bundle identifier.
 // BUNDLE_ID_SUFFIX は Debug/Release の各 xcconfig(プロジェクトレベル)で定義する。

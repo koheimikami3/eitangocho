@@ -153,6 +153,17 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   2 列の IPA と品詞は `Wrap` で組み、1 行に収まらないときは品詞を次の行へ落とす
   (`Row` で詰めると、品詞が多いカードで IPA の幅が潰れて数行に折り返す)。
   英例文の確保行数も列数で変える(2 列は 3 行、1 列は 2 行)。
+- **macOS の表示名は `PRODUCT_NAME`(= `.app` のファイル名)で決める**。
+  macOS の Dock・Finder・⌘Tab はアプリのラベルに `CFBundleDisplayName` を使わず
+  **バンドルのファイル名**を使うため、Info.plist に日本語名を入れても
+  `PRODUCT_NAME = eitangocho` のままでは「eitangocho」と表示されていた
+  (1.0.0 のストア配布版がこの状態)。`PRODUCT_NAME` を
+  「シンプル英単語帳$(APP_DISPLAY_SUFFIX)」にして解決し、Info.plist の
+  `CFBundleName` / `CFBundleDisplayName` もこの値を参照させて定義箇所を 1 つにした。
+  **実行ファイル名だけは `EXECUTABLE_NAME` で ASCII に固定する**
+  (クラッシュログや配布ツールのログに日本語のプロセス名が出ると扱いにくい)。
+  RunnerTests の `TEST_HOST` も同じ名前を組み立てている。
+  iOS はこの問題が起きない(下記のとおり `CFBundleDisplayName` がそのまま効く)。
 - **iOS の表示名は「英単語帳」**(Debug は「英単語帳 dev」)。ホーム画面のアイコン
   ラベルは全角 6〜7 文字を超えると省略されるため、macOS の「シンプル英単語帳」より
   短くした。App Store の掲載名は App Store Connect 側で別に決められるので、

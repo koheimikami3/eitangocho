@@ -401,7 +401,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Debug;
 		};
@@ -415,7 +415,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Release;
 		};
@@ -429,7 +429,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/eitangocho.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/eitangocho";
 			};
 			name = Profile;
 		};
