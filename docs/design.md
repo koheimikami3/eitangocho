@@ -111,6 +111,13 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   設定は macos/Runner/Configs/{Debug,Release,AppInfo}.xcconfig と
   ios/Flutter/{Debug,Release}.xcconfig。
   entitlements のコンテナ ID にも `$(BUNDLE_ID_SUFFIX)` を埋めて構成ごとに切り替える。
+  **アイコンも配色を反転した `AppIcon-dev` に差し替える**(青地に白 ⇔ 白地に青)。
+  Dock やホーム画面に本番版と dev 版が並ぶため、名前だけでなく見た目でも
+  区別できるようにする。`APP_ICON_NAME` を xcconfig で定義し、pbxproj の
+  `ASSETCATALOG_COMPILER_APPICON_NAME` から参照する
+  (pbxproj は変数を含む値を引用符で囲まないとパースエラーになる)。
+  **iOS のアイコンだけアルファチャンネルを落とす**(App Store Connect が弾くため)。
+  macOS は角丸の外側が透過なのでアルファを残す。
 - **バージョン番号は両プラットフォームで共通**(`pubspec.yaml` の 1 つを macOS / iOS の
   両方が読む)。1.0.0 は macOS のみ、**1.1.0 = iCloud 同期対応で macOS の 2 本目 /
   iOS の 1 本目**。ビルド番号は App Store 側ではプラットフォームごとに独立して

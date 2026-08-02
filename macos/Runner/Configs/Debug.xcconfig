@@ -7,3 +7,8 @@
 // AppInfo.xcconfig / Info.plist からこれらの変数を参照している。
 BUNDLE_ID_SUFFIX = .dev
 APP_DISPLAY_SUFFIX = (Dev)
+
+// アイコンも配色を反転した dev 用に差し替える。Dock やアプリ切替に本番版と
+// dev 版が並ぶため、名前だけでなく見た目でも一目で区別できるようにする。
+// project.pbxproj の ASSETCATALOG_COMPILER_APPICON_NAME から参照している。
+APP_ICON_NAME = AppIcon-dev
