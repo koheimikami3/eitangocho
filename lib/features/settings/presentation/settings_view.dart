@@ -1,21 +1,26 @@
+import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_radio_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:eitangocho/features/sync/presentation/desktop_sync_section.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// 設定画面(クイズ出題方向・表示・DeepL API キー・データ)。変更は即保存。
+/// 設定画面(クイズ出題方向・表示・iCloud 同期・データ・情報)。変更は即保存。
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
@@ -89,6 +94,32 @@ class SettingsView extends ConsumerWidget {
               const SettingsSection(
                 title: 'データ',
                 child: DataManagementSection(),
+              ),
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: '情報',
+                child: SettingsCard(
+                  children: [
+                    SettingsValueRow(
+                      label: 'バージョン',
+                      // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
+                      value: ref.watch(appVersionProvider).value ?? '',
+                    ),
+                    SettingsLinkRow(
+                      label: 'ライセンス',
+                      onTap: () => showLicenseDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '本アプリが利用しているオープンソースソフトウェアの一覧です。',
+                style: TextStyle(
+                  fontSize: 11,
+                  height: 1.6,
+                  color: AppColors.textQuaternary,
+                ),
               ),
             ],
           ),
