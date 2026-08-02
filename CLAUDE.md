@@ -64,8 +64,8 @@ lib/
 - **iOS 専用ウィジェットは `mobile_` プレフィックス**で同じディレクトリに置く。
   配色は macOS が `AppColors`(ライト固定)、iOS は `context.palette`(`AppPalette`)
 - **外部 API のレスポンスモデルで、存在が保証されないフィールドを `required` にしない**
-  (Free Dictionary API の `phonetics` / `example` 等は欠落しうる。安易な required は
-  欠落時にデシリアライズごと失敗する)
+  (kaikki の `sounds` / `examples`、Tatoeba の `translations` は丸ごと欠落・null に
+  なりうる。安易な required は欠落時にデシリアライズごと失敗する)
 
 ## 設計原則
 

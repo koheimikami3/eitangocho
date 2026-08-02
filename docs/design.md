@@ -9,14 +9,18 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
 
 ## 外部データソース(LLM は使わない)
 
-| データ | ソース | 備考 |
+| データ | ソース | 選定理由 |
 |---|---|---|
-| IPA・品詞・英例文・発音音声 URL | Free Dictionary API (`api.dictionaryapi.dev/api/v2/entries/en/<word>`) | キー不要・無料。取得結果はローカル DB にキャッシュし再フェッチしない。音声 URL は保存するだけで再生には使わない(下記) |
-| 単語の日本語訳(語義) | EJDict-hand(パブリックドメイン英和辞書)をアプリに同梱、初回起動時に DB へ取込 | 複数語義の列挙に対応 |
-| 例文の日本語訳 | DeepL API Free(月 50 万文字、超過時は停止で課金なし) | 文の翻訳のみに使う。単語訳には使わない |
+| IPA(米音優先)・品詞・英例文 | kaikki.org (`kaikki.org/dictionary/English/meaning/<頭字>/<頭2字>/<単語>.jsonl`) | Wiktionary を構造化した静的 JSONL。キー不要・無料で、3 項目が 1 リクエストで揃う |
+| 英例文 + 対訳 | Tatoeba (`api.tatoeba.org/unstable/sentences`) | 訳文が対でぶら下がる唯一のソース。学習者向けの短文が多い |
+| 単語の日本語訳(語義) | EJDict-hand(パブリックドメイン英和辞書)をアプリに同梱、初回起動時に DB へ取込 | 英和辞典の語義で、kaikki の訳語列挙より情報量が多い。オフラインで確実 |
+| 例文の日本語訳(予備) | DeepL API Free | Tatoeba が空振りしたときのみ。設定 UI は隠してあり実質使わない(下記) |
 | 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | 発音確認の唯一の導線。全単語で外部ブラウザに開く |
 
-- 取得チェーン: Free Dictionary API → (未収録なら)手動入力フォールバック
+- 取得チェーン: kaikki → Tatoeba → (どちらも無ければ)手動入力フォールバック。
+  EJDict は常に引く。例文は Tatoeba を優先し、空振り時だけ kaikki の英例文を使う
+- kaikki の取得結果はローカル DB にキャッシュし再フェッチしない。Tatoeba は
+  登録時に 1 回引くだけでキャッシュのヒット率が低いため保存しない
 - 品詞は enum(noun / verb / adjective / adverb / other)で保持し、表示時に日本語変換。
   複数品詞は「名詞・動詞」のように連結表示。バッジ色: 名詞=青、動詞=緑、形容詞=赤、
   副詞=紫、その他=グレー
@@ -36,27 +40,67 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   ライトの値は `PartOfSpeech` の定数、ダークは `AppPalette.posBadge` が持つ
   (macOS はライト固定で enum を直接引くため、ライトを二重に持たない)。
 - **品詞の並び順には意味がある**: バッジ色は先頭の品詞で決まる。自動入力では
-  Free Dictionary API が返した語義順(= その語の主用法が先頭。`run` なら動詞が先)
+  辞書(kaikki)が返した語義順(= その語の主用法が先頭。`run` なら動詞が先)
   をそのまま保存する。手動で選んだ分だけ enum の宣言順で後ろに足す
   (`PartOfSpeechSelection.ordered`)。チップのタップ順で保存すると、
   付け外ししただけでバッジ色が変わってしまうため。
+- **辞書ソースを Free Dictionary から kaikki に替えた**: 理由は 2 つ。(1) FD は
+  ラップ元である Wiktionary のデータを一部しか返しておらず、同一 59 語で英例文の
+  取得率が FD 76% に対し Wiktionary 直取り 88% だった。(2) FD 自体が不安定で、
+  `phrase` / `impact` / `actual` / `season` のような常用語でも 502 を返す時間帯が
+  あった。kaikki(wiktextract)は Wiktionary のダンプから生成された静的 JSONL で、
+  IPA・品詞・例文が 1 リクエストで揃う。**ダンプから誰でも再生成できるため
+  ベンダーロックインが無い**のが最大の利点で、サイトが落ちたら Wiktionary REST
+  (品詞・例文)と ipa-dict の同梱(IPA)に移せる。`WordInfoProvider` 実装の
+  差し替えで済むよう、この 2 つは移行先候補として控えに置く。
+  - 大文字小文字を区別する。`september` は 404 で `September` が 200 なので、
+    404 なら頭大文字で引き直す
+  - 生の JSONL は 1 語 20〜170KB あるため、使う項目だけに詰め直してキャッシュする
+    (`apple` で 168KB → 約 1KB)。文献引用(`type: quotation`)は捨てる
+  - IPA は方言タグ(`US` / `General-American`)で米音を優先し、`[...]` の異音表記は
+    使わない。品詞は kaikki の略号(`adj` / `adv`)で来る
+- **辞書の取得失敗で登録フロー全体を止めない**: kaikki が落ちていても EJDict の訳が
+  あれば `WordInfoException` を投げずに続行する。何も得られなかったときだけ投げる。
+  FD 時代は 502 のたびに登録そのものができなくなっていた。「取得できない」を
+  「辞書に未収録」と誤解させないため、EJDict も miss なら例外にする
+- **例文は Tatoeba を第一候補にする**: 訳文が対で付いてくるので、DeepL を呼ばずに
+  英例文と和訳が同時に埋まる。kaikki の例文は語義説明が目的で、`obtain permission`
+  のような句の断片や文献引用が混ざり単語帳には向かない。実測(70 語)で
+  Tatoeba が 86%、kaikki が残り 10% を拾い、例文ゼロは 4% だった
+- **例文は必ず語形フィルタを通す**(`word_form_matcher.dart`): Tatoeba の検索は
+  ステミングするため、`negligible` で引くと `negligence` の文しか返らないことが
+  ある(引用符で囲んでも無効)。kaikki 側も語義ごとに派生語の文が混ざる。
+  フィルタを通さないと別の単語の例文を登録してしまう。見出し語化は行わないので、
+  活用形で登録された単語は空振りする(原形で登録する前提)
+- **DeepL の設定 UI は隠した(コードは残す)**: API キーを用意できる利用者がほぼ
+  おらず、欄があるだけで何のことか分からず混乱を招いていた。Tatoeba が訳を返す
+  ようになり、DeepL の出番は「Tatoeba が空振りして kaikki の例文を採った」数%
+  だけになった。設定値・`DeeplClient`・チェーン内の翻訳ステップは残してあり、
+  コメントアウトを外せば戻せる。既にキーを保存済みの端末では動き続ける
 - **発音は音声再生をやめて Google 翻訳リンクに一本化した**: Free Dictionary API の
   音声配信(`api.dictionaryapi.dev/media/...`)のオリジンが落ちており、mp3 の代わりに
   502 が返る。鳴る単語は Cloudflare が期限切れコピーを返しているだけで(`cf-cache-status:
   STALE`)、同じ URL が数十分で 200 → 502 に変わる。単語ごとにファイルが有る / 無いの
   差ではないため、登録時に生存確認して URL を選び直しても意味がない。
-  `audioUrl` の取得・保存・同期は将来に備えて残す(再生に使わないだけ)。
   復活させるなら端末内蔵の TTS(`AVSpeechSynthesizer`)が第一候補。
+  **辞書ソースを kaikki に替えた際に `audioUrl` の取得もやめた**(kaikki も
+  Wiktionary REST も音声 URL を返さず、復活案が端末内蔵 TTS である以上不要)。
+  カラム・`WordInfo` のフィールド・エクスポート項目は残してあり、以後は常に空。
+  既存データと iCloud 同期の JSON フォーマットを壊さないため。
 - **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
   一括定義。iCloud 同期の削除ログ(deleted_words)追加で schemaVersion 2 になった
   (当初は「マイグレーションを発生させない」方針だったが、削除の伝播に必要と判断して改訂)。
-  マイグレーションはテーブル追加のみで、既存 3 テーブルには触れない。
+  辞書ソースの入れ替えで schemaVersion 3 になった。**テーブル構造は一貫して
+  追加のみで、既存 3 テーブルの定義には触れていない**。v3 は
+  `dictionary_cache_entries` の行を消すだけ(Free Dictionary の生レスポンスが
+  入っており kaikki のパーサでは読めないため。次の自動入力で入れ直される)。
 - **クイズ実績**: 記録はするが UI 表示はしない。回答毎に `lastReviewedAt` を更新し、
   「覚えている」で `correctCount` +1。出題は学習済み全件シャッフル。
 - **JSON エクスポート/インポート**: バックアップ兼デバイス間の手動移行手段。
   同じフォーマットを iCloud 同期のスナップショットにも使う。
 - **設定値の保存先**: `shared_preferences`。DeepL API キーも含め平文保存を許容する
-  (ローカル個人アプリのため。キーはコードには埋め込まない → 設定画面から入力)。
+  (ローカル個人アプリのため。キーはコードには埋め込まない → 設定画面から入力。
+  ただし現在その入力欄は隠してある。上記)。
 - **ウィンドウ**: 透明タイトルバー(MainFlutterWindow.swift の
   `titlebarAppearsTransparent` + `fullSizeContentView`)。
 - **EJDict 同梱**: テキストを 1 ファイルに結合して asset 同梱し、初回起動時に drift へ
@@ -151,8 +195,41 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
 - **クラウド側の変更監視はしない**: `NSMetadataQuery` は使わない。他端末の変更は
   上記の契機で取りに行く。
 
+## 未実装だが着手が決まっているもの
+
+- **クレジット / ライセンス画面**: 設定画面から遷移する。デザインは Claude Design で
+  作成中のため、データソース刷新とは別に実装する。
+  **ストア配布前に必須**(下記の帰属表示義務は有料化・広告表示でも免除されない)。
+  - 実装方針: 自前のクレジット画面(データソース一覧)+ 「オープンソースライセンス」
+    行から Flutter 標準の `showLicensePage` へ。pub パッケージのライセンスは
+    `LicenseRegistry` が自動収集するので、同梱データ(EJDict)と API 由来の
+    帰属情報だけ `LicenseRegistry.addLicense` で足す
+  - macOS は透明タイトルバーのため、遷移先に 52px の上部クリアランスが要る
+    (サイドバー先頭の `SizedBox(height: 52)` と同じ)
+
+### 各ソースのライセンスと必要な表示
+
+| ソース | ライセンス | 商用利用 | 必要な表示 |
+|---|---|---|---|
+| kaikki / Wiktionary | CC BY-SA 4.0 + GFDL | 可 | 帰属表示 + Wiktionary へのリンク。kaikki は Ylonen 2022 の引用と kaikki.org へのリンクを希望 |
+| Tatoeba | CC BY 2.0 FR | 可 | `sentences are from Tatoeba (https://tatoeba.org), released under CC-BY 2.0 FR`(公式の推奨文。テキストは投稿者個人のクレジット不要) |
+| EJDict-hand | CC0 / パブリックドメイン | 可 | 不要 |
+
+CC BY-SA の ShareAlike はデータの改変物に及ぶもので、表示するだけのアプリの
+ソースコードには及ばない。**非商用限定のソース(Wordnik、Merriam-Webster)は
+この理由で候補から外した**。将来の広告表示・課金と両立しなくなるため。
+
 ## 将来構想(実装しないが設計で考慮)
 
 - iPad 専用レイアウト: 現状は iPhone 相当幅に固定しているだけ
 - 同期のバックグラウンド実行・変更通知(`NSMetadataQuery`)
 - LLM 統合(例文生成): `WordInfoProvider` の追加実装として。Ollama(ローカル)優先
+- **多言語化(日本語以外の訳を出す)**: 必要なピースは現構成のまま揃う。
+  - 単語の訳: kaikki の `translations`(`apple` で 306 言語、常用語で 60 前後)。
+    EJDict に相当する辞書が無い言語はこれで代替する。`KaikkiEntry` は今のところ
+    この項目を読み飛ばしている
+  - 例文の訳: Tatoeba の `trans:lang` を差し替えるだけ。ただしコーパスの厚みは
+    言語差が大きい(英 204 万文 / 日 25 万 / 中 8.9 万 / 韓 1.6 万)。同一 20 語での
+    実測カバレッジは仏独葡 20/20、西中伊 19/20 に対し韓 13/20。薄い言語では
+    「例文の訳は付かず、英例文と単語訳だけ」になる想定が要る
+  - `WordInfoProvider` に言語パラメータを足す形にすれば、層の構成は変えずに済む
