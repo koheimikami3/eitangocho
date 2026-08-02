@@ -6,42 +6,28 @@ import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
-import 'package:eitangocho/features/word_registration/data/free_dictionary_api_client.dart';
+import 'package:eitangocho/features/word_registration/data/kaikki_api_client.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-const fdFixture = '''
-[
-  {
-    "word": "serendipity",
-    "phonetic": "/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/",
-    "phonetics": [
-      {"text": "/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/", "audio": "https://example.com/a.mp3"}
-    ],
-    "meanings": [
-      {
-        "partOfSpeech": "noun",
-        "definitions": [{"definition": "...", "example": "A lucky find."}]
-      },
-      {
-        "partOfSpeech": "pronoun",
-        "definitions": [{"definition": "..."}]
-      }
-    ]
-  }
-]
+/// kaikki の JSONL(1 行 1 品詞)。実レスポンスから必要な形だけ抜き出したもの。
+/// - sounds は方言タグ付きが複数、異音表記 `[...]` も混ざる
+/// - examples には collocation の断片と、派生語しか含まない文が混ざる
+const kaikkiFixture = '''
+{"word":"serendipity","pos":"noun","sounds":[{"tags":["Received-Pronunciation"],"ipa":"/ˌsɛɹənˈdɪpɪti/"},{"tags":["US"],"ipa":"/ˌsɛɹənˈdɪpɪɾi/"},{"tags":["US"],"ipa":"[ˌsɛɹənˈdɪpɪɾi]"}],"senses":[{"examples":[{"text":"serendipity value","type":"example","tags":["collocation"]},{"text":"It was serendipity that brought them together.","type":"example"},{"text":"Their meeting was pure serendipity, unplanned and unexpected.","type":"example"}]}]}
+{"word":"serendipity","pos":"name","sounds":[],"senses":[]}
 ''';
 
 void main() {
   late AppDatabase db;
-  var fdCallCount = 0;
+  var kaikkiCallCount = 0;
   var deeplCallCount = 0;
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    fdCallCount = 0;
+    kaikkiCallCount = 0;
     deeplCallCount = 0;
   });
 
@@ -54,18 +40,18 @@ void main() {
   http.Response utf8Response(String body, int status) =>
       http.Response.bytes(utf8.encode(body), status);
 
-  /// FD / DeepL のレスポンスを差し替えて DictionaryWordInfoProvider を組み立てる。
+  /// kaikki / DeepL のレスポンスを差し替えて DictionaryWordInfoProvider を組み立てる。
   DictionaryWordInfoProvider buildProvider({
-    http.Response Function()? fdResponse,
+    http.Response Function()? kaikkiResponse,
     http.Response Function()? deeplResponse,
     String deeplApiKey = '',
   }) {
     return DictionaryWordInfoProvider(
-      freeDictionaryClient: FreeDictionaryApiClient(
+      kaikkiClient: KaikkiApiClient(
         MockClient((_) async {
-          fdCallCount++;
-          return fdResponse != null
-              ? fdResponse()
+          kaikkiCallCount++;
+          return kaikkiResponse != null
+              ? kaikkiResponse()
               : http.Response('not found', 404);
         }),
       ),
@@ -89,12 +75,12 @@ void main() {
         entries.entries.map((e) => '${e.key}\t${e.value}').join('\n'),
       ));
 
-  test('FD・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を和訳する', () async {
+  test('kaikki・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を和訳する', () async {
     await seedEjdict({'serendipity': '思わぬ発見'});
     final provider = buildProvider(
-      fdResponse: () => utf8Response(fdFixture, 200),
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
       deeplResponse: () =>
-          utf8Response('{"translations":[{"text":"幸運な発見。"}]}', 200),
+          utf8Response('{"translations":[{"text":"二人を巡り合わせたのは偶然だった。"}]}', 200),
       deeplApiKey: 'key',
     );
 
@@ -102,16 +88,57 @@ void main() {
 
     expect(info, isNotNull);
     expect(info!.word, 'serendipity');
-    expect(info.ipa, '/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/');
-    expect(info.audioUrl, 'https://example.com/a.mp3');
-    // pronoun は other に落ち、noun と重複排除して 2 件
-    expect(info.partsOfSpeech, [PartOfSpeech.noun, PartOfSpeech.other]);
     expect(info.japanese, '思わぬ発見');
-    expect(info.exampleEn, 'A lucky find.');
-    expect(info.exampleJa, '幸運な発見。');
+    // name は other に落ちる
+    expect(info.partsOfSpeech, [PartOfSpeech.noun, PartOfSpeech.other]);
+    expect(info.exampleJa, '二人を巡り合わせたのは偶然だった。');
   });
 
-  test('FD 未収録・EJDict のみヒット: japanese のみの WordInfo を返す', () async {
+  test('IPA は米音(US / General-American)を優先し、音素表記だけを使う', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+    );
+
+    final info = await provider.fetch('serendipity');
+
+    expect(info!.ipa, '/ˌsɛɹənˈdɪpɪɾi/');
+  });
+
+  test('方言タグが無い語は最初の IPA を使う', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(
+        '{"word":"obtain","pos":"verb","sounds":[{"ipa":"/əbˈteɪn/"}],"senses":[]}',
+        200,
+      ),
+    );
+
+    expect((await provider.fetch('obtain'))!.ipa, '/əbˈteɪn/');
+  });
+
+  test('例文は断片を避け、見出し語を含む中から最短を選ぶ', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+    );
+
+    final info = await provider.fetch('serendipity');
+
+    // collocation の "serendipity value" と、より長い 2 件目は選ばれない
+    expect(info!.exampleEn, 'It was serendipity that brought them together.');
+  });
+
+  test('見出し語を含まない例文しか無ければ例文は空', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(
+        '{"word":"negligible","pos":"adj","senses":[{"examples":['
+        '{"text":"He was negligent of his duties.","type":"example"}]}]}',
+        200,
+      ),
+    );
+
+    expect((await provider.fetch('negligible'))!.exampleEn, isEmpty);
+  });
+
+  test('kaikki 未収録・EJDict のみヒット: japanese のみの WordInfo を返す', () async {
     await seedEjdict({'milksop': '意気地なし'});
     final provider = buildProvider();
 
@@ -121,14 +148,21 @@ void main() {
     expect(info!.japanese, '意気地なし');
     expect(info.ipa, isEmpty);
     expect(info.exampleEn, isEmpty);
-    expect(info.audioUrl, isEmpty);
     expect(info.partsOfSpeech, isEmpty);
   });
 
-  test('FD・EJDict 両 miss: null(未収録)', () async {
+  test('kaikki・EJDict 両 miss: null(未収録)', () async {
     final provider = buildProvider();
 
     expect(await provider.fetch('zzzzz'), isNull);
+  });
+
+  test('audioUrl は取得しない(発音は Google 翻訳リンクに一本化)', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+    );
+
+    expect((await provider.fetch('serendipity'))!.audioUrl, isEmpty);
   });
 
   test('大文字・空白は正規化してから検索する', () async {
@@ -141,19 +175,22 @@ void main() {
     expect(info?.japanese, 'リンゴ');
   });
 
-  test('成功レスポンスはキャッシュされ、2 回目は API を呼ばない', () async {
+  test('成功レスポンスはキャッシュされ、2 回目は取得しない', () async {
     final provider = buildProvider(
-      fdResponse: () => utf8Response(fdFixture, 200),
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
     );
 
     await provider.fetch('serendipity');
     await provider.fetch('serendipity');
 
-    expect(fdCallCount, 1);
-    expect(await db.dictionaryCacheDao.find('serendipity'), fdFixture);
+    expect(kaikkiCallCount, 1);
+    // 生の JSONL ではなく、正規化した JSON 配列が入る
+    final cached = await db.dictionaryCacheDao.find('serendipity');
+    expect(cached, isNotNull);
+    expect(KaikkiApiClient.parseEntries(cached!), hasLength(2));
   });
 
-  test('404(未収録)はキャッシュしない', () async {
+  test('未収録(404)はキャッシュしない', () async {
     final provider = buildProvider();
 
     await provider.fetch('zzzzz');
@@ -161,20 +198,35 @@ void main() {
     expect(await db.dictionaryCacheDao.find('zzzzz'), isNull);
   });
 
-  test('FD が 500 なら WordInfoException を投げる', () async {
+  // Free Dictionary は common word でも 502 を返すことがあり、当時は
+  // 取得失敗で登録フロー全体が失敗していた。EJDict の訳だけでも登録できる。
+  test('kaikki が 502 でも EJDict がヒットすれば例外を投げず続行する', () async {
+    await seedEjdict({'phrase': '句、成句'});
     final provider = buildProvider(
-      fdResponse: () => http.Response('error', 500),
+      kaikkiResponse: () => http.Response('bad gateway', 502),
+    );
+
+    final info = await provider.fetch('phrase');
+
+    expect(info, isNotNull);
+    expect(info!.japanese, '句、成句');
+    expect(info.ipa, isEmpty);
+  });
+
+  test('kaikki が 502 で EJDict も miss なら WordInfoException', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => http.Response('bad gateway', 502),
     );
 
     expect(
-      () => provider.fetch('apple'),
+      () => provider.fetch('zzzzz'),
       throwsA(isA<WordInfoException>()),
     );
   });
 
   test('DeepL キー未設定なら翻訳を呼ばず exampleJa は空', () async {
     final provider = buildProvider(
-      fdResponse: () => utf8Response(fdFixture, 200),
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
     );
 
     final info = await provider.fetch('serendipity');
@@ -185,7 +237,7 @@ void main() {
 
   test('DeepL 失敗(キー不正)でも throw せず exampleJa 空で続行する', () async {
     final provider = buildProvider(
-      fdResponse: () => utf8Response(fdFixture, 200),
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
       deeplApiKey: 'bad-key',
     );
 
@@ -193,6 +245,6 @@ void main() {
 
     expect(deeplCallCount, 1);
     expect(info!.exampleJa, isEmpty);
-    expect(info.exampleEn, 'A lucky find.');
+    expect(info.exampleEn, 'It was serendipity that brought them together.');
   });
 }

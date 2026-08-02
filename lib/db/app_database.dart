@@ -21,14 +21,21 @@ class AppDatabase extends _$AppDatabase {
 
   /// v1: words / ejdict_entries / dictionary_cache_entries
   /// v2: deleted_words を追加(iCloud 同期で削除を伝播させるため)
+  /// v3: dictionary_cache_entries の中身を捨てる(辞書ソースの入れ替え)
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
       // v1 → v2 はテーブル追加のみ。既存 3 テーブルには一切触れない。
       if (from < 2) await m.createTable(deletedWords);
+      // v2 → v3 は行の削除のみ(テーブル構造は変えない)。キャッシュには
+      // Free Dictionary の生レスポンスが入っており、kaikki のパーサでは
+      // 読めないため捨てる。次の自動入力で kaikki から入れ直される。
+      if (from < 3) {
+        await m.database.customStatement('DELETE FROM dictionary_cache_entries');
+      }
     },
   );
 }

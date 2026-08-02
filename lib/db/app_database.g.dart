@@ -355,8 +355,9 @@ class Word extends DataClass implements Insertable<Word> {
   final String exampleEn;
   final String exampleJa;
 
-  /// 辞書 API の発音 mp3 URL。配信元が不安定で再生には使っていない(docs/design.md)。
-  /// 将来 UI を戻せるよう取得・保存・同期だけ続けている。
+  /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
+  /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、
+  /// 既存データと iCloud 同期の JSON フォーマットを壊さないため残している。
   final String audioUrl;
   final bool isLearned;
 

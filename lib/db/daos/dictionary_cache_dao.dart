@@ -6,7 +6,7 @@ part 'dictionary_cache_dao.g.dart';
 
 /// DictionaryCacheEntries テーブルへのクエリを集約する
 /// (presentation 層から DB を直接触らない規約)。
-/// Free Dictionary API のレスポンスは成功時のみ保存し、再フェッチしない方針。
+/// kaikki のレスポンスは成功時のみ保存し、再フェッチしない方針。
 @DriftAccessor(tables: [DictionaryCacheEntries])
 class DictionaryCacheDao extends DatabaseAccessor<AppDatabase>
     with _$DictionaryCacheDaoMixin {

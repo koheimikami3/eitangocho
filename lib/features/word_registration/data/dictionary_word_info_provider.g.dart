@@ -84,4 +84,4 @@ final class WordInfoProviderProvider
   }
 }
 
-String _$wordInfoProviderHash() => r'e0e4dc900d8831d645a338d72609783d95fafd95';
+String _$wordInfoProviderHash() => r'f8f89c37dea916e58b09bc6e9dc1ca532fc31289';
