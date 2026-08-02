@@ -46,6 +46,7 @@ dependencies:
   riverpod_annotation: ^4.0.3
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   flutter_test:

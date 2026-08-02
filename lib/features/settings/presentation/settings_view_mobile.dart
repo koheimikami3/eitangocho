@@ -1,17 +1,21 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_management_section.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_section.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/presentation/mobile_sync_section.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +34,6 @@ class SettingsViewMobile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // DeepL の欄を隠している間は palette を使う箇所が無くなる。
-    // ignore: unused_local_variable
     final palette = context.palette;
     // ロード前は既定値でフォールバックする。
     final settings =
@@ -133,6 +135,30 @@ class SettingsViewMobile extends ConsumerWidget {
         const MobileSettingsSection(
           title: 'データ',
           child: MobileDataManagementSection(),
+        ),
+        const SizedBox(height: 22),
+        MobileSettingsSection(
+          title: '情報',
+          rows: [
+            MobileSettingsValueRow(
+              label: 'バージョン',
+              // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
+              value: ref.watch(appVersionProvider).value ?? '',
+            ),
+            MobileSettingsLinkRow(
+              label: 'ライセンス',
+              onTap: () => LicenseViewMobile.push(context),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '本アプリが利用しているオープンソースソフトウェアの一覧です。',
+          style: TextStyle(
+            fontSize: 11,
+            height: 1.6,
+            color: palette.textAlpha(40),
+          ),
         ),
       ],
     );
