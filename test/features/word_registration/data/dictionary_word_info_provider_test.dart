@@ -7,6 +7,7 @@ import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:eitangocho/features/word_registration/data/kaikki_api_client.dart';
+import 'package:eitangocho/features/word_registration/data/tatoeba_api_client.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -23,11 +24,13 @@ const kaikkiFixture = '''
 void main() {
   late AppDatabase db;
   var kaikkiCallCount = 0;
+  var tatoebaCallCount = 0;
   var deeplCallCount = 0;
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
     kaikkiCallCount = 0;
+    tatoebaCallCount = 0;
     deeplCallCount = 0;
   });
 
@@ -40,9 +43,23 @@ void main() {
   http.Response utf8Response(String body, int status) =>
       http.Response.bytes(utf8.encode(body), status);
 
-  /// kaikki / DeepL のレスポンスを差し替えて DictionaryWordInfoProvider を組み立てる。
+  /// Tatoeba のヒット 1 件分のレスポンス。
+  String tatoebaResponse(String en, String ja) => jsonEncode({
+        'data': [
+          {
+            'text': en,
+            'translations': [
+              {'lang': 'jpn', 'text': ja},
+            ],
+          },
+        ],
+      });
+
+  /// kaikki / Tatoeba / DeepL のレスポンスを差し替えて
+  /// DictionaryWordInfoProvider を組み立てる。
   DictionaryWordInfoProvider buildProvider({
     http.Response Function()? kaikkiResponse,
+    http.Response Function()? tatoebaResponseFn,
     http.Response Function()? deeplResponse,
     String deeplApiKey = '',
   }) {
@@ -53,6 +70,14 @@ void main() {
           return kaikkiResponse != null
               ? kaikkiResponse()
               : http.Response('not found', 404);
+        }),
+      ),
+      tatoebaClient: TatoebaApiClient(
+        MockClient((_) async {
+          tatoebaCallCount++;
+          return tatoebaResponseFn != null
+              ? tatoebaResponseFn()
+              : utf8Response('{"data":[]}', 200);
         }),
       ),
       deeplClient: DeeplClient(
@@ -136,6 +161,64 @@ void main() {
     );
 
     expect((await provider.fetch('negligible'))!.exampleEn, isEmpty);
+  });
+
+  // 和訳が対で付いてくるうえ、kaikki の例文より単語帳向きなため。
+  test('Tatoeba の例文は kaikki の例文より優先される', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+      tatoebaResponseFn: () => utf8Response(
+        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
+        200,
+      ),
+    );
+
+    final info = await provider.fetch('serendipity');
+
+    expect(info!.exampleEn, 'What a serendipity!');
+    expect(info.exampleJa, 'なんという偶然！');
+  });
+
+  test('Tatoeba が空振りなら kaikki の例文を使い、和訳は空のまま', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+    );
+
+    final info = await provider.fetch('serendipity');
+
+    expect(tatoebaCallCount, 1);
+    expect(info!.exampleEn, 'It was serendipity that brought them together.');
+    expect(info.exampleJa, isEmpty);
+  });
+
+  test('Tatoeba で和訳が取れたら DeepL は呼ばない', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
+      tatoebaResponseFn: () => utf8Response(
+        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
+        200,
+      ),
+      deeplApiKey: 'key',
+    );
+
+    await provider.fetch('serendipity');
+
+    expect(deeplCallCount, 0);
+  });
+
+  test('kaikki が未収録でも Tatoeba に例文があれば拾う', () async {
+    await seedEjdict({'serendipity': '思わぬ発見'});
+    final provider = buildProvider(
+      tatoebaResponseFn: () => utf8Response(
+        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
+        200,
+      ),
+    );
+
+    final info = await provider.fetch('serendipity');
+
+    expect(info!.exampleEn, 'What a serendipity!');
+    expect(info.ipa, isEmpty);
   });
 
   test('kaikki 未収録・EJDict のみヒット: japanese のみの WordInfo を返す', () async {

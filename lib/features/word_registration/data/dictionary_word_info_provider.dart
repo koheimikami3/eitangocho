@@ -6,6 +6,7 @@ import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:eitangocho/features/word_registration/data/kaikki_api_client.dart';
 import 'package:eitangocho/features/word_registration/data/kaikki_response.dart';
+import 'package:eitangocho/features/word_registration/data/tatoeba_api_client.dart';
 import 'package:eitangocho/features/word_registration/domain/word_form_matcher.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
@@ -21,6 +22,7 @@ part 'dictionary_word_info_provider.g.dart';
 class DictionaryWordInfoProvider implements WordInfoProvider {
   const DictionaryWordInfoProvider({
     required this._kaikkiClient,
+    required this._tatoebaClient,
     required this._deeplClient,
     required this._cacheDao,
     required this._ejdictDao,
@@ -29,6 +31,7 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
   });
 
   final KaikkiApiClient _kaikkiClient;
+  final TatoebaApiClient _tatoebaClient;
   final DeeplClient _deeplClient;
   final DictionaryCacheDao _cacheDao;
   final EjdictDao _ejdictDao;
@@ -79,7 +82,15 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     var info = _mapEntries(normalized, entries ?? const [])
         .copyWith(japanese: japanese ?? '');
 
-    // 4. 例文が取れていてキー設定済みなら DeepL で和訳(失敗は空のまま続行)
+    // 4. Tatoeba の例文を優先する。和訳が対で付いてくるうえ、kaikki の例文より
+    //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
+    //    空振りしたときだけ kaikki の例文(和訳なし)を使う。
+    final example = await _tatoebaClient.findExample(normalized);
+    if (example != null) {
+      info = info.copyWith(exampleEn: example.en, exampleJa: example.ja);
+    }
+
+    // 5. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
     if (info.exampleEn.isNotEmpty && info.exampleJa.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {
@@ -180,6 +191,7 @@ WordInfoProvider wordInfoProvider(Ref ref) {
   ref.onDispose(httpClient.close);
   return DictionaryWordInfoProvider(
     kaikkiClient: KaikkiApiClient(httpClient),
+    tatoebaClient: TatoebaApiClient(httpClient),
     deeplClient: DeeplClient(httpClient),
     cacheDao: db.dictionaryCacheDao,
     ejdictDao: db.ejdictDao,
