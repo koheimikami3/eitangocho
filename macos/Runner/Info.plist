@@ -32,5 +32,10 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<!-- 暗号は OS の HTTPS / iCloud だけを使い、独自実装を持たないため輸出規制の対象外。
+	     この宣言があるとアップロードごとの輸出コンプライアンス回答が不要になる。
+	     ios/Runner/Info.plist と同じ理由で同じ値を持つ。 -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
