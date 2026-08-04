@@ -83,7 +83,11 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
           Positioned.fill(
             child: ColoredBox(
               color: palette.surface,
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(
+                // 色を指定しないと ColorScheme.primary(seed から導出された
+                // 濃紺)になり、アプリのアクセント色と違う色が出る。
+                child: CircularProgressIndicator(color: palette.accent),
+              ),
             ),
           ),
       ],

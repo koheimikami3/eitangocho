@@ -24,10 +24,11 @@ enum MobilePronunciationButtonVariant {
 /// macOS 版の [PronunciationButton] と役割は同じだが、ホバー演出と Tooltip を
 /// 持たず(タッチでは出ないため)、配色を [AppPalette] から引く。
 ///
-/// タップ領域は Apple の推奨する 44pt 四方を確保する。デザインは負マージンで
-/// レイアウトを膨らませずに 44pt を作っているが、Flutter は親の矩形の外を
-/// ヒットテストしないため同じ手が使えない。押しやすさを優先し、レイアウト上も
-/// 44pt を占める(デザインより数 px 高くなる)。
+/// アイコンのみの形のタップ領域は **44pt 幅 × 34pt 高**。デザインは負マージンで
+/// レイアウトを膨らませずに 44pt 四方を作っているが、Flutter は親の矩形の外を
+/// ヒットテストしないため同じ手が使えない。高さを 44pt にするとカードのフッタが
+/// そのぶん間延びするので、行の高さに響かない幅だけ広げ、高さは円の直径に
+/// 合わせている(デザインの実効高 30pt に近い)。
 class MobilePronunciationButton extends StatelessWidget {
   const MobilePronunciationButton({
     required this.word,
@@ -38,11 +39,12 @@ class MobilePronunciationButton extends StatelessWidget {
   final String word;
   final MobilePronunciationButtonVariant variant;
 
-  /// 最小タップ領域(Apple のヒューマンインターフェイスガイドライン)。
+  /// タップ領域の幅、およびピル形の高さ
+  /// (Apple のヒューマンインターフェイスガイドラインの 44pt)。
   static const minTapTarget = 44.0;
 
-  /// アイコンのみの形の円の直径。タップ領域より小さく、中央に置く。
-  static const _circleDiameter = 34.0;
+  /// アイコンのみの形の円の直径。この形はこの値が高さになる。
+  static const circleDiameter = 34.0;
 
   static const _iconSize = 16.0;
 
@@ -64,12 +66,13 @@ class MobilePronunciationButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () => showMobilePronunciationSheet(context, word),
       child: label == null
-          ? SizedBox.square(
-              dimension: minTapTarget,
+          ? SizedBox(
+              width: minTapTarget,
+              height: circleDiameter,
               child: Center(
                 child: Container(
-                  width: _circleDiameter,
-                  height: _circleDiameter,
+                  width: circleDiameter,
+                  height: circleDiameter,
                   decoration: decoration,
                   child: Center(child: icon),
                 ),

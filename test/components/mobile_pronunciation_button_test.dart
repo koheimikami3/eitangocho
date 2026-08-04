@@ -28,14 +28,16 @@ void main() {
     }
   });
 
-  testWidgets('アイコンのみの形はラベルを持たず、44pt 四方のタップ領域を確保する', (tester) async {
+  testWidgets('アイコンのみの形はラベルを持たず、幅 44pt × 高さ 34pt を占める', (tester) async {
     await pump(tester, MobilePronunciationButtonVariant.icon);
 
     expect(find.byType(Text), findsNothing);
 
+    // 高さを 44pt にするとカードのフッタが間延びするため、行の高さに
+    // 響かない幅だけ広げている(クラスのドキュメント参照)。
     final size = tester.getSize(find.byType(MobilePronunciationButton));
     expect(size.width, MobilePronunciationButton.minTapTarget);
-    expect(size.height, MobilePronunciationButton.minTapTarget);
+    expect(size.height, MobilePronunciationButton.circleDiameter);
   });
 
   testWidgets('クイズの形は「発音を聞く」を出し、高さ 44pt を確保する', (tester) async {

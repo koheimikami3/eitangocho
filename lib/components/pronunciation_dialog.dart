@@ -3,7 +3,6 @@ import 'package:eitangocho/components/pronunciation_web_view.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// macOS 版の発音確認モーダル。Google 翻訳をアプリ内の WebView で開く。
 ///
@@ -86,7 +85,7 @@ class _Header extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.normal,
             borderRadius: 7,
-            onPressed: () => launchUrl(googleTranslateUrl(word)),
+            onPressed: () => openGoogleTranslateInBrowser(word),
           ),
           const SizedBox(width: 8),
           AppOutlinedButton(

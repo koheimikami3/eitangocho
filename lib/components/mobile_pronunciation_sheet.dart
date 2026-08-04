@@ -2,7 +2,6 @@ import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/components/pronunciation_web_view.dart';
 import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// iOS 版の発音確認シート。Google 翻訳をアプリ内の WebView で開く。
 ///
@@ -20,7 +19,7 @@ Future<void> showMobilePronunciationSheet(
       leftLabel: '閉じる',
       onLeft: () => Navigator.of(sheetContext).pop(),
       rightLabel: 'ブラウザで開く',
-      onRight: () => launchUrl(googleTranslateUrl(word)),
+      onRight: () => openGoogleTranslateInBrowser(word),
       // WebView 自身が残り高いっぱいに広がるため、スクロール枠には載せない。
       scrollableBody: false,
       child: PronunciationWebView(word: word),
