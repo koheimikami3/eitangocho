@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # 1.1.0 = iCloud 同期対応(macOS の 2 本目 / iOS の 1 本目)。
-# 1.2.0 は 1.1.0 リリース後の開発中バージョン(内容は未確定)。
+# 1.2.0 = 発音導線の刷新(スピーカーボタン + iOS のアプリ内 WebView)。
 # ビルド番号はここを基点にするだけで、提出用のアーカイブでは Xcode の
 # 「Manage Version and Build Number」が自動で繰り上げる。手で上げない。
 version: 1.2.0+1
