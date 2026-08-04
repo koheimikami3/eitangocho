@@ -120,6 +120,11 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
     閉じ込められる(実機で確認済み)
   - **読み込み中のインジケータは色を明示する**。既定は `ColorScheme.primary` で、
     `colorSchemeSeed` から導出された濃紺になりアクセント色と食い違う
+  - **`onWebResourceError` をそのままエラー画面にしない**。WKWebView は遷移が
+    差し替わるたびに中断(`NSURLErrorCancelled` = -999)を失敗として通知するため、
+    Google 翻訳のリダイレクトだけで「読み込めませんでした」になる。中断は無視し、
+    一度読み込みが完了した後の失敗でも画面を捨てない(広告・計測の失敗で
+    ページごと消える方が困る)。エラー時はその場で引き直せるよう再読み込みを置く
 - **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
   一括定義。iCloud 同期の削除ログ(deleted_words)追加で schemaVersion 2 になった
   (当初は「マイグレーションを発生させない」方針だったが、削除の伝播に必要と判断して改訂)。

@@ -13,7 +13,5 @@ Uri googleTranslateUrl(String word) => Uri.parse(
 /// なり、アプリ内 WebView と役割が重複するうえ、読み込みに失敗すると
 /// 「完了」でも閉じられない画面に閉じ込められる。ここはアプリの外に
 /// 出すための導線なので、本物のブラウザを開く。
-Future<bool> openGoogleTranslateInBrowser(String word) => launchUrl(
-  googleTranslateUrl(word),
-  mode: LaunchMode.externalApplication,
-);
+Future<bool> openGoogleTranslateInBrowser(String word) =>
+    launchUrl(googleTranslateUrl(word), mode: LaunchMode.externalApplication);

@@ -25,6 +25,14 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
   bool _isLoading = true;
   bool _hasError = false;
 
+  /// 一度でも読み込みが完了したか。完了後の失敗でページを捨てないための判定。
+  bool _hasRendered = false;
+
+  /// 読み込みの中断(NSURLErrorCancelled)。WKWebView は遷移が差し替わるたびに
+  /// この失敗を通知してくるため、Google 翻訳のリダイレクトでも普通に飛んでくる。
+  /// 「読み込めなかった」ではないのでエラー扱いしない。
+  static const _nsUrlErrorCancelled = -999;
+
   @override
   void initState() {
     super.initState();
@@ -34,12 +42,16 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (_) => _update(loading: true, error: false),
-          onPageFinished: (_) => _update(loading: false),
+          onPageFinished: (_) {
+            _hasRendered = true;
+            _update(loading: false, error: false);
+          },
           onWebResourceError: (error) {
-            // 画像 1 枚の失敗などでエラー画面に落とさない。
-            if (error.isForMainFrame ?? true) {
-              _update(loading: false, error: true);
-            }
+            if (error.errorCode == _nsUrlErrorCancelled) return;
+            // 表示できているのに、後続の失敗で白紙に戻さない
+            // (広告・計測の読み込み失敗でページごと消える方が困る)。
+            if (_hasRendered) return;
+            _update(loading: false, error: true);
           },
         ),
       )
@@ -54,6 +66,11 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
     });
   }
 
+  void _reload() {
+    _update(loading: true, error: false);
+    _controller.loadRequest(googleTranslateUrl(widget.word));
+  }
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
@@ -62,14 +79,39 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(
-            'ページを読み込めませんでした。\n通信状況を確認するか、ブラウザで開いてください。',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.6,
-              color: palette.textAlpha(60),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'ページを読み込めませんでした。\n通信状況を確認するか、ブラウザで開いてください。',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.6,
+                  color: palette.textAlpha(60),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // 一時的な失敗で閉じ直させないよう、その場で引き直せるようにする。
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _reload,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    '再読み込み',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: palette.accent,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );

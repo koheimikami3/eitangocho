@@ -44,7 +44,8 @@ class MobilePronunciationButton extends StatelessWidget {
   static const minTapTarget = 44.0;
 
   /// アイコンのみの形の円の直径。この形はこの値が高さになる。
-  static const circleDiameter = 34.0;
+  /// デザインは 34 だが、カードのフッタが詰まって見えるよう少し小さくしている。
+  static const circleDiameter = 32.0;
 
   static const _iconSize = 16.0;
 
