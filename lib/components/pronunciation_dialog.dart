@@ -1,15 +1,13 @@
 import 'package:eitangocho/components/app_outlined_button.dart';
 import 'package:eitangocho/components/pronunciation_web_view.dart';
 import 'package:eitangocho/constants/app_colors.dart';
-import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
 
 /// macOS 版の発音確認モーダル。Google 翻訳をアプリ内の WebView で開く。
 ///
 /// iOS はボトムシート([showMobilePronunciationSheet])だが、macOS は他の
 /// モーダル(単語編集・ライセンス)と同じダイアログに揃える。外部ブラウザに
-/// 飛ばすと学習が途切れるためアプリ内に留めるが、Google 側の制限で表示・再生が
-/// できないときのために「ブラウザで開く」を残す。
+/// 飛ばすと学習が途切れるため、確認はアプリ内で完結させる。
 Future<void> showPronunciationDialog(BuildContext context, String word) {
   return showDialog<void>(
     context: context,
@@ -79,15 +77,6 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          AppOutlinedButton(
-            label: 'ブラウザで開く',
-            verticalPadding: 6,
-            fontSize: 13,
-            fontWeight: FontWeight.normal,
-            borderRadius: 7,
-            onPressed: () => openGoogleTranslateInBrowser(word),
-          ),
-          const SizedBox(width: 8),
           AppOutlinedButton(
             label: '閉じる',
             verticalPadding: 6,

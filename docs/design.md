@@ -112,12 +112,14 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
     `webview_flutter`(Flutter 公式、4.9.0 で macOS が endorsed)1 つで
     iOS / macOS 両方が WKWebView で動く。macOS サンドボックスの
     `network.client` は設定済みで entitlements の変更は不要
-  - **「ブラウザで開く」を両方に残す**。埋め込み WebView は Google 側の制限を
-    受けうるうえ、音声再生ができなければこの導線の意味が無くなるため。
-    **`LaunchMode.externalApplication` を明示する**: 既定の `platformDefault` は
-    iOS では SFSafariViewController(アプリ内 Safari)になり、アプリ内 WebView と
-    役割が重複するうえ、読み込みに失敗すると「完了」でも閉じられない画面に
-    閉じ込められる(実機で確認済み)
+  - **外部ブラウザへの導線は置かない**。当初はアプリ内 WebView が Google 側の
+    制限を受けた場合の逃げ道として「ブラウザで開く」を両方の枠に置いていたが、
+    WebView で問題なく表示できることを確認したうえで、UI を単純にするため外した。
+    これに伴い `url_launcher` 依存も外している(唯一の利用箇所だったため)。
+    戻す場合は **`LaunchMode.externalApplication` を明示すること**: 既定の
+    `platformDefault` は iOS では SFSafariViewController(アプリ内 Safari)になり、
+    アプリ内 WebView と役割が重複するうえ、読み込みに失敗すると「完了」でも
+    閉じられない画面に閉じ込められる(実機で確認済み)
   - **読み込み中のインジケータは色を明示する**。既定は `ColorScheme.primary` で、
     `colorSchemeSeed` から導出された濃紺になりアクセント色と食い違う
   - **`onWebResourceError` をそのままエラー画面にしない**。WKWebView は遷移が

@@ -83,7 +83,7 @@ class _PronunciationWebViewState extends State<PronunciationWebView> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'ページを読み込めませんでした。\n通信状況を確認するか、ブラウザで開いてください。',
+                'ページを読み込めませんでした。\n通信状況を確認してから、もう一度お試しください。',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
