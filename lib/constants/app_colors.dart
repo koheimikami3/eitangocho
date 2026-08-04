@@ -6,6 +6,19 @@ abstract final class AppColors {
   static const accent = Color(0xFF429FF0); // 主要アクション
   static const accentHover = Color(0xFF2B8EE0);
   static const cardHoverBorder = Color(0xA6429FF0); // rgba(66,159,240,0.65)
+
+  // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。
+  static const accentSoft = Color(0x1A429FF0); // rgba(66,159,240,0.10)
+  static const accentSoftHover = Color(0x33429FF0); // rgba(66,159,240,0.20)
+  static const accentLine = Color(0x61429FF0); // rgba(66,159,240,0.38)
+  static const accentLineHover = Color(0x99429FF0); // rgba(66,159,240,0.60)
+
+  /// [accentSoft] の上に載せる文字・アイコン色。
+  ///
+  /// accent(#429FF0)では淡い地に対して 2.56:1 しか出ないため濃い青にする。
+  /// デザインの #1E7FD6 も測ると 3.77:1(hover 3.43:1)で 12〜13px の文字には
+  /// 足りないので、色相を保ったまま明度だけ下げた(通常 5.08:1 / hover 4.61:1)。
+  static const accentOnSoft = Color(0xFF176AB4);
   static const danger = Color(0xFFC03030); // 削除系
   static const dangerHover = Color(0xFFA82828);
   static const dangerHoverBackground = Color(0xFFFDF2F2);

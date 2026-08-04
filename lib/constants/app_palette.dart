@@ -60,6 +60,20 @@ class AppPalette {
   /// アクセント色はライト / ダーク共通。
   Color get accent => AppColors.accent;
 
+  /// 発音ボタンの淡い地(--accSoft)。ダークは地が暗いぶん濃く敷く。
+  Color get accentSoft =>
+      isDark ? const Color(0x38429FF0) : AppColors.accentSoft;
+
+  /// [accentSoft] の上に載せる文字・アイコン色(--accText)。
+  /// [accent] より濃い / 明るい値なのは、淡い地の上でコントラストを稼ぐため
+  /// (ライト側の値をデザインから変えた理由は [AppColors.accentOnSoft] 参照)。
+  Color get accentOnSoft =>
+      isDark ? const Color(0xFF7EC2FF) : AppColors.accentOnSoft;
+
+  /// 発音ボタンの枠線(--accLine)。ダークは文字色と同じ色相で引く。
+  Color get accentLine =>
+      isDark ? const Color(0x737EC2FF) : AppColors.accentLine;
+
   static const light = AppPalette._(
     brightness: Brightness.light,
     background: Color(0xFFFFFFFF),

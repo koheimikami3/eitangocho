@@ -1,9 +1,35 @@
 import 'dart:math' as math;
 
+import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// WCAG の相対輝度。半透明の色は重ねる先([under])と合成してから測る。
+double _luminance(Color c, Color under) {
+  double channel(double fg, double bg) {
+    final v = fg * c.a + bg * (1 - c.a);
+    return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4) as double;
+  }
+
+  return 0.2126 * channel(c.r, under.r) +
+      0.7152 * channel(c.g, under.g) +
+      0.0722 * channel(c.b, under.b);
+}
+
+/// [foreground] を [background] の上に載せたときのコントラスト比。
+/// 背景が半透明なら [under](その下の面)と合成してから測る。
+double _contrastRatio(Color foreground, Color background, Color under) {
+  final bgLum = _luminance(background, under);
+  final composited = Color.lerp(
+    under,
+    background.withValues(alpha: 1),
+    background.a,
+  )!;
+  final fgLum = _luminance(foreground, composited);
+  return (math.max(bgLum, fgLum) + 0.05) / (math.min(bgLum, fgLum) + 0.05);
+}
 
 void main() {
   test('ライト / ダークで地の色と本文色が入れ替わる', () {
@@ -54,35 +80,41 @@ void main() {
   });
 
   test('品詞バッジの文字は背景に対して 4.5:1 以上ある(10px の小さな文字のため)', () {
-    /// WCAG の相対輝度。半透明の色は重ねる先と合成してから測る。
-    double luminance(Color c, Color under) {
-      double channel(double fg, double bg) {
-        final v = fg * c.a + bg * (1 - c.a);
-        return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4) as double;
-      }
-
-      return 0.2126 * channel(c.r, under.r) +
-          0.7152 * channel(c.g, under.g) +
-          0.0722 * channel(c.b, under.b);
-    }
-
     for (final palette in [AppPalette.light, AppPalette.dark]) {
       for (final pos in PartOfSpeech.values) {
         final (bg, fg) = palette.posBadge(pos);
         // チップはカードの上に乗るため、半透明の背景はカード面と合成する。
-        final onCard = palette.surface;
-        final bgLum = luminance(bg, onCard);
-        final composited = Color.lerp(onCard, bg.withValues(alpha: 1), bg.a)!;
-        final fgLum = luminance(fg, composited);
-        final ratio =
-            (math.max(bgLum, fgLum) + 0.05) / (math.min(bgLum, fgLum) + 0.05);
         expect(
-          ratio,
+          _contrastRatio(fg, bg, palette.surface),
           greaterThanOrEqualTo(4.5),
           reason: '${palette.isDark ? 'dark' : 'light'} / ${pos.name}',
         );
       }
     }
+  });
+
+  test('発音ボタンの文字・アイコンは淡い地に対して 4.5:1 以上ある', () {
+    // ラベルは 12〜13px で「大きい文字」の 3:1 基準は使えないため 4.5:1 を要求する。
+    // デザインの #1E7FD6 のままだとライトが 3.77:1 で足りず、色相を保ったまま
+    // 明度を下げた経緯がある(AppColors.accentOnSoft 参照)。
+    for (final palette in [AppPalette.light, AppPalette.dark]) {
+      expect(
+        _contrastRatio(palette.accentOnSoft, palette.accentSoft, palette.surface),
+        greaterThanOrEqualTo(4.5),
+        reason: palette.isDark ? 'dark' : 'light',
+      );
+    }
+
+    // macOS の hover は地が濃くなるぶんコントラストが下がる。ここも割らない。
+    expect(
+      _contrastRatio(
+        AppColors.accentOnSoft,
+        AppColors.accentSoftHover,
+        AppPalette.light.surface,
+      ),
+      greaterThanOrEqualTo(4.5),
+      reason: 'macOS hover',
+    );
   });
 
   test('AppPalette.of は Brightness から対応するパレットを返す', () {

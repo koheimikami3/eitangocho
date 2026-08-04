@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/mobile_pronunciation_link.dart';
+import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +79,10 @@ class MobileQuizCard extends StatelessWidget {
           // 発音リンクは IPA の下に置く(macOS 版の QuizCard と揃える)。
           if (pronunciationOnFront) ...[
             const SizedBox(height: 8),
-            MobilePronunciationLink(word: englishWord),
+            MobilePronunciationButton(
+              word: englishWord,
+              variant: MobilePronunciationButtonVariant.pill,
+            ),
           ],
           if (revealed) ...[
             const SizedBox(height: 14),
@@ -99,7 +102,10 @@ class MobileQuizCard extends StatelessWidget {
             ),
             if (showLinkOnBack) ...[
               const SizedBox(height: 8),
-              MobilePronunciationLink(word: englishWord),
+              MobilePronunciationButton(
+              word: englishWord,
+              variant: MobilePronunciationButtonVariant.pill,
+            ),
             ],
             if (exampleEn.trim().isNotEmpty) ...[
               const SizedBox(height: 14),

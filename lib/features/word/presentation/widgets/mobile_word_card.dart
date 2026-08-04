@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/mobile_pronunciation_link.dart';
+import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
@@ -147,13 +147,9 @@ class _MobileWordCardState extends State<MobileWordCard> {
                     ),
                   ),
                   const Spacer(),
-                  // 発音操作もカードのタップに伝播させない。
-                  GestureDetector(
-                    onTap: () {},
-                    child: MobilePronunciationLink(
-                      word: word.word,
-                      compact: true,
-                    ),
+                  MobilePronunciationButton(
+                    word: word.word,
+                    variant: MobilePronunciationButtonVariant.icon,
                   ),
                 ],
               ),
