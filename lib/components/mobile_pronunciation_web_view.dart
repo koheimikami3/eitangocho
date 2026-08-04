@@ -3,24 +3,22 @@ import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-/// 発音確認用に Google 翻訳を表示する WebView(機能横断コンポーネント)。
+/// iOS 版の発音確認用 WebView。Google 翻訳を表示する。
+/// ボトムシート([showMobilePronunciationSheet])の中身として使う。
 ///
-/// iOS はボトムシート([showMobilePronunciationSheet])、macOS はダイアログ
-/// ([showPronunciationDialog])の中身として使う。枠は違うが読み込み・エラー
-/// 表示は同じなので、ここだけ共有する。
-///
-/// 配色は macOS / iOS とも [AppPalette] から引く(macOS のテーマはライト固定で
-/// 組まれているため、`context.palette` はライトを返す)。
-class PronunciationWebView extends StatefulWidget {
-  const PronunciationWebView({required this.word, super.key});
+/// **iOS 専用**。macOS は Flutter の platform view がまだジェスチャに対応して
+/// おらず、埋め込んでも再生ボタンを押せないため外部ブラウザに出している
+/// (docs/design.md 参照)。
+class MobilePronunciationWebView extends StatefulWidget {
+  const MobilePronunciationWebView({required this.word, super.key});
 
   final String word;
 
   @override
-  State<PronunciationWebView> createState() => _PronunciationWebViewState();
+  State<MobilePronunciationWebView> createState() => _MobilePronunciationWebViewState();
 }
 
-class _PronunciationWebViewState extends State<PronunciationWebView> {
+class _MobilePronunciationWebViewState extends State<MobilePronunciationWebView> {
   late final WebViewController _controller;
   bool _isLoading = true;
   bool _hasError = false;
