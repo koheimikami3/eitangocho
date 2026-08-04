@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/pronunciation_link.dart';
+import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
@@ -137,8 +137,18 @@ class _WordTableRowState extends State<WordTableRow> {
               SizedBox(
                 width: 56,
                 child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: PronunciationLink(word: word.word, compact: true),
+                  alignment: Alignment.topLeft,
+                  // 行は上揃え(デザインの align-items:start)なので、28px の
+                  // ボタンをそのまま置くと 13px のテキスト行より低く見える。
+                  // デザインの margin:-3px 0 と同じだけ引き上げる
+                  // (レイアウト高は変えたくないので Transform で見た目だけ)。
+                  child: Transform.translate(
+                    offset: const Offset(0, -3),
+                    child: PronunciationButton(
+                      word: word.word,
+                      variant: PronunciationButtonVariant.tableIcon,
+                    ),
+                  ),
                 ),
               ),
             ],

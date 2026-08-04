@@ -1,4 +1,4 @@
-import 'package:eitangocho/components/mobile_pronunciation_link.dart';
+import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
@@ -117,9 +117,11 @@ class _MobileWordCardState extends State<MobileWordCard> {
                   ),
                 ),
               ),
-            const SizedBox(height: 8),
+            // フッタ(区切り線 + 覚えた / 発音)は上下の余白を少し詰める。
+            // 発音ボタンが 34pt あり、8 + 8 だと間延びして見えるため。
+            const SizedBox(height: 6),
             Container(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 6),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(color: palette.borderAlpha(6)),
@@ -147,13 +149,9 @@ class _MobileWordCardState extends State<MobileWordCard> {
                     ),
                   ),
                   const Spacer(),
-                  // 発音操作もカードのタップに伝播させない。
-                  GestureDetector(
-                    onTap: () {},
-                    child: MobilePronunciationLink(
-                      word: word.word,
-                      compact: true,
-                    ),
+                  MobilePronunciationButton(
+                    word: word.word,
+                    variant: MobilePronunciationButtonVariant.icon,
                   ),
                 ],
               ),

@@ -1,5 +1,5 @@
 import 'package:eitangocho/components/app_filled_button.dart';
-import 'package:eitangocho/components/pronunciation_link.dart';
+import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -95,7 +95,10 @@ class QuizCard extends StatelessWidget {
               ],
               if (pronunciationOnFront) ...[
                 const SizedBox(height: 10),
-                PronunciationLink(word: englishWord),
+                PronunciationButton(
+                  word: englishWord,
+                  variant: PronunciationButtonVariant.quizPill,
+                ),
               ],
               if (revealed) ...[
                 const SizedBox(height: 14),
@@ -118,7 +121,10 @@ class QuizCard extends StatelessWidget {
                 ),
                 if (!pronunciationOnFront) ...[
                   const SizedBox(height: 10),
-                  PronunciationLink(word: englishWord),
+                  PronunciationButton(
+                  word: englishWord,
+                  variant: PronunciationButtonVariant.quizPill,
+                ),
                 ],
                 if (hasExample) ...[
                   const SizedBox(height: 10),

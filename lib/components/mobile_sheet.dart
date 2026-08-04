@@ -14,6 +14,7 @@ class MobileSheet extends StatelessWidget {
     super.key,
     this.rightLabel,
     this.onRight,
+    this.scrollableBody = true,
   });
 
   final String title;
@@ -25,6 +26,11 @@ class MobileSheet extends StatelessWidget {
   final VoidCallback? onRight;
 
   final Widget child;
+
+  /// 中身をスクロール領域に載せるか。フォームは true(既定)。
+  /// WebView のように自前で高さいっぱいに広がるものは false にして、
+  /// 余白ごとシートの残り高を渡す。
+  final bool scrollableBody;
 
   /// 画面高に対するシートの高さ(デザインの height:88%)。
   static const _heightFactor = 0.88;
@@ -57,10 +63,12 @@ class MobileSheet extends StatelessWidget {
                 onRight: onRight,
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 40),
-                  child: child,
-                ),
+                child: scrollableBody
+                    ? SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 40),
+                        child: child,
+                      )
+                    : child,
               ),
             ],
           ),

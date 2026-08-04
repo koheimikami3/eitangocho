@@ -15,7 +15,7 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
 | 英例文 + 対訳 | Tatoeba (`api.tatoeba.org/unstable/sentences`) | 訳文が対でぶら下がる唯一のソース。学習者向けの短文が多い |
 | 単語の日本語訳(語義) | EJDict-hand(パブリックドメイン英和辞書)をアプリに同梱、初回起動時に DB へ取込 | 英和辞典の語義で、kaikki の訳語列挙より情報量が多い。オフラインで確実 |
 | 例文の日本語訳(予備) | DeepL API Free | Tatoeba が空振りしたときのみ。設定 UI は隠してあり実質使わない(下記) |
-| 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | 発音確認の唯一の導線。全単語で外部ブラウザに開く |
+| 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | 発音確認の唯一の導線。iOS はアプリ内の WebView、macOS は外部ブラウザで開く(1.2.0 以降。下記) |
 
 - 取得チェーン: kaikki → Tatoeba → (どちらも無ければ)手動入力フォールバック。
   EJDict は常に引く。例文は Tatoeba を優先し、空振り時だけ kaikki の英例文を使う
@@ -87,6 +87,58 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   Wiktionary REST も音声 URL を返さず、復活案が端末内蔵 TTS である以上不要)。
   カラム・`WordInfo` のフィールド・エクスポート項目は残してあり、以後は常に空。
   既存データと iCloud 同期の JSON フォーマットを壊さないため。
+- **1.2.0 で発音の導線をスピーカーボタン + アプリ内 WebView にした**: それまでは
+  「発音を確認 ↗」というテキストリンクで外部ブラウザに飛ばしていた。矢印だけの
+  compact 表示は iOS で 44pt のタップ領域に届かず、何が開くかも読めなかった
+  (macOS は Tooltip で補っていた)。外部ブラウザに出ると 1 語確認するたびに
+  アプリへ戻る操作が要る点も含め、2 つまとめて直した。
+  - ボタンの寸法・配色はデザインの発音ボタン(淡いアクセント地 + 濃い青の
+    スピーカー)に従う。形は置き場所で変える: macOS はカード=26px ピル「発音」/
+    テーブル=28px 角丸アイコン / クイズ=32px ピル「発音を聞く」、iOS は
+    カード・一覧=34px 円形アイコン / クイズ=ピル「発音を聞く」
+  - **アイコンは `Icons.volume_up` ではなく `SpeakerIcon`(CustomPainter)**。
+    Material のものは音波が 3 本でデザインと形が違う
+  - **文字色はデザインの `#1e7fd6` を測り直して `#176AB4` に変えた**。淡い地
+    (白 + アクセント 10%)に対して #1e7fd6 は 3.77:1(hover 3.43:1)しか出ず、
+    12〜13px の文字には足りない。色相を保ったまま明度だけ下げて 5.08:1 にし、
+    品詞バッジと同じくテストで 4.5:1 を保証する。ダーク(`#7EC2FF`)は元から足りている
+  - **iOS のアイコンボタンのタップ領域は 44pt 幅 × 34pt 高**。デザインは負マージンで
+    行を膨らませずに 44pt 四方を作っているが、Flutter は親の矩形の外をヒットテスト
+    しないため同じ手が使えない(広げた分が死に領域になる)。高さも 44pt にすると
+    学習中カードのフッタが間延びしたため、行の高さに響かない幅だけ広げ、高さは
+    円の直径に合わせた。あわせてフッタの上下の余白を 8 → 6 に詰めている
+  - **WebView はデザインには無く、ユーザー判断による追加。ただし iOS 限定**。
+    編集シートと同じ `MobileSheet` に `webview_flutter`(Flutter 公式)を載せる。
+  - **macOS はアプリ内 WebView を諦めて外部ブラウザのままにした**。パッケージは
+    4.9.0 で macOS が endorsed になっており表示自体はできるが、**Flutter の
+    platform view が macOS ではまだジェスチャに対応していない**ため、埋め込むと
+    Google 翻訳の再生ボタンを押せない(表示はされるのに操作が届かない)。
+    公式ドキュメントの Version note に明記されている
+    (<https://docs.flutter.dev/platform-integration/macos/platform-views>)。
+    加えて `uiScale` の `Transform.scale` 配下になるため描画も甘くなる。
+    Flutter 側が対応したら iOS と同じダイアログに載せ替えられる。
+    macOS サンドボックスの `network.client` は設定済みなので、その際も
+    entitlements の変更は不要
+  - **外部ブラウザを開くのは macOS だけで、iOS には置かない**。当初は WebView が
+    Google 側の制限を受けた場合の逃げ道として iOS のシートにも「ブラウザで開く」を
+    置いていたが、問題なく表示・再生できることを確認したうえで UI を単純にするため
+    外した。**`LaunchMode.externalApplication` を明示すること**: 既定の
+    `platformDefault` は iOS では SFSafariViewController(アプリ内 Safari)になり、
+    アプリ内 WebView と役割が重複するうえ、読み込みに失敗すると「完了」でも
+    閉じられない画面に閉じ込められる(実機で確認済み)
+  - **読み込み中のインジケータは色を明示する**。既定は `ColorScheme.primary` で、
+    `colorSchemeSeed` から導出された濃紺になりアクセント色と食い違う
+  - **debug の iOS では hot restart 後に WebView のアサーションが出るが実害はない**。
+    `didReceiveAuthenticationChallenge`(HTTPS の証明書検証で毎回呼ばれる)が、
+    hot restart で作り直された Dart 側の管理表に無い ID で飛んでくるため。
+    ネイティブの WKWebView は hot restart では破棄されず生き残るのが理由で、
+    コールドスタートでは起きない。`assert` は release では除去され、debug でも
+    プラグイン側が握り潰すのでクラッシュしない
+  - **`onWebResourceError` をそのままエラー画面にしない**。WKWebView は遷移が
+    差し替わるたびに中断(`NSURLErrorCancelled` = -999)を失敗として通知するため、
+    Google 翻訳のリダイレクトだけで「読み込めませんでした」になる。中断は無視し、
+    一度読み込みが完了した後の失敗でも画面を捨てない(広告・計測の失敗で
+    ページごと消える方が困る)。エラー時はその場で引き直せるよう再読み込みを置く
 - **DB スキーマ**: words / ejdict_entries / dictionary_cache_entries を schemaVersion 1 で
   一括定義。iCloud 同期の削除ログ(deleted_words)追加で schemaVersion 2 になった
   (当初は「マイグレーションを発生させない」方針だったが、削除の伝播に必要と判断して改訂)。
@@ -237,6 +289,8 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   一覧と入れ替える(ウィンドウ全体を覆う遷移を挟むと設定画面から遠くなるため)
 - iOS の戻るボタンの色はデザインの `#1e7fd6` ではなく `palette.accent`(`#429FF0`)。
   `#1e7fd6` はデザイン内で広告 / Pro の導線に付く色で役割が違う
+  (デザインは発音ボタンの文字色にも同じ値を当てているが、そちらは淡い地に
+  載せるためコントラストを測って `#176AB4` に振り直した。上記)
 - **データ書き出しのボタン名は macOS だけ `...` を残す**(デザインからは消えたが
   ユーザー判断で維持)。ダイアログが開くことを示す macOS の慣習に沿う
 
