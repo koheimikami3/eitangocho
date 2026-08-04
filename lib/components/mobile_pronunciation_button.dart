@@ -1,8 +1,7 @@
+import 'package:eitangocho/components/mobile_pronunciation_sheet.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_palette.dart';
-import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// [MobilePronunciationButton] の形。
 enum MobilePronunciationButtonVariant {
@@ -19,7 +18,8 @@ enum MobilePronunciationButtonVariant {
   };
 }
 
-/// iOS 版の発音確認ボタン。Google 翻訳を開く。
+/// iOS 版の発音確認ボタン。
+/// Google 翻訳をアプリ内のシート([showMobilePronunciationSheet])で開く。
 ///
 /// macOS 版の [PronunciationButton] と役割は同じだが、ホバー演出と Tooltip を
 /// 持たず(タッチでは出ないため)、配色を [AppPalette] から引く。
@@ -62,7 +62,7 @@ class MobilePronunciationButton extends StatelessWidget {
     return GestureDetector(
       // 円の外側の余白(タップ領域)でも反応させる。
       behavior: HitTestBehavior.opaque,
-      onTap: () => launchUrl(googleTranslateUrl(word)),
+      onTap: () => showMobilePronunciationSheet(context, word),
       child: label == null
           ? SizedBox.square(
               dimension: minTapTarget,

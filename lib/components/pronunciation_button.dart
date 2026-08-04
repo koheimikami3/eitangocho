@@ -1,8 +1,7 @@
+import 'package:eitangocho/components/pronunciation_dialog.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_colors.dart';
-import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// [PronunciationButton] の形。置かれる場所ごとにデザインが違う。
 enum PronunciationButtonVariant {
@@ -60,7 +59,8 @@ enum PronunciationButtonVariant {
   };
 }
 
-/// 発音確認ボタン(機能横断コンポーネント)。Google 翻訳を開く。
+/// 発音確認ボタン(機能横断コンポーネント)。
+/// Google 翻訳をアプリ内のモーダル([showPronunciationDialog])で開く。
 ///
 /// iOS 版は [MobilePronunciationButton]。配色は macOS がライト固定のため
 /// [AppColors] から直接引く。
@@ -84,10 +84,6 @@ class PronunciationButton extends StatefulWidget {
 class _PronunciationButtonState extends State<PronunciationButton> {
   bool _isHovered = false;
 
-  Future<void> _openGoogleTranslate() async {
-    await launchUrl(googleTranslateUrl(widget.word));
-  }
-
   @override
   Widget build(BuildContext context) {
     final variant = widget.variant;
@@ -98,7 +94,7 @@ class _PronunciationButtonState extends State<PronunciationButton> {
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: _openGoogleTranslate,
+        onTap: () => showPronunciationDialog(context, widget.word),
         child: Container(
           height: variant.height,
           // アイコンのみの形は正方形にする。
