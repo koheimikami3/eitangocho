@@ -201,6 +201,15 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   - 1.2.0 の macOS 提出でこの制約に当たり、`1.2.0+1` → `1.2.0+2` に上げ直した
     (iOS の 1.2.0 は build 1 のまま通っている)
   - CI などアップロードを Xcode 以外で行う場合は `--build-number` で明示する
+  - **pubspec を上げたら、Xcode で Archive する前に `flutter build ios|macos
+    --config-only` を実行する**。Info.plist の `CFBundleShortVersionString` /
+    `CFBundleVersion` は `$(FLUTTER_BUILD_NAME)` / `$(FLUTTER_BUILD_NUMBER)` を
+    参照しており、その実体である `ios/Flutter/Generated.xcconfig` と
+    `macos/Flutter/ephemeral/Flutter-Generated.xcconfig` は Flutter ツールが
+    ビルドを走らせたときだけ pubspec から書き出される(どちらも gitignore 対象の
+    生成物)。Xcode 単体の Archive は pubspec を読まないため、前回ビルド時の
+    古い値でアーカイブされる。1.3.0 で実際に 1.2.0 のままアーカイブされた
+    (`flutter test` / `flutter analyze` では再生成されない)
 
 ## iOS 版の設計判断
 
