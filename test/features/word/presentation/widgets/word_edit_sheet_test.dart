@@ -70,6 +70,7 @@ void main() {
     });
   });
 
+  // 単語名を変えずに保存できる = 自分自身を重複扱いしない、の確認も兼ねる。
   testWidgets('保存すると入力内容が DB に反映される', (tester) async {
     await runSheet(tester, (word) async {
       await tester.enterText(find.byType(TextField).at(2), 'リンゴ');
@@ -80,6 +81,25 @@ void main() {
       expect(updated.japanese, 'リンゴ');
       // 保存するとシートが閉じる。
       expect(find.text('単語を編集'), findsNothing);
+    });
+  });
+
+  testWidgets('既存の単語名に変更するとエラーになり、更新もされない', (tester) async {
+    await runSheet(tester, (word) async {
+      await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+      );
+
+      // 大文字違いでも同じ単語とみなす。
+      await tester.enterText(find.byType(TextField).first, 'Banana');
+      await tester.tap(find.text('保存'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('「banana」は既に登録されています。'), findsOneWidget);
+      // シートは開いたままで、単語名も元のまま。
+      expect(find.text('単語を編集'), findsOneWidget);
+      final words = await db.wordDao.getAll();
+      expect(words.map((w) => w.word), containsAll(['apple', 'banana']));
     });
   });
 

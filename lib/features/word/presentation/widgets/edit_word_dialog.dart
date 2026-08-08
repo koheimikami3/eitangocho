@@ -67,6 +67,18 @@ class _EditWordDialogState extends State<_EditWordDialog> {
       setState(() => _errorMessage = '英単語と日本語訳は必須です。');
       return;
     }
+    // 単語名を既存の単語に書き換えられると重複ができるため、登録時と同じく止める
+    // (自分自身は除外する)。
+    final duplicate = await widget.ref
+        .read(databaseProvider)
+        .wordDao
+        .findByWord(word, excludeId: widget.word.id);
+    if (duplicate != null) {
+      if (mounted) {
+        setState(() => _errorMessage = '「${duplicate.word}」は既に登録されています。');
+      }
+      return;
+    }
 
     await widget.ref.read(databaseProvider).wordDao.updateWord(
       widget.word.id,
