@@ -40,6 +40,23 @@ void main() {
     expect(size.height, MobilePronunciationButton.circleDiameter);
   });
 
+  testWidgets('アイコンのみの形は円をタップ領域の右端に揃える', (tester) async {
+    await pump(tester, MobilePronunciationButtonVariant.icon);
+
+    // 中央寄せだと円の右端がコンテンツの右端より内側に入り、左端の
+    // チェックボックスに対して左寄りに見える(クラスのドキュメント参照)。
+    final tapTarget = tester.getRect(find.byType(MobilePronunciationButton));
+    final circle = tester.getRect(
+      find.descendant(
+        of: find.byType(MobilePronunciationButton),
+        matching: find.byType(Container),
+      ),
+    );
+
+    expect(circle.width, MobilePronunciationButton.circleDiameter);
+    expect(circle.right, tapTarget.right);
+  });
+
   testWidgets('クイズの形は「発音を聞く」を出し、高さ 44pt を確保する', (tester) async {
     await pump(tester, MobilePronunciationButtonVariant.pill);
 
