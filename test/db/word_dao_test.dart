@@ -73,6 +73,36 @@ void main() {
     expect(words, isEmpty);
   });
 
+  // 重複登録の検出(DB に UNIQUE 制約は置かず、このクエリで抑止する)。
+  group('findByWord', () {
+    test('大文字小文字・前後空白を無視して既存の単語を返す', () async {
+      await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+
+      expect((await db.wordDao.findByWord('apple'))?.word, 'apple');
+      expect((await db.wordDao.findByWord('Apple'))?.word, 'apple');
+      expect((await db.wordDao.findByWord('  APPLE  '))?.word, 'apple');
+    });
+
+    test('未登録の単語では null を返す', () async {
+      await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+
+      expect(await db.wordDao.findByWord('banana'), isNull);
+    });
+
+    test('excludeId で指定した 1 件は対象外になる(編集で自分自身に当たらない)', () async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+
+      expect(await db.wordDao.findByWord('apple', excludeId: id), isNull);
+      expect(await db.wordDao.findByWord('apple', excludeId: id + 1), isNotNull);
+    });
+  });
+
   // 削除ログ(iCloud 同期で削除を伝播させるためのトゥームストーン)。
   group('削除ログ', () {
     test('deleteWord は削除ログを残す(キーは小文字化する)', () async {

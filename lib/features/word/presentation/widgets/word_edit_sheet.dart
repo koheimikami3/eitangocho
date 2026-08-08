@@ -50,7 +50,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
   );
   late Set<PartOfSpeech> _selectedPartsOfSpeech = widget.word.partsOfSpeech
       .toSet();
-  bool _hasError = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -66,7 +66,19 @@ class _WordEditSheetState extends State<_WordEditSheet> {
     final word = _wordController.text.trim();
     final japanese = _japaneseController.text.trim();
     if (word.isEmpty || japanese.isEmpty) {
-      setState(() => _hasError = true);
+      setState(() => _errorMessage = '英単語と日本語訳は必須です。');
+      return;
+    }
+    // 単語名を既存の単語に書き換えられると重複ができるため、登録時と同じく止める
+    // (自分自身は除外する)。
+    final duplicate = await widget.ref
+        .read(databaseProvider)
+        .wordDao
+        .findByWord(word, excludeId: widget.word.id);
+    if (duplicate != null) {
+      if (mounted) {
+        setState(() => _errorMessage = '「${duplicate.word}」は既に登録されています。');
+      }
       return;
     }
 
@@ -158,10 +170,10 @@ class _WordEditSheetState extends State<_WordEditSheet> {
             controller: _exampleJaController,
             maxLines: 2,
           ),
-          if (_hasError) ...[
+          if (_errorMessage != null) ...[
             const SizedBox(height: 14),
             Text(
-              '英単語と日本語訳は必須です。',
+              _errorMessage!,
               style: TextStyle(fontSize: 12, color: palette.danger),
             ),
           ],

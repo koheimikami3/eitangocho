@@ -10,9 +10,26 @@ part 'word_dao.g.dart';
 class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
   WordDao(super.db);
 
-  /// 削除ログのマージキー。WordExportService の突き合わせと揃える
-  /// (大文字小文字・前後空白の違いで別単語扱いにならないようにする)。
-  String _deletionKey(String word) => word.trim().toLowerCase();
+  /// 単語の同一判定キー(削除ログのマージ・重複登録の検出に使う)。
+  /// WordExportService の突き合わせと揃える(大文字小文字・前後空白の違いで
+  /// 別単語扱いにならないようにする)。
+  String _matchKey(String word) => word.trim().toLowerCase();
+
+  /// 同じ単語が既に登録されていれば返す(重複登録の検出用)。
+  /// [excludeId] を渡すとその 1 件を除いて探す(編集で自分自身に当たらないため)。
+  ///
+  /// DB に UNIQUE 制約は置いていない(既存端末に重複が残っている可能性があり、
+  /// 制約を足すとマイグレーションと iCloud インポートが失敗しうる)。
+  /// 重複の抑止はこのクエリを使うアプリ層の検証だけで行う。
+  Future<Word?> findByWord(String word, {int? excludeId}) {
+    final query = select(words)
+      ..where((t) => t.word.lower().equals(_matchKey(word)))
+      ..limit(1);
+    if (excludeId != null) {
+      query.where((t) => t.id.equals(excludeId).not());
+    }
+    return query.getSingleOrNull();
+  }
 
   /// 登録日時の新しい順(同時刻は id の新しい順)
   Stream<List<Word>> watchAll() => (select(words)
@@ -64,7 +81,7 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
       await (delete(words)..where((t) => t.id.equals(id))).go();
       await into(deletedWords).insertOnConflictUpdate(
         DeletedWordsCompanion(
-          word: Value(_deletionKey(target.word)),
+          word: Value(_matchKey(target.word)),
           deletedAt: Value(DateTime.now()),
         ),
       );
@@ -77,7 +94,7 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
   /// 指定単語の削除ログを取り消す(再登録・インポートでの復活時)。
   Future<void> _clearDeletion(String word) => (delete(
     deletedWords,
-  )..where((t) => t.word.equals(_deletionKey(word)))).go();
+  )..where((t) => t.word.equals(_matchKey(word)))).go();
 
   /// [before] より古い削除ログを掃除する。
   /// ログを無期限に持ち続けるとスナップショットが膨らみ続けるため、

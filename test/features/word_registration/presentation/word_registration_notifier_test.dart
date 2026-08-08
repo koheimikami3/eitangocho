@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
@@ -380,6 +381,69 @@ void main() {
       expect(state.step, RegistrationStep.form);
       expect(state.fetched, isNull);
       expect(state.notFound, isFalse);
+    });
+  });
+
+  // 同じ単語が 2 件並ぶのは事故なので、登録させずに止める。
+  group('重複登録', () {
+    Future<void> insertApple() => db.wordDao.insertWord(
+      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+    );
+
+    test('登録済みなら autoFill は辞書を引かず input に留まる', () async {
+      await insertApple();
+      var fetchCalled = false;
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async {
+          fetchCalled = true;
+          return null;
+        }),
+      );
+
+      await container.read(wordRegistrationProvider.notifier).autoFill('apple');
+
+      final state = container.read(wordRegistrationProvider);
+      expect(fetchCalled, isFalse);
+      expect(state.step, RegistrationStep.input);
+      expect(state.errorMessage, '「apple」は既に登録されています。');
+    });
+
+    test('大文字違い・前後空白でも autoFill は弾く', () async {
+      await insertApple();
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((_) async => null),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('  Apple ');
+
+      expect(
+        container.read(wordRegistrationProvider).errorMessage,
+        '「apple」は既に登録されています。',
+      );
+    });
+
+    test('save も弾き、単語は増えない(フォームで書き換えた場合の保険)', () async {
+      await insertApple();
+      container = buildContainer();
+
+      final result = await container
+          .read(wordRegistrationProvider.notifier)
+          .save(
+            word: 'Apple',
+            ipa: '',
+            japanese: 'りんご',
+            exampleEn: '',
+            exampleJa: '',
+          );
+
+      expect(result, isFalse);
+      expect(
+        container.read(wordRegistrationProvider).errorMessage,
+        '「apple」は既に登録されています。',
+      );
+      expect(await db.wordDao.watchAll().first, hasLength(1));
     });
   });
 }
