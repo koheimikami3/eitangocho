@@ -29,6 +29,11 @@ enum MobilePronunciationButtonVariant {
 /// ヒットテストしないため同じ手が使えない。高さを 44pt にするとカードのフッタが
 /// そのぶん間延びするので、行の高さに響かない幅だけ広げ、高さは円の直径に
 /// 合わせている(デザインの実効高 30pt に近い)。
+///
+/// **円はタップ領域の右端に揃える**(中央寄せにしない)。この形は常に行や
+/// カードのフッタの末尾に置かれるため、中央寄せだと円の右端がコンテンツの
+/// 右端より内側に入り、左端のチェックボックスに対して左寄りに見える。
+/// 幅を広げたぶんは左側に伸ばす(隣の要素との間隔が広がるだけで済む)。
 class MobilePronunciationButton extends StatelessWidget {
   const MobilePronunciationButton({
     required this.word,
@@ -70,7 +75,8 @@ class MobilePronunciationButton extends StatelessWidget {
           ? SizedBox(
               width: minTapTarget,
               height: circleDiameter,
-              child: Center(
+              child: Align(
+                alignment: Alignment.centerRight,
                 child: Container(
                   width: circleDiameter,
                   height: circleDiameter,
