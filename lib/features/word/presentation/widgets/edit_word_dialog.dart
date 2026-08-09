@@ -152,6 +152,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                 LabeledTextField(
                   label: '日本語訳 *',
                   controller: _japaneseController,
+                  maxLines: null,
                 ),
                 const SizedBox(height: 16),
                 Column(
@@ -183,13 +184,15 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                 LabeledTextField(
                   label: '英例文',
                   controller: _exampleEnController,
-                  maxLines: 2,
+                  minLines: 2,
+                  maxLines: null,
                 ),
                 const SizedBox(height: 16),
                 LabeledTextField(
                   label: '日本語例文',
                   controller: _exampleJaController,
-                  maxLines: 2,
+                  minLines: 2,
+                  maxLines: null,
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 16),

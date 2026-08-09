@@ -207,6 +207,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         LabeledTextField(
           label: '日本語訳 *',
           controller: _japaneseController,
+          maxLines: null,
           trailing: _autoJapanese ? const AutoFillBadge() : null,
         ),
         const SizedBox(height: 16),
@@ -243,14 +244,16 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         LabeledTextField(
           label: '英例文',
           controller: _exampleEnController,
-          maxLines: 2,
+          minLines: 2,
+          maxLines: null,
           trailing: _autoExampleEn ? const AutoFillBadge() : null,
         ),
         const SizedBox(height: 16),
         LabeledTextField(
           label: '日本語例文',
           controller: _exampleJaController,
-          maxLines: 2,
+          minLines: 2,
+          maxLines: null,
           trailing: _autoExampleJa ? const AutoFillBadge() : null,
         ),
         if (state.errorMessage != null) ...[
