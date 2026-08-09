@@ -136,6 +136,23 @@ void main() {
     expect(await mock.client.findExample('negligible'), isNull);
   });
 
+  // 句動詞は語形フィルタが複合語を扱えないと候補が全滅する。
+  test('句動詞は語順が変わった文も採用する', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        responseOf([
+          ('He put on a coat.', '彼はコートを着た。'),
+          ('The wedding was put off.', '結婚式は延期された。'),
+        ]),
+        200,
+      ),
+    );
+
+    final example = await mock.client.findExample('put off');
+
+    expect(example!.en, 'The wedding was put off.');
+  });
+
   test('和訳が無い文は採用しない', () async {
     final mock = buildClient(
       () => utf8Response(
