@@ -185,7 +185,7 @@ class _WordRegistrationSheetState
         ),
         RegistrationStep.loading => const _LoadingStep(),
         RegistrationStep.form => _FormStep(
-          notFound: state.notFound,
+          warningMessage: state.warningMessage,
           translationFailed: state.translationFailed,
           errorMessage: state.errorMessage,
           wordController: _wordController,
@@ -319,7 +319,7 @@ class _LoadingStep extends StatelessWidget {
 
 class _FormStep extends StatelessWidget {
   const _FormStep({
-    required this.notFound,
+    required this.warningMessage,
     required this.translationFailed,
     required this.errorMessage,
     required this.wordController,
@@ -336,7 +336,7 @@ class _FormStep extends StatelessWidget {
     required this.onTogglePartOfSpeech,
   });
 
-  final bool notFound;
+  final String? warningMessage;
   final bool translationFailed;
   final String? errorMessage;
   final TextEditingController wordController;
@@ -359,10 +359,8 @@ class _FormStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (notFound) ...[
-          _WarningBanner(
-            message: '辞書に見つかりませんでした。手動で入力できます。',
-          ),
+        if (warningMessage != null) ...[
+          _WarningBanner(message: warningMessage!),
           const SizedBox(height: 14),
         ],
         if (translationFailed) ...[

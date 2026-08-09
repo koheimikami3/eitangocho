@@ -9,6 +9,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/word/presentation/widgets/delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/headword.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,7 +62,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
   }
 
   Future<void> _save() async {
-    final word = _wordController.text.trim();
+    final word = normalizeHeadword(_wordController.text);
     final japanese = _japaneseController.text.trim();
     if (word.isEmpty || japanese.isEmpty) {
       setState(() => _errorMessage = '英単語と日本語訳は必須です。');

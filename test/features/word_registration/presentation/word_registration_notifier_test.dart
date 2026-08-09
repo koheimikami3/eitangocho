@@ -446,4 +446,40 @@ void main() {
       expect(await db.wordDao.watchAll().first, hasLength(1));
     });
   });
+
+  // 句動詞を登録できるようになったので、語の間に空白を重ねて入力されうる。
+  // そのまま通すと kaikki のパスが 404 になり、重複判定もすり抜ける。
+  group('句動詞の空白正規化', () {
+    test('autoFill は語間の連続空白を 1 つに畳んで辞書を引く', () async {
+      String? requested;
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider((word) async {
+          requested = word;
+          return null;
+        }),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('  give   up ');
+
+      expect(requested, 'give up');
+    });
+
+    test('save も畳んだ形で保存する', () async {
+      container = buildContainer();
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .save(
+            word: 'give   up',
+            ipa: '',
+            japanese: 'あきらめる',
+            exampleEn: '',
+            exampleJa: '',
+          );
+
+      expect((await db.wordDao.getAll()).single.word, 'give up');
+    });
+  });
 }

@@ -59,6 +59,37 @@ void main() {
     });
   });
 
+  // 句動詞。Tatoeba・kaikki とも実際に返してくる文で確認する。
+  group('containsWordForm(句)', () {
+    test('先頭語の規則変化を許して句を含む文にマッチする', () {
+      expect(containsWordForm('I give up!', 'give up'), isTrue);
+      expect(containsWordForm('I look forward to that.', 'look forward to'),
+          isTrue);
+      expect(
+        containsWordForm('Are you looking forward to spring?', 'look forward to'),
+        isTrue,
+      );
+      expect(containsWordForm('Stop putting off finding a job.', 'put off'),
+          isTrue);
+    });
+
+    test('語順が変わっても・目的語が割り込んでもマッチする', () {
+      // 受動態で put と off が離れる
+      expect(containsWordForm('The wedding was put off.', 'put off'), isTrue);
+      // give と up の間に目的語が挟まる
+      expect(containsWordForm('They give it up easily.', 'give up'), isTrue);
+    });
+
+    test('後続の語を欠く文は弾く', () {
+      expect(containsWordForm('I gave him a book.', 'give up'), isFalse);
+      expect(containsWordForm('I look at the sky.', 'look forward to'), isFalse);
+    });
+
+    test('先頭語の不規則変化は拾えない(既知の制約)', () {
+      expect(containsWordForm('He gave up smoking.', 'give up'), isFalse);
+    });
+  });
+
   group('wordForms', () {
     test('語尾 e は落ちた形も持つ', () {
       expect(wordForms('make'), containsAll(['make', 'making', 'maked']));

@@ -14,10 +14,24 @@
 library;
 
 /// [sentence] が [word] またはその規則変化形をトークンとして含むか。
+///
+/// [word] が `give up` のような句(句動詞・複合語)のときは、**先頭語だけ
+/// 規則変化を許し、後続のトークンはその形のまま**文中にあることを求める。
+/// 句動詞の後ろに付くのは副詞・前置詞(up / forward / to)で活用しないため。
+/// 語順と隣接は問わない: `The wedding was put off.` のように受動態で語順が
+/// 変わる文や、`give himself up` のように目的語が割り込む文を落とさないため。
+///
+/// 先頭語が不規則変化する句(`give up` に対する `He gave up.`)は拾えない。
+/// 単語 1 語のときと同じ割り切りで、Tatoeba は候補を複数件取るため
+/// 実用上は原形を含む文が残る。
 bool containsWordForm(String sentence, String word) {
-  final forms = wordForms(word);
-  if (forms.isEmpty) return false;
-  return _tokenize(sentence).any(forms.contains);
+  final headwordTokens = _tokenize(word).toList();
+  if (headwordTokens.isEmpty) return false;
+
+  final sentenceTokens = _tokenize(sentence).toSet();
+  final forms = wordForms(headwordTokens.first);
+  if (!sentenceTokens.any(forms.contains)) return false;
+  return headwordTokens.skip(1).every(sentenceTokens.contains);
 }
 
 /// [word] の規則変化形(小文字)。不規則変化は扱わない。

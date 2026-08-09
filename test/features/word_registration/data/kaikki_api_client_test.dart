@@ -115,6 +115,21 @@ void main() {
     expect(mock.paths.single, '/dictionary/English/meaning/a/a/a.jsonl');
   });
 
+  // 句動詞は見出しに空白を含むが、kaikki の 2 文字プレフィックスも空白込みの
+  // 規則(/a/a%20/a%20la%20carte.jsonl)なので、単語と同じ組み立てでよい。
+  test('句動詞のパスは空白込みで組む', () async {
+    final mock = buildClient(
+      (_) => utf8Response('{"word":"give up","pos":"verb","senses":[]}', 200),
+    );
+
+    await mock.client.fetchEntriesJson('give up');
+
+    expect(
+      mock.paths.single,
+      '/dictionary/English/meaning/g/gi/give%20up.jsonl',
+    );
+  });
+
   test('壊れた行はその行だけ捨てて続行する', () async {
     final mock = buildClient(
       (_) => utf8Response(

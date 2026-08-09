@@ -6,6 +6,7 @@ import 'package:eitangocho/features/word_registration/domain/registration_step.d
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_state.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/headword.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'word_registration_notifier.g.dart';
@@ -27,8 +28,9 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
   }
 
   /// ステップ 1 の「自動入力」。取得成功・未収録なら form へ、失敗なら input に戻す。
-  Future<void> autoFill(String word) async {
-    if (word.trim().isEmpty) {
+  Future<void> autoFill(String rawWord) async {
+    final word = normalizeHeadword(rawWord);
+    if (word.isEmpty) {
       state = state.copyWith(errorMessage: '英単語を入力してください。');
       return;
     }
@@ -104,13 +106,14 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
     required String exampleEn,
     required String exampleJa,
   }) async {
-    if (word.trim().isEmpty || japanese.trim().isEmpty) {
+    final headword = normalizeHeadword(word);
+    if (headword.isEmpty || japanese.trim().isEmpty) {
       state = state.copyWith(errorMessage: '英単語と日本語訳は必須です。');
       return false;
     }
     // フォームでも英単語を書き換えられるため、保存時にも重複を見る
     // (ステップ 1 で弾いた単語に戻された場合もここで止まる)。
-    if (await _rejectIfDuplicate(word)) return false;
+    if (await _rejectIfDuplicate(headword)) return false;
 
     // 自動取得できた並び(辞書の主用法が先頭)を保ち、手動で足した品詞は
     // 規定順で後ろに置く。チップのタップ順には依存させない。
@@ -122,7 +125,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
 
     await ref.read(databaseProvider).wordDao.insertWord(
       WordsCompanion(
-        word: Value(word.trim()),
+        word: Value(headword),
         ipa: Value(ipa.trim()),
         japanese: Value(japanese.trim()),
         partsOfSpeech: Value(partsOfSpeech),
