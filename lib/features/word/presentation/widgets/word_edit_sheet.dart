@@ -133,8 +133,10 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           MobileLabeledField(
             label: '英単語 *',
             controller: _wordController,
+            asciiOnly: true,
           ),
           const SizedBox(height: 14),
+          // IPA は非 ASCII なので asciiOnly を付けない。
           MobileLabeledField(
             label: '発音記号 (IPA)',
             controller: _ipaController,
@@ -143,6 +145,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           MobileLabeledField(
             label: '日本語訳 *',
             controller: _japaneseController,
+            maxLines: null,
           ),
           const SizedBox(height: 14),
           Text(
@@ -162,13 +165,15 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           MobileLabeledField(
             label: '英例文',
             controller: _exampleEnController,
-            maxLines: 2,
+            minLines: 2,
+            maxLines: null,
           ),
           const SizedBox(height: 14),
           MobileLabeledField(
             label: '日本語例文',
             controller: _exampleJaController,
-            maxLines: 2,
+            minLines: 2,
+            maxLines: null,
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 14),

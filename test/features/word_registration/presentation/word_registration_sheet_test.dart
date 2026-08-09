@@ -120,6 +120,26 @@ void main() {
     });
   });
 
+  // 英単語だけ半角英字キーボードに固定する。IPA は非 ASCII なので巻き込まない。
+  testWidgets('英単語欄だけ ASCII キーボードに固定する', (tester) async {
+    await runSheet(tester, fetched, () async {
+      expect(
+        tester.widget<TextField>(find.byType(TextField).first).keyboardType,
+        TextInputType.visiblePassword,
+      );
+
+      await tester.enterText(find.byType(TextField).first, 'serendipity');
+      await tester.tap(find.text('自動入力'));
+      await tester.pumpAndSettle();
+
+      final fields = tester
+          .widgetList<TextField>(find.byType(TextField))
+          .toList();
+      expect(fields[0].keyboardType, TextInputType.visiblePassword); // 英単語
+      expect(fields[1].keyboardType, TextInputType.text); // 発音記号 (IPA)
+    });
+  });
+
   testWidgets('登録するとシートが閉じ、DB に保存される', (tester) async {
     await runSheet(tester, fetched, () async {
       await tester.enterText(find.byType(TextField).first, 'serendipity');

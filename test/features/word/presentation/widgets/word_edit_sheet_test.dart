@@ -70,6 +70,17 @@ void main() {
     });
   });
 
+  // 英単語だけ半角英字キーボードに固定する。IPA は非 ASCII なので巻き込まない。
+  testWidgets('英単語欄だけ ASCII キーボードに固定する', (tester) async {
+    await runSheet(tester, (word) async {
+      final fields = tester
+          .widgetList<TextField>(find.byType(TextField))
+          .toList();
+      expect(fields[0].keyboardType, TextInputType.visiblePassword); // 英単語
+      expect(fields[1].keyboardType, TextInputType.text); // 発音記号 (IPA)
+    });
+  });
+
   // 単語名を変えずに保存できる = 自分自身を重複扱いしない、の確認も兼ねる。
   testWidgets('保存すると入力内容が DB に反映される', (tester) async {
     await runSheet(tester, (word) async {

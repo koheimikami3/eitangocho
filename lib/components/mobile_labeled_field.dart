@@ -6,22 +6,30 @@ import 'package:flutter/material.dart';
 ///
 /// [autoFilled] が true のときはラベル脇に「自動入力」バッジを出す
 /// (単語登録で辞書から埋まった項目を示す)。
+///
+/// [maxLines] に null を渡すと内容量に応じて欄が伸びる([minLines] が下限)。
 class MobileLabeledField extends StatelessWidget {
   const MobileLabeledField({
     required this.label,
     required this.controller,
     super.key,
     this.hintText = '手動で入力してください',
+    this.minLines,
     this.maxLines = 1,
     this.autoFilled = false,
+    this.asciiOnly = false,
     this.onSubmitted,
   });
 
   final String label;
   final TextEditingController controller;
   final String hintText;
-  final int maxLines;
+  final int? minLines;
+  final int? maxLines;
   final bool autoFilled;
+
+  /// 半角英字キーボードに固定するか(英単語の入力欄で使う)。
+  final bool asciiOnly;
   final ValueChanged<String>? onSubmitted;
 
   @override
@@ -54,8 +62,19 @@ class MobileLabeledField extends StatelessWidget {
         const SizedBox(height: 6),
         TextField(
           controller: controller,
+          minLines: minLines,
           maxLines: maxLines,
           onSubmitted: onSubmitted,
+          // 英単語欄で日本語 IME に切り替えられないようにする。
+          // **visiblePassword でなければならない**: Flutter の iOS 実装
+          // (ToUIKeyboardType)で UIKeyboardTypeASCIICapable にマップされるのは
+          // これだけで、text は UIKeyboardTypeDefault(地球儀キーでかなに切替可)、
+          // emailAddress / url は ASCII だが @ や .com キーが出る。
+          // 入力内容を隠す指定ではない(obscureText は別)。
+          keyboardType: asciiOnly ? TextInputType.visiblePassword : null,
+          // 見出し語は入力どおりに保存されるため、勝手な補正・変換候補は出さない。
+          autocorrect: !asciiOnly,
+          enableSuggestions: !asciiOnly,
           cursorWidth: AppDimensions.mobileCursorWidth,
           cursorColor: palette.accent,
           // iOS で入力欄をタップしたときに拡大されないよう 16px 以上にする。

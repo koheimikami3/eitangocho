@@ -239,6 +239,7 @@ class _InputStep extends StatelessWidget {
           label: '英単語 *',
           controller: controller,
           hintText: 'apple',
+          asciiOnly: true,
           onSubmitted: (_) => onAutoFill(),
         ),
         const SizedBox(height: 14),
@@ -370,8 +371,13 @@ class _FormStep extends StatelessWidget {
           ),
           const SizedBox(height: 14),
         ],
-        MobileLabeledField(label: '英単語 *', controller: wordController),
+        MobileLabeledField(
+          label: '英単語 *',
+          controller: wordController,
+          asciiOnly: true,
+        ),
         const SizedBox(height: 14),
+        // IPA は非 ASCII なので asciiOnly を付けない。
         MobileLabeledField(
           label: '発音記号 (IPA)',
           controller: ipaController,
@@ -381,6 +387,7 @@ class _FormStep extends StatelessWidget {
         MobileLabeledField(
           label: '日本語訳 *',
           controller: japaneseController,
+          maxLines: null,
           autoFilled: autoJapanese,
         ),
         const SizedBox(height: 14),
@@ -409,14 +416,16 @@ class _FormStep extends StatelessWidget {
         MobileLabeledField(
           label: '英例文',
           controller: exampleEnController,
-          maxLines: 2,
+          minLines: 2,
+          maxLines: null,
           autoFilled: autoExampleEn,
         ),
         const SizedBox(height: 14),
         MobileLabeledField(
           label: '日本語例文',
           controller: exampleJaController,
-          maxLines: 2,
+          minLines: 2,
+          maxLines: null,
           autoFilled: autoExampleJa,
         ),
         if (errorMessage != null) ...[
