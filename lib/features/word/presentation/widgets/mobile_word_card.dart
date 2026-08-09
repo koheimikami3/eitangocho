@@ -3,6 +3,7 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_pos_badge.dart';
+import 'package:eitangocho/features/word/presentation/widgets/mobile_shrinking_ipa_text.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の学習中カード 1 枚(設定に応じて 1 列 / 2 列グリッドに並ぶ)。
@@ -37,12 +38,11 @@ class _MobileWordCardState extends State<MobileWordCard> {
   bool _revealed = false;
 
   // 英例文は行数差でカード高さがばらつくため、常に固定行数分の高さを確保する。
-  // 2 列は幅が狭く 2 行では大半の例文が途中で切れるため 3 行、
-  // 1 列は 1 行あたりが長いので 2 行に収める。
+  // 列数によらず 2 行(当初 2 列だけ 3 行にしていたが、辞書から入る例文は
+  // 2 列幅でも 2 行に収まるものが大半で、3 行目はほぼ空白になっていた)。
   static const _exampleFontSize = 12.0;
   static const _exampleLineHeight = 1.45;
-  static const _exampleLinesInTwoColumns = 3;
-  static const _exampleLinesInSingleColumn = 2;
+  static const _exampleLines = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +50,6 @@ class _MobileWordCardState extends State<MobileWordCard> {
     final word = widget.word;
     final showIpa = widget.showIpa && word.ipa.isNotEmpty;
     final hasExample = word.exampleEn.trim().isNotEmpty;
-    final exampleLines = widget.singleColumn
-        ? _exampleLinesInSingleColumn
-        : _exampleLinesInTwoColumns;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -90,12 +87,12 @@ class _MobileWordCardState extends State<MobileWordCard> {
             // 常に固定行数分を確保する(child が無ければ空白のまま)。
             ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: _exampleFontSize * _exampleLineHeight * exampleLines,
+                minHeight: _exampleFontSize * _exampleLineHeight * _exampleLines,
               ),
               child: hasExample
                   ? Text(
                       word.exampleEn,
-                      maxLines: exampleLines,
+                      maxLines: _exampleLines,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: _exampleFontSize,
@@ -165,8 +162,7 @@ class _MobileWordCardState extends State<MobileWordCard> {
 
 /// カード上部(単語 + IPA + 品詞バッジ)。列数で組み方が変わる。
 ///
-/// - 2 列: 単語が 1 行を占有し、その下に IPA(左)とバッジ(右)。
-///   IPA が無いときはバッジが左寄せになる(デザインどおり)。
+/// - 2 列: 単語・IPA・バッジをそれぞれ独立した行に積む。
 /// - 1 列: 幅に余裕があるので単語・IPA・バッジを 1 行に並べ、バッジだけ右端。
 class _CardHeader extends StatelessWidget {
   const _CardHeader({
@@ -195,14 +191,6 @@ class _CardHeader extends StatelessWidget {
         color: palette.text,
       ),
     );
-    final ipaText = Text(
-      word.ipa,
-      style: TextStyle(
-        fontSize: 11,
-        fontFamily: 'Menlo',
-        color: palette.textAlpha(45),
-      ),
-    );
     final badge = MobilePosBadge(partsOfSpeech: word.partsOfSpeech);
 
     if (singleColumn) {
@@ -221,7 +209,18 @@ class _CardHeader extends StatelessWidget {
                 Flexible(child: wordText),
                 if (showIpa) ...[
                   const SizedBox(width: _gap),
-                  Flexible(child: ipaText),
+                  // 1 列は幅に余裕があり、単語と同じ行に置く都合で
+                  // ベースラインを揃える必要があるため縮小はしない。
+                  Flexible(
+                    child: Text(
+                      word.ipa,
+                      style: TextStyle(
+                        fontSize: MobileShrinkingIpaText.maxFontSize,
+                        fontFamily: 'Menlo',
+                        color: palette.textAlpha(45),
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -232,27 +231,22 @@ class _CardHeader extends StatelessWidget {
       );
     }
 
+    // IPA とバッジは 1 行に収まるかに関わらず必ず別々の行に置く。
+    // 収まるときだけ同じ行に並べる組み方(Wrap)だと、単語ごとに
+    // 2 行になったり 3 行になったりしてカードの見え方が揃わない。
+    // 行が固定なので IPA には幅いっぱいが渡り、バッジは左寄せになる
+    // (IPA 非表示時に左へ寄っていた従来の挙動と同じ位置)。
     return Column(
-      // Wrap を横幅いっぱいにするため stretch にする(shrink-wrap すると
-      // spaceBetween に配れる余白が無くなり、バッジが右端に寄らない)。
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         wordText,
+        if (showIpa) ...[
+          const SizedBox(height: 3),
+          MobileShrinkingIpaText(ipa: word.ipa),
+        ],
         const SizedBox(height: 3),
-        // Row ではなく Wrap にして、IPA とバッジが 1 行に収まらないときは
-        // バッジを次の行へ落とす(デザインの flex-wrap 相当)。Row で詰めると
-        // 品詞が多いカードで IPA 側の幅が潰れ、IPA が数行に折り返してしまう。
-        //
-        // spaceBetween により、同じ行に並ぶときは IPA が左・バッジが右へ、
-        // 行に 1 つしか無いとき(IPA 非表示・折り返し時)は左寄せになる。
-        Wrap(
-          spacing: _gap,
-          runSpacing: 3,
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [if (showIpa) ipaText, badge],
-        ),
+        badge,
       ],
     );
   }
