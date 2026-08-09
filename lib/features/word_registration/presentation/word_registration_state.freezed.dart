@@ -226,8 +226,8 @@ return $default(_that.step,_that.fetched,_that.notFound,_that.translationFailed,
 /// @nodoc
 
 
-class _WordRegistrationState implements WordRegistrationState {
-  const _WordRegistrationState({this.step = RegistrationStep.input, this.fetched, this.notFound = false, this.translationFailed = false, final  Set<PartOfSpeech> selectedPartsOfSpeech = const <PartOfSpeech>{}, this.errorMessage}): _selectedPartsOfSpeech = selectedPartsOfSpeech;
+class _WordRegistrationState extends WordRegistrationState {
+  const _WordRegistrationState({this.step = RegistrationStep.input, this.fetched, this.notFound = false, this.translationFailed = false, final  Set<PartOfSpeech> selectedPartsOfSpeech = const <PartOfSpeech>{}, this.errorMessage}): _selectedPartsOfSpeech = selectedPartsOfSpeech,super._();
   
 
 @override@JsonKey() final  RegistrationStep step;

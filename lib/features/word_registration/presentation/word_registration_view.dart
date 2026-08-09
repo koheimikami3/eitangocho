@@ -166,7 +166,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   }
 
   Widget _buildForm(WordRegistrationState state) {
-    final banner = _bannerMessage(state);
+    final banner = state.warningMessage;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -284,22 +284,6 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
     );
   }
 
-  /// フォーム上部の警告バナー文言。未収録(全項目手動)と
-  /// EJDict のみヒット(訳のみ自動入力)で文言を変える。
-  String? _bannerMessage(WordRegistrationState state) {
-    if (state.notFound) {
-      return '辞書に見つかりませんでした。手動で入力できます。';
-    }
-    final fetched = state.fetched;
-    // audioUrl は画面に出さないので、文言どおり IPA と例文だけで判定する。
-    if (fetched != null &&
-        fetched.japanese.isNotEmpty &&
-        fetched.ipa.isEmpty &&
-        fetched.exampleEn.isEmpty) {
-      return '発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)';
-    }
-    return null;
-  }
 }
 
 /// 「戻る」「キャンセル」用のテキストボタン(hover で濃色)。
