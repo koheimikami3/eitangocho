@@ -44,14 +44,34 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   @override
   void initState() {
     super.initState();
-    _ipaController.addListener(() => _clearBadgeIfEmpty(
-        _ipaController, () => _autoIpa, (v) => _autoIpa = v));
-    _japaneseController.addListener(() => _clearBadgeIfEmpty(
-        _japaneseController, () => _autoJapanese, (v) => _autoJapanese = v));
-    _exampleEnController.addListener(() => _clearBadgeIfEmpty(
-        _exampleEnController, () => _autoExampleEn, (v) => _autoExampleEn = v));
-    _exampleJaController.addListener(() => _clearBadgeIfEmpty(
-        _exampleJaController, () => _autoExampleJa, (v) => _autoExampleJa = v));
+    _ipaController.addListener(
+      () => _clearBadgeIfEmpty(
+        _ipaController,
+        () => _autoIpa,
+        (v) => _autoIpa = v,
+      ),
+    );
+    _japaneseController.addListener(
+      () => _clearBadgeIfEmpty(
+        _japaneseController,
+        () => _autoJapanese,
+        (v) => _autoJapanese = v,
+      ),
+    );
+    _exampleEnController.addListener(
+      () => _clearBadgeIfEmpty(
+        _exampleEnController,
+        () => _autoExampleEn,
+        (v) => _autoExampleEn = v,
+      ),
+    );
+    _exampleJaController.addListener(
+      () => _clearBadgeIfEmpty(
+        _exampleJaController,
+        () => _autoExampleJa,
+        (v) => _autoExampleJa = v,
+      ),
+    );
   }
 
   void _clearBadgeIfEmpty(
@@ -107,13 +127,15 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   }
 
   Future<void> _save() async {
-    final saved = await ref.read(wordRegistrationProvider.notifier).save(
-      word: _wordController.text,
-      ipa: _ipaController.text,
-      japanese: _japaneseController.text,
-      exampleEn: _exampleEnController.text,
-      exampleJa: _exampleJaController.text,
-    );
+    final saved = await ref
+        .read(wordRegistrationProvider.notifier)
+        .save(
+          word: _wordController.text,
+          ipa: _ipaController.text,
+          japanese: _japaneseController.text,
+          exampleEn: _exampleEnController.text,
+          exampleJa: _exampleJaController.text,
+        );
     if (saved && mounted) {
       ref.read(mainPageProvider.notifier).selectView(MainView.learning);
     }
@@ -148,15 +170,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           width: AppDimensions.formWidth,
           child: switch (state.step) {
             RegistrationStep.input => RegistrationInputStep(
-                wordController: _wordController,
-                errorMessage: state.errorMessage,
-                onAutoFill: () => ref
-                    .read(wordRegistrationProvider.notifier)
-                    .autoFill(_wordController.text),
-                onSkip: () => ref
-                    .read(wordRegistrationProvider.notifier)
-                    .skipToManual(),
-              ),
+              wordController: _wordController,
+              errorMessage: state.errorMessage,
+              onAutoFill: () => ref
+                  .read(wordRegistrationProvider.notifier)
+                  .autoFill(_wordController.text),
+              onSkip: () =>
+                  ref.read(wordRegistrationProvider.notifier).skipToManual(),
+            ),
             RegistrationStep.loading => const RegistrationLoadingStep(),
             RegistrationStep.form => _buildForm(state),
           },
@@ -260,10 +281,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           const SizedBox(height: 16),
           Text(
             state.errorMessage!,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.danger,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.danger),
           ),
         ],
         const SizedBox(height: 16),
@@ -283,7 +301,6 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
       ],
     );
   }
-
 }
 
 /// 「戻る」「キャンセル」用のテキストボタン(hover で濃色)。

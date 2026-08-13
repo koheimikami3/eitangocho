@@ -21,9 +21,8 @@ class ToolbarSearchField extends ConsumerWidget {
       width: 200,
       child: TextField(
         focusNode: ref.watch(toolbarSearchFocusProvider),
-        onChanged: (value) => ref
-            .read(mainPageProvider.notifier)
-            .updateSearchQuery(value),
+        onChanged: (value) =>
+            ref.read(mainPageProvider.notifier).updateSearchQuery(value),
         // 既定のカーソルは行高いっぱい・太めで存在感が強いため、
         // 少し低く・細くする。
         cursorHeight: 15,

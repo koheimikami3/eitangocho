@@ -1,5 +1,7 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
+import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
@@ -36,8 +38,7 @@ class SettingsViewMobile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     // ロード前は既定値でフォールバックする。
-    final settings =
-        ref.watch(settingsProvider).value ?? const SettingsState();
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
 
     return ListView(
@@ -50,6 +51,12 @@ class SettingsViewMobile extends ConsumerWidget {
         AppDimensions.mobilePadding * 2 + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
+        // 課金を扱えない環境(SDK キーが未設定・iOS 以外)ではセクションごと
+        // 出さない。間隔の SizedBox も一緒に畳まないと余白だけが残る。
+        if (ref.watch(purchaseProvider).available) ...[
+          const MobileProSection(),
+          const SizedBox(height: 22),
+        ],
         MobileSettingsSection(
           title: '外観',
           rows: [

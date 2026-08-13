@@ -48,8 +48,9 @@ class _SidebarItemState extends State<SidebarItem> {
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textPrimary,
-                    fontWeight:
-                        widget.selected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: widget.selected
+                        ? FontWeight.w600
+                        : FontWeight.w400,
                   ),
                 ),
               ),

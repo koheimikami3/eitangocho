@@ -16,8 +16,7 @@ class DataManagementSection extends ConsumerStatefulWidget {
       _DataManagementSectionState();
 }
 
-class _DataManagementSectionState
-    extends ConsumerState<DataManagementSection> {
+class _DataManagementSectionState extends ConsumerState<DataManagementSection> {
   bool _busy = false;
 
   Future<void> _export() async {
@@ -69,10 +68,7 @@ class _DataManagementSectionState
         const SizedBox(height: 8),
         const Text(
           '単語帳を JSON ファイルとして書き出し / 読み込みます。',
-          style: TextStyle(
-            fontSize: 11,
-            color: AppColors.textQuaternary,
-          ),
+          style: TextStyle(fontSize: 11, color: AppColors.textQuaternary),
         ),
       ],
     );

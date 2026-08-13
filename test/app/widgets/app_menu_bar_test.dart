@@ -16,8 +16,7 @@ void main() {
     String menuLabel,
     String itemLabel,
   ) {
-    final menu =
-        menus.firstWhere((m) => m.label == menuLabel) as PlatformMenu;
+    final menu = menus.firstWhere((m) => m.label == menuLabel) as PlatformMenu;
     return menu.menus.firstWhere((i) => i.label == itemLabel);
   }
 
@@ -47,10 +46,7 @@ void main() {
     });
 
     test('検索フィールドが無いとき(onSearch=null)⌘F は無効になる', () {
-      final menus = AppMenuBar.buildMenus(
-        onRegister: () {},
-        onSearch: null,
-      );
+      final menus = AppMenuBar.buildMenus(onRegister: () {}, onSearch: null);
 
       // onSelected が null だと項目もショートカットも無効になる。
       expect(itemOf(menus, '編集', '検索').onSelected, isNull);
@@ -61,7 +57,9 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
-          home: AppMenuBar(child: Text('body', textDirection: TextDirection.ltr)),
+          home: AppMenuBar(
+            child: Text('body', textDirection: TextDirection.ltr),
+          ),
         ),
       ),
     );

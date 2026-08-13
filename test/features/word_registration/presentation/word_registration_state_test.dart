@@ -16,10 +16,7 @@ void main() {
 
   group('warningMessage', () {
     test('全部埋まっていれば出さない', () {
-      expect(
-        const WordRegistrationState(fetched: full).warningMessage,
-        isNull,
-      );
+      expect(const WordRegistrationState(fetched: full).warningMessage, isNull);
     });
 
     test('未収録なら手動入力を促す', () {
@@ -31,14 +28,9 @@ void main() {
 
     // EJDict は句動詞を 1 件も収録していないため、句動詞ではこれが常態になる。
     test('訳が空なら、他が埋まっていても訳の不足を先に伝える', () {
-      final state = WordRegistrationState(
-        fetched: full.copyWith(japanese: ''),
-      );
+      final state = WordRegistrationState(fetched: full.copyWith(japanese: ''));
 
-      expect(
-        state.warningMessage,
-        '日本語訳は辞書に見つかりませんでした(手動で入力してください)',
-      );
+      expect(state.warningMessage, '日本語訳は辞書に見つかりませんでした(手動で入力してください)');
     });
 
     test('訳だけ取れたときは IPA と例文の不足を伝える', () {
@@ -46,10 +38,7 @@ void main() {
         fetched: full.copyWith(ipa: '', exampleEn: ''),
       );
 
-      expect(
-        state.warningMessage,
-        '発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)',
-      );
+      expect(state.warningMessage, '発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)');
     });
 
     test('手動入力へスキップしたときは出さない', () {

@@ -74,16 +74,14 @@ void main() {
 
   /// macOS: 既定のテスト画面(800x600)は uiScale で拡大すると実質幅が狭く
   /// ツールバーが溢れるため、実際のウィンドウに近いサイズにする。
-  Future<void> runDesktop(
-    WidgetTester tester,
-    Future<void> Function() body,
-  ) => runApp(
-    tester,
-    TargetPlatform.macOS,
-    physicalSize: const Size(1600, 1000),
-    devicePixelRatio: 1,
-    body: body,
-  );
+  Future<void> runDesktop(WidgetTester tester, Future<void> Function() body) =>
+      runApp(
+        tester,
+        TargetPlatform.macOS,
+        physicalSize: const Size(1600, 1000),
+        devicePixelRatio: 1,
+        body: body,
+      );
 
   /// iOS: iPhone 16 Pro 相当(論理 402x874)。
   Future<void> runMobile(

@@ -16,6 +16,5 @@ class PartOfSpeechListConverter
   }
 
   @override
-  String toSql(List<PartOfSpeech> value) =>
-      value.map((p) => p.name).join(',');
+  String toSql(List<PartOfSpeech> value) => value.map((p) => p.name).join(',');
 }

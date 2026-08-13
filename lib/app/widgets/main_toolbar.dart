@@ -22,8 +22,7 @@ class MainToolbar extends ConsumerWidget {
       MainView.settings => '設定',
     };
     // 検索は学習中・全単語ビューのみ表示(プロトタイプの showSearch 準拠)。
-    final showSearch =
-        view == MainView.learning || view == MainView.allWords;
+    final showSearch = view == MainView.learning || view == MainView.allWords;
 
     return Container(
       height: AppDimensions.toolbarHeight,

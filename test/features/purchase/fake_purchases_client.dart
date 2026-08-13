@@ -33,6 +33,10 @@ class FakePurchasesClient implements PurchasesClient {
   Object? configureError;
   Object? restoreError;
 
+  /// 購入を途中で止めておくための関門。App Store のダイアログが出ている間
+  /// (= 処理中の表示)を再現したいテストだけ使う。
+  Completer<void>? purchaseGate;
+
   var configureCount = 0;
   var purchaseCount = 0;
   var restoreCount = 0;
@@ -62,6 +66,7 @@ class FakePurchasesClient implements PurchasesClient {
   @override
   Future<PurchaseOutcome> purchase() async {
     purchaseCount++;
+    await purchaseGate?.future;
     return purchaseOutcome;
   }
 

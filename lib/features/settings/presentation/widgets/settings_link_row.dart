@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 
 /// 設定カード内のリンク行(ラベル + 右端のシェブロン)。クリックで別画面を開く。
 class SettingsLinkRow extends StatefulWidget {
-  const SettingsLinkRow({
-    required this.label,
-    required this.onTap,
-    super.key,
-  });
+  const SettingsLinkRow({required this.label, required this.onTap, super.key});
 
   final String label;
   final VoidCallback onTap;

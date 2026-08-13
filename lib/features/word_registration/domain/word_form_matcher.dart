@@ -39,8 +39,14 @@ Set<String> wordForms(String word) {
   final base = word.trim().toLowerCase();
   if (base.isEmpty) return const {};
 
-  final forms = {base, '${base}s', '${base}es', '${base}ed', '${base}d',
-      '${base}ing'};
+  final forms = {
+    base,
+    '${base}s',
+    '${base}es',
+    '${base}ed',
+    '${base}d',
+    '${base}ing',
+  };
 
   // make → making / made 相当(語尾 e の脱落)
   if (base.endsWith('e') && base.length > 1) {
@@ -48,7 +54,9 @@ Set<String> wordForms(String word) {
     forms.addAll(['${stem}ing', '${stem}ed']);
   }
   // study → studies / studied
-  if (base.endsWith('y') && base.length > 1 && !_isVowel(base[base.length - 2])) {
+  if (base.endsWith('y') &&
+      base.length > 1 &&
+      !_isVowel(base[base.length - 2])) {
     final stem = base.substring(0, base.length - 1);
     forms.addAll(['${stem}ies', '${stem}ied']);
   }

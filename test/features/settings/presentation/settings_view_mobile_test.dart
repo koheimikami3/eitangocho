@@ -1,5 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/purchase/data/purchases_client.dart';
+import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
@@ -12,6 +14,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../purchase/fake_purchases_client.dart';
+
 void main() {
   late AppDatabase db;
 
@@ -23,7 +27,12 @@ void main() {
 
   tearDown(() => db.close());
 
-  Future<void> pumpSettings(WidgetTester tester) async {
+  /// [purchasesClient] を渡した回だけ Pro セクションが出る
+  /// (既定の実装は SDK キーが空なので available が false になる)。
+  Future<void> pumpSettings(
+    WidgetTester tester, {
+    PurchasesClient? purchasesClient,
+  }) async {
     // 情報セクションは最下部にあり、既定の 800x600 では ListView が
     // 遅延生成して描画されない。全セクションが収まる高さにしておく。
     tester.view
@@ -38,6 +47,8 @@ void main() {
           // 実機のバンドルを読むため、テストでは固定値に差し替える。
           appVersionProvider.overrideWith((ref) async => '1.1.0'),
           licenseListProvider.overrideWith((ref) async => []),
+          if (purchasesClient != null)
+            purchasesClientProvider.overrideWithValue(purchasesClient),
         ],
         child: const MaterialApp(home: Scaffold(body: SettingsViewMobile())),
       ),
@@ -52,10 +63,7 @@ void main() {
     expect(find.text('バージョン'), findsOneWidget);
     expect(find.text('1.1.0'), findsOneWidget);
     expect(find.text('ライセンス'), findsOneWidget);
-    expect(
-      find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'),
-      findsOneWidget,
-    );
+    expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsOneWidget);
   });
 
   testWidgets('ライセンス行をタップすると一覧へ遷移する', (tester) async {
@@ -74,5 +82,27 @@ void main() {
 
     expect(find.byType(MobileDeeplApiKeyField), findsNothing);
     expect(find.textContaining('DeepL'), findsNothing);
+  });
+
+  testWidgets('Pro セクションは外観より上に出す', (tester) async {
+    final client = FakePurchasesClient();
+    addTearDown(client.dispose);
+
+    await pumpSettings(tester, purchasesClient: client);
+    await tester.pump();
+
+    expect(find.byType(MobileProSection), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.byType(MobileProSection)).dy,
+      lessThan(tester.getTopLeft(find.text('外観')).dy),
+    );
+  });
+
+  testWidgets('課金を扱えない環境では Pro セクションを出さない', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.byType(MobileProSection), findsNothing);
+    // セクションを畳んだぶんの余白も残さない。
+    expect(tester.getTopLeft(find.text('外観')).dy, 16);
   });
 }

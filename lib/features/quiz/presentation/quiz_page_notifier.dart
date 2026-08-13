@@ -32,10 +32,10 @@ class QuizPageNotifier extends _$QuizPageNotifier {
   /// 「覚えている」: 実績を記録して次へ進む。
   Future<void> answerKnew() async {
     final word = state.questions[state.index];
-    await ref.read(databaseProvider).wordDao.recordQuizResult(
-      word.id,
-      knew: true,
-    );
+    await ref
+        .read(databaseProvider)
+        .wordDao
+        .recordQuizResult(word.id, knew: true);
     _advance(knew: true, word: word);
   }
 

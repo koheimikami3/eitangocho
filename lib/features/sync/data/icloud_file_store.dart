@@ -14,12 +14,12 @@ class IcloudFileStore implements CloudFileStore {
   final MethodChannel channel;
 
   @override
-  Future<String?> read() =>
-      _invoke(() => channel.invokeMethod<String>('read'));
+  Future<String?> read() => _invoke(() => channel.invokeMethod<String>('read'));
 
   @override
-  Future<void> write(String contents) =>
-      _invoke(() => channel.invokeMethod<void>('write', {'contents': contents}));
+  Future<void> write(String contents) => _invoke(
+    () => channel.invokeMethod<void>('write', {'contents': contents}),
+  );
 
   @override
   Future<DateTime?> lastModified() async {
@@ -37,14 +37,10 @@ class IcloudFileStore implements CloudFileStore {
     try {
       return await body();
     } on PlatformException catch (e) {
-      throw CloudUnavailableException(
-        e.message ?? 'iCloud との通信に失敗しました。',
-      );
+      throw CloudUnavailableException(e.message ?? 'iCloud との通信に失敗しました。');
     } on MissingPluginException {
       // iCloud 未対応のプラットフォームで呼ばれた場合。
-      throw const CloudUnavailableException(
-        'このプラットフォームでは iCloud 同期を利用できません。',
-      );
+      throw const CloudUnavailableException('このプラットフォームでは iCloud 同期を利用できません。');
     }
   }
 }

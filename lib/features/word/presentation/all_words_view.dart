@@ -43,12 +43,8 @@ class AllWordsView extends ConsumerWidget {
                             .wordDao
                             .setLearned(word.id, isLearned: isLearned),
                         onTap: () => showEditWordDialog(context, ref, word),
-                        onContextMenu: (position) => showWordContextMenu(
-                          context,
-                          ref,
-                          word,
-                          position,
-                        ),
+                        onContextMenu: (position) =>
+                            showWordContextMenu(context, ref, word, position),
                       );
                     },
                   ),

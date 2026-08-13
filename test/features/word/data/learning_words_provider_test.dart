@@ -54,10 +54,10 @@ void main() {
     final container = makeContainer();
     await warmUp(container);
 
-    expect(
-      container.read(filteredLearningWordsProvider).map((w) => w.word),
-      ['apple', 'Banana'],
-    );
+    expect(container.read(filteredLearningWordsProvider).map((w) => w.word), [
+      'apple',
+      'Banana',
+    ]);
   });
 
   test('検索は英単語が大文字小文字を無視した部分一致、日本語訳は部分一致', () async {
@@ -65,16 +65,14 @@ void main() {
     await warmUp(container);
 
     container.read(mainPageProvider.notifier).updateSearchQuery('ban');
-    expect(
-      container.read(filteredLearningWordsProvider).map((w) => w.word),
-      ['Banana'],
-    );
+    expect(container.read(filteredLearningWordsProvider).map((w) => w.word), [
+      'Banana',
+    ]);
 
     container.read(mainPageProvider.notifier).updateSearchQuery('りんご');
-    expect(
-      container.read(filteredLearningWordsProvider).map((w) => w.word),
-      ['apple'],
-    );
+    expect(container.read(filteredLearningWordsProvider).map((w) => w.word), [
+      'apple',
+    ]);
   });
 
   test('検索語が学習済みの単語に一致しても出さない', () async {

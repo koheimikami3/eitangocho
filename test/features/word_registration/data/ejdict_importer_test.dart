@@ -50,9 +50,7 @@ void main() {
     });
 
     test('取込済み(count > 0)なら asset を読まず 0 を返す', () async {
-      await db.ejdictDao.bulkInsert(
-        parseEjdict('apple\tリンゴ'),
-      );
+      await db.ejdictDao.bulkInsert(parseEjdict('apple\tリンゴ'));
 
       // 未取込だと rootBundle.loadString で asset 読込に進むため、
       // 0 が返る = count 判定でスキップされたことを意味する。

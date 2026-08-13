@@ -117,9 +117,7 @@ class WordExportService {
       throw const WordExportFormatException('JSON の形式が不正です。');
     }
     if (!_supportedVersions.contains(decoded['version'])) {
-      throw const WordExportFormatException(
-        '対応していないバージョンのファイルです。',
-      );
+      throw const WordExportFormatException('対応していないバージョンのファイルです。');
     }
     final rawWords = decoded['words'];
     if (rawWords is! List) {
@@ -241,10 +239,7 @@ class WordExportService {
       deletions: [
         for (final MapEntry(key: key, value: deletedAt)
             in deletionsByKey.entries)
-          DeletedWordsCompanion(
-            word: Value(key),
-            deletedAt: Value(deletedAt),
-          ),
+          DeletedWordsCompanion(word: Value(key), deletedAt: Value(deletedAt)),
       ],
     );
 
@@ -305,7 +300,10 @@ class WordExportService {
 
   List<PartOfSpeech> _partsOfSpeechOf(_PlannedEntry plan) {
     final byName = PartOfSpeech.values.asNameMap();
-    return plan.entry.partsOfSpeech.map((name) => byName[name]).nonNulls.toList();
+    return plan.entry.partsOfSpeech
+        .map((name) => byName[name])
+        .nonNulls
+        .toList();
   }
 
   /// 新規追加用。word・createdAt もファイルの値をそのまま書く。

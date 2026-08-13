@@ -47,7 +47,9 @@ void main() {
     container = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
-        wordInfoProviderProvider.overrideWithValue(_FakeWordInfoProvider(fetched)),
+        wordInfoProviderProvider.overrideWithValue(
+          _FakeWordInfoProvider(fetched),
+        ),
         adsDisabled,
       ],
     );

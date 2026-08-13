@@ -31,10 +31,7 @@ class LicenseDetailViewMobile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const MobilePushHeader(
-                title: 'ライセンス',
-                backLabel: 'ライセンス',
-              ),
+              const MobilePushHeader(title: 'ライセンス', backLabel: 'ライセンス'),
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(

@@ -87,7 +87,8 @@ class _MobileWordCardState extends State<MobileWordCard> {
             // 常に固定行数分を確保する(child が無ければ空白のまま)。
             ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: _exampleFontSize * _exampleLineHeight * _exampleLines,
+                minHeight:
+                    _exampleFontSize * _exampleLineHeight * _exampleLines,
               ),
               child: hasExample
                   ? Text(
@@ -120,9 +121,7 @@ class _MobileWordCardState extends State<MobileWordCard> {
             Container(
               padding: const EdgeInsets.only(top: 6),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: palette.borderAlpha(6)),
-                ),
+                border: Border(top: BorderSide(color: palette.borderAlpha(6))),
               ),
               child: Row(
                 children: [
@@ -270,8 +269,7 @@ class _RevealToggle extends StatelessWidget {
   static const _hintFontSize = 12.0;
 
   /// 訳を 1 行表示したときの外形高さ(パディング + 1 行 + 枠線 1px×2)。
-  static const _boxHeight =
-      _padding * 2 + _japaneseFontSize * _lineHeight + 2;
+  static const _boxHeight = _padding * 2 + _japaneseFontSize * _lineHeight + 2;
 
   /// 破線側のパディング。枠線を CustomPaint で描く(= 高さを取らない)ぶんと
   /// 文字が小さいぶんをここで埋め、タップしても高さが変わらないようにする。

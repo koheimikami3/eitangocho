@@ -34,7 +34,9 @@ class AppDatabase extends _$AppDatabase {
       // Free Dictionary の生レスポンスが入っており、kaikki のパーサでは
       // 読めないため捨てる。次の自動入力で kaikki から入れ直される。
       if (from < 3) {
-        await m.database.customStatement('DELETE FROM dictionary_cache_entries');
+        await m.database.customStatement(
+          'DELETE FROM dictionary_cache_entries',
+        );
       }
     },
   );

@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 
 /// 設定カード内の読み取り専用行(ラベル + 右端に値)。バージョン表示など。
 class SettingsValueRow extends StatelessWidget {
-  const SettingsValueRow({
-    required this.label,
-    required this.value,
-    super.key,
-  });
+  const SettingsValueRow({required this.label, required this.value, super.key});
 
   final String label;
   final String value;
@@ -29,10 +25,7 @@ class SettingsValueRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textTertiary,
-            ),
+            style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
           ),
         ],
       ),

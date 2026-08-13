@@ -68,10 +68,7 @@ void main() {
   });
 
   testWidgets('文字色はライト / ダークで切り替わる', (tester) async {
-    Color labelColor() => tester
-        .widget<Text>(find.text('発音を聞く'))
-        .style!
-        .color!;
+    Color labelColor() => tester.widget<Text>(find.text('発音を聞く')).style!.color!;
 
     await pump(tester, MobilePronunciationButtonVariant.pill);
     final light = labelColor();

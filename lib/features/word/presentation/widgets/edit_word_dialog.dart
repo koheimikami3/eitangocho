@@ -81,21 +81,26 @@ class _EditWordDialogState extends State<_EditWordDialog> {
       return;
     }
 
-    await widget.ref.read(databaseProvider).wordDao.updateWord(
-      widget.word.id,
-      WordsCompanion(
-        word: Value(word),
-        ipa: Value(_ipaController.text.trim()),
-        japanese: Value(japanese),
-        // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
-        // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
-        partsOfSpeech: Value(
-          _selectedPartsOfSpeech.ordered(basedOn: widget.word.partsOfSpeech),
-        ),
-        exampleEn: Value(_exampleEnController.text.trim()),
-        exampleJa: Value(_exampleJaController.text.trim()),
-      ),
-    );
+    await widget.ref
+        .read(databaseProvider)
+        .wordDao
+        .updateWord(
+          widget.word.id,
+          WordsCompanion(
+            word: Value(word),
+            ipa: Value(_ipaController.text.trim()),
+            japanese: Value(japanese),
+            // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
+            // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
+            partsOfSpeech: Value(
+              _selectedPartsOfSpeech.ordered(
+                basedOn: widget.word.partsOfSpeech,
+              ),
+            ),
+            exampleEn: Value(_exampleEnController.text.trim()),
+            exampleJa: Value(_exampleJaController.text.trim()),
+          ),
+        );
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -171,8 +176,8 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     PosChipSelector(
                       selected: _selectedPartsOfSpeech,
                       onToggle: (pos) => setState(() {
-                        _selectedPartsOfSpeech = _selectedPartsOfSpeech
-                                .contains(pos)
+                        _selectedPartsOfSpeech =
+                            _selectedPartsOfSpeech.contains(pos)
                             ? (Set<PartOfSpeech>.from(_selectedPartsOfSpeech)
                                 ..remove(pos))
                             : (Set<PartOfSpeech>.from(_selectedPartsOfSpeech)

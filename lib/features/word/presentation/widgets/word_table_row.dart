@@ -48,9 +48,7 @@ class _WordTableRowState extends State<WordTableRow> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: background,
-            border: const Border(
-              bottom: BorderSide(color: Color(0x0F000000)),
-            ),
+            border: const Border(bottom: BorderSide(color: Color(0x0F000000))),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,

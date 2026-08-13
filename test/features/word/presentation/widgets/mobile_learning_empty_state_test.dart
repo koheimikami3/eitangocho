@@ -22,9 +22,7 @@ void main() {
 
   tearDown(() async => db.close());
 
-  testWidgets('登録ボタンで登録シートが開く(ビュー切替の行き止まりにならない)', (
-    tester,
-  ) async {
+  testWidgets('登録ボタンで登録シートが開く(ビュー切替の行き止まりにならない)', (tester) async {
     // シートは iOS 用の表示なので、プラットフォームを装ってから開く。
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final container = ProviderContainer(

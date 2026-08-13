@@ -51,15 +51,15 @@ void main() {
 
   /// Tatoeba のヒット 1 件分のレスポンス。
   String tatoebaResponse(String en, String ja) => jsonEncode({
-        'data': [
-          {
-            'text': en,
-            'translations': [
-              {'lang': 'jpn', 'text': ja},
-            ],
-          },
+    'data': [
+      {
+        'text': en,
+        'translations': [
+          {'lang': 'jpn', 'text': ja},
         ],
-      });
+      },
+    ],
+  });
 
   /// kaikki / Tatoeba / DeepL のレスポンスを差し替えて
   /// DictionaryWordInfoProvider を組み立てる。
@@ -102,9 +102,11 @@ void main() {
   }
 
   Future<void> seedEjdict(Map<String, String> entries) =>
-      db.ejdictDao.bulkInsert(parseEjdict(
-        entries.entries.map((e) => '${e.key}\t${e.value}').join('\n'),
-      ));
+      db.ejdictDao.bulkInsert(
+        parseEjdict(
+          entries.entries.map((e) => '${e.key}\t${e.value}').join('\n'),
+        ),
+      );
 
   test('kaikki・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を和訳する', () async {
     await seedEjdict({'serendipity': '思わぬ発見'});
@@ -173,10 +175,8 @@ void main() {
   test('Tatoeba の例文は kaikki の例文より優先される', () async {
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
-      tatoebaResponseFn: () => utf8Response(
-        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
-        200,
-      ),
+      tatoebaResponseFn: () =>
+          utf8Response(tatoebaResponse('What a serendipity!', 'なんという偶然！'), 200),
     );
 
     final info = await provider.fetch('serendipity');
@@ -200,10 +200,8 @@ void main() {
   test('Tatoeba で和訳が取れたら DeepL は呼ばない', () async {
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
-      tatoebaResponseFn: () => utf8Response(
-        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
-        200,
-      ),
+      tatoebaResponseFn: () =>
+          utf8Response(tatoebaResponse('What a serendipity!', 'なんという偶然！'), 200),
       deeplApiKey: 'key',
     );
 
@@ -215,10 +213,8 @@ void main() {
   test('kaikki が未収録でも Tatoeba に例文があれば拾う', () async {
     await seedEjdict({'serendipity': '思わぬ発見'});
     final provider = buildProvider(
-      tatoebaResponseFn: () => utf8Response(
-        tatoebaResponse('What a serendipity!', 'なんという偶然！'),
-        200,
-      ),
+      tatoebaResponseFn: () =>
+          utf8Response(tatoebaResponse('What a serendipity!', 'なんという偶然！'), 200),
     );
 
     final info = await provider.fetch('serendipity');
@@ -265,8 +261,7 @@ void main() {
 
   test('訳語が多い語は打ち切る(必須項目の欄が長大にならないように)', () async {
     final many = [
-      for (var i = 0; i < 12; i++)
-        '{"lang_code":"ja","word":"訳$i"}',
+      for (var i = 0; i < 12; i++) '{"lang_code":"ja","word":"訳$i"}',
     ].join(',');
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(
@@ -293,7 +288,10 @@ void main() {
     final info = await provider.fetch('x');
 
     expect(info!.japanese, '諦める');
-    expect(await db.dictionaryCacheDao.find('x'), isNot(contains('abandonner')));
+    expect(
+      await db.dictionaryCacheDao.find('x'),
+      isNot(contains('abandonner')),
+    );
   });
 
   test('kaikki・EJDict 両 miss で例文も無ければ null(未収録)', () async {
@@ -398,10 +396,7 @@ void main() {
       kaikkiResponse: () => http.Response('bad gateway', 502),
     );
 
-    expect(
-      () => provider.fetch('zzzzz'),
-      throwsA(isA<WordInfoException>()),
-    );
+    expect(() => provider.fetch('zzzzz'), throwsA(isA<WordInfoException>()));
   });
 
   test('DeepL キー未設定なら翻訳を呼ばず exampleJa は空', () async {

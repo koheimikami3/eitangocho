@@ -8,18 +8,19 @@ import 'package:http/testing.dart';
 /// 実レスポンスの形。translations は `trans:lang` 指定時のみ入る平坦な配列で、
 /// 指定しないと null になる。
 String responseOf(List<(String, String?)> sentences) => jsonEncode({
-      'data': [
-        for (final (text, ja) in sentences)
-          {
-            'text': text,
-            'lang': 'eng',
-            'translations':
-                ja == null ? null : [
-                  {'lang': 'jpn', 'text': ja},
-                ],
-          },
-      ],
-    });
+  'data': [
+    for (final (text, ja) in sentences)
+      {
+        'text': text,
+        'lang': 'eng',
+        'translations': ja == null
+            ? null
+            : [
+                {'lang': 'jpn', 'text': ja},
+              ],
+      },
+  ],
+});
 
 void main() {
   http.Response utf8Response(String body, int status) =>
@@ -94,10 +95,7 @@ void main() {
   test('下限以上の候補が無ければ、短い中でいちばん語数の多い文に降りる', () async {
     final mock = buildClient(
       () => utf8Response(
-        responseOf([
-          ('Ghosts!', '幽霊だ！'),
-          ('Ghosts exist.', '幽霊は存在する。'),
-        ]),
+        responseOf([('Ghosts!', '幽霊だ！'), ('Ghosts exist.', '幽霊は存在する。')]),
         200,
       ),
     );
@@ -111,7 +109,10 @@ void main() {
     final mock = buildClient(
       () => utf8Response(
         responseOf([
-          ('Tom obtained a firearm from the shop in town yesterday.', 'トムは昨日町の店で銃を買った。'),
+          (
+            'Tom obtained a firearm from the shop in town yesterday.',
+            'トムは昨日町の店で銃を買った。',
+          ),
           ('How much money have you obtained?', 'あなたはどれくらいのお金を手にしましたか。'),
         ]),
         200,
@@ -189,7 +190,10 @@ void main() {
       ),
     );
 
-    expect((await mock.client.findExample('obtain'))!.en, 'Tom obtained a firearm.');
+    expect(
+      (await mock.client.findExample('obtain'))!.en,
+      'Tom obtained a firearm.',
+    );
   });
 
   test('ヒットしなければ null', () async {

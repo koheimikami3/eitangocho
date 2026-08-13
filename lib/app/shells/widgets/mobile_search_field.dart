@@ -30,10 +30,7 @@ class MobileSearchField extends ConsumerWidget {
         hintStyle: TextStyle(color: palette.textAlpha(30)),
         filled: true,
         fillColor: palette.surfaceAlt,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 9,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         border: border,
         enabledBorder: border,
         focusedBorder: border,

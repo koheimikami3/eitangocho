@@ -43,33 +43,34 @@ void main() {
     expect(entries, hasLength(2));
     expect(entries.first.pos, 'noun');
     expect(entries.last.pos, 'adj');
-    expect(
-      mock.paths.single,
-      '/dictionary/English/meaning/m/mo/monster.jsonl',
-    );
+    expect(mock.paths.single, '/dictionary/English/meaning/m/mo/monster.jsonl');
   });
 
   test('ipa を持たない sounds 要素があってもパースできる', () async {
     final mock = buildClient((_) => utf8Response(monsterJsonl, 200));
 
-    final entries =
-        KaikkiApiClient.parseEntries((await mock.client.fetchEntriesJson('monster'))!);
+    final entries = KaikkiApiClient.parseEntries(
+      (await mock.client.fetchEntriesJson('monster'))!,
+    );
 
     final ipas = [
       for (final sound in entries.first.sounds)
         if (sound.ipa != null) sound.ipa,
     ];
     expect(ipas, ['/ˈmɒnstə(ɹ)/', '/ˈmɑnstɚ/']);
-    expect(entries.first.sounds.firstWhere((s) => s.tags.contains('US')).ipa,
-        '/ˈmɑnstɚ/');
+    expect(
+      entries.first.sounds.firstWhere((s) => s.tags.contains('US')).ipa,
+      '/ˈmɑnstɚ/',
+    );
   });
 
   // 引用は長文でキャッシュを膨らませるだけなので保存段階で落とす。
   test('quotation の例文は捨て、example だけ残す', () async {
     final mock = buildClient((_) => utf8Response(monsterJsonl, 200));
 
-    final entries =
-        KaikkiApiClient.parseEntries((await mock.client.fetchEntriesJson('monster'))!);
+    final entries = KaikkiApiClient.parseEntries(
+      (await mock.client.fetchEntriesJson('monster'))!,
+    );
 
     final texts = [
       for (final sense in entries.first.senses)
@@ -139,8 +140,9 @@ void main() {
       ),
     );
 
-    final entries =
-        KaikkiApiClient.parseEntries((await mock.client.fetchEntriesJson('monster'))!);
+    final entries = KaikkiApiClient.parseEntries(
+      (await mock.client.fetchEntriesJson('monster'))!,
+    );
 
     expect(entries.single.pos, 'noun');
   });

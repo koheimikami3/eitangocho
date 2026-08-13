@@ -8,11 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const items = [
-    LicenseItem(
-      name: 'alpha',
-      summary: 'MIT License',
-      texts: ['MIT 本文'],
-    ),
+    LicenseItem(name: 'alpha', summary: 'MIT License', texts: ['MIT 本文']),
     LicenseItem(
       name: 'Tatoeba(例文と対訳)',
       summary: 'CC BY 2.0 FR',
@@ -26,9 +22,7 @@ void main() {
   }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          licenseListProvider.overrideWith((ref) async => licenses),
-        ],
+        overrides: [licenseListProvider.overrideWith((ref) async => licenses)],
         child: const MaterialApp(home: LicenseViewMobile()),
       ),
     );

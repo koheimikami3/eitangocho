@@ -74,6 +74,21 @@ class AppPalette {
   Color get accentLine =>
       isDark ? const Color(0x737EC2FF) : AppColors.accentLine;
 
+  /// Pro(広告非表示)の購入ボタンの地。ライト / ダーク共通。
+  ///
+  /// デザインが広告 / Pro の導線に当てている青は #1E7FD6 だが、白文字を載せると
+  /// 4.15:1 しか出ず、13px のラベルには足りない。発音ボタンのときと同じく
+  /// 色相を保ったまま明度を下げた [AppColors.accentOnSoft] を使う(5.58:1)。
+  /// ダークもデザインは同じ青のままなので、ここもライトと共通にする。
+  Color get proButton => AppColors.accentOnSoft;
+
+  /// 購入済みで押せなくなった購入ボタンの地。
+  Color get proButtonDone =>
+      isDark ? const Color(0x1FFFFFFF) : const Color(0xFFECECEF);
+
+  /// 購入済みの購入ボタンの文字色。ダークだけ 1 段明るいのはデザイン準拠。
+  Color get proButtonDoneForeground => textAlpha(isDark ? 60 : 50);
+
   static const light = AppPalette._(
     brightness: Brightness.light,
     background: Color(0xFFFFFFFF),

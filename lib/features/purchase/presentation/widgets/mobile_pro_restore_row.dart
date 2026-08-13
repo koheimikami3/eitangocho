@@ -1,0 +1,52 @@
+import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// 設定画面「Pro」の復元行。
+///
+/// 機種変更・再インストールで購入が消えた人のための導線なので、購入済みに
+/// 見えているかどうかに関わらず押せる(購入済みのときだけ隠すと、まさに
+/// 必要な人が使えない)。
+class MobileProRestoreRow extends ConsumerWidget {
+  const MobileProRestoreRow({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
+    final state = ref.watch(purchaseProvider);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: state.restoring
+          ? null
+          : ref.read(purchaseProvider.notifier).restore,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                '購入を復元',
+                style: TextStyle(
+                  fontSize: 13,
+                  // デザインはここに --accText を当てている。その対応色が
+                  // accentOnSoft で、13px の文字でも 4.5:1 を満たす
+                  // (accent のままだとカード地に対して足りない)。
+                  color: state.restoring
+                      ? palette.textAlpha(40)
+                      : palette.accentOnSoft,
+                ),
+              ),
+            ),
+            if (state.restoreMessage != null)
+              Text(
+                state.restoreMessage!,
+                style: TextStyle(fontSize: 11, color: palette.textAlpha(45)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
