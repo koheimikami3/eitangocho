@@ -13,6 +13,7 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../../ads/ads_test_overrides.dart';
+import '../../review/review_test_overrides.dart';
 
 void main() {
   late AppDatabase db;
@@ -52,6 +53,7 @@ void main() {
         databaseProvider.overrideWithValue(db),
         learnedWordsProvider.overrideWithValue(learned),
         adsDisabled,
+        reviewDisabled,
       ],
     );
   }

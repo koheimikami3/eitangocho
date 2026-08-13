@@ -30,7 +30,10 @@ class ReviewPrompter {
   /// 結果画面が出てから依頼を出すまでの待ち時間。
   final Duration promptDelay;
 
-  final _prefs = SharedPreferencesAsync();
+  /// 遅延生成にするのは、`SharedPreferencesAsync()` の生成自体がプラグイン
+  /// 未登録の環境で投げるため。Provider の生成時に投げると、レビューとは無関係な
+  /// クイズの回答処理まで巻き込んで落ちる(失敗は下の try で握って捨てる)。
+  late final _prefs = SharedPreferencesAsync();
 
   /// クイズを最後まで終えたときに呼ぶ。条件を満たしたときだけ依頼を出す。
   ///

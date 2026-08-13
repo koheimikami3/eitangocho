@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
+import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -50,12 +53,28 @@ class QuizPageNotifier extends _$QuizPageNotifier {
 
   void _advance({required bool knew, required Word word}) {
     final next = state.index + 1;
+    final done = next >= state.questions.length;
     state = state.copyWith(
       index: next,
       revealed: false,
       okCount: state.okCount + (knew ? 1 : 0),
       forgotWords: knew ? state.forgotWords : [...state.forgotWords, word],
-      phase: next >= state.questions.length ? QuizPhase.done : QuizPhase.active,
+      phase: done ? QuizPhase.done : QuizPhase.active,
     );
+
+    // 最後まで終えた直後がレビュー依頼の唯一の契機(条件は ReviewPrompter が
+    // 判定し、満たさなければ何も起きない)。macOS / iOS の両方がこの Notifier を
+    // 共有しているため、呼び出し口はここ 1 箇所で足りる。
+    // 依頼の成否はクイズの進行に関係しないので待たない。
+    if (done) {
+      unawaited(
+        ref
+            .read(reviewPrompterProvider)
+            .onQuizCompleted(
+              okCount: state.okCount,
+              total: state.questions.length,
+            ),
+      );
+    }
   }
 }
