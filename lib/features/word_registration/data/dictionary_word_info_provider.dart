@@ -44,6 +44,9 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
   /// コロケーションの断片は単語帳の例文にならない。
   static const _minExampleWords = 4;
 
+  /// kaikki の訳語から日本語訳に採る最大件数(EJDict が未収録のときの予備)。
+  static const _maxJapaneseWords = 5;
+
   @override
   Future<WordInfo?> fetch(String word) async {
     final normalized = word.trim().toLowerCase();
@@ -79,8 +82,11 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       return null;
     }
 
-    var info = _mapEntries(normalized, entries ?? const [])
-        .copyWith(japanese: japanese ?? '');
+    // EJDict の語義を優先し、未収録のときだけ kaikki の訳語に落とす。
+    // EJDict は英和辞典の語義で情報量が多く、kaikki 側は訳語の列挙なので
+    // 出番は EJDict が持たない見出し(句動詞がほぼこれに当たる)だけになる。
+    var info = _mapEntries(normalized, entries ?? const []);
+    if (japanese != null) info = info.copyWith(japanese: japanese);
 
     // 4. Tatoeba の例文を優先する。和訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
@@ -113,8 +119,29 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       word: word,
       ipa: _selectIpa(entries),
       partsOfSpeech: partsOfSpeech,
+      japanese: _selectJapanese(entries),
       exampleEn: _selectExample(entries, word),
     );
+  }
+
+  /// kaikki の訳語を日本語訳の文字列にまとめる。
+  ///
+  /// 同じ訳語が語義ごとに重複して来る(`give up` の「諦める」は 2 件)ので
+  /// 畳み、EJDict の語義と同じ ` / ` 区切りで連結する。並びは kaikki が
+  /// 返した順のままで、語義の主従は反映されない(`give up` は「降服する」が
+  /// 先頭に来る)。**必須項目の欄が長大にならないよう [_maxJapaneseWords] で
+  /// 打ち切る**。多義語では 10 件以上返ることがあるため。
+  String _selectJapanese(List<KaikkiEntry> entries) {
+    final words = <String>{};
+    for (final entry in entries) {
+      for (final translation in entry.translations) {
+        final word = (translation.word ?? '').trim();
+        if (word.isEmpty) continue;
+        words.add(word);
+        if (words.length == _maxJapaneseWords) return words.join(' / ');
+      }
+    }
+    return words.join(' / ');
   }
 
   /// 米音を優先して IPA を 1 つ選ぶ。

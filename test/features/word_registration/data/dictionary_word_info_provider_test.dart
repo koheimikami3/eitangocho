@@ -21,6 +21,12 @@ const kaikkiFixture = '''
 {"word":"serendipity","pos":"name","sounds":[],"senses":[]}
 ''';
 
+/// 句動詞の実レスポンス(`give up`)から translations だけ抜き出したもの。
+/// 「諦める」は語義違いで 2 件来る(畳んで 1 つにする)。
+const giveUpJsonl = '''
+{"word":"give up","pos":"verb","senses":[],"translations":[{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"surrender","alt":"こうふくする","roman":"kōfuku suru","word":"降服する"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"stop, quit, desist","roman":"akirameru","word":"諦める"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"abandon","alt":"あきらめる","roman":"akirameru","word":"諦める"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"abandon","roman":"yameru","word":"やめる"}]}
+''';
+
 void main() {
   late AppDatabase db;
   var kaikkiCallCount = 0;
@@ -234,6 +240,62 @@ void main() {
     expect(info.partsOfSpeech, isEmpty);
   });
 
+  // 句動詞は EJDict に無いので、ここが唯一の日本語訳の出所になる。
+  test('EJDict が未収録なら kaikki の訳語を日本語訳に使う', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(giveUpJsonl, 200),
+    );
+
+    final info = await provider.fetch('give up');
+
+    // 語義ごとに重複する「諦める」は 1 つに畳み、EJDict と同じ区切りで繋ぐ。
+    expect(info!.japanese, '降服する / 諦める / やめる');
+  });
+
+  test('EJDict がヒットすれば kaikki の訳語は使わない', () async {
+    await seedEjdict({'give up': 'あきらめる(EJDict 側)'});
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(giveUpJsonl, 200),
+    );
+
+    final info = await provider.fetch('give up');
+
+    expect(info!.japanese, 'あきらめる(EJDict 側)');
+  });
+
+  test('訳語が多い語は打ち切る(必須項目の欄が長大にならないように)', () async {
+    final many = [
+      for (var i = 0; i < 12; i++)
+        '{"lang_code":"ja","word":"訳$i"}',
+    ].join(',');
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(
+        '{"word":"x","pos":"verb","senses":[],"translations":[$many]}',
+        200,
+      ),
+    );
+
+    final info = await provider.fetch('x');
+
+    expect(info!.japanese.split(' / '), hasLength(5));
+  });
+
+  test('日本語以外の訳語はキャッシュにも日本語訳にも残さない', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(
+        '{"word":"x","pos":"verb","senses":[],"translations":['
+        '{"lang_code":"fr","word":"abandonner"},'
+        '{"lang_code":"ja","word":"諦める"}]}',
+        200,
+      ),
+    );
+
+    final info = await provider.fetch('x');
+
+    expect(info!.japanese, '諦める');
+    expect(await db.dictionaryCacheDao.find('x'), isNot(contains('abandonner')));
+  });
+
   test('kaikki・EJDict 両 miss: null(未収録)', () async {
     final provider = buildProvider();
 
@@ -271,6 +333,20 @@ void main() {
     final cached = await db.dictionaryCacheDao.find('serendipity');
     expect(cached, isNotNull);
     expect(KaikkiApiClient.parseEntries(cached!), hasLength(2));
+  });
+
+  // キャッシュは toJson / fromJson を通るため、キー名がずれると 2 回目だけ
+  // 訳が消える(1 回目は生レスポンスから読むので気付けない)。
+  test('キャッシュから読んだ 2 回目も kaikki の訳語を返す', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(giveUpJsonl, 200),
+    );
+
+    await provider.fetch('give up');
+    final second = await provider.fetch('give up');
+
+    expect(kaikkiCallCount, 1);
+    expect(second!.japanese, '降服する / 諦める / やめる');
   });
 
   test('未収録(404)はキャッシュしない', () async {

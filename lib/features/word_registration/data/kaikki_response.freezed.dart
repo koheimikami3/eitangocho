@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$KaikkiEntry {
 
- String? get word; String? get pos; List<KaikkiSound> get sounds; List<KaikkiSense> get senses;
+ String? get word; String? get pos; List<KaikkiSound> get sounds; List<KaikkiSense> get senses; List<KaikkiTranslation> get translations;
 /// Create a copy of KaikkiEntry
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $KaikkiEntryCopyWith<KaikkiEntry> get copyWith => _$KaikkiEntryCopyWithImpl<Kaik
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.pos, pos) || other.pos == pos)&&const DeepCollectionEquality().equals(other.sounds, sounds)&&const DeepCollectionEquality().equals(other.senses, senses));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.pos, pos) || other.pos == pos)&&const DeepCollectionEquality().equals(other.sounds, sounds)&&const DeepCollectionEquality().equals(other.senses, senses)&&const DeepCollectionEquality().equals(other.translations, translations));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,pos,const DeepCollectionEquality().hash(sounds),const DeepCollectionEquality().hash(senses));
+int get hashCode => Object.hash(runtimeType,word,pos,const DeepCollectionEquality().hash(sounds),const DeepCollectionEquality().hash(senses),const DeepCollectionEquality().hash(translations));
 
 @override
 String toString() {
-  return 'KaikkiEntry(word: $word, pos: $pos, sounds: $sounds, senses: $senses)';
+  return 'KaikkiEntry(word: $word, pos: $pos, sounds: $sounds, senses: $senses, translations: $translations)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $KaikkiEntryCopyWith<$Res>  {
   factory $KaikkiEntryCopyWith(KaikkiEntry value, $Res Function(KaikkiEntry) _then) = _$KaikkiEntryCopyWithImpl;
 @useResult
 $Res call({
- String? word, String? pos, List<KaikkiSound> sounds, List<KaikkiSense> senses
+ String? word, String? pos, List<KaikkiSound> sounds, List<KaikkiSense> senses, List<KaikkiTranslation> translations
 });
 
 
@@ -65,13 +65,14 @@ class _$KaikkiEntryCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiEntry
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? word = freezed,Object? pos = freezed,Object? sounds = null,Object? senses = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? word = freezed,Object? pos = freezed,Object? sounds = null,Object? senses = null,Object? translations = null,}) {
   return _then(_self.copyWith(
 word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String?,pos: freezed == pos ? _self.pos : pos // ignore: cast_nullable_to_non_nullable
 as String?,sounds: null == sounds ? _self.sounds : sounds // ignore: cast_nullable_to_non_nullable
 as List<KaikkiSound>,senses: null == senses ? _self.senses : senses // ignore: cast_nullable_to_non_nullable
-as List<KaikkiSense>,
+as List<KaikkiSense>,translations: null == translations ? _self.translations : translations // ignore: cast_nullable_to_non_nullable
+as List<KaikkiTranslation>,
   ));
 }
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses,  List<KaikkiTranslation> translations)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KaikkiEntry() when $default != null:
-return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
+return $default(_that.word,_that.pos,_that.sounds,_that.senses,_that.translations);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses,  List<KaikkiTranslation> translations)  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiEntry():
-return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
+return $default(_that.word,_that.pos,_that.sounds,_that.senses,_that.translations);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? word,  String? pos,  List<KaikkiSound> sounds,  List<KaikkiSense> senses,  List<KaikkiTranslation> translations)?  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiEntry() when $default != null:
-return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
+return $default(_that.word,_that.pos,_that.sounds,_that.senses,_that.translations);case _:
   return null;
 
 }
@@ -212,7 +213,7 @@ return $default(_that.word,_that.pos,_that.sounds,_that.senses);case _:
 @JsonSerializable()
 
 class _KaikkiEntry implements KaikkiEntry {
-  const _KaikkiEntry({this.word, this.pos, final  List<KaikkiSound> sounds = const <KaikkiSound>[], final  List<KaikkiSense> senses = const <KaikkiSense>[]}): _sounds = sounds,_senses = senses;
+  const _KaikkiEntry({this.word, this.pos, final  List<KaikkiSound> sounds = const <KaikkiSound>[], final  List<KaikkiSense> senses = const <KaikkiSense>[], final  List<KaikkiTranslation> translations = const <KaikkiTranslation>[]}): _sounds = sounds,_senses = senses,_translations = translations;
   factory _KaikkiEntry.fromJson(Map<String, dynamic> json) => _$KaikkiEntryFromJson(json);
 
 @override final  String? word;
@@ -231,6 +232,13 @@ class _KaikkiEntry implements KaikkiEntry {
   return EqualUnmodifiableListView(_senses);
 }
 
+ final  List<KaikkiTranslation> _translations;
+@override@JsonKey() List<KaikkiTranslation> get translations {
+  if (_translations is EqualUnmodifiableListView) return _translations;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_translations);
+}
+
 
 /// Create a copy of KaikkiEntry
 /// with the given fields replaced by the non-null parameter values.
@@ -245,16 +253,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.pos, pos) || other.pos == pos)&&const DeepCollectionEquality().equals(other._sounds, _sounds)&&const DeepCollectionEquality().equals(other._senses, _senses));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.pos, pos) || other.pos == pos)&&const DeepCollectionEquality().equals(other._sounds, _sounds)&&const DeepCollectionEquality().equals(other._senses, _senses)&&const DeepCollectionEquality().equals(other._translations, _translations));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,pos,const DeepCollectionEquality().hash(_sounds),const DeepCollectionEquality().hash(_senses));
+int get hashCode => Object.hash(runtimeType,word,pos,const DeepCollectionEquality().hash(_sounds),const DeepCollectionEquality().hash(_senses),const DeepCollectionEquality().hash(_translations));
 
 @override
 String toString() {
-  return 'KaikkiEntry(word: $word, pos: $pos, sounds: $sounds, senses: $senses)';
+  return 'KaikkiEntry(word: $word, pos: $pos, sounds: $sounds, senses: $senses, translations: $translations)';
 }
 
 
@@ -265,7 +273,7 @@ abstract mixin class _$KaikkiEntryCopyWith<$Res> implements $KaikkiEntryCopyWith
   factory _$KaikkiEntryCopyWith(_KaikkiEntry value, $Res Function(_KaikkiEntry) _then) = __$KaikkiEntryCopyWithImpl;
 @override @useResult
 $Res call({
- String? word, String? pos, List<KaikkiSound> sounds, List<KaikkiSense> senses
+ String? word, String? pos, List<KaikkiSound> sounds, List<KaikkiSense> senses, List<KaikkiTranslation> translations
 });
 
 
@@ -282,13 +290,14 @@ class __$KaikkiEntryCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiEntry
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? word = freezed,Object? pos = freezed,Object? sounds = null,Object? senses = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? word = freezed,Object? pos = freezed,Object? sounds = null,Object? senses = null,Object? translations = null,}) {
   return _then(_KaikkiEntry(
 word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String?,pos: freezed == pos ? _self.pos : pos // ignore: cast_nullable_to_non_nullable
 as String?,sounds: null == sounds ? _self._sounds : sounds // ignore: cast_nullable_to_non_nullable
 as List<KaikkiSound>,senses: null == senses ? _self._senses : senses // ignore: cast_nullable_to_non_nullable
-as List<KaikkiSense>,
+as List<KaikkiSense>,translations: null == translations ? _self._translations : translations // ignore: cast_nullable_to_non_nullable
+as List<KaikkiTranslation>,
   ));
 }
 
@@ -561,6 +570,272 @@ class __$KaikkiSoundCopyWithImpl<$Res>
 ipa: freezed == ipa ? _self.ipa : ipa // ignore: cast_nullable_to_non_nullable
 as String?,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$KaikkiTranslation {
+
+ String? get word;@JsonKey(name: 'lang_code') String? get langCode;
+/// Create a copy of KaikkiTranslation
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$KaikkiTranslationCopyWith<KaikkiTranslation> get copyWith => _$KaikkiTranslationCopyWithImpl<KaikkiTranslation>(this as KaikkiTranslation, _$identity);
+
+  /// Serializes this KaikkiTranslation to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,word,langCode);
+
+@override
+String toString() {
+  return 'KaikkiTranslation(word: $word, langCode: $langCode)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $KaikkiTranslationCopyWith<$Res>  {
+  factory $KaikkiTranslationCopyWith(KaikkiTranslation value, $Res Function(KaikkiTranslation) _then) = _$KaikkiTranslationCopyWithImpl;
+@useResult
+$Res call({
+ String? word,@JsonKey(name: 'lang_code') String? langCode
+});
+
+
+
+
+}
+/// @nodoc
+class _$KaikkiTranslationCopyWithImpl<$Res>
+    implements $KaikkiTranslationCopyWith<$Res> {
+  _$KaikkiTranslationCopyWithImpl(this._self, this._then);
+
+  final KaikkiTranslation _self;
+  final $Res Function(KaikkiTranslation) _then;
+
+/// Create a copy of KaikkiTranslation
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? word = freezed,Object? langCode = freezed,}) {
+  return _then(_self.copyWith(
+word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
+as String?,langCode: freezed == langCode ? _self.langCode : langCode // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [KaikkiTranslation].
+extension KaikkiTranslationPatterns on KaikkiTranslation {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _KaikkiTranslation value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _KaikkiTranslation() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _KaikkiTranslation value)  $default,){
+final _that = this;
+switch (_that) {
+case _KaikkiTranslation():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _KaikkiTranslation value)?  $default,){
+final _that = this;
+switch (_that) {
+case _KaikkiTranslation() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _KaikkiTranslation() when $default != null:
+return $default(_that.word,_that.langCode);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)  $default,) {final _that = this;
+switch (_that) {
+case _KaikkiTranslation():
+return $default(_that.word,_that.langCode);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)?  $default,) {final _that = this;
+switch (_that) {
+case _KaikkiTranslation() when $default != null:
+return $default(_that.word,_that.langCode);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _KaikkiTranslation implements KaikkiTranslation {
+  const _KaikkiTranslation({this.word, @JsonKey(name: 'lang_code') this.langCode});
+  factory _KaikkiTranslation.fromJson(Map<String, dynamic> json) => _$KaikkiTranslationFromJson(json);
+
+@override final  String? word;
+@override@JsonKey(name: 'lang_code') final  String? langCode;
+
+/// Create a copy of KaikkiTranslation
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$KaikkiTranslationCopyWith<_KaikkiTranslation> get copyWith => __$KaikkiTranslationCopyWithImpl<_KaikkiTranslation>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$KaikkiTranslationToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,word,langCode);
+
+@override
+String toString() {
+  return 'KaikkiTranslation(word: $word, langCode: $langCode)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$KaikkiTranslationCopyWith<$Res> implements $KaikkiTranslationCopyWith<$Res> {
+  factory _$KaikkiTranslationCopyWith(_KaikkiTranslation value, $Res Function(_KaikkiTranslation) _then) = __$KaikkiTranslationCopyWithImpl;
+@override @useResult
+$Res call({
+ String? word,@JsonKey(name: 'lang_code') String? langCode
+});
+
+
+
+
+}
+/// @nodoc
+class __$KaikkiTranslationCopyWithImpl<$Res>
+    implements _$KaikkiTranslationCopyWith<$Res> {
+  __$KaikkiTranslationCopyWithImpl(this._self, this._then);
+
+  final _KaikkiTranslation _self;
+  final $Res Function(_KaikkiTranslation) _then;
+
+/// Create a copy of KaikkiTranslation
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? word = freezed,Object? langCode = freezed,}) {
+  return _then(_KaikkiTranslation(
+word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
+as String?,langCode: freezed == langCode ? _self.langCode : langCode // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

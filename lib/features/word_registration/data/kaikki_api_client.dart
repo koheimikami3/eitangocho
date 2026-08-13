@@ -21,6 +21,9 @@ class KaikkiApiClient {
   /// 名乗らずに叩かない(商用サービスではないため)。
   static const _userAgent = 'eitangocho (https://github.com/koheimikami3/eitangocho)';
 
+  /// 訳語のうち残す言語(kaikki の `lang_code`)。
+  static const _japaneseLangCode = 'ja';
+
   /// 正規化済みの JSON 配列文字列を返す(キャッシュにそのまま保存する形)。
   /// 未収録は null、それ以外の失敗は [WordInfoException]。
   ///
@@ -86,6 +89,9 @@ class KaikkiApiClient {
   /// 文献引用)は捨てる。引用は「[W]ith their magical words they [poets]
   /// bring forth ... — Leigh Hunt」のような長文で単語帳には使えないうえ、
   /// キャッシュサイズの大半を占めるため。
+  ///
+  /// 訳語は日本語だけ残す。全言語ぶんを持っており(`give up` は 1 品詞に
+  /// 243 件)、そのまま保存するとキャッシュを縮めた意味が無くなる。
   static List<KaikkiEntry> _parseJsonl(String body) {
     final entries = <KaikkiEntry>[];
     for (final line in const LineSplitter().convert(body)) {
@@ -109,6 +115,10 @@ class KaikkiApiClient {
                     if (example.type == 'example') example,
                 ],
               ),
+          ],
+          translations: [
+            for (final translation in entry.translations)
+              if (translation.langCode == _japaneseLangCode) translation,
           ],
         ),
       );
