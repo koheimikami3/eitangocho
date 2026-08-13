@@ -68,12 +68,12 @@ void main() {
       'q': 'obtain',
       'trans:lang': 'jpn',
       'sort': 'relevance',
-      'limit': '10',
+      'limit': '30',
     });
   });
 
   // 最短だけで選ぶと monster に「Monster!」が付いてしまう。
-  test('1〜2 語の文より、3 語以上の文を優先する', () async {
+  test('下限に満たない文より、下限以上の文を優先する', () async {
     final mock = buildClient(
       () => utf8Response(
         responseOf([
@@ -91,7 +91,7 @@ void main() {
   });
 
   // 語数で足切りすると、短文しか無い語で和訳付きの例文を丸ごと失う。
-  test('3 語以上の候補が無ければ、短い中でいちばん語数の多い文に降りる', () async {
+  test('下限以上の候補が無ければ、短い中でいちばん語数の多い文に降りる', () async {
     final mock = buildClient(
       () => utf8Response(
         responseOf([
@@ -107,18 +107,43 @@ void main() {
     expect(example!.en, 'Ghosts exist.');
   });
 
-  test('条件を満たす中では最短の文を選ぶ', () async {
+  test('下限を満たす中では最短の文を選ぶ', () async {
     final mock = buildClient(
       () => utf8Response(
         responseOf([
-          ('Tom obtained a firearm from the shop yesterday.', 'トムは昨日店で銃を買った。'),
-          ('Tom obtained a gun.', 'トムは銃を手に入れた。'),
+          ('Tom obtained a firearm from the shop in town yesterday.', 'トムは昨日町の店で銃を買った。'),
+          ('How much money have you obtained?', 'あなたはどれくらいのお金を手にしましたか。'),
         ]),
         200,
       ),
     );
 
-    expect((await mock.client.findExample('obtain'))!.en, 'Tom obtained a gun.');
+    expect(
+      (await mock.client.findExample('obtain'))!.en,
+      'How much money have you obtained?',
+    );
+  });
+
+  // 下限は語数で見ているので、長短の比較も語数で揃える。文字数で比べると、
+  // 語数の少ない長い単語の文が「長い文」として勝ってしまう。
+  test('長短は文字数ではなく語数で比べる', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        responseOf([
+          // 4 語だが 40 文字(文字数で比べるとこちらが最長になる)
+          ('Apples contain considerable antioxidants.', 'りんごには相当量の抗酸化物質が含まれる。'),
+          // 5 語 20 文字
+          ('I want an apple now.', 'りんごが今すぐ欲しい。'),
+        ]),
+        200,
+      ),
+    );
+
+    // どちらも下限に届かないので降格し、語数の多い方を採る。
+    expect(
+      (await mock.client.findExample('apple'))!.en,
+      'I want an apple now.',
+    );
   });
 
   // Tatoeba の検索はステミングするため、これを弾けないと別の単語の例文が入る。
