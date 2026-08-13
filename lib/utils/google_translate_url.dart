@@ -10,7 +10,7 @@ Uri googleTranslateUrl(String word) => Uri.parse(
 ///
 /// iOS はアプリ内の WebView で完結するが、macOS は platform view の制約で
 /// WebView 内を操作できないため外部ブラウザに出す(docs/design.md 参照)。
-///OK
+///
 /// **`LaunchMode.externalApplication` を明示するのが要点**。既定の
 /// `platformDefault` は iOS では SFSafariViewController(アプリ内 Safari)に
 /// なり、読み込みに失敗すると「完了」でも閉じられない画面に閉じ込められる。
