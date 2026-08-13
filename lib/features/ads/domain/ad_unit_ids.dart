@@ -36,13 +36,10 @@ abstract final class AdUnitIds {
   /// 本番の ID。AdMob の「バナー(タブバー上)」ユニット。
   static const _releaseTabBarBanner = 'ca-app-pub-3768273762534884/2278462321';
 
-  /// TODO: AdMob で「バナー(登録シート)」を作成したら入れる。
-  static const _releaseSheetBanner = '';
+  /// AdMob の「バナー(登録シート)」ユニット。
+  static const _releaseSheetBanner = 'ca-app-pub-3768273762534884/5497904061';
 
-  /// TODO: AdMob で「レクタングル(クイズ結果)」を作成したら入れる。
-  ///
-  /// 空の間はレクタングルを出さないだけでなく、タブバー上のバナーを
-  /// 引っ込める判断もしない(広告がゼロの画面になってしまうため。
-  /// `tabBarBannerVisibleProvider` 参照)。
-  static const _releaseQuizRectangle = '';
+  /// AdMob の「レクタングル(クイズ結果)」ユニット。
+  static const _releaseQuizRectangle =
+      'ca-app-pub-3768273762534884/2121765839';
 }
