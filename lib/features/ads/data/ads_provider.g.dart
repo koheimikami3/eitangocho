@@ -62,4 +62,4 @@ final class AdsEnabledProvider
   }
 }
 
-String _$adsEnabledHash() => r'96b8bc82e867332999b27c5c3b14d2a0b4484467';
+String _$adsEnabledHash() => r'7cafec4cc4c790649983f12e238c39da1e059425';

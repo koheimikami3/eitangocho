@@ -1,7 +1,6 @@
 import 'package:eitangocho/app/eitangocho_app.dart';
 import 'package:eitangocho/app/shells/widgets/mobile_tab_bar.dart';
 import 'package:eitangocho/db/app_database.dart';
-import 'package:eitangocho/features/ads/data/ads_provider.dart';
 import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/learning_words_view_mobile.dart';
@@ -12,6 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+import '../features/ads/ads_test_overrides.dart';
 
 /// 広告が読み込めた状態を装う(実際の BannerAd はプラグインが要るため)。
 class _LoadedBannerAdHeight extends BannerAdHeight {
@@ -56,9 +57,7 @@ void main() {
             ),
             // MainPage が起動時にキックする EJDict 取込も DB に触れるため差し替える。
             ejdictImportProvider.overrideWith((ref) async => 0),
-            // 広告 SDK は iOS のネイティブプラグインが要る。シェルの表示を見る
-            // だけのこのテストでは初期化させない。
-            adsEnabledProvider.overrideWith((ref) async => false),
+            adsDisabled,
             // 広告は読み込めないため、高さが要るテストだけ結果を差し替える。
             if (bannerAdHeight > 0)
               bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),

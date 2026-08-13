@@ -18,9 +18,9 @@ part 'ads_provider.g.dart';
 Future<bool> adsEnabled(Ref ref) async {
   // 広告は iOS のみ。macOS はプラグインが無く、呼べば MissingPluginException。
   if (!AppPlatform.isIOS) return false;
-  // 本番の広告ユニット ID が未設定の間は SDK に触れない。GMA SDK は不正な
-  // アプリ ID で初期化すると例外を投げるため、初期化ごと見送る。
-  if (AdUnitIds.banner.isEmpty) {
+  // 広告ユニットが 1 つも配線されていない間は SDK に触れない。GMA SDK は
+  // 不正なアプリ ID で初期化すると例外を投げるため、初期化ごと見送る。
+  if (!AdUnitIds.hasAnyUnit) {
     adLog('広告ユニット ID が空のため広告を出しません(AdMob 登録待ち)');
     return false;
   }

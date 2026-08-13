@@ -1,11 +1,12 @@
 import 'package:eitangocho/app/app_route_observer.dart';
-import 'package:eitangocho/features/ads/data/ads_provider.dart';
 import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_banner_ad.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../../ads_test_overrides.dart';
 
 /// 広告が読み込み済みの状態を装う。実際の [BannerAd] はプラグイン(ネイティブ)
 /// が要るためテストでは作れないので、「高さが確定している」という結果だけを
@@ -22,8 +23,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          // 広告 SDK に触れさせない(macOS のテスト実行機ではプラグインが無い)。
-          adsEnabledProvider.overrideWith((ref) async => false),
+          adsDisabled,
           if (adLoaded)
             bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),
         ],
