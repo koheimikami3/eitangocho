@@ -48,6 +48,15 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
         ]))
       .get();
 
+  /// 登録されている単語の件数。
+  /// 一覧を読まずに件数だけ知りたい呼び出し(レビュー依頼の判定)のために置く。
+  Future<int> countWords() {
+    final count = words.id.count();
+    return (selectOnly(words)..addColumns([count])).map((row) {
+      return row.read(count) ?? 0;
+    }).getSingle();
+  }
+
   /// 単語を追加する。同じ単語の削除ログが残っていれば取り消す
   /// (取り消さないと、削除 → 再登録した単語が次の同期でまた消えてしまう)。
   Future<int> insertWord(WordsCompanion entry) {

@@ -40,6 +40,21 @@ void main() {
     expect(words.map((w) => w.word), ['second', 'first']);
   });
 
+  test('countWords は登録件数を返し、削除に追従する', () async {
+    expect(await db.wordDao.countWords(), 0);
+
+    final id = await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+    );
+    await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+    );
+    expect(await db.wordDao.countWords(), 2);
+
+    await db.wordDao.deleteWord(id);
+    expect(await db.wordDao.countWords(), 1);
+  });
+
   test('updateWord はフィールドと updatedAt を更新する', () async {
     final id = await db.wordDao.insertWord(
       const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
