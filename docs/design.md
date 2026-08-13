@@ -318,10 +318,11 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   アプリ ID 側も同じ方針で `ios/Flutter/{Debug,Release}.xcconfig` に置き、
   Info.plist の `GADApplicationIdentifier` から参照する
   (`BUNDLE_ID_SUFFIX` / `APP_ICON_NAME` と同じ仕組み)。
-- **本番 ID が空の間は SDK を初期化しない**。AdMob の登録待ちで
-  `GAD_APPLICATION_IDENTIFIER` が空のままだと、初期化した GMA SDK はアプリ ID
-  不正で例外を投げる。広告ユニット ID が空なら初期化ごと見送ることで、
-  「広告が出ないだけで動く release ビルド」にしてある。
+- **広告ユニット ID が空なら SDK を初期化しない**。`GAD_APPLICATION_IDENTIFIER`
+  が空のまま初期化すると GMA SDK はアプリ ID 不正で例外を投げる。ユニット ID が
+  空なら初期化ごと見送ることで、ID を用意する前でも「広告が出ないだけで動く
+  release ビルド」になる(AdMob 登録待ちの間に実際に使った)。枠を増やすときも、
+  ユニットを作ってから配線すれば同じ保険が効く。
 - **辞書の取得失敗と同じく、広告の失敗で本体を止めない**。ATT・初期化・読み込みの
   例外は握って `adsEnabled` を false にするだけにする。
 - **トラッキング同意は ATT のみ**(EEA 向けの UMP は入れない)。要求は

@@ -15,7 +15,8 @@ abstract final class AdUnitIds {
   /// iOS のアンカー型アダプティブバナー用のテスト ID(Google 公式)。
   static const _testBanner = 'ca-app-pub-3940256099942544/2435281174';
 
-  /// TODO: AdMob でバナーユニットを作成したら本番の ID に差し替える。
-  /// 空の間は広告 SDK の初期化ごと見送る(ads_provider.dart)。
-  static const _releaseBanner = '';
+  /// 本番の ID。AdMob の「バナー(タブバー上)」ユニット。
+  /// 未取得の枠を足すときは空文字にせず、ユニットを作ってから配線すること
+  /// (空だと広告 SDK の初期化ごと見送られる。ads_provider.dart)。
+  static const _releaseBanner = 'ca-app-pub-3768273762534884/2278462321';
 }
