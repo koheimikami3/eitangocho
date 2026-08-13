@@ -4,6 +4,7 @@ import 'package:eitangocho/app/app_route_observer.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/ads/data/ads_provider.dart';
+import 'package:eitangocho/features/ads/domain/ad_log.dart';
 import 'package:eitangocho/features/ads/domain/ad_unit_ids.dart';
 import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
 import 'package:flutter/material.dart';
@@ -93,11 +94,15 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
       if (!await ref.read(adsEnabledProvider.future)) return;
       if (!mounted || _covered) return;
 
-      final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(
-        _adWidth(context),
-      );
+      final width = _adWidth(context);
+      final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
       // 端末に合う高さが無ければ広告そのものを諦める(枠も出さない)。
-      if (size == null || !mounted || _covered) return;
+      if (size == null) {
+        adLog('幅 $width に合うアダプティブサイズが得られませんでした');
+        return;
+      }
+      if (!mounted || _covered) return;
+      adLog('読み込み開始: ${size.width}x${size.height} / ${AdUnitIds.banner}');
 
       await BannerAd(
         adUnitId: AdUnitIds.banner,
@@ -105,6 +110,7 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
+            adLog('読み込み成功');
             // 読み込み中に覆われた / 画面から消えたなら出さずに捨てる。
             if (!mounted || _covered) {
               ad.dispose();
@@ -120,7 +126,10 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
                 );
           },
           // 在庫切れ・通信断など。次の機会(復帰時)に読み直す。
-          onAdFailedToLoad: (ad, error) => ad.dispose(),
+          onAdFailedToLoad: (ad, error) {
+            adLog('読み込み失敗: $error');
+            ad.dispose();
+          },
         ),
       ).load();
     } finally {

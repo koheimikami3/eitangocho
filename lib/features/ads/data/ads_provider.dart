@@ -1,4 +1,5 @@
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:eitangocho/features/ads/domain/ad_log.dart';
 import 'package:eitangocho/features/ads/domain/ad_unit_ids.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -19,14 +20,25 @@ Future<bool> adsEnabled(Ref ref) async {
   if (!AppPlatform.isIOS) return false;
   // 本番の広告ユニット ID が未設定の間は SDK に触れない。GMA SDK は不正な
   // アプリ ID で初期化すると例外を投げるため、初期化ごと見送る。
-  if (AdUnitIds.banner.isEmpty) return false;
+  if (AdUnitIds.banner.isEmpty) {
+    adLog('広告ユニット ID が空のため広告を出しません(AdMob 登録待ち)');
+    return false;
+  }
 
   try {
-    await _requestTrackingAuthorizationIfNeeded();
-    await MobileAds.instance.initialize();
+    // ATT の応答が返らないまま止まっても広告自体は出せる(パーソナライズ
+    // されないだけ)。アプリがまだアクティブでないうちに要求すると応答が
+    // 返らないことがあるため、待ち続けずに先へ進む。
+    await _requestTrackingAuthorizationIfNeeded().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () => adLog('ATT の応答が無いまま初期化へ進みます'),
+    );
+    final status = await MobileAds.instance.initialize();
+    adLog('SDK 初期化完了: ${status.adapterStatuses.keys.join(", ")}');
     return true;
-  } catch (_) {
+  } catch (error, stackTrace) {
     // 広告が出せなくても単語帳としては使えるべきなので、握って諦める。
+    adLog('SDK の初期化に失敗: $error\n$stackTrace');
     return false;
   }
 }
@@ -38,6 +50,8 @@ Future<bool> adsEnabled(Ref ref) async {
 /// その回のリクエストには反映されないため。
 Future<void> _requestTrackingAuthorizationIfNeeded() async {
   final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+  adLog('ATT の現在の状態: ${status.name}');
   if (status != TrackingStatus.notDetermined) return;
-  await AppTrackingTransparency.requestTrackingAuthorization();
+  final answer = await AppTrackingTransparency.requestTrackingAuthorization();
+  adLog('ATT の応答: ${answer.name}');
 }
