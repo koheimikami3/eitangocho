@@ -3,6 +3,7 @@ import 'package:eitangocho/components/mobile_pos_chip_selector.dart';
 import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_notifier.dart';
@@ -169,6 +170,7 @@ class _WordRegistrationSheetState
 
     return MobileSheet(
       title: '単語を登録',
+      footer: const MobileSheetBannerAd(),
       // フォームまで進んでいれば入力ステップへ戻す、そうでなければ閉じる。
       leftLabel: isForm ? '戻る' : 'キャンセル',
       onLeft: isForm

@@ -15,6 +15,7 @@ class MobileSheet extends StatelessWidget {
     this.rightLabel,
     this.onRight,
     this.scrollableBody = true,
+    this.footer,
   });
 
   final String title;
@@ -31,6 +32,10 @@ class MobileSheet extends StatelessWidget {
   /// WebView のように自前で高さいっぱいに広がるものは false にして、
   /// 余白ごとシートの残り高を渡す。
   final bool scrollableBody;
+
+  /// スクロール領域の外側、シート最下部に固定で置くもの。
+  /// 今のところ用途はバナー広告だけ(`MobileSheetBannerAd`)。
+  final Widget? footer;
 
   /// 画面高に対するシートの高さ(デザインの height:88%)。
   static const _heightFactor = 0.88;
@@ -70,6 +75,7 @@ class MobileSheet extends StatelessWidget {
                       )
                     : child,
               ),
+              ?footer,
             ],
           ),
         ),
