@@ -296,6 +296,64 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   拡張子ではなく UTI で絞り込むため `XTypeGroup` に
   `uniformTypeIdentifiers` が必須。
 
+## バナー広告の設計判断(1.4.0)
+
+- **広告は iOS のみ**。デザイン(`英単語帳アプリ.dc.html`)の macOS 側に広告枠が
+  無く、`google_mobile_ads` も macOS 非対応(呼べば `MissingPluginException`)。
+  分岐は `AppPlatform.isIOS` で行い、`adsEnabledProvider` が false を返す。
+- **枠はタブバー上の常設バナー 1 つだけ**。デザインには登録シート内のバナーと
+  クイズ結果の 300×250 レクタングルもあるが、まず 1 枠で表示崩れと収益を実機で
+  確かめるため次バージョン以降に回した。「広告を非表示にする」課金も同じ理由で
+  分離してある(広告本体より作業量が大きい)。表示は `adsEnabledProvider` の
+  真偽値 1 点で分岐させてあり、購入状態は後からそこに混ぜられる。
+- **`google_mobile_ads` は 9.x**。本プロジェクトは CocoaPods を使っておらず
+  (`ios/Podfile` が無い)、SPM 対応は 8.0.0 以降のため 8.0.0 未満は選べない。
+  SPM が解決したネイティブ SDK のバージョンは `Package.resolved` で固定する。
+- **広告ユニット ID は Dart 定数に直書き**(`ad_unit_ids.dart`)。DeepL の API
+  キーと違い広告 ID は AdMob が発行する公開値で、秘匿する意味も設定画面から
+  入力させる意味も無い。**debug は Google 公式のテスト ID**にする(開発中に本番
+  ユニットを叩くと無効なトラフィックとみなされ、アカウントごと停止されうる)。
+  アプリ ID 側も同じ方針で `ios/Flutter/{Debug,Release}.xcconfig` に置き、
+  Info.plist の `GADApplicationIdentifier` から参照する
+  (`BUNDLE_ID_SUFFIX` / `APP_ICON_NAME` と同じ仕組み)。
+- **本番 ID が空の間は SDK を初期化しない**。AdMob の登録待ちで
+  `GAD_APPLICATION_IDENTIFIER` が空のままだと、初期化した GMA SDK はアプリ ID
+  不正で例外を投げる。広告ユニット ID が空なら初期化ごと見送ることで、
+  「広告が出ないだけで動く release ビルド」にしてある。
+- **辞書の取得失敗と同じく、広告の失敗で本体を止めない**。ATT・初期化・読み込みの
+  例外は握って `adsEnabled` を false にするだけにする。
+- **トラッキング同意は ATT のみ**(EEA 向けの UMP は入れない)。要求は
+  **初回フレームを描いた後・`notDetermined` のときだけ 1 回**。アプリがアクティブに
+  なる前に要求してもダイアログは出ないまま返る。**SDK の初期化より前**に済ませる
+  のは、初期化後にトラッキング可否が変わってもその回の広告リクエストに
+  反映されないため。応答の内容は見ない(拒否でも非パーソナライズ広告は出せる)。
+- **サイズはアンカー型アダプティブ**。固定 320×50 より収益を狙う。API は
+  `AdSize.getLargeAnchoredAdaptiveBannerAdSize`
+  (`getCurrentOrientationAnchoredAdaptiveBannerAdSize` は 8.0.0 で非推奨)。
+  幅は画面幅ではなく `AppDimensions.mobileContentMaxWidth` に合わせる
+  (iPad ではシェルがこの幅に絞っており、広告だけがはみ出すため)。
+- **高さが確定するまで枠ごと出さない**。アダプティブの高さは端末ごとに Google が
+  返すまで分からない。先に空の枠を置くと、広告が付かない端末で下端に意味の無い
+  帯が残る。確定した高さは `bannerAdHeightProvider` に流し、シェルがコンテンツの
+  下余白(タブバーの高さ + バナー高)に足す。**この Provider は keepAlive**:
+  書き手(バナー)と読み手(シェル)が別ウィジェットのため、購読者が一瞬でも
+  居ない状態で書くと autoDispose が値ごと捨ててしまう。
+- **覆われている間はツリーから外す**。登録・編集シートは画面高の 88% を占め、
+  バナーを完全に隠す。隠れた広告のインプレッションを稼がないよう、上に画面が
+  積まれたら広告を破棄し、戻ったら読み込み直す。検知は **`RouteObserver`**
+  (`lib/app/app_route_observer.dart`)で行う。シート側に「今開いている」を
+  報告させると導線を足すたびに書き漏らすうえ、ライセンス画面のような全画面
+  プッシュも同じ扱いにできるため。
+- **デザイン準拠**: 背景 `palette.surfaceHeader`、上境界 `palette.borderAlpha(8)`、
+  パディング 8/12。デザイン左上の黄色い「広告」バッジは枠を示すプレースホルダで
+  実装しない(AdChoices は AdMob 側が描く)。
+- **コード外に必要な作業**: AdMob でのアプリ登録とバナーユニット作成、
+  App Store Connect のプライバシー申告(トラッキング / 識別子 / 使用状況データ)、
+  プライバシーポリシーへの AdMob と IDFA の記載、app-ads.txt の配信ドメインと
+  マーケティング URL のドメイン一致。**ネイティブの GMA SDK は SPM 経由で入る
+  ため `NOTICES` に載らない**(pub パッケージ分は自動収集される)。表示義務の
+  有無は未確認で、必要なら `registerDataSourceLicenses` と同じ要領で足す。
+
 ## iCloud 同期の設計判断
 
 - **方式**: アプリの iCloud コンテナに置いた JSON スナップショット 1 個。
