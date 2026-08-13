@@ -5,6 +5,7 @@ import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:eitangocho/utils/headword.dart';
@@ -124,6 +125,9 @@ class _WordEditSheetState extends State<_WordEditSheet> {
 
     return MobileSheet(
       title: '単語を編集',
+      // デザインにあるのは登録シートだけだが、作りが同じでユーザー判断により
+      // こちらにも出す(開く頻度はこちらの方が高い)。
+      footer: const MobileSheetBannerAd(),
       leftLabel: 'キャンセル',
       onLeft: () => Navigator.of(context).pop(),
       rightLabel: '保存',

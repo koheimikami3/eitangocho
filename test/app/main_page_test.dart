@@ -1,13 +1,24 @@
 import 'package:eitangocho/app/eitangocho_app.dart';
+import 'package:eitangocho/app/shells/widgets/mobile_tab_bar.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word/presentation/learning_words_view_mobile.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show Size;
+import 'package:flutter/material.dart' show MediaQuery, Size;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+import '../features/ads/ads_test_overrides.dart';
+
+/// 広告が読み込めた状態を装う(実際の BannerAd はプラグインが要るため)。
+class _LoadedBannerAdHeight extends BannerAdHeight {
+  @override
+  double build() => 50;
+}
 
 void main() {
   setUp(() {
@@ -31,6 +42,7 @@ void main() {
     required Size physicalSize,
     required double devicePixelRatio,
     required Future<void> Function() body,
+    double bannerAdHeight = 0,
   }) async {
     debugDefaultTargetPlatformOverride = platform;
     tester.view.physicalSize = physicalSize;
@@ -45,6 +57,10 @@ void main() {
             ),
             // MainPage が起動時にキックする EJDict 取込も DB に触れるため差し替える。
             ejdictImportProvider.overrideWith((ref) async => 0),
+            adsDisabled,
+            // 広告は読み込めないため、高さが要るテストだけ結果を差し替える。
+            if (bannerAdHeight > 0)
+              bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),
           ],
           child: const EitangochoApp(),
         ),
@@ -72,13 +88,15 @@ void main() {
   /// iOS: iPhone 16 Pro 相当(論理 402x874)。
   Future<void> runMobile(
     WidgetTester tester,
-    Future<void> Function() body,
-  ) => runApp(
+    Future<void> Function() body, {
+    double bannerAdHeight = 0,
+  }) => runApp(
     tester,
     TargetPlatform.iOS,
     physicalSize: const Size(1206, 2622),
     devicePixelRatio: 3,
     body: body,
+    bannerAdHeight: bannerAdHeight,
   );
 
   group('macOS(サイドバー版)', () {
@@ -136,6 +154,30 @@ void main() {
         // 検索欄と登録ボタンは消える。
         expect(find.text('設定'), findsNWidgets(2));
         expect(find.text('＋ 登録'), findsNothing);
+      });
+    });
+
+    testWidgets('広告が無いときの下余白はタブバーの高さだけ', (tester) async {
+      await runMobile(tester, () async {
+        expect(
+          MediaQuery.paddingOf(
+            tester.element(find.byType(LearningWordsViewMobile)),
+          ).bottom,
+          MobileTabBar.heightOf(tester.element(find.byType(MobileTabBar))),
+        );
+      });
+    });
+
+    testWidgets('バナー広告の高さはタブバーの高さに足される', (tester) async {
+      await runMobile(tester, bannerAdHeight: 50, () async {
+        // 広告はタブバーの上に積まれるので、コンテンツの下端が隠れないよう
+        // 両方の高さを空ける。
+        expect(
+          MediaQuery.paddingOf(
+            tester.element(find.byType(LearningWordsViewMobile)),
+          ).bottom,
+          MobileTabBar.heightOf(tester.element(find.byType(MobileTabBar))) + 50,
+        );
       });
     });
   });

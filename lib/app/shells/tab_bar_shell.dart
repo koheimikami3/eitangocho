@@ -4,6 +4,8 @@ import 'package:eitangocho/app/shells/widgets/mobile_header.dart';
 import 'package:eitangocho/app/shells/widgets/mobile_tab_bar.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
+import 'package:eitangocho/features/ads/presentation/widgets/mobile_banner_ad.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view_mobile.dart';
 import 'package:eitangocho/features/word/presentation/all_words_view_mobile.dart';
@@ -43,6 +45,8 @@ class _ShellBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
+    // 広告が読み込まれていない間は 0。
+    final bannerHeight = ref.watch(bannerAdHeightProvider);
 
     // タブバーは半透明でコンテンツの上に重なる(デザインの position:absolute +
     // backdrop-filter)。そのため Column ではなく Stack で重ね、コンテンツ側は
@@ -53,12 +57,12 @@ class _ShellBody extends ConsumerWidget {
           children: [
             const MobileHeader(),
             Expanded(
-              // 上のセーフエリアはヘッダが消費済み。下端はタブバーが重なるので、
-              // その分をビュー側のスクロール余白として渡す。
+              // 上のセーフエリアはヘッダが消費済み。下端はタブバーとバナー広告が
+              // 重なるので、その分をビュー側のスクロール余白として渡す。
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                   padding: EdgeInsets.only(
-                    bottom: MobileTabBar.heightOf(context),
+                    bottom: MobileTabBar.heightOf(context) + bannerHeight,
                   ),
                 ),
                 child: switch (view) {
@@ -78,7 +82,12 @@ class _ShellBody extends ConsumerWidget {
           left: 0,
           right: 0,
           bottom: 0,
-          child: MobileTabBar(),
+          // バナー広告はタブバーの上に積む(デザインの並び)。広告が無い間は
+          // MobileBannerAd 自身が何も描かないため、見た目は従来どおり。
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [MobileBannerAd(), MobileTabBar()],
+          ),
         ),
       ],
     );

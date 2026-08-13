@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/ads/presentation/widgets/mobile_quiz_rectangle_ad.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,6 +45,9 @@ class MobileQuizResultView extends ConsumerWidget {
           const SizedBox(height: 16),
           _ForgotList(words: forgotWords),
         ],
+        // 広告は一覧とボタンの間(デザインどおり)。上の余白は広告自身が
+        // 持つため、読み込めなければ高さごと消えて元のレイアウトに戻る。
+        const MobileQuizRectangleAd(),
         const SizedBox(height: 16),
         Row(
           children: [

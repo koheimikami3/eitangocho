@@ -9,3 +9,8 @@
 BUNDLE_ID_SUFFIX =
 APP_DISPLAY_NAME = 英単語帳
 APP_ICON_NAME = AppIcon
+
+// AdMob のアプリ ID(Info.plist の GADApplicationIdentifier から参照)。
+// AdMob に登録した「シンプル英単語帳 - iOS」のアプリ ID。
+// GMA SDK はここが不正な値だと初期化時に落ちるため、値を消さないこと。
+GAD_APPLICATION_IDENTIFIER = ca-app-pub-3768273762534884~5341432918

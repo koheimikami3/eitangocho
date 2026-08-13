@@ -9,6 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../../ads/ads_test_overrides.dart';
+
 void main() {
   late AppDatabase db;
 
@@ -26,7 +28,7 @@ void main() {
     // シートは iOS 用の表示なので、プラットフォームを装ってから開く。
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final container = ProviderContainer(
-      overrides: [databaseProvider.overrideWithValue(db)],
+      overrides: [databaseProvider.overrideWithValue(db), adsDisabled],
     );
     try {
       await tester.pumpWidget(
