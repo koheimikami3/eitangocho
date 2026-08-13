@@ -296,10 +296,31 @@ void main() {
     expect(await db.dictionaryCacheDao.find('x'), isNot(contains('abandonner')));
   });
 
-  test('kaikki・EJDict 両 miss: null(未収録)', () async {
+  test('kaikki・EJDict 両 miss で例文も無ければ null(未収録)', () async {
     final provider = buildProvider();
 
     expect(await provider.fetch('zzzzz'), isNull);
+  });
+
+  // kaikki の見出しが入力とずれる句(`run out of` は Wiktionary が `run out`)
+  // では、Tatoeba だけが自動入力の出所になる。ここで打ち切ると空のフォームに
+  // なってしまう。
+  test('kaikki・EJDict 両 miss でも Tatoeba に例文があれば返す', () async {
+    final provider = buildProvider(
+      tatoebaResponseFn: () => utf8Response(
+        tatoebaResponse("We've run out of soap.", '石鹸がないです。'),
+        200,
+      ),
+    );
+
+    final info = await provider.fetch('run out of');
+
+    expect(info, isNotNull);
+    expect(info!.exampleEn, "We've run out of soap.");
+    expect(info.exampleJa, '石鹸がないです。');
+    // 埋まるのは例文だけ。訳が空なので登録フォームは警告バナーを出す。
+    expect(info.japanese, isEmpty);
+    expect(info.partsOfSpeech, isEmpty);
   });
 
   test('audioUrl は取得しない(発音は Google 翻訳リンクに一本化)', () async {
