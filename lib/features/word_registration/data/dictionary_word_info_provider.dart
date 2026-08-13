@@ -75,11 +75,11 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     await _ensureEjdictImported();
     final japanese = await _ejdictDao.lookup(normalized);
 
-    // 3. 何も得られなかったとき。通信に失敗していたなら未収録ではないので、
-    //    その旨をエラーとして伝える(「未収録」と誤解させない)。
-    if (entries == null && japanese == null) {
-      if (kaikkiFailure != null) throw kaikkiFailure;
-      return null;
+    // 3. 辞書が両方空振りで、しかも通信に失敗していたならエラーにする。
+    //    「取得できない」を「辞書に未収録」と誤解させないため。オフラインなら
+    //    続く Tatoeba も失敗するので、ここで打ち切ってよい。
+    if (entries == null && japanese == null && kaikkiFailure != null) {
+      throw kaikkiFailure;
     }
 
     // EJDict の語義を優先し、未収録のときだけ kaikki の訳語に落とす。
@@ -91,12 +91,20 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     // 4. Tatoeba の例文を優先する。和訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
     //    空振りしたときだけ kaikki の例文(和訳なし)を使う。
+    //
+    //    **辞書が両方空振りでも引く**。kaikki の見出しがユーザーの入力とずれる句
+    //    (`run out of` は Wiktionary の見出しが `run out` なので 404)では、
+    //    ここが唯一の自動入力になる。単語 1 語では kaikki がほぼ埋めるため、
+    //    この経路に来るのは実質そういう句と綴り間違いだけ。
     final example = await _tatoebaClient.findExample(normalized);
     if (example != null) {
       info = info.copyWith(exampleEn: example.en, exampleJa: example.ja);
     }
 
-    // 5. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
+    // 5. 辞書にも例文にも何も無ければ未収録として扱う(手動入力へ倒す)。
+    if (entries == null && japanese == null && example == null) return null;
+
+    // 6. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
     if (info.exampleEn.isNotEmpty && info.exampleJa.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {

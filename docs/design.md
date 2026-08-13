@@ -96,6 +96,11 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
       (`WordRegistrationState.warningMessage`)。kaikki は英語定義(`glosses`)を
       9/10 で持っており参考表示の候補になるが、第 1 語義が主用法とは限らず
       (`give in` は「To collapse or fall」が先頭)、効果を見てから判断する
+  - **kaikki と EJDict が両方空振りでも Tatoeba は引く**。kaikki の見出しが
+    入力とずれる句があるため(`run out of` は Wiktionary の見出しが `run out`
+    なので 404)。以前はここで打ち切っており、例文も対訳もある語で空のフォームが
+    開いていた。単語 1 語では kaikki がほぼ埋めるので、この経路に来るのは
+    実質そういう句と綴り間違いだけ。全部空振りなら従来どおり未収録扱いにする
   - 語形フィルタは複合語では**先頭語だけ規則変化を許し、後続のトークンは
     その形のまま**求める(副詞・前置詞は活用しないため)。語順と隣接は問わない:
     `The wedding was put off.` の受動態や `give it up` の目的語割り込みを
