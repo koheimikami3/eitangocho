@@ -1,3 +1,4 @@
+import 'package:eitangocho/app/app_route_observer.dart';
 import 'package:eitangocho/app/main_page.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
@@ -36,6 +37,8 @@ class EitangochoApp extends ConsumerWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(palette),
+      // 「上に別の画面が積まれたか」をバナー広告が知るために要る。
+      navigatorObservers: [appRouteObserver],
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。
       // 縮小サイズでレイアウトしてから拡大描画する。Navigator ごと包むため
       // ダイアログ・メニューにも一律に適用される。
