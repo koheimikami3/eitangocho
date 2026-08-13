@@ -9,9 +9,8 @@ part 'kaikki_response.g.dart';
 /// sounds の要素も ipa を持つもの・audio だけのもの・rhymes だけのものが
 /// 混在する。フィールドを required にしない(CLAUDE.md 規約)。
 ///
-/// 使うのは word / pos / sounds / senses だけで、実際のレスポンスが持つ
-/// etymology_text / forms / translations 等は読み飛ばす(translations は
-/// 多言語化のときに使う。docs/design.md の将来構想)。
+/// 使うのは word / pos / sounds / senses / translations だけで、実際の
+/// レスポンスが持つ etymology_text / forms 等は読み飛ばす。
 @freezed
 abstract class KaikkiEntry with _$KaikkiEntry {
   const factory KaikkiEntry({
@@ -19,6 +18,7 @@ abstract class KaikkiEntry with _$KaikkiEntry {
     String? pos,
     @Default(<KaikkiSound>[]) List<KaikkiSound> sounds,
     @Default(<KaikkiSense>[]) List<KaikkiSense> senses,
+    @Default(<KaikkiTranslation>[]) List<KaikkiTranslation> translations,
   }) = _KaikkiEntry;
 
   factory KaikkiEntry.fromJson(Map<String, dynamic> json) =>
@@ -37,6 +37,25 @@ abstract class KaikkiSound with _$KaikkiSound {
 
   factory KaikkiSound.fromJson(Map<String, dynamic> json) =>
       _$KaikkiSoundFromJson(json);
+}
+
+/// 訳語(Wiktionary の translations 節)。
+///
+/// 生のレスポンスは全言語ぶんを持ち、`give up` では 1 品詞に 243 件来る。
+/// キャッシュへ詰め直す時点で日本語(`lang_code == 'ja'`)だけに絞るので、
+/// パース後にこのリストへ残るのは日本語の訳語だけになる。
+///
+/// [word] は漢字表記(`諦める`)で、かなは `alt` に入るが読みは使わないので
+/// 読み飛ばす。同じ訳語が語義ごとに重複して来るため、使う側で畳む。
+@freezed
+abstract class KaikkiTranslation with _$KaikkiTranslation {
+  const factory KaikkiTranslation({
+    String? word,
+    @JsonKey(name: 'lang_code') String? langCode,
+  }) = _KaikkiTranslation;
+
+  factory KaikkiTranslation.fromJson(Map<String, dynamic> json) =>
+      _$KaikkiTranslationFromJson(json);
 }
 
 @freezed

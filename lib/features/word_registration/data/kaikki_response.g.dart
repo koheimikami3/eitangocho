@@ -19,6 +19,11 @@ _KaikkiEntry _$KaikkiEntryFromJson(Map<String, dynamic> json) => _KaikkiEntry(
           ?.map((e) => KaikkiSense.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <KaikkiSense>[],
+  translations:
+      (json['translations'] as List<dynamic>?)
+          ?.map((e) => KaikkiTranslation.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <KaikkiTranslation>[],
 );
 
 Map<String, dynamic> _$KaikkiEntryToJson(_KaikkiEntry instance) =>
@@ -27,6 +32,7 @@ Map<String, dynamic> _$KaikkiEntryToJson(_KaikkiEntry instance) =>
       'pos': instance.pos,
       'sounds': instance.sounds,
       'senses': instance.senses,
+      'translations': instance.translations,
     };
 
 _KaikkiSound _$KaikkiSoundFromJson(Map<String, dynamic> json) => _KaikkiSound(
@@ -38,6 +44,15 @@ _KaikkiSound _$KaikkiSoundFromJson(Map<String, dynamic> json) => _KaikkiSound(
 
 Map<String, dynamic> _$KaikkiSoundToJson(_KaikkiSound instance) =>
     <String, dynamic>{'ipa': instance.ipa, 'tags': instance.tags};
+
+_KaikkiTranslation _$KaikkiTranslationFromJson(Map<String, dynamic> json) =>
+    _KaikkiTranslation(
+      word: json['word'] as String?,
+      langCode: json['lang_code'] as String?,
+    );
+
+Map<String, dynamic> _$KaikkiTranslationToJson(_KaikkiTranslation instance) =>
+    <String, dynamic>{'word': instance.word, 'lang_code': instance.langCode};
 
 _KaikkiSense _$KaikkiSenseFromJson(Map<String, dynamic> json) => _KaikkiSense(
   examples:

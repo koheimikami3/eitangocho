@@ -14,11 +14,13 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
 | IPA(米音優先)・品詞・英例文 | kaikki.org (`kaikki.org/dictionary/English/meaning/<頭字>/<頭2字>/<単語>.jsonl`) | Wiktionary を構造化した静的 JSONL。キー不要・無料で、3 項目が 1 リクエストで揃う |
 | 英例文 + 対訳 | Tatoeba (`api.tatoeba.org/unstable/sentences`) | 訳文が対でぶら下がる唯一のソース。学習者向けの短文が多い |
 | 単語の日本語訳(語義) | EJDict-hand(パブリックドメイン英和辞書)をアプリに同梱、初回起動時に DB へ取込 | 英和辞典の語義で、kaikki の訳語列挙より情報量が多い。オフラインで確実 |
+| 単語の日本語訳(予備) | kaikki の `translations`(1.4.0) | EJDict が未収録の見出し(句動詞がほぼこれ)を埋める。既に引いている JSONL の中にあり追加リクエストが要らない |
 | 例文の日本語訳(予備) | DeepL API Free | Tatoeba が空振りしたときのみ。設定 UI は隠してあり実質使わない(下記) |
 | 発音確認 URL | `https://translate.google.com/?sl=en&tl=ja&text=<word>&op=translate` を自動生成 | 発音確認の唯一の導線。iOS はアプリ内の WebView、macOS は外部ブラウザで開く(1.2.0 以降。下記) |
 
 - 取得チェーン: kaikki → Tatoeba → (どちらも無ければ)手動入力フォールバック。
-  EJDict は常に引く。例文は Tatoeba を優先し、空振り時だけ kaikki の英例文を使う
+  EJDict は常に引く。例文は Tatoeba を優先し、空振り時だけ kaikki の英例文を使う。
+  日本語訳は EJDict を優先し、未収録のときだけ kaikki の訳語に落とす
 - kaikki の取得結果はローカル DB にキャッシュし再フェッチしない。Tatoeba は
   登録時に 1 回引くだけでキャッシュのヒット率が低いため保存しない
 - 品詞は enum(noun / verb / adjective / adverb / other)で保持し、表示時に日本語変換。
@@ -79,10 +81,21 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   - Tatoeba も `give up` / `look forward to` / `put off` で対訳付きの短文を返す
   - **EJDict-hand には句動詞が実質無い**(複合語見出し 6770 件は
     `Adam's apple` のような名詞句が中心)。常用句動詞 30 語での実測は
-    品詞 29/30・例文と対訳 30/30・IPA 6/30 に対し、**単語の訳は 0/30**。
-    **句動詞は「品詞と例文は自動で埋まり、訳は手入力」が正常系**になる
-    (IPA は付く語もある)。訳が空のときは警告バナーで手入力を促す
-    (`WordRegistrationState.warningMessage`)
+    品詞 29/30・例文と対訳 30/30・IPA 6/30 に対し、**EJDict からの訳は 0/30**
+  - **訳は kaikki の `translations` で埋める**(同 30 語で 20/30)。EJDict が
+    未収録のときだけ落ちる予備なので、単語 1 語の挙動は変わらない。
+    - **既に引いている JSONL の中にあり、追加リクエストは要らない**。全言語ぶん
+      入っている(`give up` は 1 品詞に 243 件)ので、キャッシュへ詰め直す時点で
+      `lang_code == 'ja'` だけに絞る
+    - 同じ訳語が語義ごとに重複して来るため畳み、EJDict と同じ ` / ` で連結する。
+      **並びは kaikki が返した順のままで語義の主従は反映されない**
+      (`give up` は「降服する」が先頭に来る)。必須項目の欄が長大にならないよう
+      5 件で打ち切る
+    - 残る 10/30(`figure out` `put up with` `set up` `go on` `take care of` 等)は
+      依然として空。訳が空のときは警告バナーで手入力を促す
+      (`WordRegistrationState.warningMessage`)。kaikki は英語定義(`glosses`)を
+      9/10 で持っており参考表示の候補になるが、第 1 語義が主用法とは限らず
+      (`give in` は「To collapse or fall」が先頭)、効果を見てから判断する
   - 語形フィルタは複合語では**先頭語だけ規則変化を許し、後続のトークンは
     その形のまま**求める(副詞・前置詞は活用しないため)。語順と隣接は問わない:
     `The wedding was put off.` の受動態や `give it up` の目的語割り込みを
