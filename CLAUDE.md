@@ -13,6 +13,8 @@
 スナップショット 1 個で同期する(自前サーバは持たない)。
 
 - 外部 API・確定済み設計判断の詳細: @docs/design.md
+- ストアに掲載したリリースノートの控え: `docs/release-notes.md`
+  (提出のたびに追記する。書き方の決まりも同ファイルの冒頭にある)
 - 機能仕様と UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
   `lib/constants/app_colors.dart` / `lib/constants/app_palette.dart` /
   `lib/constants/app_dimensions.dart` のトークンが正基準
