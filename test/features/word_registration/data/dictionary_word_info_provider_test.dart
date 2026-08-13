@@ -335,6 +335,20 @@ void main() {
     expect(KaikkiApiClient.parseEntries(cached!), hasLength(2));
   });
 
+  // キャッシュは toJson / fromJson を通るため、キー名がずれると 2 回目だけ
+  // 訳が消える(1 回目は生レスポンスから読むので気付けない)。
+  test('キャッシュから読んだ 2 回目も kaikki の訳語を返す', () async {
+    final provider = buildProvider(
+      kaikkiResponse: () => utf8Response(giveUpJsonl, 200),
+    );
+
+    await provider.fetch('give up');
+    final second = await provider.fetch('give up');
+
+    expect(kaikkiCallCount, 1);
+    expect(second!.japanese, '降服する / 諦める / やめる');
+  });
+
   test('未収録(404)はキャッシュしない', () async {
     final provider = buildProvider();
 
