@@ -340,11 +340,17 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   なる前に要求してもダイアログは出ないまま返る。**SDK の初期化より前**に済ませる
   のは、初期化後にトラッキング可否が変わってもその回の広告リクエストに
   反映されないため。応答の内容は見ない(拒否でも非パーソナライズ広告は出せる)。
-- **サイズはアンカー型アダプティブ**。固定 320×50 より収益を狙う。API は
-  `AdSize.getLargeAnchoredAdaptiveBannerAdSize`
-  (`getCurrentOrientationAnchoredAdaptiveBannerAdSize` は 8.0.0 で非推奨)。
-  幅は画面幅ではなく `AppDimensions.mobileContentMaxWidth` に合わせる
-  (iPad ではシェルがこの幅に絞っており、広告だけがはみ出すため)。
+- **サイズはアンカー型アダプティブ**。固定 320×50 より収益を狙う。幅は画面幅では
+  なく `AppDimensions.mobileContentMaxWidth` に合わせる(iPad ではシェルがこの幅に
+  絞っており、広告だけがはみ出すため)。
+  **大きさは枠の性格で使い分ける**(実機で見て決めた):
+  - タブバー上は**通常サイズ**(`getCurrentOrientationAnchoredAdaptiveBannerAdSize`)。
+    大型は端末高の 15%(実測 118pt・枠込み 135pt)あり、全画面に常駐する枠としては
+    大きすぎた。**この API は 8.0.0 で非推奨**だが、Google が用意する「幅に追従する
+    小さめのバナー」は現状これだけなので `ignore` を付けて使う。削除されたら固定の
+    `AdSize.banner` か、`getInlineAdaptiveBannerAdSize`(maxHeight 指定可)に移す
+  - シート内は**大型**(`getLargeAnchoredAdaptiveBannerAdSize`)のまま。開いている
+    間だけ出るもので、フォームの下は元から余っており圧迫しない
 - **高さが確定するまで枠ごと出さない**。アダプティブの高さは端末ごとに Google が
   返すまで分からない。先に空の枠を置くと、広告が付かない端末で下端に意味の無い
   帯が残る。確定した高さは `bannerAdHeightProvider` に流し、シェルがコンテンツの

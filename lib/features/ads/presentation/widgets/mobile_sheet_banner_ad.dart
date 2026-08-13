@@ -34,6 +34,8 @@ class MobileSheetBannerAd extends StatelessWidget {
 
     return MobileAdSlot(
       adUnitId: AdUnitIds.sheetBanner,
+      // こちらは大型のまま。シートは開いている間だけのもので、下半分は
+      // 元から余っているため常設のバナーほど圧迫しない。
       resolveSize: (context) =>
           AdSize.getLargeAnchoredAdaptiveBannerAdSize(_adWidth(context)),
       builder: (context, adView) => Container(

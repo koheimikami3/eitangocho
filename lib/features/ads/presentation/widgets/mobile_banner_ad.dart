@@ -87,8 +87,17 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
 
     return MobileAdSlot(
       adUnitId: AdUnitIds.tabBarBanner,
+      // 常設のこの枠だけ通常サイズのアンカー型アダプティブにする(大型は
+      // 端末高の 15% = 実測 118pt あり、常に居座るには大きすぎた)。
+      // 通常サイズの API は 8.0.0 で非推奨になったが、Google が用意する
+      // 「幅に合わせた小さめのバナー」は現状これだけ。将来削除されたら
+      // 固定の AdSize.banner(320x50)か、maxHeight を指定できる
+      // getInlineAdaptiveBannerAdSize に移す。
       resolveSize: (context) =>
-          AdSize.getLargeAnchoredAdaptiveBannerAdSize(_adWidth(context)),
+          // ignore: deprecated_member_use
+          AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+            _adWidth(context),
+          ),
       onSizeChanged: (size) => ref
           .read(bannerAdHeightProvider.notifier)
           .update(
