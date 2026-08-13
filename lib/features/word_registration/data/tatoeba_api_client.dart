@@ -22,19 +22,31 @@ class TatoebaApiClient {
 
   /// 候補の取得件数。1 件だけ取ると語形フィルタで落ちたときに空振りするため
   /// 多めに取り、クライアント側で選ぶ。
-  static const _limit = 10;
+  ///
+  /// 10 から 30 に増やした([_preferredMinWords] を 6 に上げたのに合わせて)。
+  /// 下限を満たす文が候補に入る確率が上がり、実測 25 語では下限に届かず降格
+  /// するのが 2 件だけになった。`gradual` のように 10 件では語形フィルタを
+  /// 通る文が 1 つも無く例文ゼロだった語も拾えるようになる。
+  static const _limit = 30;
 
   /// 優先する最低語数。最短を採るだけだと `monster` に「Monster!」のような
   /// 感嘆詞 1 語の文が選ばれてしまうため、これを下回る文は後回しにする。
   ///
-  /// 3 に留めているのは、実測 20 語で 4 にすると `apple` の候補
-  /// (`Want an apple?`)が全滅し、`Eat a banana!` が `You are a banana.` に
-  /// 変わるなど副作用のほうが大きかったため。3 なら差し替わるのは
-  /// 1〜2 語の文だけで、`He is diligent.` のような良い短文は残る。
+  /// **3 から 6 に上げた**。3 だと `He is diligent.` / `Are ghosts real?` /
+  /// `Tom is reluctant.` のような文が選ばれ、単語帳の例文として文脈が足りて
+  /// いなかった(実測 25 語で平均 4.2 語)。6 にすると平均 6.0 語になり、
+  /// `Yoshiko is very diligent in knitting.` のような文に変わる。
   ///
-  /// なお辞書側(kaikki)の下限は 4 語だが、あちらは `obtain permission` のような
-  /// 句の断片を除くためのもので目的が違う。
-  static const _preferredMinWords = 3;
+  /// 8 まで上げると 7/25 が下限に届かず降格し、`negligible` では 21 語の文が
+  /// 選ばれてカード(英例文は 2 行)で切れるため、6 で止める。
+  ///
+  /// **下限であって上限ではない**。長さを決めているのは [_select] の
+  /// 「下限以上の中で最短」の方で、この値を下げると例文は短くなる。
+  ///
+  /// なお辞書側(kaikki)の下限は 4 語のままにしてある。あちらは
+  /// `obtain permission` のような句の断片を除くためのハード条件で目的が違い、
+  /// 上げると例文が丸ごと消える(Tatoeba が空振りしたときしか使われない)。
+  static const _preferredMinWords = 6;
 
   /// [word] を含む英文と和訳の組を 1 つ返す。見つからなければ null。
   Future<ExampleSentence?> findExample(String word) async {
@@ -74,6 +86,10 @@ class TatoebaApiClient {
   /// ただし [_preferredMinWords] 語以上を先に見て、そこに候補が無いときだけ
   /// 短い文に降りる。語数で足切りしてしまうと、短文しか無い語で和訳付きの
   /// 例文を丸ごと失う(辞書側の和訳なし例文に落ちる)ため。
+  ///
+  /// 長短の比較は文字数ではなく**語数**で行う。下限を語数で見ているのに
+  /// 比較が文字数だと、降格したときに「語数は少ないが文字数は長い文」が
+  /// 選ばれて基準が噛み合わない。
   ExampleSentence? _select(List<TatoebaSentence> sentences, String word) {
     final candidates = <ExampleSentence>[];
     for (final sentence in sentences) {
@@ -92,12 +108,12 @@ class TatoebaApiClient {
         .where((c) => _wordCount(c.en) >= _preferredMinWords)
         .toList();
     if (qualified.isNotEmpty) {
-      qualified.sort((a, b) => a.en.length.compareTo(b.en.length));
+      qualified.sort((a, b) => _wordCount(a.en).compareTo(_wordCount(b.en)));
       return qualified.first;
     }
     // 全部が短すぎるときは、その中でいちばん語数の多いものを採る
     // (ここで最短を採ると「Ghosts exist.」より「Ghosts!」が勝ってしまう)。
-    candidates.sort((a, b) => b.en.length.compareTo(a.en.length));
+    candidates.sort((a, b) => _wordCount(b.en).compareTo(_wordCount(a.en)));
     return candidates.first;
   }
 
