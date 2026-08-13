@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:eitangocho/app/app_route_observer.dart';
@@ -43,6 +44,15 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
   /// 上に別の画面(シート・全画面遷移)が積まれている間は true。
   var _covered = false;
 
+  /// 読み込み失敗後の再試行。通信断は一時的なことが多いのに、1 回失敗した
+  /// きりだと次に画面が作り直されるまでずっと空のままになる。
+  Timer? _retryTimer;
+  var _retryCount = 0;
+
+  /// 再試行の上限。これを超えたら次にシートから戻るまで諦める
+  /// (在庫切れのときに延々とリクエストを投げても仕方がない)。
+  static const _maxRetries = 3;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +71,7 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
   @override
   void dispose() {
     appRouteObserver.unsubscribe(this);
+    _retryTimer?.cancel();
     _ad?.dispose();
     super.dispose();
   }
@@ -78,13 +89,31 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
   @override
   void didPopNext() {
     setState(() => _covered = false);
+    // 前回諦めていても、画面が戻ってきたら仕切り直す。
+    _retryCount = 0;
     _loadAd();
   }
 
   void _disposeAd() {
+    _retryTimer?.cancel();
     _ad?.dispose();
     _ad = null;
     ref.read(bannerAdHeightProvider.notifier).update(0);
+  }
+
+  /// 失敗した読み込みを間隔を空けて試し直す(10 秒 → 20 秒 → 40 秒)。
+  void _scheduleRetry() {
+    if (_retryCount >= _maxRetries) {
+      adLog('再試行の上限に達したので諦めます');
+      return;
+    }
+    final delay = Duration(seconds: 10 * (1 << _retryCount));
+    _retryCount++;
+    adLog('${delay.inSeconds} 秒後に再試行します($_retryCount/$_maxRetries)');
+    _retryTimer?.cancel();
+    _retryTimer = Timer(delay, () {
+      if (mounted && !_covered) _loadAd();
+    });
   }
 
   Future<void> _loadAd() async {
@@ -111,6 +140,7 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
         listener: BannerAdListener(
           onAdLoaded: (ad) {
             adLog('読み込み成功');
+            _retryCount = 0;
             // 読み込み中に覆われた / 画面から消えたなら出さずに捨てる。
             if (!mounted || _covered) {
               ad.dispose();
@@ -125,10 +155,11 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
                       MobileBannerAd._borderWidth,
                 );
           },
-          // 在庫切れ・通信断など。次の機会(復帰時)に読み直す。
+          // 在庫切れ・通信断など。通信断は一時的なことが多いので数回試す。
           onAdFailedToLoad: (ad, error) {
             adLog('読み込み失敗: $error');
             ad.dispose();
+            if (mounted && !_covered) _scheduleRetry();
           },
         ),
       ).load();
