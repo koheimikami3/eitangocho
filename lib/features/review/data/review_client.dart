@@ -9,6 +9,10 @@ part 'review_client.g.dart';
 /// SDK の型が [ReviewPrompter] より上に漏れないようにする。テストでは
 /// フェイクに差し替える(テストの実行機にはプラグインの実体が無いため)。
 abstract interface class ReviewClient {
+  /// 設定に App Store のレビューリンクを出せるか。
+  /// false なら [openStoreListing] は呼ばれない(リンク行ごと出さない)。
+  bool get canOpenStoreListing;
+
   /// レビュー依頼を出せる環境か。false なら [requestReview] は呼ばない。
   Future<bool> isAvailable();
 
@@ -26,6 +30,9 @@ abstract interface class ReviewClient {
 /// in_app_review による実装。
 class InAppReviewClient implements ReviewClient {
   const InAppReviewClient();
+
+  @override
+  bool get canOpenStoreListing => ReviewConfig.canOpenStoreListing;
 
   @override
   Future<bool> isAvailable() => InAppReview.instance.isAvailable();

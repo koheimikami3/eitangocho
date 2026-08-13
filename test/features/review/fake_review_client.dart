@@ -6,10 +6,14 @@ import 'package:eitangocho/features/review/data/review_client.dart';
 /// ダイアログを出さない(ストア配布版でしか出ない)。判定の経路を確かめるため、
 /// 呼ばれた回数だけを数える。
 class FakeReviewClient implements ReviewClient {
-  FakeReviewClient({this.available = true});
+  FakeReviewClient({this.available = true, this.canOpenStoreListing = true});
 
   /// レビュー依頼を出せる端末か。
   bool available;
+
+  /// App Store ID が設定されているか(設定のリンク行の出し分け)。
+  @override
+  final bool canOpenStoreListing;
 
   /// 投げさせたい例外。
   Object? requestError;

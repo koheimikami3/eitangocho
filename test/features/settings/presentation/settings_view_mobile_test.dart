@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
@@ -12,6 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../review/fake_review_client.dart';
+
 void main() {
   late AppDatabase db;
 
@@ -23,7 +26,12 @@ void main() {
 
   tearDown(() => db.close());
 
-  Future<void> pumpSettings(WidgetTester tester) async {
+  /// [reviewClient] を渡さない場合は本番の実装のまま(App Store ID が空なので
+  /// レビュー行は出ない)。
+  Future<void> pumpSettings(
+    WidgetTester tester, {
+    ReviewClient? reviewClient,
+  }) async {
     // 情報セクションは最下部にあり、既定の 800x600 では ListView が
     // 遅延生成して描画されない。全セクションが収まる高さにしておく。
     tester.view
@@ -38,6 +46,8 @@ void main() {
           // 実機のバンドルを読むため、テストでは固定値に差し替える。
           appVersionProvider.overrideWith((ref) async => '1.1.0'),
           licenseListProvider.overrideWith((ref) async => []),
+          if (reviewClient != null)
+            reviewClientProvider.overrideWithValue(reviewClient),
         ],
         child: const MaterialApp(home: Scaffold(body: SettingsViewMobile())),
       ),
@@ -66,6 +76,26 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LicenseViewMobile), findsOneWidget);
+  });
+
+  testWidgets('App Store ID が未設定ならレビュー行を出さない', (tester) async {
+    await pumpSettings(
+      tester,
+      reviewClient: FakeReviewClient(canOpenStoreListing: false),
+    );
+
+    expect(find.text('App Store でレビューを書く'), findsNothing);
+  });
+
+  testWidgets('レビュー行をタップすると App Store のレビュー画面を開く', (tester) async {
+    final client = FakeReviewClient();
+    await pumpSettings(tester, reviewClient: client);
+
+    await tester.ensureVisible(find.text('App Store でレビューを書く'));
+    await tester.tap(find.text('App Store でレビューを書く'));
+    await tester.pump();
+
+    expect(client.openStoreListingCount, 1);
   });
 
   // 欄そのものは残してあり(コメントアウト)、UI にだけ出さない。

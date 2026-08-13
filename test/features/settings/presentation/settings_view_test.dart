@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view.dart';
@@ -11,6 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+import '../../review/fake_review_client.dart';
 
 void main() {
   late AppDatabase db;
@@ -25,11 +28,14 @@ void main() {
 
   /// [platform] を装って設定画面を描画する。debug 変数の後始末は
   /// word_card_test.dart と同じ理由でテスト本体の中(finally)で行う。
+  /// [reviewClient] を渡さない場合は本番の実装のまま(App Store ID が空なので
+  /// レビュー行は出ない)。
   Future<void> runForPlatform(
     WidgetTester tester,
     TargetPlatform platform,
-    Future<void> Function() body,
-  ) async {
+    Future<void> Function() body, {
+    ReviewClient? reviewClient,
+  }) async {
     // 情報セクションは最下部にあり、既定の 800x600 では画面外に出て
     // タップが当たらない。全セクションが収まる高さにしておく。
     tester.view
@@ -46,6 +52,8 @@ void main() {
             // 実機のバンドルを読むため、テストでは固定値に差し替える。
             appVersionProvider.overrideWith((ref) async => '1.1.0'),
             licenseListProvider.overrideWith((ref) async => []),
+            if (reviewClient != null)
+              reviewClientProvider.overrideWithValue(reviewClient),
           ],
           child: const MaterialApp(home: Scaffold(body: SettingsView())),
         ),
@@ -94,6 +102,22 @@ void main() {
       expect(find.text('閉じる'), findsOneWidget);
       expect(find.text('この一覧はビルド時に自動生成されます。'), findsOneWidget);
     });
+  });
+
+  testWidgets('App Store ID が未設定ならレビュー行を出さない', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      expect(find.text('App Store でレビューを書く'), findsNothing);
+    }, reviewClient: FakeReviewClient(canOpenStoreListing: false));
+  });
+
+  testWidgets('レビュー行のクリックで App Store のレビュー画面を開く', (tester) async {
+    final client = FakeReviewClient();
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      await tester.tap(find.text('App Store でレビューを書く'));
+      await tester.pump();
+
+      expect(client.openStoreListingCount, 1);
+    }, reviewClient: client);
   });
 
   // 欄そのものは残してあり(コメントアウト)、UI にだけ出さない。

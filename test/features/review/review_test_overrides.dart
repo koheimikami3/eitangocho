@@ -15,6 +15,9 @@ class _DisabledReviewClient implements ReviewClient {
   const _DisabledReviewClient();
 
   @override
+  bool get canOpenStoreListing => false;
+
+  @override
   Future<bool> isAvailable() async => false;
 
   @override
