@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../ads_test_overrides.dart';
+import '../../../purchase/purchase_test_overrides.dart';
 
 /// 広告が読み込み済みの状態を装う。実際の [BannerAd] はプラグイン(ネイティブ)
 /// が要るためテストでは作れないので、「高さが確定している」という結果だけを
@@ -24,6 +25,7 @@ void main() {
       ProviderScope(
         overrides: [
           adsDisabled,
+          purchasesDisabled,
           if (adLoaded)
             bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),
         ],
