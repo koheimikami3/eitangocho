@@ -58,6 +58,9 @@ dependencies:
   google_mobile_ads: ^9.0.0
   # ATT(トラッキング許可ダイアログ)。広告 SDK 初期化前に応答を得るために使う。
   app_tracking_transparency: ^2.0.7
+  # 課金(広告非表示の買い切り)。SPM 対応は purchases_flutter 9.5.0 以降で、
+  # 本プロジェクトは CocoaPods を使っていないためそれ未満は選べない。
+  purchases_flutter: ^10.9.0
 
 dev_dependencies:
   flutter_test:
