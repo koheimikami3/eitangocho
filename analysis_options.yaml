@@ -9,6 +9,13 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Xcode の Swift Package Manager が依存パッケージのソース(Dart のテストを
+    # 含む)を build/ios/SourcePackages に展開するため、そのままだと
+    # `flutter analyze` が他人のコードの lint を大量に報告する。
+    - build/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

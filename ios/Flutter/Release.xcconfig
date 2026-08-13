@@ -9,3 +9,10 @@
 BUNDLE_ID_SUFFIX =
 APP_DISPLAY_NAME = 英単語帳
 APP_ICON_NAME = AppIcon
+
+// AdMob のアプリ ID(Info.plist の GADApplicationIdentifier から参照)。
+// TODO: AdMob でのアプリ登録が済んだら本番の ID(ca-app-pub-...~...)を入れる。
+// 空のままでも起動はする: Dart 側は広告ユニット ID が空なら SDK の初期化ごと
+// 見送るため(lib/features/ads/data/ads_provider.dart)、GMA SDK が
+// アプリ ID 不正で落ちる経路に入らない。広告は表示されない。
+GAD_APPLICATION_IDENTIFIER =

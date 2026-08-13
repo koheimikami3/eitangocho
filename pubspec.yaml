@@ -52,6 +52,11 @@ dependencies:
   package_info_plus: ^10.2.1
   webview_flutter: ^4.14.1
   url_launcher: ^6.3.2
+  # 広告は iOS のみ(macOS は未対応)。SPM 対応は google_mobile_ads 8.0.0 以降で、
+  # 本プロジェクトは CocoaPods を使っていないため 8.0.0 未満は選べない。
+  google_mobile_ads: ^9.0.0
+  # ATT(トラッキング許可ダイアログ)。広告 SDK 初期化前に応答を得るために使う。
+  app_tracking_transparency: ^2.0.7
 
 dev_dependencies:
   flutter_test:

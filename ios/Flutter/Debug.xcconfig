@@ -16,3 +16,9 @@ APP_DISPLAY_NAME = 英単語帳 dev
 // 並ぶため、ラベルだけでなく見た目でも一目で区別できるようにする。
 // project.pbxproj の ASSETCATALOG_COMPILER_APPICON_NAME から参照している。
 APP_ICON_NAME = AppIcon-dev
+
+// AdMob のアプリ ID(Info.plist の GADApplicationIdentifier から参照)。
+// Debug は Bundle ID に .dev が付いた別アプリで AdMob に登録していないため、
+// Google 公式のテスト用アプリ ID を使う。広告ユニット ID 側も debug では
+// テスト ID になる(lib/features/ads/domain/ad_unit_ids.dart)。
+GAD_APPLICATION_IDENTIFIER = ca-app-pub-3940256099942544~1458002511
