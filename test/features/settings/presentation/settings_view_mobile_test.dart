@@ -3,8 +3,10 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
+import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view_mobile.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +84,18 @@ void main() {
     expect(find.text('サポート'), findsOneWidget);
     expect(find.text('App Store でレビューを書く'), findsOneWidget);
     expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+  });
+
+  testWidgets('作者の他のアプリにサブリスを出す', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.text('作者の他のアプリ'), findsOneWidget);
+    expect(find.byType(MobileAuthorAppCard), findsOneWidget);
+    expect(find.text(AuthorApp.name), findsOneWidget);
+    expect(find.text(AuthorApp.tagline), findsOneWidget);
+    expect(find.text(AuthorApp.availability), findsOneWidget);
+    expect(find.text('入手'), findsOneWidget);
+    expect(find.text('App Store が開きます。'), findsOneWidget);
   });
 
   testWidgets('情報セクションにバージョンとライセンスを出す', (tester) async {
