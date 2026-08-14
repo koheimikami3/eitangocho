@@ -4,11 +4,10 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_radio_row.dart';
@@ -16,7 +15,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_secti
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
-import 'package:eitangocho/features/sync/presentation/desktop_sync_section.dart';
+import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,16 +85,11 @@ class SettingsView extends ConsumerWidget {
               // ),
               const SizedBox(height: 22),
               // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの
-              // 持ち出しを扱うため 1 つのセクションにまとめる(デザイン準拠)。
+              // 持ち出しを扱うため 1 枚のカードにまとめる(デザイン準拠)。
               const SettingsSection(
                 title: 'データ',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DesktopSyncSection(),
-                    SizedBox(height: 12),
-                    DataManagementSection(),
-                  ],
+                child: SettingsCard(
+                  children: [DesktopSyncRows(), DataBackupRows()],
                 ),
               ),
               const SizedBox(height: 22),
@@ -113,8 +107,6 @@ class SettingsView extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-              const SettingsCaption('感想やご要望はレビューでお知らせください。'),
               const SizedBox(height: 22),
               SettingsSection(
                 title: '情報',
@@ -125,17 +117,12 @@ class SettingsView extends ConsumerWidget {
                       // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
                       value: ref.watch(appVersionProvider).value ?? '',
                     ),
-                    // ライセンスは最後に置く。カード下の説明文がこの行に掛かる。
                     SettingsLinkRow(
                       label: 'ライセンス',
                       onTap: () => showLicenseDialog(context),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              const SettingsCaption(
-                '本アプリが利用しているオープンソースソフトウェアの一覧です。',
               ),
             ],
           ),

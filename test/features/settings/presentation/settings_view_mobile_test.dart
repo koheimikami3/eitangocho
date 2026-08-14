@@ -76,14 +76,18 @@ void main() {
     expect(find.text('外観'), findsNothing);
   });
 
-  testWidgets('データセクションに iCloud 同期と書き出しを同居させる', (tester) async {
+  testWidgets('データセクションは iCloud 同期と書き出しを 1 枚のカードに並べる', (tester) async {
     await pumpSettings(tester);
 
     expect(find.text('データ'), findsOneWidget);
     expect(find.text('iCloud 同期'), findsOneWidget);
-    expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
-    expect(find.text('エクスポート'), findsOneWidget);
-    expect(find.text('インポート'), findsOneWidget);
+    expect(find.text('データを書き出す'), findsOneWidget);
+    expect(find.text('データを読み込む'), findsOneWidget);
+    // 補足文はデザインどおり出さない。同期状態は「今すぐ同期」行の右端に出す
+    // (同期 OFF ではその行ごと無いので、この場面では何も出ない)。
+    expect(find.text('単語帳を JSON ファイルとして書き出し / 読み込みます。'), findsNothing);
+    expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsNothing);
+    expect(find.text('今すぐ同期'), findsNothing);
   });
 
   testWidgets('サポートセクションにレビュー行を出す', (tester) async {
@@ -91,7 +95,8 @@ void main() {
 
     expect(find.text('サポート'), findsOneWidget);
     expect(find.text('App Store でレビューを書く'), findsOneWidget);
-    expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+    // セクション下の説明文はデザインに無いので出さない。
+    expect(find.text('感想やご要望はレビューでお知らせください。'), findsNothing);
   });
 
   testWidgets('作者の他のアプリにサブリスを出す', (tester) async {
@@ -103,7 +108,7 @@ void main() {
     expect(find.text(AuthorApp.tagline), findsOneWidget);
     expect(find.text(AuthorApp.availability), findsOneWidget);
     expect(find.text('入手'), findsOneWidget);
-    expect(find.text('App Store が開きます。'), findsOneWidget);
+    expect(find.text('App Store が開きます。'), findsNothing);
   });
 
   testWidgets('情報セクションにバージョンとライセンスを出す', (tester) async {
@@ -113,7 +118,7 @@ void main() {
     expect(find.text('バージョン'), findsOneWidget);
     expect(find.text('1.1.0'), findsOneWidget);
     expect(find.text('ライセンス'), findsOneWidget);
-    expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsOneWidget);
+    expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsNothing);
   });
 
   testWidgets('ライセンス行をタップすると一覧へ遷移する', (tester) async {

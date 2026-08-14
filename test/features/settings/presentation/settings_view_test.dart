@@ -80,13 +80,18 @@ void main() {
     });
   });
 
-  testWidgets('データセクションに iCloud 同期と書き出しを同居させる', (tester) async {
+  testWidgets('データセクションは iCloud 同期と書き出しを 1 枚のカードに並べる', (tester) async {
     await runForPlatform(tester, TargetPlatform.macOS, () async {
       expect(find.text('データ'), findsOneWidget);
       expect(find.text('iCloud 同期'), findsOneWidget);
-      expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
-      expect(find.text('エクスポート...'), findsOneWidget);
-      expect(find.text('インポート...'), findsOneWidget);
+      // 末尾の `...` は macOS だけに付ける(ダイアログが開くことを示す慣習)。
+      expect(find.text('データを書き出す...'), findsOneWidget);
+      expect(find.text('データを読み込む...'), findsOneWidget);
+      // 補足文はデザインどおり出さない。同期状態は「今すぐ同期」行の右端に出す
+      // (同期 OFF ではその行ごと無いので、この場面では何も出ない)。
+      expect(find.text('単語帳を JSON ファイルとして書き出し / 読み込みます。'), findsNothing);
+      expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsNothing);
+      expect(find.text('今すぐ同期'), findsNothing);
     });
   });
 
@@ -94,7 +99,8 @@ void main() {
     await runForPlatform(tester, TargetPlatform.macOS, () async {
       expect(find.text('サポート'), findsOneWidget);
       expect(find.text('App Store でレビューを書く'), findsOneWidget);
-      expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+      // セクション下の説明文はデザインに無いので出さない。
+      expect(find.text('感想やご要望はレビューでお知らせください。'), findsNothing);
     });
   });
 
@@ -104,7 +110,7 @@ void main() {
       expect(find.text('バージョン'), findsOneWidget);
       expect(find.text('1.1.0'), findsOneWidget);
       expect(find.text('ライセンス'), findsOneWidget);
-      expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsOneWidget);
+      expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsNothing);
     });
   });
 
