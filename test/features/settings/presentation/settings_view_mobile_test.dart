@@ -26,8 +26,7 @@ void main() {
 
   tearDown(() => db.close());
 
-  /// [reviewClient] を渡さない場合は本番の実装のまま(App Store ID が空なので
-  /// レビュー行は出ない)。
+  /// [reviewClient] を渡さない場合は本番の実装のまま。
   Future<void> pumpSettings(
     WidgetTester tester, {
     ReviewClient? reviewClient,
@@ -78,13 +77,16 @@ void main() {
     expect(find.byType(LicenseViewMobile), findsOneWidget);
   });
 
-  testWidgets('App Store ID が未設定ならレビュー行を出さない', (tester) async {
-    await pumpSettings(
-      tester,
-      reviewClient: FakeReviewClient(canOpenStoreListing: false),
-    );
+  // 行はデザインどおり常に出す。開けない状態で SDK を叩かないことだけ担保する。
+  testWidgets('App Store ID が未設定でもレビュー行は出すが SDK は呼ばない', (tester) async {
+    final client = FakeReviewClient(canOpenStoreListing: false);
+    await pumpSettings(tester, reviewClient: client);
 
-    expect(find.text('App Store でレビューを書く'), findsNothing);
+    await tester.ensureVisible(find.text('App Store でレビューを書く'));
+    await tester.tap(find.text('App Store でレビューを書く'));
+    await tester.pump();
+
+    expect(client.openStoreListingCount, 0);
   });
 
   testWidgets('レビュー行をタップすると App Store のレビュー画面を開く', (tester) async {

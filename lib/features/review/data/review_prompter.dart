@@ -78,7 +78,14 @@ class ReviewPrompter {
   }
 
   /// 設定の常設リンクから App Store のレビュー画面を開く。
+  ///
+  /// **App Store ID が未設定なら何もしない。** リンク行はデザインどおり常に
+  /// 出すため(出し分けをやめた)、開けない状態で SDK を呼ばないようにここで止める。
   Future<void> openStoreListing() async {
+    if (!client.canOpenStoreListing) {
+      reviewLog('App Store ID が未設定のため開けません');
+      return;
+    }
     try {
       await client.openStoreListing();
     } on Object catch (error) {

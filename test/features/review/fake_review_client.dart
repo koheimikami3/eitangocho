@@ -11,7 +11,7 @@ class FakeReviewClient implements ReviewClient {
   /// レビュー依頼を出せる端末か。
   bool available;
 
-  /// App Store ID が設定されているか(設定のリンク行の出し分け)。
+  /// App Store ID が設定されているか(リンク行のタップを通すかどうか)。
   @override
   final bool canOpenStoreListing;
 

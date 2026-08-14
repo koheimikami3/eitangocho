@@ -1,5 +1,4 @@
 import 'package:eitangocho/constants/app_colors.dart';
-import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
@@ -109,13 +108,11 @@ class SettingsView extends ConsumerWidget {
                     ),
                     // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
                     // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
-                    // App Store ID が未設定の間は行ごと出さない。
-                    if (ref.watch(reviewClientProvider).canOpenStoreListing)
-                      SettingsLinkRow(
-                        label: 'App Store でレビューを書く',
-                        onTap: () =>
-                            ref.read(reviewPrompterProvider).openStoreListing(),
-                      ),
+                    SettingsLinkRow(
+                      label: 'App Store でレビューを書く',
+                      onTap: () =>
+                          ref.read(reviewPrompterProvider).openStoreListing(),
+                    ),
                     // ライセンスは最後に置く。カード下の説明文がこの行に掛かる。
                     SettingsLinkRow(
                       label: 'ライセンス',

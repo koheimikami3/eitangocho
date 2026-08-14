@@ -6,8 +6,8 @@
 abstract final class ReviewConfig {
   /// App Store の数値 ID(`https://apps.apple.com/app/id<ここ>`)。
   ///
-  /// **空の間は設定のレビューリンクを出さない。** `AdUnitIds.hasAnyUnit` と
-  /// 同じ保険で、ID を用意する前でも「リンクが出ないだけで動く」ビルドになる。
+  /// **空の間はリンク行をタップしても何も起きない**(行そのものは出す)。
+  /// `AdUnitIds.hasAnyUnit` と同じ保険で、ID を用意する前でも動くビルドになる。
   /// レビュー依頼(requestReview)側は ID を必要としないため、空でも動く。
   ///
   /// iOS / macOS は同じアプリレコード(`com.kohei.mikami.eitangocho`)なので

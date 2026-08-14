@@ -1,6 +1,5 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
-import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
@@ -149,12 +148,10 @@ class SettingsViewMobile extends ConsumerWidget {
             ),
             // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
             // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
-            // App Store ID が未設定の間は行ごと出さない。
-            if (ref.watch(reviewClientProvider).canOpenStoreListing)
-              MobileSettingsLinkRow(
-                label: 'App Store でレビューを書く',
-                onTap: () => ref.read(reviewPrompterProvider).openStoreListing(),
-              ),
+            MobileSettingsLinkRow(
+              label: 'App Store でレビューを書く',
+              onTap: () => ref.read(reviewPrompterProvider).openStoreListing(),
+            ),
             // ライセンスは最後に置く。セクション下の説明文がこの行に掛かる。
             MobileSettingsLinkRow(
               label: 'ライセンス',

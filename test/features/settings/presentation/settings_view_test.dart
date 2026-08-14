@@ -28,8 +28,7 @@ void main() {
 
   /// [platform] を装って設定画面を描画する。debug 変数の後始末は
   /// word_card_test.dart と同じ理由でテスト本体の中(finally)で行う。
-  /// [reviewClient] を渡さない場合は本番の実装のまま(App Store ID が空なので
-  /// レビュー行は出ない)。
+  /// [reviewClient] を渡さない場合は本番の実装のまま。
   Future<void> runForPlatform(
     WidgetTester tester,
     TargetPlatform platform,
@@ -104,10 +103,15 @@ void main() {
     });
   });
 
-  testWidgets('App Store ID が未設定ならレビュー行を出さない', (tester) async {
+  // 行はデザインどおり常に出す。開けない状態で SDK を叩かないことだけ担保する。
+  testWidgets('App Store ID が未設定でもレビュー行は出すが SDK は呼ばない', (tester) async {
+    final client = FakeReviewClient(canOpenStoreListing: false);
     await runForPlatform(tester, TargetPlatform.macOS, () async {
-      expect(find.text('App Store でレビューを書く'), findsNothing);
-    }, reviewClient: FakeReviewClient(canOpenStoreListing: false));
+      await tester.tap(find.text('App Store でレビューを書く'));
+      await tester.pump();
+
+      expect(client.openStoreListingCount, 0);
+    }, reviewClient: client);
   });
 
   testWidgets('レビュー行のクリックで App Store のレビュー画面を開く', (tester) async {
