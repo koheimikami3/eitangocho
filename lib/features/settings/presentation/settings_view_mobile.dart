@@ -15,6 +15,9 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_ba
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
+// 同上(DeepL の欄の説明文で使う)。セクション下の説明文はデザイン刷新で
+// 無くなり、残る説明文は MobileSyncStatusCaption が自前で組んでいる。
+// ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
@@ -52,7 +55,7 @@ class SettingsViewMobile extends ConsumerWidget {
         AppDimensions.mobilePadding,
         AppDimensions.mobilePadding,
         // タブバーが重なる分の余白(シェルが MediaQuery で渡している)。
-        // 最後の説明文がタブバーに近づきすぎないよう、設定画面だけ余分に空ける。
+        // 最後のカードがタブバーに近づきすぎないよう、設定画面だけ余分に空ける。
         AppDimensions.mobilePadding * 2 + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
@@ -146,8 +149,6 @@ class SettingsViewMobile extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        const MobileSettingsCaption('感想やご要望はレビューでお知らせください。'),
         const SizedBox(height: 22),
         // 紹介先が iPhone 専用アプリのため、この枠は iOS 版にしか無い
         // (macOS から踏んでもインストールできない)。
@@ -155,8 +156,6 @@ class SettingsViewMobile extends ConsumerWidget {
           title: '作者の他のアプリ',
           child: MobileAuthorAppCard(),
         ),
-        const SizedBox(height: 8),
-        const MobileSettingsCaption('App Store が開きます。'),
         const SizedBox(height: 22),
         MobileSettingsSection(
           title: '情報',
@@ -166,16 +165,11 @@ class SettingsViewMobile extends ConsumerWidget {
               // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
               value: ref.watch(appVersionProvider).value ?? '',
             ),
-            // ライセンスは最後に置く。セクション下の説明文がこの行に掛かる。
             MobileSettingsLinkRow(
               label: 'ライセンス',
               onTap: () => LicenseViewMobile.push(context),
             ),
           ],
-        ),
-        const SizedBox(height: 8),
-        const MobileSettingsCaption(
-          '本アプリが利用しているオープンソースソフトウェアの一覧です。',
         ),
       ],
     );

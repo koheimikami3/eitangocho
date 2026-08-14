@@ -98,7 +98,8 @@ void main() {
     await runForPlatform(tester, TargetPlatform.macOS, () async {
       expect(find.text('サポート'), findsOneWidget);
       expect(find.text('App Store でレビューを書く'), findsOneWidget);
-      expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+      // セクション下の説明文はデザインに無いので出さない。
+      expect(find.text('感想やご要望はレビューでお知らせください。'), findsNothing);
     });
   });
 
@@ -108,7 +109,7 @@ void main() {
       expect(find.text('バージョン'), findsOneWidget);
       expect(find.text('1.1.0'), findsOneWidget);
       expect(find.text('ライセンス'), findsOneWidget);
-      expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsOneWidget);
+      expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsNothing);
     });
   });
 
