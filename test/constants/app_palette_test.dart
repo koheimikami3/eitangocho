@@ -117,6 +117,19 @@ void main() {
     );
   });
 
+  test('Pro の購入ボタンは白文字が地に対して 4.5:1 以上ある', () {
+    // 13px の文字なので「大きい文字」の 3:1 基準は使えない。デザインの
+    // #1E7FD6 は 4.23:1 で足りず、発音ボタンと同じ濃い青に振り直している。
+    // ライト / ダークとも同じ地を使うため、地の合成先だけ切り替えて確かめる。
+    for (final palette in [AppPalette.light, AppPalette.dark]) {
+      expect(
+        _contrastRatio(Colors.white, AppColors.accentOnSoft, palette.surface),
+        greaterThanOrEqualTo(4.5),
+        reason: palette.isDark ? 'dark' : 'light',
+      );
+    }
+  });
+
   test('AppPalette.of は Brightness から対応するパレットを返す', () {
     expect(AppPalette.of(Brightness.light), AppPalette.light);
     expect(AppPalette.of(Brightness.dark), AppPalette.dark);

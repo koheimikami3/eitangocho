@@ -36,7 +36,7 @@ void main() {
     // 情報セクションは最下部にあり、既定の 800x600 では ListView が
     // 遅延生成して描画されない。全セクションが収まる高さにしておく。
     tester.view
-      ..physicalSize = const Size(400, 2600)
+      ..physicalSize = const Size(400, 3000)
       ..devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -55,6 +55,16 @@ void main() {
     );
     await tester.pump();
   }
+
+  // 課金は未実装で、この枠は見た目だけ(押しても何も起きない)。
+  testWidgets('Pro セクションを先頭に出す', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.text('Pro'), findsOneWidget);
+    expect(find.text('広告を非表示にする'), findsOneWidget);
+    expect(find.text('購入'), findsOneWidget);
+    expect(find.text('購入を復元'), findsOneWidget);
+  });
 
   testWidgets('表示セクションにテーマとカードの並びを小見出しでまとめる', (tester) async {
     await pumpSettings(tester);

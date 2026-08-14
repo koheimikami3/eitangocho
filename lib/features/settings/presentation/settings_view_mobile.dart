@@ -13,6 +13,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_ma
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_pro_section.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
@@ -54,6 +55,9 @@ class SettingsViewMobile extends ConsumerWidget {
         AppDimensions.mobilePadding * 2 + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
+        // 課金は未実装で、この枠は見た目だけ(MobileProSection のコメント参照)。
+        const MobileSettingsSection(title: 'Pro', child: MobileProSection()),
+        const SizedBox(height: 22),
         MobileSettingsSection(
           title: '表示',
           rows: [
