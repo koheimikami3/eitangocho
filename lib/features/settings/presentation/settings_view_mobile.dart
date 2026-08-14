@@ -11,7 +11,7 @@ import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_management_section.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
@@ -22,7 +22,8 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_setting
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_subheader.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
-import 'package:eitangocho/features/sync/presentation/mobile_sync_section.dart';
+import 'package:eitangocho/features/sync/presentation/mobile_sync_rows.dart';
+import 'package:eitangocho/features/sync/presentation/mobile_sync_status_caption.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -124,18 +125,15 @@ class SettingsViewMobile extends ConsumerWidget {
         // ),
         const SizedBox(height: 22),
         // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの持ち出しを
-        // 扱うため 1 つのセクションにまとめる(デザイン準拠)。
+        // 扱うため 1 枚のカードにまとめる(デザイン準拠)。
         const MobileSettingsSection(
           title: 'データ',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              MobileSyncSection(),
-              SizedBox(height: 12),
-              MobileDataManagementSection(),
-            ],
-          ),
+          rows: [MobileSyncRows(), MobileDataBackupRows()],
         ),
+        const SizedBox(height: 8),
+        // 同期状態(最終同期・エラー)はカードの外に出す。デザインの図には
+        // 無いが、同期の失敗を伝える唯一の場所なので残す。
+        const MobileSyncStatusCaption(),
         const SizedBox(height: 22),
         MobileSettingsSection(
           title: 'サポート',
