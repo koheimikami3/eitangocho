@@ -10,7 +10,7 @@ abstract final class PurchaseConfig {
   ///
   /// **空なら SDK に一切触れない。** `AdUnitIds.hasAnyUnit` と同じ保険で、
   /// RevenueCat への登録が済む前でも「Pro の欄が出ないだけで動く」ビルドになる。
-  static const appleApiKey = '';
+  static const appleApiKey = 'appl_gHFKDdyYkYhLiZuKjSPjyIPFvLX';
 
   /// 「広告を非表示にする」の entitlement ID(RevenueCat のダッシュボードで作る)。
   static const entitlementId = 'pro';
