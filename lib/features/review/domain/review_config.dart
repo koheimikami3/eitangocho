@@ -9,7 +9,10 @@ abstract final class ReviewConfig {
   /// **空の間は設定のレビューリンクを出さない。** `AdUnitIds.hasAnyUnit` と
   /// 同じ保険で、ID を用意する前でも「リンクが出ないだけで動く」ビルドになる。
   /// レビュー依頼(requestReview)側は ID を必要としないため、空でも動く。
-  static const appStoreId = '';
+  ///
+  /// iOS / macOS は同じアプリレコード(`com.kohei.mikami.eitangocho`)なので
+  /// ID は 1 つで両方に効く。
+  static const appStoreId = '6794990348';
 
   /// 設定にレビューリンクを出せるか。
   static bool get canOpenStoreListing => appStoreId.isNotEmpty;
