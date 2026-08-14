@@ -49,9 +49,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setQuizDirection(QuizDirection direction) async {
     await _prefs.setString(_keyQuizDirection, direction.name);
     state = AsyncData(
-      (state.value ?? const SettingsState()).copyWith(
-        quizDirection: direction,
-      ),
+      (state.value ?? const SettingsState()).copyWith(quizDirection: direction),
     );
   }
 

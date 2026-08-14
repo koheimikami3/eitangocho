@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 ///
 /// 単語の編集シートと同じ枠([MobileSheet])に載せる。外部ブラウザに飛ばすと
 /// 学習が途切れるため、確認はアプリ内で完結させる。
-Future<void> showMobilePronunciationSheet(
-  BuildContext context,
-  String word,
-) {
+Future<void> showMobilePronunciationSheet(BuildContext context, String word) {
   return showMobileSheet<void>(
     context: context,
     builder: (sheetContext) => MobileSheet(

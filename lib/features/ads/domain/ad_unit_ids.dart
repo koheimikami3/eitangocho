@@ -40,6 +40,5 @@ abstract final class AdUnitIds {
   static const _releaseSheetBanner = 'ca-app-pub-3768273762534884/5497904061';
 
   /// AdMob の「レクタングル(クイズ結果)」ユニット。
-  static const _releaseQuizRectangle =
-      'ca-app-pub-3768273762534884/2121765839';
+  static const _releaseQuizRectangle = 'ca-app-pub-3768273762534884/2121765839';
 }

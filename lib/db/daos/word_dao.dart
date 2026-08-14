@@ -32,21 +32,21 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
   }
 
   /// 登録日時の新しい順(同時刻は id の新しい順)
-  Stream<List<Word>> watchAll() => (select(words)
-        ..orderBy([
-          (t) => OrderingTerm.desc(t.createdAt),
-          (t) => OrderingTerm.desc(t.id),
-        ]))
-      .watch();
+  Stream<List<Word>> watchAll() =>
+      (select(words)..orderBy([
+            (t) => OrderingTerm.desc(t.createdAt),
+            (t) => OrderingTerm.desc(t.id),
+          ]))
+          .watch();
 
   /// 登録日時の新しい順(watchAll と同じ並び)で全件取得する。
   /// JSON エクスポート用の同期版(watchAll の Stream 版とは別に用意)。
-  Future<List<Word>> getAll() => (select(words)
-        ..orderBy([
-          (t) => OrderingTerm.desc(t.createdAt),
-          (t) => OrderingTerm.desc(t.id),
-        ]))
-      .get();
+  Future<List<Word>> getAll() =>
+      (select(words)..orderBy([
+            (t) => OrderingTerm.desc(t.createdAt),
+            (t) => OrderingTerm.desc(t.id),
+          ]))
+          .get();
 
   /// 登録されている単語の件数。
   /// 一覧を読まずに件数だけ知りたい呼び出し(レビュー依頼の判定)のために置く。
@@ -62,9 +62,9 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
   Future<int> insertWord(WordsCompanion entry) {
     final now = DateTime.now();
     return transaction(() async {
-      final id = await into(words).insert(
-        entry.copyWith(createdAt: Value(now), updatedAt: Value(now)),
-      );
+      final id = await into(
+        words,
+      ).insert(entry.copyWith(createdAt: Value(now), updatedAt: Value(now)));
       if (entry.word.present) {
         await _clearDeletion(entry.word.value);
       }
@@ -101,16 +101,15 @@ class WordDao extends DatabaseAccessor<AppDatabase> with _$WordDaoMixin {
   Future<List<DeletedWord>> getDeletions() => select(deletedWords).get();
 
   /// 指定単語の削除ログを取り消す(再登録・インポートでの復活時)。
-  Future<void> _clearDeletion(String word) => (delete(
-    deletedWords,
-  )..where((t) => t.word.equals(_matchKey(word)))).go();
+  Future<void> _clearDeletion(String word) =>
+      (delete(deletedWords)..where((t) => t.word.equals(_matchKey(word)))).go();
 
   /// [before] より古い削除ログを掃除する。
   /// ログを無期限に持ち続けるとスナップショットが膨らみ続けるため、
   /// 全端末が確実に同期し終える程度の期間だけ残す。
-  Future<void> pruneDeletions(DateTime before) =>
-      (delete(deletedWords)..where((t) => t.deletedAt.isSmallerThanValue(before)))
-          .go();
+  Future<void> pruneDeletions(DateTime before) => (delete(
+    deletedWords,
+  )..where((t) => t.deletedAt.isSmallerThanValue(before))).go();
 
   Future<void> setLearned(int id, {required bool isLearned}) =>
       (update(words)..where((t) => t.id.equals(id))).write(

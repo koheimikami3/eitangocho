@@ -17,11 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// macOS 版の [showEditWordDialog] に対応する。削除はこのシート最下部の
 /// 「この単語を削除...」からのみ到達する(iOS には右クリックが無く、
 /// デザイン上も長押しメニューを持たないため、ここが唯一の削除導線)。
-Future<void> showWordEditSheet(
-  BuildContext context,
-  WidgetRef ref,
-  Word word,
-) {
+Future<void> showWordEditSheet(BuildContext context, WidgetRef ref, Word word) {
   return showMobileSheet<void>(
     context: context,
     builder: (context) => _WordEditSheet(word: word, ref: ref),
@@ -84,21 +80,26 @@ class _WordEditSheetState extends State<_WordEditSheet> {
       return;
     }
 
-    await widget.ref.read(databaseProvider).wordDao.updateWord(
-      widget.word.id,
-      WordsCompanion(
-        word: Value(word),
-        ipa: Value(_ipaController.text.trim()),
-        japanese: Value(japanese),
-        // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
-        // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
-        partsOfSpeech: Value(
-          _selectedPartsOfSpeech.ordered(basedOn: widget.word.partsOfSpeech),
-        ),
-        exampleEn: Value(_exampleEnController.text.trim()),
-        exampleJa: Value(_exampleJaController.text.trim()),
-      ),
-    );
+    await widget.ref
+        .read(databaseProvider)
+        .wordDao
+        .updateWord(
+          widget.word.id,
+          WordsCompanion(
+            word: Value(word),
+            ipa: Value(_ipaController.text.trim()),
+            japanese: Value(japanese),
+            // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
+            // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
+            partsOfSpeech: Value(
+              _selectedPartsOfSpeech.ordered(
+                basedOn: widget.word.partsOfSpeech,
+              ),
+            ),
+            exampleEn: Value(_exampleEnController.text.trim()),
+            exampleJa: Value(_exampleJaController.text.trim()),
+          ),
+        );
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -142,10 +143,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           ),
           const SizedBox(height: 14),
           // IPA は非 ASCII なので asciiOnly を付けない。
-          MobileLabeledField(
-            label: '発音記号 (IPA)',
-            controller: _ipaController,
-          ),
+          MobileLabeledField(label: '発音記号 (IPA)', controller: _ipaController),
           const SizedBox(height: 14),
           MobileLabeledField(
             label: '日本語訳 *',

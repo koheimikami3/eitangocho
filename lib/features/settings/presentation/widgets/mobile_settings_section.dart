@@ -12,10 +12,7 @@ class MobileSettingsSection extends StatelessWidget {
     super.key,
     this.rows,
     this.child,
-  }) : assert(
-         (rows == null) != (child == null),
-         'rows と child はどちらか一方だけを指定する',
-       );
+  }) : assert((rows == null) != (child == null), 'rows と child はどちらか一方だけを指定する');
 
   final String title;
   final List<Widget>? rows;

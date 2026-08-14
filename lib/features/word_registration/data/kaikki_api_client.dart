@@ -19,7 +19,8 @@ class KaikkiApiClient {
   static const _timeout = Duration(seconds: 15);
 
   /// 名乗らずに叩かない(商用サービスではないため)。
-  static const _userAgent = 'eitangocho (https://github.com/koheimikami3/eitangocho)';
+  static const _userAgent =
+      'eitangocho (https://github.com/koheimikami3/eitangocho)';
 
   /// 訳語のうち残す言語(kaikki の `lang_code`)。
   static const _japaneseLangCode = 'ja';
@@ -37,8 +38,7 @@ class KaikkiApiClient {
     // kaikki は大文字小文字を区別する。固有名詞・月名は見出しが大文字なので
     // (september は 404 で September は 200)、404 なら頭大文字で引き直す。
     if (body == null) {
-      final capitalized =
-          normalized[0].toUpperCase() + normalized.substring(1);
+      final capitalized = normalized[0].toUpperCase() + normalized.substring(1);
       body = await _get(capitalized);
     }
     if (body == null) return null;

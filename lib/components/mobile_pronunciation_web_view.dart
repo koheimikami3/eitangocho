@@ -15,10 +15,12 @@ class MobilePronunciationWebView extends StatefulWidget {
   final String word;
 
   @override
-  State<MobilePronunciationWebView> createState() => _MobilePronunciationWebViewState();
+  State<MobilePronunciationWebView> createState() =>
+      _MobilePronunciationWebViewState();
 }
 
-class _MobilePronunciationWebViewState extends State<MobilePronunciationWebView> {
+class _MobilePronunciationWebViewState
+    extends State<MobilePronunciationWebView> {
   late final WebViewController _controller;
   bool _isLoading = true;
   bool _hasError = false;

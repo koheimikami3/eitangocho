@@ -10,7 +10,9 @@ import 'package:flutter_test/flutter_test.dart';
 double _luminance(Color c, Color under) {
   double channel(double fg, double bg) {
     final v = fg * c.a + bg * (1 - c.a);
-    return v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4) as double;
+    return v <= 0.03928
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4) as double;
   }
 
   return 0.2126 * channel(c.r, under.r) +
@@ -71,11 +73,10 @@ void main() {
 
   test('品詞バッジのライト配色は enum の定数と一致する(macOS が直接引くため)', () {
     for (final pos in PartOfSpeech.values) {
-      expect(
-        AppPalette.light.posBadge(pos),
-        (pos.badgeBackground, pos.badgeForeground),
-        reason: pos.name,
-      );
+      expect(AppPalette.light.posBadge(pos), (
+        pos.badgeBackground,
+        pos.badgeForeground,
+      ), reason: pos.name);
     }
   });
 
@@ -99,7 +100,11 @@ void main() {
     // 明度を下げた経緯がある(AppColors.accentOnSoft 参照)。
     for (final palette in [AppPalette.light, AppPalette.dark]) {
       expect(
-        _contrastRatio(palette.accentOnSoft, palette.accentSoft, palette.surface),
+        _contrastRatio(
+          palette.accentOnSoft,
+          palette.accentSoft,
+          palette.surface,
+        ),
         greaterThanOrEqualTo(4.5),
         reason: palette.isDark ? 'dark' : 'light',
       );
@@ -117,15 +122,23 @@ void main() {
     );
   });
 
-  test('Pro の購入ボタンは白文字が地に対して 4.5:1 以上ある', () {
-    // 13px の文字なので「大きい文字」の 3:1 基準は使えない。デザインの
-    // #1E7FD6 は 4.23:1 で足りず、発音ボタンと同じ濃い青に振り直している。
-    // ライト / ダークとも同じ地を使うため、地の合成先だけ切り替えて確かめる。
+  test('Pro の購入ボタンと復元行は 4.5:1 以上ある', () {
     for (final palette in [AppPalette.light, AppPalette.dark]) {
+      final theme = palette.isDark ? 'dark' : 'light';
+
+      // 13px のラベル。デザインの #1E7FD6 のままだと白文字が 4.15:1 で
+      // 足りないため、発音ボタンと同じ濃い青に振り直してある。
       expect(
-        _contrastRatio(Colors.white, AppColors.accentOnSoft, palette.surface),
+        _contrastRatio(Colors.white, palette.proButton, palette.surface),
         greaterThanOrEqualTo(4.5),
-        reason: palette.isDark ? 'dark' : 'light',
+        reason: '$theme / 購入ボタン',
+      );
+
+      // 復元行はカードの地に直接載る 13px。accent(#429FF0)では届かない。
+      expect(
+        _contrastRatio(palette.accentOnSoft, palette.surface, palette.surface),
+        greaterThanOrEqualTo(4.5),
+        reason: '$theme / 購入を復元',
       );
     }
   });

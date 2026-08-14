@@ -32,10 +32,7 @@ class MobileLearningEmptyState extends StatelessWidget {
           GestureDetector(
             onTap: () => showWordRegistrationSheet(context),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: palette.accent,
                 borderRadius: BorderRadius.circular(10),

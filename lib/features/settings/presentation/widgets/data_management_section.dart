@@ -16,8 +16,7 @@ class DataManagementSection extends ConsumerStatefulWidget {
       _DataManagementSectionState();
 }
 
-class _DataManagementSectionState
-    extends ConsumerState<DataManagementSection> {
+class _DataManagementSectionState extends ConsumerState<DataManagementSection> {
   bool _busy = false;
 
   Future<void> _export() async {

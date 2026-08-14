@@ -41,10 +41,7 @@ class LabeledTextField extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
             ),
-            if (trailing != null) ...[
-              const SizedBox(width: 6),
-              trailing!,
-            ],
+            if (trailing != null) ...[const SizedBox(width: 6), trailing!],
           ],
         ),
         const SizedBox(height: 5),

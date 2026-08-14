@@ -53,9 +53,7 @@ class MobileSheet extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: palette.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(18),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -126,11 +124,7 @@ class _SheetHeader extends StatelessWidget {
               _SheetAction(label: leftLabel, onTap: onLeft),
               const Spacer(),
               if (rightLabel != null && onRight != null)
-                _SheetAction(
-                  label: rightLabel!,
-                  onTap: onRight!,
-                  bold: true,
-                ),
+                _SheetAction(label: rightLabel!, onTap: onRight!, bold: true),
             ],
           ),
         ],

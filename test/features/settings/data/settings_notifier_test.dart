@@ -64,22 +64,25 @@ void main() {
     );
   });
 
-  test('setQuizDirection / setShowIpa / setDeeplApiKey で state が更新される', () async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-    await container.read(settingsProvider.future);
+  test(
+    'setQuizDirection / setShowIpa / setDeeplApiKey で state が更新される',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      await container.read(settingsProvider.future);
 
-    final notifier = container.read(settingsProvider.notifier);
-    await notifier.setQuizDirection(QuizDirection.jaToEn);
-    await notifier.setShowIpa(false);
-    await notifier.setDeeplApiKey(' my-key ');
+      final notifier = container.read(settingsProvider.notifier);
+      await notifier.setQuizDirection(QuizDirection.jaToEn);
+      await notifier.setShowIpa(false);
+      await notifier.setDeeplApiKey(' my-key ');
 
-    final settings = container.read(settingsProvider).requireValue;
-    expect(settings.quizDirection, QuizDirection.jaToEn);
-    expect(settings.showIpa, isFalse);
-    // 前後の空白は取り除いて保存する
-    expect(settings.deeplApiKey, 'my-key');
-  });
+      final settings = container.read(settingsProvider).requireValue;
+      expect(settings.quizDirection, QuizDirection.jaToEn);
+      expect(settings.showIpa, isFalse);
+      // 前後の空白は取り除いて保存する
+      expect(settings.deeplApiKey, 'my-key');
+    },
+  );
 
   test('appearance の既定はライトで、setAppearance で切り替わり永続化される', () async {
     final container1 = ProviderContainer();
@@ -107,9 +110,7 @@ void main() {
     await container1
         .read(settingsProvider.notifier)
         .setQuizDirection(QuizDirection.jaToEn);
-    await container1
-        .read(settingsProvider.notifier)
-        .setShowIpa(false);
+    await container1.read(settingsProvider.notifier).setShowIpa(false);
     await container1
         .read(settingsProvider.notifier)
         .setDeeplApiKey('persisted-key');

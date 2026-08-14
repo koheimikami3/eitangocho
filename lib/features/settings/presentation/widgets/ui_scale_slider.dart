@@ -60,10 +60,7 @@ class UiScaleSlider extends ConsumerWidget {
             child: Text(
               '${value.toStringAsFixed(1)}x',
               textAlign: TextAlign.right,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              ),
+              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
           ),
         ],
@@ -103,7 +100,8 @@ class _CircleThumbShape extends SliderComponentShape {
       center + const Offset(0, 1),
       _radius,
       Paint()
-        ..color = const Color(0x4D000000) // 影: rgba(0,0,0,0.3)
+        ..color =
+            const Color(0x4D000000) // 影: rgba(0,0,0,0.3)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
     );
     canvas.drawCircle(center, _radius, Paint()..color = Colors.white);

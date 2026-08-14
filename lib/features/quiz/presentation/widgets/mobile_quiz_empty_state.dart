@@ -26,14 +26,10 @@ class MobileQuizEmptyState extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         GestureDetector(
-          onTap: () => ref
-              .read(mainPageProvider.notifier)
-              .selectView(MainView.learning),
+          onTap: () =>
+              ref.read(mainPageProvider.notifier).selectView(MainView.learning),
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               color: palette.surface,
               borderRadius: BorderRadius.circular(10),

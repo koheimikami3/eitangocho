@@ -14,16 +14,14 @@ void main() {
   });
 
   List<EjdictEntriesCompanion> entriesOf(Map<String, String> map) => [
-        for (final e in map.entries)
-          EjdictEntriesCompanion.insert(word: e.key, meanings: e.value),
-      ];
+    for (final e in map.entries)
+      EjdictEntriesCompanion.insert(word: e.key, meanings: e.value),
+  ];
 
   test('bulkInsert と count', () async {
     expect(await db.ejdictDao.count(), 0);
 
-    await db.ejdictDao.bulkInsert(
-      entriesOf({'apple': 'リンゴ', 'book': '本'}),
-    );
+    await db.ejdictDao.bulkInsert(entriesOf({'apple': 'リンゴ', 'book': '本'}));
 
     expect(await db.ejdictDao.count(), 2);
   });
@@ -44,9 +42,7 @@ void main() {
   });
 
   test('チャンクサイズ(5000)を超える件数も取り込める', () async {
-    final many = {
-      for (var i = 0; i < 5001; i++) 'word$i': '訳$i',
-    };
+    final many = {for (var i = 0; i < 5001; i++) 'word$i': '訳$i'};
 
     await db.ejdictDao.bulkInsert(entriesOf(many));
 

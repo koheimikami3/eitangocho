@@ -69,9 +69,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: palette.borderAlpha(10)),
-                ),
+                border: Border(top: BorderSide(color: palette.borderAlpha(10))),
               ),
               child: IntrinsicHeight(
                 child: Row(

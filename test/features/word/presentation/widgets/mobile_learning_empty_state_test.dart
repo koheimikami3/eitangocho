@@ -10,6 +10,7 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../../../ads/ads_test_overrides.dart';
+import '../../../purchase/purchase_test_overrides.dart';
 
 void main() {
   late AppDatabase db;
@@ -22,13 +23,15 @@ void main() {
 
   tearDown(() async => db.close());
 
-  testWidgets('登録ボタンで登録シートが開く(ビュー切替の行き止まりにならない)', (
-    tester,
-  ) async {
+  testWidgets('登録ボタンで登録シートが開く(ビュー切替の行き止まりにならない)', (tester) async {
     // シートは iOS 用の表示なので、プラットフォームを装ってから開く。
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final container = ProviderContainer(
-      overrides: [databaseProvider.overrideWithValue(db), adsDisabled],
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        adsDisabled,
+        purchasesDisabled,
+      ],
     );
     try {
       await tester.pumpWidget(

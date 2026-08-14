@@ -17,17 +17,11 @@ Future<void> showWordContextMenu(
   // position はウィンドウのグローバル座標。Overlay は UI 全体拡大
   // (EitangochoApp の uiScale)の内側にあるため、変換を挟まないと
   // メニューが右下方向にずれる。globalToLocal が拡大の逆変換も行う。
-  final overlay =
-      Overlay.of(context).context.findRenderObject()! as RenderBox;
+  final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
   final local = overlay.globalToLocal(position);
   final selected = await showMenu<_ContextMenuAction>(
     context: context,
-    position: RelativeRect.fromLTRB(
-      local.dx,
-      local.dy,
-      local.dx,
-      local.dy,
-    ),
+    position: RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy),
     color: const Color.fromRGBO(250, 250, 251, 0.98),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),

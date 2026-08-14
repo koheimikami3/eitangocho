@@ -104,10 +104,7 @@ void main() {
       expect(find.text('バージョン'), findsOneWidget);
       expect(find.text('1.1.0'), findsOneWidget);
       expect(find.text('ライセンス'), findsOneWidget);
-      expect(
-        find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'),
-        findsOneWidget,
-      );
+      expect(find.text('本アプリが利用しているオープンソースソフトウェアの一覧です。'), findsOneWidget);
     });
   });
 

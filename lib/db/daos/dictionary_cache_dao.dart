@@ -14,9 +14,9 @@ class DictionaryCacheDao extends DatabaseAccessor<AppDatabase>
 
   /// キャッシュ済みの生レスポンス JSON を返す。未キャッシュなら null。
   Future<String?> find(String word) async {
-    final entry = await (select(dictionaryCacheEntries)
-          ..where((t) => t.word.equals(word)))
-        .getSingleOrNull();
+    final entry = await (select(
+      dictionaryCacheEntries,
+    )..where((t) => t.word.equals(word))).getSingleOrNull();
     return entry?.responseJson;
   }
 

@@ -28,9 +28,7 @@ class SettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ロード前は既定値でフォールバックする。
-    final settings =
-        ref.watch(settingsProvider).value ??
-        const SettingsState();
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
 
     return Align(

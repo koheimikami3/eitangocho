@@ -24,9 +24,9 @@ void main() {
   });
 
   test('未知のトークンは無視される', () {
-    expect(
-      converter.fromSql('verb,unknown,noun'),
-      [PartOfSpeech.verb, PartOfSpeech.noun],
-    );
+    expect(converter.fromSql('verb,unknown,noun'), [
+      PartOfSpeech.verb,
+      PartOfSpeech.noun,
+    ]);
   });
 }

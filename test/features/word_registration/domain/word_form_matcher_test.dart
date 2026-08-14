@@ -27,8 +27,10 @@ void main() {
         isFalse,
       );
       expect(
-        containsWordForm('I am going to substantiate this theory.',
-            'substantial'),
+        containsWordForm(
+          'I am going to substantiate this theory.',
+          'substantial',
+        ),
         isFalse,
       );
       expect(containsWordForm("It's abundantly clear.", 'abundant'), isFalse);
@@ -63,14 +65,21 @@ void main() {
   group('containsWordForm(句)', () {
     test('先頭語の規則変化を許して句を含む文にマッチする', () {
       expect(containsWordForm('I give up!', 'give up'), isTrue);
-      expect(containsWordForm('I look forward to that.', 'look forward to'),
-          isTrue);
       expect(
-        containsWordForm('Are you looking forward to spring?', 'look forward to'),
+        containsWordForm('I look forward to that.', 'look forward to'),
         isTrue,
       );
-      expect(containsWordForm('Stop putting off finding a job.', 'put off'),
-          isTrue);
+      expect(
+        containsWordForm(
+          'Are you looking forward to spring?',
+          'look forward to',
+        ),
+        isTrue,
+      );
+      expect(
+        containsWordForm('Stop putting off finding a job.', 'put off'),
+        isTrue,
+      );
     });
 
     test('語順が変わっても・目的語が割り込んでもマッチする', () {
@@ -82,7 +91,10 @@ void main() {
 
     test('後続の語を欠く文は弾く', () {
       expect(containsWordForm('I gave him a book.', 'give up'), isFalse);
-      expect(containsWordForm('I look at the sky.', 'look forward to'), isFalse);
+      expect(
+        containsWordForm('I look at the sky.', 'look forward to'),
+        isFalse,
+      );
     });
 
     test('先頭語の不規則変化は拾えない(既知の制約)', () {

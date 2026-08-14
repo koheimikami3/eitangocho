@@ -13,6 +13,7 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../features/ads/ads_test_overrides.dart';
+import '../features/purchase/purchase_test_overrides.dart';
 
 /// 広告が読み込めた状態を装う(実際の BannerAd はプラグインが要るため)。
 class _LoadedBannerAdHeight extends BannerAdHeight {
@@ -58,6 +59,7 @@ void main() {
             // MainPage が起動時にキックする EJDict 取込も DB に触れるため差し替える。
             ejdictImportProvider.overrideWith((ref) async => 0),
             adsDisabled,
+            purchasesDisabled,
             // 広告は読み込めないため、高さが要るテストだけ結果を差し替える。
             if (bannerAdHeight > 0)
               bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),
@@ -74,16 +76,14 @@ void main() {
 
   /// macOS: 既定のテスト画面(800x600)は uiScale で拡大すると実質幅が狭く
   /// ツールバーが溢れるため、実際のウィンドウに近いサイズにする。
-  Future<void> runDesktop(
-    WidgetTester tester,
-    Future<void> Function() body,
-  ) => runApp(
-    tester,
-    TargetPlatform.macOS,
-    physicalSize: const Size(1600, 1000),
-    devicePixelRatio: 1,
-    body: body,
-  );
+  Future<void> runDesktop(WidgetTester tester, Future<void> Function() body) =>
+      runApp(
+        tester,
+        TargetPlatform.macOS,
+        physicalSize: const Size(1600, 1000),
+        devicePixelRatio: 1,
+        body: body,
+      );
 
   /// iOS: iPhone 16 Pro 相当(論理 402x874)。
   Future<void> runMobile(

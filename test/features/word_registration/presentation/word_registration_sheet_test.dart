@@ -14,6 +14,7 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../../ads/ads_test_overrides.dart';
+import '../../purchase/purchase_test_overrides.dart';
 
 /// 常に同じ結果を返す WordInfoProvider(ネットワークに出ないため)。
 class _FakeWordInfoProvider implements WordInfoProvider {
@@ -47,8 +48,11 @@ void main() {
     container = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
-        wordInfoProviderProvider.overrideWithValue(_FakeWordInfoProvider(fetched)),
+        wordInfoProviderProvider.overrideWithValue(
+          _FakeWordInfoProvider(fetched),
+        ),
         adsDisabled,
+        purchasesDisabled,
       ],
     );
     try {

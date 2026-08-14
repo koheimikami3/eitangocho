@@ -248,14 +248,13 @@ void main() {
     final id = await addWord('apple', 'りんご');
     await db.wordDao.deleteWord(id);
     // 181 日前に削除されたことにする。
-    await (db.update(db.deletedWords)..where((t) => t.word.equals('apple')))
-        .write(
-          DeletedWordsCompanion(
-            deletedAt: Value(
-              DateTime.now().subtract(const Duration(days: 181)),
-            ),
-          ),
-        );
+    await (db.update(
+      db.deletedWords,
+    )..where((t) => t.word.equals('apple'))).write(
+      DeletedWordsCompanion(
+        deletedAt: Value(DateTime.now().subtract(const Duration(days: 181))),
+      ),
+    );
 
     await service.sync();
 

@@ -65,8 +65,9 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
           await _cacheDao.save(normalized, entriesJson);
         }
       }
-      entries =
-          entriesJson == null ? null : KaikkiApiClient.parseEntries(entriesJson);
+      entries = entriesJson == null
+          ? null
+          : KaikkiApiClient.parseEntries(entriesJson);
     } on WordInfoException catch (e) {
       kaikkiFailure = e;
     }
@@ -108,8 +109,10 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     if (info.exampleEn.isNotEmpty && info.exampleJa.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {
-        final translated =
-            await _deeplClient.translateToJapanese(info.exampleEn, apiKey);
+        final translated = await _deeplClient.translateToJapanese(
+          info.exampleEn,
+          apiKey,
+        );
         info = info.copyWith(exampleJa: translated ?? '');
       }
     }
@@ -167,9 +170,7 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     ];
     if (candidates.isEmpty) return '';
     const usTags = {'US', 'General-American'};
-    final us = candidates
-        .where((s) => s.tags.any(usTags.contains))
-        .firstOrNull;
+    final us = candidates.where((s) => s.tags.any(usTags.contains)).firstOrNull;
     return (us ?? candidates.first).ipa ?? '';
   }
 
@@ -183,7 +184,9 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     for (final entry in entries) {
       for (final sense in entry.senses) {
         for (final example in sense.examples) {
-          final text = (example.text ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
+          final text = (example.text ?? '')
+              .replaceAll(RegExp(r'\s+'), ' ')
+              .trim();
           if (text.isEmpty) continue;
           if (example.tags.contains('collocation')) continue;
           if (text.split(' ').length < _minExampleWords) continue;
@@ -201,12 +204,12 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
   /// `adjective` / `adverb` とは表記が違う)。それ以外(pron, prep, name 等)は
   /// other に落とす。
   PartOfSpeech _toPartOfSpeech(String? raw) => switch (raw) {
-        'verb' => PartOfSpeech.verb,
-        'noun' => PartOfSpeech.noun,
-        'adj' => PartOfSpeech.adjective,
-        'adv' => PartOfSpeech.adverb,
-        _ => PartOfSpeech.other,
-      };
+    'verb' => PartOfSpeech.verb,
+    'noun' => PartOfSpeech.noun,
+    'adj' => PartOfSpeech.adjective,
+    'adv' => PartOfSpeech.adverb,
+    _ => PartOfSpeech.other,
+  };
 }
 
 /// 登録 Notifier はこの Provider 経由でのみ WordInfoProvider を取得する

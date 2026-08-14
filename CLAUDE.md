@@ -42,7 +42,7 @@ lib/
 ├── providers/    # グローバル Provider(DB インスタンス等)
 ├── db/           # drift のテーブル定義・DAO・Database クラス
 └── features/     # 機能別: word / quiz / word_registration / settings / sync /
-                  #         review
+                  #         ads / purchase(iOS のみ)/ review
     └── <feature>/
         ├── data/          # DAO・外部 API と連携する Riverpod Provider
         ├── domain/        # Freezed モデル・機能固有 enum

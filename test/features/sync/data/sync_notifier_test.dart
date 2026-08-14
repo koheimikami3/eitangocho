@@ -79,9 +79,7 @@ void main() {
   Future<void> resumeApp() async {
     const states = [AppLifecycleState.inactive, AppLifecycleState.resumed];
     for (final state in states) {
-      await TestDefaultBinaryMessengerBinding
-          .instance
-          .defaultBinaryMessenger
+      await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .handlePlatformMessage(
             'flutter/lifecycle',
             const StringCodec().encodeMessage(state.toString()),
@@ -107,9 +105,7 @@ void main() {
     );
     final container = makeContainer();
 
-    await container
-        .read(syncProvider.notifier)
-        .setEnabled(enabled: true);
+    await container.read(syncProvider.notifier).setEnabled(enabled: true);
 
     final state = container.read(syncProvider);
     expect(state.enabled, isTrue);
@@ -123,9 +119,7 @@ void main() {
     store.failWith = const CloudUnavailableException('iCloud が利用できません。');
     final container = makeContainer();
 
-    await container
-        .read(syncProvider.notifier)
-        .setEnabled(enabled: true);
+    await container.read(syncProvider.notifier).setEnabled(enabled: true);
 
     final state = container.read(syncProvider);
     expect(state.syncing, isFalse);
@@ -209,9 +203,7 @@ void main() {
 
   test('有効/無効は永続化され、次回起動時に復元される', () async {
     final container1 = makeContainer();
-    await container1
-        .read(syncProvider.notifier)
-        .setEnabled(enabled: true);
+    await container1.read(syncProvider.notifier).setEnabled(enabled: true);
     container1.dispose();
 
     // 同じインメモリ prefs を共有した別 container で読み直す。

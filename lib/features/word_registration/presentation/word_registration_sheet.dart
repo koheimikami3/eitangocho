@@ -136,13 +136,15 @@ class _WordRegistrationSheetState
   }
 
   Future<void> _save() async {
-    final saved = await ref.read(wordRegistrationProvider.notifier).save(
-      word: _wordController.text,
-      ipa: _ipaController.text,
-      japanese: _japaneseController.text,
-      exampleEn: _exampleEnController.text,
-      exampleJa: _exampleJaController.text,
-    );
+    final saved = await ref
+        .read(wordRegistrationProvider.notifier)
+        .save(
+          word: _wordController.text,
+          ipa: _ipaController.text,
+          japanese: _japaneseController.text,
+          exampleEn: _exampleEnController.text,
+          exampleJa: _exampleJaController.text,
+        );
     // macOS 版はビューを切り替えるが、iOS はシートを閉じるだけでよい
     // (背後の学習中リストは Stream で自動更新される)。
     if (saved && mounted) Navigator.of(context).pop();
@@ -173,9 +175,7 @@ class _WordRegistrationSheetState
       footer: const MobileSheetBannerAd(),
       // フォームまで進んでいれば入力ステップへ戻す、そうでなければ閉じる。
       leftLabel: isForm ? '戻る' : 'キャンセル',
-      onLeft: isForm
-          ? notifier.backToInput
-          : () => Navigator.of(context).pop(),
+      onLeft: isForm ? notifier.backToInput : () => Navigator.of(context).pop(),
       rightLabel: isForm ? '登録する' : null,
       onRight: isForm ? _save : null,
       child: switch (state.step) {
@@ -366,9 +366,7 @@ class _FormStep extends StatelessWidget {
           const SizedBox(height: 14),
         ],
         if (translationFailed) ...[
-          _WarningBanner(
-            message: '例文の日本語訳を取得できませんでした。手動で入力できます。',
-          ),
+          _WarningBanner(message: '例文の日本語訳を取得できませんでした。手動で入力できます。'),
           const SizedBox(height: 14),
         ],
         MobileLabeledField(
@@ -458,10 +456,7 @@ class _WarningBanner extends StatelessWidget {
       ),
       child: Text(
         message,
-        style: TextStyle(
-          fontSize: 13,
-          color: palette.warningBannerForeground,
-        ),
+        style: TextStyle(fontSize: 13, color: palette.warningBannerForeground),
       ),
     );
   }

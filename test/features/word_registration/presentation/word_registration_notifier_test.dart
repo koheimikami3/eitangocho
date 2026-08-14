@@ -169,10 +169,8 @@ void main() {
     ]);
   });
 
-  test(
-      'wordInfoProvider は keepAlive で、リスナー無しの read 後もイベントループを'
-      '跨いで破棄されない(fetch 途中に http.Client が close される回帰を防ぐ)',
-      () async {
+  test('wordInfoProvider は keepAlive で、リスナー無しの read 後もイベントループを'
+      '跨いで破棄されない(fetch 途中に http.Client が close される回帰を防ぐ)', () async {
     // フェイクを渡さず実 wordInfoProvider を使う(内部で http.Client を保持する)。
     container = buildContainer();
 
@@ -202,9 +200,7 @@ void main() {
         wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
       );
 
-      await container
-          .read(wordRegistrationProvider.notifier)
-          .autoFill('   ');
+      await container.read(wordRegistrationProvider.notifier).autoFill('   ');
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
@@ -233,9 +229,7 @@ void main() {
         wordInfoProvider: _FakeWordInfoProvider((_) async => null),
       );
 
-      await container
-          .read(wordRegistrationProvider.notifier)
-          .autoFill('zzzzz');
+      await container.read(wordRegistrationProvider.notifier).autoFill('zzzzz');
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.form);
@@ -250,16 +244,11 @@ void main() {
         ),
       );
 
-      await container
-          .read(wordRegistrationProvider.notifier)
-          .autoFill('apple');
+      await container.read(wordRegistrationProvider.notifier).autoFill('apple');
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
-      expect(
-        state.errorMessage,
-        '辞書データの取得に失敗しました。通信環境を確認してください。',
-      );
+      expect(state.errorMessage, '辞書データの取得に失敗しました。通信環境を確認してください。');
     });
 
     // DeepL のキーは条件に含めない。設定 UI を隠したいま、キーを条件にすると

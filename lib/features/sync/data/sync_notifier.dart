@@ -168,10 +168,7 @@ class SyncNotifier extends Notifier<SyncState> {
       state = state.copyWith(syncing: false, errorMessage: e.message);
     } on Object catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(
-        syncing: false,
-        errorMessage: '同期に失敗しました: $e',
-      );
+      state = state.copyWith(syncing: false, errorMessage: '同期に失敗しました: $e');
     }
   }
 }

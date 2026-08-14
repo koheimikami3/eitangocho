@@ -28,10 +28,7 @@ void main() {
         detectLicenseName('Apache License\nVersion 2.0, January 2004'),
         'Apache License 2.0',
       );
-      expect(
-        detectLicenseName('CC0 1.0 Universal'),
-        'CC0 1.0 Universal',
-      );
+      expect(detectLicenseName('CC0 1.0 Universal'), 'CC0 1.0 Universal');
       expect(
         detectLicenseName(
           'released under the Creative Commons Attribution-ShareAlike 4.0 '

@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 
 /// インポート結果(追加/更新/変更なし/スキップ件数)を表示するダイアログ。
 /// 意匠は delete_confirm_dialog.dart に準拠(角丸 13 / width 380)。
-Future<void> showImportResultDialog(
-  BuildContext context,
-  ImportResult result,
-) {
+Future<void> showImportResultDialog(BuildContext context, ImportResult result) {
   return showDialog<void>(
     context: context,
     builder: (context) => Dialog(
@@ -70,7 +67,10 @@ Future<void> showImportErrorDialog(BuildContext context, String message) {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(message, style: const TextStyle(color: AppColors.textSecondary)),
+              Text(
+                message,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
               const SizedBox(height: 16),
               AppFilledButton(
                 label: '閉じる',

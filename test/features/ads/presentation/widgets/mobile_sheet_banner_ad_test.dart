@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../ads_test_overrides.dart';
+import '../../../purchase/purchase_test_overrides.dart';
 
 void main() {
   /// [keyboardHeight] を装ってシート内バナーを描く。実際のキーボードは
@@ -12,7 +13,7 @@ void main() {
   Future<void> pumpBanner(WidgetTester tester, double keyboardHeight) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [adsDisabled],
+        overrides: [adsDisabled, purchasesDisabled],
         child: MaterialApp(
           // Scaffold を挟まないのは、body に渡す MediaQuery から
           // viewInsets.bottom を取り除いてしまうため(実際の置き場所は

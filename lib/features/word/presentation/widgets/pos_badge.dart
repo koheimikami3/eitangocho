@@ -10,7 +10,9 @@ class PosBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pos = partsOfSpeech.isEmpty ? PartOfSpeech.other : partsOfSpeech.first;
+    final pos = partsOfSpeech.isEmpty
+        ? PartOfSpeech.other
+        : partsOfSpeech.first;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(

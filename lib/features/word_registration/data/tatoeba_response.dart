@@ -29,10 +29,8 @@ abstract class TatoebaSentence with _$TatoebaSentence {
 
 @freezed
 abstract class TatoebaTranslation with _$TatoebaTranslation {
-  const factory TatoebaTranslation({
-    String? lang,
-    String? text,
-  }) = _TatoebaTranslation;
+  const factory TatoebaTranslation({String? lang, String? text}) =
+      _TatoebaTranslation;
 
   factory TatoebaTranslation.fromJson(Map<String, dynamic> json) =>
       _$TatoebaTranslationFromJson(json);

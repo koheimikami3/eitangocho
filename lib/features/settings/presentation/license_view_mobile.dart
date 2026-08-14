@@ -16,9 +16,9 @@ class LicenseViewMobile extends ConsumerWidget {
   const LicenseViewMobile({super.key});
 
   /// 設定画面から開く。
-  static Future<void> push(BuildContext context) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const LicenseViewMobile()),
-      );
+  static Future<void> push(BuildContext context) => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const LicenseViewMobile()));
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,14 +41,14 @@ class LicenseViewMobile extends ConsumerWidget {
                 child: switch (licenses) {
                   AsyncData(:final value) => _LicenseList(items: value),
                   AsyncError() => Center(
-                      child: Text(
-                        'ライセンス情報を読み込めませんでした。',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: palette.textAlpha(45),
-                        ),
+                    child: Text(
+                      'ライセンス情報を読み込めませんでした。',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: palette.textAlpha(45),
                       ),
                     ),
+                  ),
                   _ => const Center(child: CircularProgressIndicator()),
                 },
               ),

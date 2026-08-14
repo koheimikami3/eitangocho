@@ -251,9 +251,7 @@ class _RevealAreaState extends State<_RevealArea> {
                   ),
                 )
               : DottedBorderBox(
-                  backgroundColor: _isHovered
-                      ? const Color(0x08000000)
-                      : null,
+                  backgroundColor: _isHovered ? const Color(0x08000000) : null,
                   child: const Text(
                     '日本語訳を表示',
                     style: TextStyle(fontSize: 12, color: Color(0x66000000)),
