@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_subheader.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の設定セクション(小見出し + 角丸カード)。
@@ -50,7 +51,9 @@ class MobileSettingsSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (var i = 0; i < rows!.length; i++) ...[
-                  if (i > 0)
+                  // 小見出しは直後の行と 1 組に見せたいので、間に線を入れない
+                  // (見出しの手前には入るので、組の区切りは保たれる)。
+                  if (i > 0 && rows![i - 1] is! MobileSettingsSubheader)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       child: Divider(
