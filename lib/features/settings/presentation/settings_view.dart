@@ -1,4 +1,3 @@
-import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
@@ -9,6 +8,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/data_managemen
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_radio_row.dart';
@@ -21,7 +21,7 @@ import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// 設定画面(クイズ出題方向・表示・iCloud 同期・データ・情報)。変更は即保存。
+/// macOS 版の設定画面(表示・クイズ・データ・サポート・情報)。変更は即保存。
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
@@ -43,20 +43,6 @@ class SettingsView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SettingsSection(
-                title: 'クイズの出題方向',
-                child: SettingsCard(
-                  children: [
-                    for (final direction in QuizDirection.values)
-                      SettingsRadioRow(
-                        label: direction.label,
-                        selected: settings.quizDirection == direction,
-                        onTap: () => notifier.setQuizDirection(direction),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 22),
-              SettingsSection(
                 title: '表示',
                 child: SettingsCard(
                   children: [
@@ -69,6 +55,20 @@ class SettingsView extends ConsumerWidget {
                     // iOS では OS の文字サイズ設定に委ねるため出さない。
                     if (AppPlatform.isMacOS)
                       UiScaleSlider(value: settings.uiScale),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: 'クイズ',
+                child: SettingsCard(
+                  children: [
+                    for (final direction in QuizDirection.values)
+                      SettingsRadioRow(
+                        label: direction.label,
+                        selected: settings.quizDirection == direction,
+                        onTap: () => notifier.setQuizDirection(direction),
+                      ),
                   ],
                 ),
               ),
@@ -87,15 +87,36 @@ class SettingsView extends ConsumerWidget {
               //   ),
               // ),
               const SizedBox(height: 22),
-              const SettingsSection(
-                title: 'iCloud 同期',
-                child: DesktopSyncSection(),
-              ),
-              const SizedBox(height: 22),
+              // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの
+              // 持ち出しを扱うため 1 つのセクションにまとめる(デザイン準拠)。
               const SettingsSection(
                 title: 'データ',
-                child: DataManagementSection(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DesktopSyncSection(),
+                    SizedBox(height: 12),
+                    DataManagementSection(),
+                  ],
+                ),
               ),
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: 'サポート',
+                child: SettingsCard(
+                  children: [
+                    // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
+                    // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
+                    SettingsLinkRow(
+                      label: 'App Store でレビューを書く',
+                      onTap: () =>
+                          ref.read(reviewPrompterProvider).openStoreListing(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              const SettingsCaption('感想やご要望はレビューでお知らせください。'),
               const SizedBox(height: 22),
               SettingsSection(
                 title: '情報',
@@ -106,13 +127,6 @@ class SettingsView extends ConsumerWidget {
                       // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
                       value: ref.watch(appVersionProvider).value ?? '',
                     ),
-                    // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
-                    // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
-                    SettingsLinkRow(
-                      label: 'App Store でレビューを書く',
-                      onTap: () =>
-                          ref.read(reviewPrompterProvider).openStoreListing(),
-                    ),
                     // ライセンスは最後に置く。カード下の説明文がこの行に掛かる。
                     SettingsLinkRow(
                       label: 'ライセンス',
@@ -122,13 +136,8 @@ class SettingsView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              const SettingsCaption(
                 '本アプリが利用しているオープンソースソフトウェアの一覧です。',
-                style: TextStyle(
-                  fontSize: 11,
-                  height: 1.6,
-                  color: AppColors.textQuaternary,
-                ),
               ),
             ],
           ),

@@ -80,6 +80,24 @@ void main() {
     });
   });
 
+  testWidgets('データセクションに iCloud 同期と書き出しを同居させる', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      expect(find.text('データ'), findsOneWidget);
+      expect(find.text('iCloud 同期'), findsOneWidget);
+      expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
+      expect(find.text('エクスポート...'), findsOneWidget);
+      expect(find.text('インポート...'), findsOneWidget);
+    });
+  });
+
+  testWidgets('サポートセクションにレビュー行を出す', (tester) async {
+    await runForPlatform(tester, TargetPlatform.macOS, () async {
+      expect(find.text('サポート'), findsOneWidget);
+      expect(find.text('App Store でレビューを書く'), findsOneWidget);
+      expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+    });
+  });
+
   testWidgets('情報セクションにバージョンとライセンスを出す', (tester) async {
     await runForPlatform(tester, TargetPlatform.macOS, () async {
       expect(find.text('情報'), findsOneWidget);

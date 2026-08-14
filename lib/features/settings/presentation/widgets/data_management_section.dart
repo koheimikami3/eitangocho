@@ -1,5 +1,5 @@
 import 'package:eitangocho/components/app_outlined_button.dart';
-import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/word_backup_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// ボタン hover 背景(プロトタイプの #f5f5f6)。
 const _hoverBackground = Color(0xFFF5F5F6);
 
-/// 設定画面の「データ」セクション。JSON エクスポート/インポートの導線。
+/// macOS 版の設定画面「データ」セクションのうち、JSON エクスポート/インポートの導線。
 class DataManagementSection extends ConsumerStatefulWidget {
   const DataManagementSection({super.key});
 
@@ -67,13 +67,7 @@ class _DataManagementSectionState
           ],
         ),
         const SizedBox(height: 8),
-        const Text(
-          '単語帳を JSON ファイルとして書き出し / 読み込みます。',
-          style: TextStyle(
-            fontSize: 11,
-            color: AppColors.textQuaternary,
-          ),
-        ),
+        const SettingsCaption('単語帳を JSON ファイルとして書き出し / 読み込みます。'),
       ],
     );
   }
