@@ -19,8 +19,7 @@ class LearningWordsViewMobile extends ConsumerWidget {
     final words = ref.watch(filteredLearningWordsProvider);
     // ロード前は既定値でフォールバックする。
     // showIpa はカードの IPA 表示のみに適用する(macOS 版と同じ)。
-    final settings =
-        ref.watch(settingsProvider).value ?? const SettingsState();
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final showIpa = settings.showIpa;
     final columns = settings.cardLayout.columns;
 

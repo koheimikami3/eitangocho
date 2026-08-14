@@ -13,6 +13,8 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../../ads/ads_test_overrides.dart';
+import '../../purchase/purchase_test_overrides.dart';
+import '../../review/review_test_overrides.dart';
 
 void main() {
   late AppDatabase db;
@@ -30,9 +32,7 @@ void main() {
   /// container を返す。drift の watch() ストリーム(wordListProvider)を
   /// 購読させないことで、破棄時の購読解除タイマー衝突(drift #3323)を避ける
   /// (quiz_page_notifier_test.dart と同じ手法)。
-  Future<ProviderContainer> setupLearned(
-    List<(String, String)> words,
-  ) async {
+  Future<ProviderContainer> setupLearned(List<(String, String)> words) async {
     for (final (word, japanese) in words) {
       final id = await db.wordDao.insertWord(
         WordsCompanion(
@@ -52,6 +52,8 @@ void main() {
         databaseProvider.overrideWithValue(db),
         learnedWordsProvider.overrideWithValue(learned),
         adsDisabled,
+        purchasesDisabled,
+        reviewDisabled,
       ],
     );
   }
@@ -119,10 +121,7 @@ void main() {
 
       expect(find.text('復習完了'), findsOneWidget);
       expect(find.text('覚えている 0語 / 忘れていた 1語'), findsOneWidget);
-      expect(
-        find.text('忘れていた単語(学習中リストに戻りました)'),
-        findsOneWidget,
-      );
+      expect(find.text('忘れていた単語(学習中リストに戻りました)'), findsOneWidget);
       expect(find.text('もう一度'), findsOneWidget);
     });
   });

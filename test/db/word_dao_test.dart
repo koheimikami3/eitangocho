@@ -40,6 +40,21 @@ void main() {
     expect(words.map((w) => w.word), ['second', 'first']);
   });
 
+  test('countWords は登録件数を返し、削除に追従する', () async {
+    expect(await db.wordDao.countWords(), 0);
+
+    final id = await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+    );
+    await db.wordDao.insertWord(
+      const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+    );
+    expect(await db.wordDao.countWords(), 2);
+
+    await db.wordDao.deleteWord(id);
+    expect(await db.wordDao.countWords(), 1);
+  });
+
   test('updateWord はフィールドと updatedAt を更新する', () async {
     final id = await db.wordDao.insertWord(
       const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
@@ -99,7 +114,10 @@ void main() {
       );
 
       expect(await db.wordDao.findByWord('apple', excludeId: id), isNull);
-      expect(await db.wordDao.findByWord('apple', excludeId: id + 1), isNotNull);
+      expect(
+        await db.wordDao.findByWord('apple', excludeId: id + 1),
+        isNotNull,
+      );
     });
   });
 
@@ -143,8 +161,7 @@ void main() {
       );
       await db.wordDao.deleteWord(oldId);
       // deleteWord は deletedAt に now を入れるため、古い日時へ直す。
-      await (db.update(db.deletedWords)
-            ..where((t) => t.word.equals('old')))
+      await (db.update(db.deletedWords)..where((t) => t.word.equals('old')))
           .write(DeletedWordsCompanion(deletedAt: Value(DateTime.utc(2020))));
 
       final recentId = await db.wordDao.insertWord(
@@ -173,34 +190,40 @@ void main() {
     expect(words.single.isLearned, isFalse);
   });
 
-  test('recordQuizResult(knew:true) は correctCount+1・lastReviewedAt 付与し updatedAt は変えない', () async {
-    final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
-    );
-    final before = (await db.wordDao.watchAll().first).single;
+  test(
+    'recordQuizResult(knew:true) は correctCount+1・lastReviewedAt 付与し updatedAt は変えない',
+    () async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+      final before = (await db.wordDao.watchAll().first).single;
 
-    await Future<void>.delayed(const Duration(seconds: 1));
-    await db.wordDao.recordQuizResult(id, knew: true);
-    await db.wordDao.recordQuizResult(id, knew: true);
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await db.wordDao.recordQuizResult(id, knew: true);
+      await db.wordDao.recordQuizResult(id, knew: true);
 
-    final after = (await db.wordDao.watchAll().first).single;
-    expect(after.correctCount, 2);
-    expect(after.lastReviewedAt, isNotNull);
-    // 実績記録では updatedAt を更新しない(内容編集専用に予約)。
-    expect(after.updatedAt, before.updatedAt);
-  });
+      final after = (await db.wordDao.watchAll().first).single;
+      expect(after.correctCount, 2);
+      expect(after.lastReviewedAt, isNotNull);
+      // 実績記録では updatedAt を更新しない(内容編集専用に予約)。
+      expect(after.updatedAt, before.updatedAt);
+    },
+  );
 
-  test('recordQuizResult(knew:false) は correctCount 据え置きで lastReviewedAt を更新する', () async {
-    final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
-    );
+  test(
+    'recordQuizResult(knew:false) は correctCount 据え置きで lastReviewedAt を更新する',
+    () async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
 
-    await db.wordDao.recordQuizResult(id, knew: false);
+      await db.wordDao.recordQuizResult(id, knew: false);
 
-    final after = (await db.wordDao.watchAll().first).single;
-    expect(after.correctCount, 0);
-    expect(after.lastReviewedAt, isNotNull);
-  });
+      final after = (await db.wordDao.watchAll().first).single;
+      expect(after.correctCount, 0);
+      expect(after.lastReviewedAt, isNotNull);
+    },
+  );
 
   test('getAll は watchAll と同じ並び順で全件返す', () async {
     await db.wordDao.insertWord(

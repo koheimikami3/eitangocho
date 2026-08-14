@@ -7,11 +7,18 @@ import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+import '../../review/review_test_overrides.dart';
 
 void main() {
   late AppDatabase db;
 
   setUp(() {
+    // クイズを最後まで進めるとレビュー依頼の判定(回数の記録)を通る。
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
     db = AppDatabase.forTesting(NativeDatabase.memory());
   });
 
@@ -37,6 +44,7 @@ void main() {
       overrides: [
         databaseProvider.overrideWithValue(db),
         learnedWordsProvider.overrideWithValue(learned),
+        reviewDisabled,
       ],
     );
     addTearDown(container.dispose);

@@ -1,9 +1,10 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/word_backup_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// iOS 版の設定画面「データ」セクション。JSON エクスポート/インポートの導線。
+/// iOS 版の設定画面「データ」セクションのうち、JSON エクスポート/インポートの導線。
 ///
 /// 処理そのものは macOS 版と共通([exportWordsToFile] /
 /// [importWordsFromFile])で、ここは見た目と多重実行の抑止だけを持つ。
@@ -33,8 +34,6 @@ class _MobileDataManagementSectionState
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -56,10 +55,7 @@ class _MobileDataManagementSectionState
           ],
         ),
         const SizedBox(height: 8),
-        Text(
-          '単語帳を JSON ファイルとして書き出し / 読み込みます。',
-          style: TextStyle(fontSize: 11, color: palette.textAlpha(40)),
-        ),
+        const MobileSettingsCaption('単語帳を JSON ファイルとして書き出し / 読み込みます。'),
       ],
     );
   }

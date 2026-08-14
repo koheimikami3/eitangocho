@@ -90,9 +90,7 @@ class MobileQuizCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.only(top: 14),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: palette.borderAlpha(8)),
-                ),
+                border: Border(top: BorderSide(color: palette.borderAlpha(8))),
               ),
               child: Text(
                 back,
@@ -103,16 +101,14 @@ class MobileQuizCard extends StatelessWidget {
             if (showLinkOnBack) ...[
               const SizedBox(height: 8),
               MobilePronunciationButton(
-              word: englishWord,
-              variant: MobilePronunciationButtonVariant.pill,
-            ),
+                word: englishWord,
+                variant: MobilePronunciationButtonVariant.pill,
+              ),
             ],
             if (exampleEn.trim().isNotEmpty) ...[
               const SizedBox(height: 14),
               Text(
-                exampleJa.trim().isEmpty
-                    ? exampleEn
-                    : '$exampleEn\n$exampleJa',
+                exampleJa.trim().isEmpty ? exampleEn : '$exampleEn\n$exampleJa',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,

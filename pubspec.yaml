@@ -20,10 +20,11 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # 1.2.0 = 発音導線の刷新(スピーカーボタン + iOS のアプリ内 WebView)。
 # 1.3.0 = iOS の発音ボタンの位置揃え + 単語の重複登録ガード。
 # 1.4.0 = iOS のバナー広告 + 句動詞の登録 + 入力欄と学習中カードの調整。
+# 1.5.0 = iOS の Pro(広告非表示の買い切り)。macOS には出さない。
 # ビルド番号は提出のたびにここで上げる。macOS はバージョンをまたいだ再利用も
 # 許さない(全履歴を通じて単調増加)ため、一度使った番号は二度と使わない。
 # +2 は 1.2.0 の macOS 提出が build 1 で弾かれたため。docs/design.md 参照。
-version: 1.4.0+4
+version: 1.5.0+5
 
 environment:
   sdk: ^3.12.2
@@ -53,11 +54,17 @@ dependencies:
   package_info_plus: ^10.2.1
   webview_flutter: ^4.14.1
   url_launcher: ^6.3.2
+  # OS 標準のレビュー依頼(iOS / macOS)。SPM 対応は 2.0.10 以降で、
+  # 本プロジェクトは CocoaPods を使っていないためそれ未満は選べない。
+  in_app_review: ^2.0.12
   # 広告は iOS のみ(macOS は未対応)。SPM 対応は google_mobile_ads 8.0.0 以降で、
   # 本プロジェクトは CocoaPods を使っていないため 8.0.0 未満は選べない。
   google_mobile_ads: ^9.0.0
   # ATT(トラッキング許可ダイアログ)。広告 SDK 初期化前に応答を得るために使う。
   app_tracking_transparency: ^2.0.7
+  # 課金(広告非表示の買い切り)。SPM 対応は purchases_flutter 9.5.0 以降で、
+  # 本プロジェクトは CocoaPods を使っていないためそれ未満は選べない。
+  purchases_flutter: ^10.9.0
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +99,7 @@ flutter:
 
   assets:
     - assets/ejdict/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

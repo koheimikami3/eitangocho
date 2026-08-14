@@ -45,9 +45,7 @@ class QuizView extends ConsumerWidget {
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight - 40,
-            ),
+            constraints: BoxConstraints(minHeight: constraints.maxHeight - 40),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),

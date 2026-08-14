@@ -54,8 +54,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         fetched: info,
         notFound: false,
         selectedPartsOfSpeech: info.partsOfSpeech.toSet(),
-        translationFailed:
-            info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
+        translationFailed: info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
       );
     } on WordInfoException {
       if (!ref.mounted) return;
@@ -123,19 +122,22 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
             basedOn: state.fetched?.partsOfSpeech ?? const [],
           );
 
-    await ref.read(databaseProvider).wordDao.insertWord(
-      WordsCompanion(
-        word: Value(headword),
-        ipa: Value(ipa.trim()),
-        japanese: Value(japanese.trim()),
-        partsOfSpeech: Value(partsOfSpeech),
-        exampleEn: Value(exampleEn.trim()),
-        exampleJa: Value(exampleJa.trim()),
-        // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
-        // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
-        audioUrl: Value(state.fetched?.audioUrl ?? ''),
-      ),
-    );
+    await ref
+        .read(databaseProvider)
+        .wordDao
+        .insertWord(
+          WordsCompanion(
+            word: Value(headword),
+            ipa: Value(ipa.trim()),
+            japanese: Value(japanese.trim()),
+            partsOfSpeech: Value(partsOfSpeech),
+            exampleEn: Value(exampleEn.trim()),
+            exampleJa: Value(exampleJa.trim()),
+            // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
+            // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
+            audioUrl: Value(state.fetched?.audioUrl ?? ''),
+          ),
+        );
     return true;
   }
 }

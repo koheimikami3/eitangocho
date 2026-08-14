@@ -83,8 +83,9 @@ class _SkipLinkState extends State<_SkipLink> {
           style: TextStyle(
             fontSize: 12,
             color: AppColors.accent,
-            decoration:
-                _isHovered ? TextDecoration.underline : TextDecoration.none,
+            decoration: _isHovered
+                ? TextDecoration.underline
+                : TextDecoration.none,
           ),
         ),
       ),

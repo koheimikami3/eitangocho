@@ -20,7 +20,8 @@ final filteredWordListProvider = Provider<List<Word>>((ref) {
   final lower = query.toLowerCase();
   return words
       .where(
-        (w) => w.word.toLowerCase().contains(lower) || w.japanese.contains(query),
+        (w) =>
+            w.word.toLowerCase().contains(lower) || w.japanese.contains(query),
       )
       .toList();
 });

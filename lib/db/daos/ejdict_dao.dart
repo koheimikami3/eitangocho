@@ -11,9 +11,9 @@ class EjdictDao extends DatabaseAccessor<AppDatabase> with _$EjdictDaoMixin {
 
   /// 見出し語に一致するエントリの訳文字列を返す。未収録なら null。
   Future<String?> lookup(String word) async {
-    final entry = await (select(ejdictEntries)
-          ..where((t) => t.word.equals(word)))
-        .getSingleOrNull();
+    final entry = await (select(
+      ejdictEntries,
+    )..where((t) => t.word.equals(word))).getSingleOrNull();
     return entry?.meanings;
   }
 

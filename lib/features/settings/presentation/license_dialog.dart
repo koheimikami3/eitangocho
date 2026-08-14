@@ -10,10 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// iOS はプッシュ遷移だが macOS はダイアログ(デザインどおり)。全文は別画面に
 /// せず、同じダイアログ内で一覧と入れ替える(ウィンドウ全体を覆う遷移を挟むと
 /// 設定画面から遠くなるため)。
-Future<void> showLicenseDialog(BuildContext context) => showDialog<void>(
-      context: context,
-      builder: (_) => const _LicenseDialog(),
-    );
+Future<void> showLicenseDialog(BuildContext context) =>
+    showDialog<void>(context: context, builder: (_) => const _LicenseDialog());
 
 class _LicenseDialog extends ConsumerStatefulWidget {
   const _LicenseDialog();
@@ -32,9 +30,7 @@ class _LicenseDialogState extends ConsumerState<_LicenseDialog> {
 
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
       clipBehavior: Clip.antiAlias,
       insetPadding: const EdgeInsets.all(40),
       child: ConstrainedBox(
@@ -125,32 +121,32 @@ class _LicenseList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(licenseListProvider)) {
       AsyncData(:final value) => ListView.builder(
-          shrinkWrap: true,
-          itemCount: value.length + 1,
-          itemBuilder: (context, index) => index == value.length
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  child: Text(
-                    'この一覧はビルド時に自動生成されます。',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textQuaternary,
-                    ),
+        shrinkWrap: true,
+        itemCount: value.length + 1,
+        itemBuilder: (context, index) => index == value.length
+            ? const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                child: Text(
+                  'この一覧はビルド時に自動生成されます。',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textQuaternary,
                   ),
-                )
-              : _LicenseRow(item: value[index], onTap: onSelect),
-        ),
+                ),
+              )
+            : _LicenseRow(item: value[index], onTap: onSelect),
+      ),
       AsyncError() => const Padding(
-          padding: EdgeInsets.all(18),
-          child: Text(
-            'ライセンス情報を読み込めませんでした。',
-            style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
-          ),
+        padding: EdgeInsets.all(18),
+        child: Text(
+          'ライセンス情報を読み込めませんでした。',
+          style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
         ),
+      ),
       _ => const Padding(
-          padding: EdgeInsets.all(40),
-          child: Center(child: CircularProgressIndicator()),
-        ),
+        padding: EdgeInsets.all(40),
+        child: Center(child: CircularProgressIndicator()),
+      ),
     };
   }
 }
@@ -180,9 +176,7 @@ class _LicenseRowState extends State<_LicenseRow> {
         child: Container(
           decoration: BoxDecoration(
             color: _hovered ? AppColors.inputBackground : null,
-            border: const Border(
-              bottom: BorderSide(color: AppColors.border),
-            ),
+            border: const Border(bottom: BorderSide(color: AppColors.border)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           child: Row(

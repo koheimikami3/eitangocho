@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:eitangocho/features/ads/data/ads_provider.dart';
 import 'package:eitangocho/features/ads/domain/ad_log.dart';
+import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -138,8 +139,27 @@ class _MobileAdSlotState extends ConsumerState<MobileAdSlot> {
     }
   }
 
+  /// 読み込み済みの広告を捨て、枠の高さも返す。
+  void _discardAd() {
+    if (!mounted || _ad == null) return;
+    _retryTimer?.cancel();
+    _ad?.dispose();
+    setState(() => _ad = null);
+    widget.onSizeChanged?.call(null);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Pro を買ったら 3 枠とも即座に消す。次にこの枠が作り直されるまで
+    // 待っていると、設定画面から戻るまで買ったはずの広告が残る。
+    if (ref.watch(purchaseProvider).proUnlocked) {
+      // build 中に State は変えられないため、フレームの後に回す。
+      if (_ad != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _discardAd());
+      }
+      return const SizedBox.shrink();
+    }
+
     final ad = _ad;
     if (ad == null) return const SizedBox.shrink();
 

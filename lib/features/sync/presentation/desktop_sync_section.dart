@@ -1,5 +1,6 @@
 import 'package:eitangocho/components/app_outlined_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
@@ -7,7 +8,7 @@ import 'package:eitangocho/features/sync/presentation/sync_status_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// macOS 版の設定画面「iCloud 同期」セクションの中身。
+/// macOS 版の設定画面「データ」セクションのうち、iCloud 同期の部分。
 class DesktopSyncSection extends ConsumerWidget {
   const DesktopSyncSection({super.key});
 
@@ -41,15 +42,9 @@ class DesktopSyncSection extends ConsumerWidget {
               ),
             if (state.enabled) const SizedBox(width: 10),
             Expanded(
-              child: Text(
+              child: SettingsCaption(
                 syncStatusText(state),
-                style: TextStyle(
-                  fontSize: 11,
-                  height: 1.6,
-                  color: state.errorMessage != null
-                      ? AppColors.danger
-                      : AppColors.textQuaternary,
-                ),
+                color: state.errorMessage != null ? AppColors.danger : null,
               ),
             ),
           ],

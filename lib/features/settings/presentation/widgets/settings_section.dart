@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 
 /// 設定画面のセクション(見出し + 中身)。プロトタイプの見出し意匠に合わせる。
 class SettingsSection extends StatelessWidget {
-  const SettingsSection({
-    required this.title,
-    required this.child,
-    super.key,
-  });
+  const SettingsSection({required this.title, required this.child, super.key});
 
   final String title;
   final Widget child;

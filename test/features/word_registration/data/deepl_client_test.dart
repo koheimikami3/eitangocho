@@ -18,8 +18,10 @@ void main() {
       }),
     );
 
-    final result =
-        await client.translateToJapanese('He reads a book.', 'test-key');
+    final result = await client.translateToJapanese(
+      'He reads a book.',
+      'test-key',
+    );
 
     expect(result, '彼は本を読む。');
     expect(captured.headers['Authorization'], 'DeepL-Auth-Key test-key');

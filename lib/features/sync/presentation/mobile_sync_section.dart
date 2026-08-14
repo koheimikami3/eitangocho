@@ -1,11 +1,12 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_caption.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/sync/presentation/sync_status_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// iOS 版の設定画面「iCloud 同期」セクションの中身。
+/// iOS 版の設定画面「データ」セクションのうち、iCloud 同期の部分。
 class MobileSyncSection extends ConsumerWidget {
   const MobileSyncSection({super.key});
 
@@ -48,15 +49,9 @@ class MobileSyncSection extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        MobileSettingsCaption(
           syncStatusText(state),
-          style: TextStyle(
-            fontSize: 11,
-            height: 1.6,
-            color: state.errorMessage != null
-                ? palette.danger
-                : palette.textAlpha(40),
-          ),
+          color: state.errorMessage != null ? palette.danger : null,
         ),
       ],
     );

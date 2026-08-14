@@ -122,9 +122,9 @@ class QuizCard extends StatelessWidget {
                 if (!pronunciationOnFront) ...[
                   const SizedBox(height: 10),
                   PronunciationButton(
-                  word: englishWord,
-                  variant: PronunciationButtonVariant.quizPill,
-                ),
+                    word: englishWord,
+                    variant: PronunciationButtonVariant.quizPill,
+                  ),
                 ],
                 if (hasExample) ...[
                   const SizedBox(height: 10),

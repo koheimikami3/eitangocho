@@ -16,10 +16,10 @@ void main() {
     test('基準にある品詞は基準の並びを保つ(辞書が返した主用法が先頭に残る)', () {
       const basedOn = [PartOfSpeech.verb, PartOfSpeech.noun];
 
-      expect(
-        {PartOfSpeech.noun, PartOfSpeech.verb}.ordered(basedOn: basedOn),
-        [PartOfSpeech.verb, PartOfSpeech.noun],
-      );
+      expect({PartOfSpeech.noun, PartOfSpeech.verb}.ordered(basedOn: basedOn), [
+        PartOfSpeech.verb,
+        PartOfSpeech.noun,
+      ]);
     });
 
     test('基準に無い品詞は enum の宣言順で後ろに付く', () {

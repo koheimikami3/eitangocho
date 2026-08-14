@@ -72,10 +72,7 @@ class MobilePushHeader extends StatelessWidget {
                         const SizedBox(width: 2),
                         Text(
                           backLabel,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: palette.accent,
-                          ),
+                          style: TextStyle(fontSize: 16, color: palette.accent),
                         ),
                       ],
                     ),

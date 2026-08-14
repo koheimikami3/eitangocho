@@ -25,14 +25,12 @@ class EitangochoApp extends ConsumerWidget {
     // (1.0 でリリース済みの外観を変えないため)。
     final palette = AppPlatform.isMacOS
         ? AppPalette.light
-        : AppPalette.of(
-            switch (ref.watch(
-              settingsProvider.select((s) => s.value?.appearance),
-            )) {
-              AppAppearance.dark => Brightness.dark,
-              AppAppearance.light || null => Brightness.light,
-            },
-          );
+        : AppPalette.of(switch (ref.watch(
+            settingsProvider.select((s) => s.value?.appearance),
+          )) {
+            AppAppearance.dark => Brightness.dark,
+            AppAppearance.light || null => Brightness.light,
+          });
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

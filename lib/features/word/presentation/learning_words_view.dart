@@ -76,8 +76,7 @@ class LearningWordsView extends ConsumerWidget {
                                 .read(databaseProvider)
                                 .wordDao
                                 .setLearned(word.id, isLearned: isLearned),
-                            onTap: () =>
-                                showEditWordDialog(context, ref, word),
+                            onTap: () => showEditWordDialog(context, ref, word),
                             onContextMenu: (position) => showWordContextMenu(
                               context,
                               ref,

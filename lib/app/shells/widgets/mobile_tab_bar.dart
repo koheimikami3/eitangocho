@@ -32,10 +32,9 @@ class MobileTabBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
-    final bottomInset = (MediaQuery.paddingOf(context).bottom).clamp(
-      _minBottomInset,
-      40.0,
-    );
+    final bottomInset = (MediaQuery.paddingOf(
+      context,
+    ).bottom).clamp(_minBottomInset, 40.0);
 
     return ClipRect(
       child: BackdropFilter(
@@ -74,9 +73,7 @@ class MobileTabBar extends ConsumerWidget {
                 // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
                 onTap: () {
                   ref.read(quizPageProvider.notifier).startQuiz();
-                  ref
-                      .read(mainPageProvider.notifier)
-                      .selectView(MainView.quiz);
+                  ref.read(mainPageProvider.notifier).selectView(MainView.quiz);
                 },
               ),
               _TabItem(
