@@ -1,3 +1,4 @@
+import 'package:eitangocho/features/settings/presentation/widgets/settings_divider.dart';
 import 'package:flutter/material.dart';
 
 /// 設定画面の白カード。子の行を縦に並べ、行間に区切り線を挟む。
@@ -8,9 +9,6 @@ class SettingsCard extends StatelessWidget {
 
   /// カード枠線色(プロトタイプの rgba(0,0,0,0.10))。
   static const _border = Color(0x1A000000);
-
-  /// 行間の区切り線色(プロトタイプの rgba(0,0,0,0.07))。
-  static const _divider = Color(0x12000000);
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +22,7 @@ class SettingsCard extends StatelessWidget {
       child: Column(
         children: [
           for (var i = 0; i < children.length; i++) ...[
-            if (i > 0)
-              Container(
-                height: 1,
-                margin: const EdgeInsets.symmetric(horizontal: 14),
-                color: _divider,
-              ),
+            if (i > 0) const SettingsDivider(),
             children[i],
           ],
         ],

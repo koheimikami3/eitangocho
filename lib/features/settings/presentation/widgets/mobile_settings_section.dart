@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_subheader.dart';
 import 'package:flutter/material.dart';
 
@@ -51,14 +52,7 @@ class MobileSettingsSection extends StatelessWidget {
                   // 小見出しは直後の行と 1 組に見せたいので、間に線を入れない
                   // (見出しの手前には入るので、組の区切りは保たれる)。
                   if (i > 0 && rows![i - 1] is! MobileSettingsSubheader)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: palette.borderAlpha(7),
-                      ),
-                    ),
+                    const MobileSettingsDivider(),
                   rows![i],
                 ],
               ],
