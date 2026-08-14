@@ -4,7 +4,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/data_management_section.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
 // ignore: unused_import
 import 'package:eitangocho/features/settings/presentation/widgets/deepl_api_key_field.dart';
@@ -16,7 +16,8 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_secti
 import 'package:eitangocho/features/settings/presentation/widgets/settings_toggle_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
-import 'package:eitangocho/features/sync/presentation/desktop_sync_section.dart';
+import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
+import 'package:eitangocho/features/sync/presentation/desktop_sync_status_caption.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,15 +87,19 @@ class SettingsView extends ConsumerWidget {
               // ),
               const SizedBox(height: 22),
               // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの
-              // 持ち出しを扱うため 1 つのセクションにまとめる(デザイン準拠)。
+              // 持ち出しを扱うため 1 枚のカードにまとめる(デザイン準拠)。
               const SettingsSection(
                 title: 'データ',
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    DesktopSyncSection(),
-                    SizedBox(height: 12),
-                    DataManagementSection(),
+                    SettingsCard(
+                      children: [DesktopSyncRows(), DataBackupRows()],
+                    ),
+                    SizedBox(height: 8),
+                    // 同期状態(最終同期・エラー)はカードの外に出す。
+                    // デザインの図には無いが、同期の失敗を伝える唯一の場所。
+                    DesktopSyncStatusCaption(),
                   ],
                 ),
               ),

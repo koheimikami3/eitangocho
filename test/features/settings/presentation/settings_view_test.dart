@@ -80,13 +80,17 @@ void main() {
     });
   });
 
-  testWidgets('データセクションに iCloud 同期と書き出しを同居させる', (tester) async {
+  testWidgets('データセクションは iCloud 同期と書き出しを 1 枚のカードに並べる', (tester) async {
     await runForPlatform(tester, TargetPlatform.macOS, () async {
       expect(find.text('データ'), findsOneWidget);
       expect(find.text('iCloud 同期'), findsOneWidget);
+      // 末尾の `...` は macOS だけに付ける(ダイアログが開くことを示す慣習)。
+      expect(find.text('データを書き出す...'), findsOneWidget);
+      expect(find.text('データを読み込む...'), findsOneWidget);
+      // 同期状態の説明文だけカードの外に残す(同期の失敗を伝える唯一の場所)。
       expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
-      expect(find.text('エクスポート...'), findsOneWidget);
-      expect(find.text('インポート...'), findsOneWidget);
+      // 書き出し / 読み込みの補足文はデザインどおり出さない。
+      expect(find.text('単語帳を JSON ファイルとして書き出し / 読み込みます。'), findsNothing);
     });
   });
 
