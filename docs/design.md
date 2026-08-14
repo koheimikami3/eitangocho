@@ -481,10 +481,19 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   App Store Connect にその ID のアプリが無いため。購入・復元の実地検証は
   **TestFlight(release ビルド)**で行い、debug で UI を確認したいときは
   `purchasesClientProvider` をフェイクに差し替える(テストと同じもの)。
-- **コード外に必要な作業**: App Store Connect の有料 App 契約、非消耗型の
-  App 内課金の作成(製品 ID は `com.kohei.mikami.eitangocho.pro`)、
-  RevenueCat のプロジェクト作成と App Store Connect 連携、entitlement `pro` と
-  offering の Lifetime パッケージへの紐付け、プライバシー申告への「購入」追加。
+- **ストア側の名前とコードは 3 か所で一致している必要がある**。どれか 1 つでも
+  ずれると価格が出ず購入もできないため、変えるときは両側を揃えること。
+  - 製品 ID `com.kohei.mikami.eitangocho.pro`(App Store Connect の非消耗型。
+    **変更も再利用もできない**)
+  - entitlement `pro`(`PurchaseConfig.entitlementId`)
+  - offering `default` の **`$rc_lifetime`** パッケージ
+    (実装は `offerings.current?.lifetime` を読む)
+  - onboarding が自動生成する entitlement は識別子がプロジェクト名になるため
+    使わない(`pro` を作り直して自動生成分は削除した)。同じくパッケージに
+    自動で入る Test Store の商品も外す
+- **コード外に残る作業**: プライバシー申告への「購入」追加、審査用スクリーン
+  ショット(設定画面の Pro セクション)、初回は**アプリのバージョンと一緒に
+  App 内課金を提出する**必要がある点。
   **ネイティブの RevenueCat SDK は SPM 経由で入るため `NOTICES` に載らない**
   (GMA SDK と同じ論点)。
 
