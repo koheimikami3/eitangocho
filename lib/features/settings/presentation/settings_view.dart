@@ -16,7 +16,6 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_toggl
 import 'package:eitangocho/features/settings/presentation/widgets/settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
-import 'package:eitangocho/features/sync/presentation/desktop_sync_status_caption.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,17 +88,8 @@ class SettingsView extends ConsumerWidget {
               // 持ち出しを扱うため 1 枚のカードにまとめる(デザイン準拠)。
               const SettingsSection(
                 title: 'データ',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SettingsCard(
-                      children: [DesktopSyncRows(), DataBackupRows()],
-                    ),
-                    SizedBox(height: 8),
-                    // 同期状態(最終同期・エラー)はカードの外に出す。
-                    // デザインの図には無いが、同期の失敗を伝える唯一の場所。
-                    DesktopSyncStatusCaption(),
-                  ],
+                child: SettingsCard(
+                  children: [DesktopSyncRows(), DataBackupRows()],
                 ),
               ),
               const SizedBox(height: 22),

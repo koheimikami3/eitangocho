@@ -2,14 +2,18 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
+import 'package:eitangocho/features/sync/presentation/sync_status_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// iOS 版の設定画面「データ」カードのうち、iCloud 同期の行。
 ///
 /// カード枠は [MobileSettingsSection] が描くため、ここは行だけを返す
-/// (同じカードに書き出し / 読み込みの行が続く)。同期状態の説明文は
-/// カードの外に出るので [MobileSyncStatusCaption] が持つ。
+/// (同じカードに書き出し / 読み込みの行が続く)。
+///
+/// 同期状態はカードの外に出さず「今すぐ同期」行の右端に出す。カードの下に
+/// 置くと、間に書き出し / 読み込みの行が挟まって何に掛かる文か読めないため。
+/// エラーだけは長く折り返しが要るので独立した行にする。
 class MobileSyncRows extends ConsumerWidget {
   const MobileSyncRows({super.key});
 
@@ -28,7 +32,15 @@ class MobileSyncRows extends ConsumerWidget {
         ),
         if (state.enabled) ...[
           const MobileSettingsDivider(),
-          _SyncNowRow(syncing: state.syncing, onTap: notifier.syncNow),
+          _SyncNowRow(
+            syncing: state.syncing,
+            status: syncStatusText(state),
+            onTap: notifier.syncNow,
+          ),
+          if (state.errorMessage != null) ...[
+            const MobileSettingsDivider(),
+            _SyncErrorRow(message: state.errorMessage!),
+          ],
         ],
       ],
     );
@@ -36,9 +48,14 @@ class MobileSyncRows extends ConsumerWidget {
 }
 
 class _SyncNowRow extends StatelessWidget {
-  const _SyncNowRow({required this.syncing, required this.onTap});
+  const _SyncNowRow({
+    required this.syncing,
+    required this.status,
+    required this.onTap,
+  });
 
   final bool syncing;
+  final String status;
   final VoidCallback onTap;
 
   @override
@@ -65,7 +82,13 @@ class _SyncNowRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (syncing)
+            // 右端の状態はバージョン行(MobileSettingsValueRow)と同じ体裁。
+            Text(
+              status,
+              style: TextStyle(fontSize: 13, color: palette.textAlpha(40)),
+            ),
+            if (syncing) ...[
+              const SizedBox(width: 8),
               SizedBox(
                 width: 16,
                 height: 16,
@@ -74,8 +97,29 @@ class _SyncNowRow extends StatelessWidget {
                   color: palette.accent,
                 ),
               ),
+            ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SyncErrorRow extends StatelessWidget {
+  const _SyncErrorRow({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      child: Text(
+        message,
+        // 行というより注記なので、他の行(14px)より小さくする。
+        style: TextStyle(fontSize: 12, height: 1.5, color: palette.danger),
       ),
     );
   }

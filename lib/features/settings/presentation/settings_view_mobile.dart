@@ -26,7 +26,6 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_setting
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/presentation/mobile_sync_rows.dart';
-import 'package:eitangocho/features/sync/presentation/mobile_sync_status_caption.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -133,10 +132,6 @@ class SettingsViewMobile extends ConsumerWidget {
           title: 'データ',
           rows: [MobileSyncRows(), MobileDataBackupRows()],
         ),
-        const SizedBox(height: 8),
-        // 同期状態(最終同期・エラー)はカードの外に出す。デザインの図には
-        // 無いが、同期の失敗を伝える唯一の場所なので残す。
-        const MobileSyncStatusCaption(),
         const SizedBox(height: 22),
         MobileSettingsSection(
           title: 'サポート',

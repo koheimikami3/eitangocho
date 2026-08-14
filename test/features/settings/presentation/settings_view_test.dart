@@ -87,10 +87,11 @@ void main() {
       // 末尾の `...` は macOS だけに付ける(ダイアログが開くことを示す慣習)。
       expect(find.text('データを書き出す...'), findsOneWidget);
       expect(find.text('データを読み込む...'), findsOneWidget);
-      // 同期状態の説明文だけカードの外に残す(同期の失敗を伝える唯一の場所)。
-      expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
-      // 書き出し / 読み込みの補足文はデザインどおり出さない。
+      // 補足文はデザインどおり出さない。同期状態は「今すぐ同期」行の右端に出す
+      // (同期 OFF ではその行ごと無いので、この場面では何も出ない)。
       expect(find.text('単語帳を JSON ファイルとして書き出し / 読み込みます。'), findsNothing);
+      expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsNothing);
+      expect(find.text('今すぐ同期'), findsNothing);
     });
   });
 
