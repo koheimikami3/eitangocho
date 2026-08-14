@@ -54,6 +54,36 @@ void main() {
     await tester.pump();
   }
 
+  testWidgets('表示セクションにテーマとカードの並びを小見出しでまとめる', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.text('表示'), findsOneWidget);
+    expect(find.text('テーマ'), findsOneWidget);
+    expect(find.text('学習中カードの並び'), findsOneWidget);
+    expect(find.text('ライト'), findsOneWidget);
+    expect(find.text('発音記号(IPA)を表示'), findsOneWidget);
+    // 統合前の独立セクションは残っていないこと。
+    expect(find.text('外観'), findsNothing);
+  });
+
+  testWidgets('データセクションに iCloud 同期と書き出しを同居させる', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.text('データ'), findsOneWidget);
+    expect(find.text('iCloud 同期'), findsOneWidget);
+    expect(find.text('iCloud を使う端末同士で単語帳を同期します。'), findsOneWidget);
+    expect(find.text('エクスポート'), findsOneWidget);
+    expect(find.text('インポート'), findsOneWidget);
+  });
+
+  testWidgets('サポートセクションにレビュー行を出す', (tester) async {
+    await pumpSettings(tester);
+
+    expect(find.text('サポート'), findsOneWidget);
+    expect(find.text('App Store でレビューを書く'), findsOneWidget);
+    expect(find.text('感想やご要望はレビューでお知らせください。'), findsOneWidget);
+  });
+
   testWidgets('情報セクションにバージョンとライセンスを出す', (tester) async {
     await pumpSettings(tester);
 
