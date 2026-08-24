@@ -1,4 +1,4 @@
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:eitangocho/features/ads/data/tracking_authorizer.dart';
 import 'package:eitangocho/features/ads/domain/ad_log.dart';
 import 'package:eitangocho/features/ads/domain/ad_unit_ids.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
@@ -35,13 +35,10 @@ Future<bool> adsEnabled(Ref ref) async {
   }
 
   try {
-    // ATT の応答が返らないまま止まっても広告自体は出せる(パーソナライズ
-    // されないだけ)。アプリがまだアクティブでないうちに要求すると応答が
-    // 返らないことがあるため、待ち続けずに先へ進む。
-    await _requestTrackingAuthorizationIfNeeded().timeout(
-      const Duration(seconds: 5),
-      onTimeout: () => adLog('ATT の応答が無いまま初期化へ進みます'),
-    );
+    // ATT はアプリがアクティブになるまで要求されない(TrackingAuthorizer が
+    // 待つ)。ダイアログを出せなかった場合もここは戻り、非パーソナライズ
+    // 広告として初期化へ進む。出し直しは向こうが引き受ける。
+    await ref.read(trackingAuthorizerProvider).ensureRequested();
     final status = await MobileAds.instance.initialize();
     adLog('SDK 初期化完了: ${status.adapterStatuses.keys.join(", ")}');
     return true;
@@ -50,17 +47,4 @@ Future<bool> adsEnabled(Ref ref) async {
     adLog('SDK の初期化に失敗: $error\n$stackTrace');
     return false;
   }
-}
-
-/// ATT(トラッキング許可)をまだ聞いていないときだけ 1 回求める。
-///
-/// 応答の内容は見ない。拒否されてもパーソナライズされない広告は出せるため。
-/// SDK の初期化より先に済ませるのは、初期化後に IDFA の利用可否が変わっても
-/// その回のリクエストには反映されないため。
-Future<void> _requestTrackingAuthorizationIfNeeded() async {
-  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-  adLog('ATT の現在の状態: ${status.name}');
-  if (status != TrackingStatus.notDetermined) return;
-  final answer = await AppTrackingTransparency.requestTrackingAuthorization();
-  adLog('ATT の応答: ${answer.name}');
 }

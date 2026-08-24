@@ -5,7 +5,7 @@ import 'package:eitangocho/features/ads/data/ads_provider.dart';
 /// iOS を装う(`debugDefaultTargetPlatformOverride`)ウィジェットテストでは、
 /// 広告枠を含む画面を描いた時点で `adsEnabled` が走り、ATT と広告 SDK の
 /// プラグインを呼びに行ってしまう。実行機は macOS でプラグインが無いため
-/// 例外になるうえ、ATT のタイムアウト用タイマーが残って
+/// 例外になるうえ、ATT がアクティブ化を待つタイマーが残って
 /// flutter_test の "pending timer" 検査に引っかかる。
 ///
 /// 広告そのものを検証するテスト以外は、これを overrides に足すこと。

@@ -63,8 +63,10 @@ class _MobileAdSlotState extends ConsumerState<MobileAdSlot> {
   @override
   void initState() {
     super.initState();
-    // 最初のフレームを描いてから読み込む。ATT のダイアログはアプリが
-    // アクティブになる前に要求しても表示されないまま返ってしまう。
+    // 最初のフレームを描いてから読み込む(サイズの決定に context が要る)。
+    // ATT をアプリがアクティブになるまで待たせるのは TrackingAuthorizer の
+    // 役目で、ここではない。最初のフレームはまだアクティブではないため、
+    // このコールバックを ATT のタイミングの拠り所にしてはいけない。
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadAd());
   }
 
