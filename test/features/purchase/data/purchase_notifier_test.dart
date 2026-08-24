@@ -175,4 +175,31 @@ void main() {
 
     expect(container.read(purchaseProvider).proUnlocked, isFalse);
   });
+
+  group('proUnlockedKnown', () {
+    test('entitlement が届いた時点で完了し、そのとき状態も入っている', () async {
+      client.initialProUnlocked = true;
+      final container = makeContainer();
+      final notifier = container.read(purchaseProvider.notifier);
+
+      await notifier.proUnlockedKnown;
+
+      expect(container.read(purchaseProvider).proUnlocked, isTrue);
+    });
+
+    test('課金を扱えない環境でも完了する', () async {
+      client = FakePurchasesClient(isAvailable: false);
+      final container = makeContainer();
+
+      // 待ち手を取り残すと、広告側が確定待ちのまま止まる。
+      await container.read(purchaseProvider.notifier).proUnlockedKnown;
+    });
+
+    test('初期化に失敗しても完了する', () async {
+      client.configureError = Exception('SDK が無い');
+      final container = makeContainer();
+
+      await container.read(purchaseProvider.notifier).proUnlockedKnown;
+    });
+  });
 }

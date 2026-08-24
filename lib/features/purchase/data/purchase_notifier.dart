@@ -25,6 +25,25 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
 
   late final Future<void> _initialized;
 
+  final _proUnlockedKnown = Completer<void>();
+
+  /// 購入状態(entitlement)が一度でも分かったことを表す Future。
+  ///
+  /// 広告側が「Pro を買った人には ATT を聞かない」を実際に効かせるために待つ。
+  /// [PurchaseState.proUnlocked] の初期値 false を鵜呑みにすると、購入者にも
+  /// 毎起動トラッキング許可を求めてしまう。
+  ///
+  /// 価格の取得までは待たない([_initialized] との違い)。entitlement とは
+  /// 別の問い合わせで、遅い方に引きずられると ATT がそのぶん遅れるため。
+  ///
+  /// 「分かった」には諦めも含む。課金が使えない環境・初期化の失敗・破棄でも
+  /// 完了させる。待ち手を取り残すと広告そのものが出なくなる。
+  Future<void> get proUnlockedKnown => _proUnlockedKnown.future;
+
+  void _markProUnlockedKnown() {
+    if (!_proUnlockedKnown.isCompleted) _proUnlockedKnown.complete();
+  }
+
   @override
   PurchaseState build() {
     _initialized = _initialize();
@@ -32,6 +51,7 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     ref.onDispose(() {
       _messageTimer?.cancel();
       _proUnlocked?.cancel();
+      _markProUnlockedKnown();
     });
 
     return PurchaseState(
@@ -48,6 +68,7 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     final client = ref.read(purchasesClientProvider);
     if (!client.isAvailable) {
       purchaseLog('課金は無効です(iOS 以外、または SDK キーが未設定)');
+      _markProUnlockedKnown();
       return;
     }
 
@@ -56,11 +77,13 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     } on Object catch (error) {
       purchaseLog('SDK の初期化に失敗しました: $error');
       if (ref.mounted) state = state.copyWith(available: false);
+      _markProUnlockedKnown();
       return;
     }
     if (!ref.mounted) return;
 
     _proUnlocked = client.watchProUnlocked().listen((unlocked) {
+      _markProUnlockedKnown();
       if (!ref.mounted) return;
       purchaseLog('購入状態: ${unlocked ? "Pro" : "未購入"}');
       state = state.copyWith(proUnlocked: unlocked);
