@@ -98,6 +98,10 @@ class _MobileAdSlotState extends ConsumerState<MobileAdSlot> {
       adLog('広告ユニット ID が空のためこの枠は出しません');
       return;
     }
+    // Pro を買った後に作られた枠は、そもそも広告を要求しない。adsEnabled は
+    // 一度 true を返すとその値を保つため(購入状態を watch すると、確定待ちの
+    // 最中に自分自身を無効化してしまう)、購入後の判定はここで行う。
+    if (ref.read(purchaseProvider).proUnlocked) return;
     _requesting = true;
     try {
       if (!await ref.read(adsEnabledProvider.future)) return;

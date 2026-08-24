@@ -37,6 +37,10 @@ class FakePurchasesClient implements PurchasesClient {
   /// (= 処理中の表示)を再現したいテストだけ使う。
   Completer<void>? purchaseGate;
 
+  /// 初期化を途中で止めておくための関門。購入状態がまだ確定していない間の
+  /// 挙動を見たいテストだけ使う([purchaseGate] と同じ仕組み)。
+  Completer<void>? configureGate;
+
   var configureCount = 0;
   var purchaseCount = 0;
   var restoreCount = 0;
@@ -51,6 +55,7 @@ class FakePurchasesClient implements PurchasesClient {
   @override
   Future<void> configure() async {
     configureCount++;
+    await configureGate?.future;
     if (configureError != null) throw configureError!;
   }
 
