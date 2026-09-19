@@ -245,10 +245,19 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   macOS が 1.0.0、iOS が 1.1.0(iCloud 同期対応)で、**1.1.0 は macOS に出して
   いない**。macOS の 2 本目は 1.2.0 になる。掲載したリリースノートは
   [release-notes.md](release-notes.md) に控えがある。
-  **ビルド番号は提出のたびに pubspec で必ず上げる**。
-  当初は「Xcode の Manage Version and Build Number が自動で繰り上げるので
-  手では上げない」としていたが、**1.2.0 の macOS アップロードが弾かれて
-  誤りと判明した**(繰り上がらないまま build 1 のまま提出された)。
+  **pubspec のビルド番号は `+1` に固定し、実際の番号は Xcode の
+  Manage Version and Build Number に任せる**(1.5.0 で戻した)。1.5.0 の
+  再提出で、pubspec が `+5` のまま build 6 がアップロードされ、自動の
+  繰り上げが効くことを確認したため。
+  - **ただし macOS で同じことが起きる保証はない**。1.2.0 の macOS
+    アップロードは、まさにこの自動繰り上げが効かず build 1 のまま提出されて
+    弾かれている(当時はこれを理由に「提出のたびに pubspec で上げる」運用に
+    変えていた)。確認できたのは iOS の 1 例だけで、しかも pubspec が `+5`
+    だったため「アップロード済みの最大値 + 1」なのか「アーカイブの値 + 1」
+    なのか区別できない。後者なら `+1` 固定では毎回 2 になり 2 回目で衝突する。
+    **提出のたび、特に macOS では、上がった番号を必ず確認すること**
+  - **使用済みの番号**: 1.5.0 は iOS で build 5(Guideline 2.1 でリジェクト)と
+    build 6(承認)。
   - **macOS はアプリの全履歴を通じてビルド番号が単調増加でなければならない**。
     iOS はマーケティングバージョン内でユニークなら足りる(1.1.0 の build 1 と
     1.2.0 の build 1 が共存できる)が、macOS はバージョンをまたいだ再利用も
@@ -257,10 +266,11 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
   - 1.2.0 の macOS 提出でこの制約に当たり、`1.2.0+1` → `1.2.0+2` に上げ直した
     (iOS の 1.2.0 は build 1 のまま通っている)
   - CI などアップロードを Xcode 以外で行う場合は `--build-number` で明示する
-  - **pubspec を上げたら、Xcode で Archive する前に `flutter build ios|macos
-    --config-only` を実行する**。Info.plist の `CFBundleShortVersionString` /
-    `CFBundleVersion` は `$(FLUTTER_BUILD_NAME)` / `$(FLUTTER_BUILD_NUMBER)` を
-    参照しており、その実体である `ios/Flutter/Generated.xcconfig` と
+  - **pubspec のバージョンを変えたら、Xcode で Archive する前に
+    `flutter build ios|macos --config-only` を実行する**。Info.plist の
+    `CFBundleShortVersionString` / `CFBundleVersion` は
+    `$(FLUTTER_BUILD_NAME)` / `$(FLUTTER_BUILD_NUMBER)` を参照しており、その
+    実体である `ios/Flutter/Generated.xcconfig` と
     `macos/Flutter/ephemeral/Flutter-Generated.xcconfig` は Flutter ツールが
     ビルドを走らせたときだけ pubspec から書き出される(どちらも gitignore 対象の
     生成物)。Xcode 単体の Archive は pubspec を読まないため、前回ビルド時の
