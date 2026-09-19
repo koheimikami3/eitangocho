@@ -18,6 +18,7 @@ abstract final class AppColors {
   /// accent(#429FF0)では淡い地に対して 2.56:1 しか出ないため濃い青にする。
   /// デザインの #1E7FD6 も測ると 3.77:1(hover 3.43:1)で 12〜13px の文字には
   /// 足りないので、色相を保ったまま明度だけ下げた(通常 5.08:1 / hover 4.61:1)。
+  /// macOS 専用の値。iOS は 1.6.0 の刷新で別の値を持つ(AppPalette.accentOnSoft)。
   static const accentOnSoft = Color(0xFF176AB4);
   static const danger = Color(0xFFC03030); // 削除系
   static const dangerHover = Color(0xFFA82828);

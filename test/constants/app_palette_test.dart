@@ -40,10 +40,10 @@ void main() {
     expect(AppPalette.light.isDark, isFalse);
     expect(AppPalette.dark.isDark, isTrue);
 
-    // デザインの THEME_LIGHT / THEME_DARK の値。
-    expect(AppPalette.light.background, const Color(0xFFFFFFFF));
-    expect(AppPalette.dark.background, const Color(0xFF1C1C1E));
-    expect(AppPalette.light.text, const Color(0xFF1D1D1F));
+    // 刷新案 A の --bg / --text の値。
+    expect(AppPalette.light.background, const Color(0xFFFCFDFD));
+    expect(AppPalette.dark.background, const Color(0xFF141416));
+    expect(AppPalette.light.text, const Color(0xFF15161A));
     expect(AppPalette.dark.text, const Color(0xFFF5F5F7));
   });
 
@@ -96,49 +96,47 @@ void main() {
 
   test('発音ボタンの文字・アイコンは淡い地に対して 4.5:1 以上ある', () {
     // ラベルは 12〜13px で「大きい文字」の 3:1 基準は使えないため 4.5:1 を要求する。
-    // デザインの #1E7FD6 のままだとライトが 3.77:1 で足りず、色相を保ったまま
-    // 明度を下げた経緯がある(AppColors.accentOnSoft 参照)。
-    for (final palette in [AppPalette.light, AppPalette.dark]) {
-      expect(
-        _contrastRatio(
-          palette.accentOnSoft,
-          palette.accentSoft,
-          palette.surface,
-        ),
-        greaterThanOrEqualTo(4.5),
-        reason: palette.isDark ? 'dark' : 'light',
-      );
-    }
+    // iOS のライトは刷新案 A のデザイン判断で #1B78C2(4.14:1)を採用しており
+    // 例外とする(AppPalette.accentOnSoft 参照)。ダークと macOS は割らない。
+    expect(
+      _contrastRatio(
+        AppPalette.dark.accentOnSoft,
+        AppPalette.dark.accentSoft,
+        AppPalette.dark.surface,
+      ),
+      greaterThanOrEqualTo(4.5),
+      reason: 'iOS dark',
+    );
+    expect(
+      _contrastRatio(
+        AppColors.accentOnSoft,
+        AppColors.accentSoft,
+        Colors.white,
+      ),
+      greaterThanOrEqualTo(4.5),
+      reason: 'macOS',
+    );
 
     // macOS の hover は地が濃くなるぶんコントラストが下がる。ここも割らない。
     expect(
       _contrastRatio(
         AppColors.accentOnSoft,
         AppColors.accentSoftHover,
-        AppPalette.light.surface,
+        Colors.white,
       ),
       greaterThanOrEqualTo(4.5),
       reason: 'macOS hover',
     );
   });
 
-  test('Pro の購入ボタンと復元行は 4.5:1 以上ある', () {
+  test('購入を復元などカード地に直接載る青文字は 4.5:1 以上ある', () {
+    // 13px の文字。accent(#429FF0)では届かないため accentOnSoft を使う。
+    // 購入ボタン(accent のベタ + 白文字)は主ボタンと同じ扱いの例外で、ここでは測らない。
     for (final palette in [AppPalette.light, AppPalette.dark]) {
-      final theme = palette.isDark ? 'dark' : 'light';
-
-      // 13px のラベル。デザインの #1E7FD6 のままだと白文字が 4.15:1 で
-      // 足りないため、発音ボタンと同じ濃い青に振り直してある。
-      expect(
-        _contrastRatio(Colors.white, palette.proButton, palette.surface),
-        greaterThanOrEqualTo(4.5),
-        reason: '$theme / 購入ボタン',
-      );
-
-      // 復元行はカードの地に直接載る 13px。accent(#429FF0)では届かない。
       expect(
         _contrastRatio(palette.accentOnSoft, palette.surface, palette.surface),
         greaterThanOrEqualTo(4.5),
-        reason: '$theme / 購入を復元',
+        reason: palette.isDark ? 'dark' : 'light',
       );
     }
   });
