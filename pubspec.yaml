@@ -21,11 +21,12 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # 1.3.0 = iOS の発音ボタンの位置揃え + 単語の重複登録ガード。
 # 1.4.0 = iOS のバナー広告 + 句動詞の登録 + 入力欄と学習中カードの調整。
 # 1.5.0 = iOS の Pro(広告非表示の買い切り)。macOS には出さない。
-# ビルド番号は +1 固定にし、実際の番号は Xcode の Manage Version and Build
-# Number に任せる(1.5.0 の再提出で、pubspec が +5 のまま build 6 が上がった)。
-# macOS はバージョンをまたいだ再利用も許さない(全履歴を通じて単調増加)ため、
-# 自動の繰り上げが効いているかは提出のたびに確認すること。docs/design.md 参照。
-version: 1.5.0+1
+# ビルド番号は提出のたびにここで上げる。macOS はバージョンをまたいだ再利用も
+# 許さない(全履歴を通じて単調増加)ため、一度使った番号は二度と使わない。
+# Xcode の自動繰り上げは iOS でしか効かないので、厳しい macOS に合わせて
+# ここに次の番号を持たせる。使用済み番号の台帳は docs/design.md にある。
+# +7 は 5 と 6 を iOS の 1.5.0 が使ったため(6 が承認された版)。
+version: 1.5.0+7
 
 environment:
   sdk: ^3.12.2
