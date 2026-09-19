@@ -85,6 +85,12 @@ class _ForgotList extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+      ),
+      // 枠線は中身の上に重ねて描く(foregroundDecoration)。decoration の
+      // border だと中身が枠の内側に四角く置かれ、ヘッダーの背景が上の角丸の
+      // 枠線を塗りつぶしてしまう。
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0x1A000000)),
       ),
       clipBehavior: Clip.antiAlias,
@@ -106,12 +112,18 @@ class _ForgotList extends StatelessWidget {
               ),
             ),
           ),
-          for (final word in words)
+          for (var i = 0; i < words.length; i++)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Color(0x0D000000))),
-              ),
+              // 区切り線は行と行の間だけ。最後の行にも引くとカードの下枠と
+              // 2 本並んで太く見える。
+              decoration: i < words.length - 1
+                  ? const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Color(0x0D000000)),
+                      ),
+                    )
+                  : null,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
@@ -119,7 +131,7 @@ class _ForgotList extends StatelessWidget {
                   SizedBox(
                     width: 110,
                     child: Text(
-                      word.word,
+                      words[i].word,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -130,7 +142,7 @@ class _ForgotList extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      word.japanese,
+                      words[i].japanese,
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
