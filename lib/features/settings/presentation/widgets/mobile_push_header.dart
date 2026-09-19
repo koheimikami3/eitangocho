@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 
 /// iOS 版のプッシュ遷移先ヘッダ(戻るボタン + 中央タイトル)。
 ///
-/// 戻るの文字色はデザインの `#1e7fd6` ではなく `palette.accent` を使う。
-/// デザイン内で `#1e7fd6` は広告 / Pro の導線に付く色で、アプリ本体の
-/// アクセント(`#429FF0`)とは役割が違うため、トークン側に寄せている。
+/// 戻るは押せる「文字」なので、面の青(`palette.accent`)ではなく濃い方の
+/// `palette.accentOnSoft` を使う(1.6.0 の刷新案 A で設定画面の青を 2 値に統一)。
 class MobilePushHeader extends StatelessWidget {
   const MobilePushHeader({
     required this.title,
@@ -66,13 +65,16 @@ class MobilePushHeader extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             height: 1,
-                            color: palette.accent,
+                            color: palette.accentOnSoft,
                           ),
                         ),
                         const SizedBox(width: 2),
                         Text(
                           backLabel,
-                          style: TextStyle(fontSize: 16, color: palette.accent),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: palette.accentOnSoft,
+                          ),
                         ),
                       ],
                     ),

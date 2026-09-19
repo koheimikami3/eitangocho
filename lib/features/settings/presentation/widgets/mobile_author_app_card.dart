@@ -86,19 +86,20 @@ class MobileAuthorAppCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             // 「入手」は App Store のボタンに合わせた見た目のラベルで、
-            // ボタンではない(タップ領域はカード全体)。
+            // ボタンではない(タップ領域はカード全体)。押せる青の面は
+            // accent のベタ + 白文字に統一している(購入ボタンと同じ)。
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: palette.accentSoft,
+                color: palette.accent,
                 borderRadius: BorderRadius.circular(99),
               ),
-              child: Text(
+              child: const Text(
                 '入手',
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: palette.accentOnSoft,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
               ),
             ),
