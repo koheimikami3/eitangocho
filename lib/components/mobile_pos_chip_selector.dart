@@ -38,7 +38,7 @@ class MobilePosChipSelector extends StatelessWidget {
                   color: isSelected ? background : Colors.transparent,
                   borderRadius: BorderRadius.circular(99),
                   border: Border.all(
-                    color: isSelected ? background : palette.borderAlpha(15),
+                    color: isSelected ? background : palette.inputBorder,
                   ),
                 ),
                 child: Text(

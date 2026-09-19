@@ -108,7 +108,7 @@ class _LicenseRow extends StatelessWidget {
       onTap: () => LicenseDetailViewMobile.push(context, item),
       child: Container(
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: palette.borderAlpha(6))),
+          border: Border(bottom: BorderSide(color: palette.rowLine)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(

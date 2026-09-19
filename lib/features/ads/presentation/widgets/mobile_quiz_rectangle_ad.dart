@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/ads/domain/ad_unit_ids.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_ad_slot.dart';
@@ -31,8 +32,10 @@ class MobileQuizRectangleAd extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: palette.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: palette.borderAlpha(10)),
+              borderRadius: BorderRadius.circular(
+                AppDimensions.mobileCardRadius,
+              ),
+              border: Border.all(color: palette.cardBorder),
             ),
             clipBehavior: Clip.antiAlias,
             child: adView,

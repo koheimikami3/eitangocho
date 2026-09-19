@@ -47,7 +47,7 @@ class MobileSheetBannerAd extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: palette.surfaceHeader,
-          border: Border(top: BorderSide(color: palette.borderAlpha(8))),
+          border: Border(top: BorderSide(color: palette.headLine)),
         ),
         child: adView,
       ),

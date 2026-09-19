@@ -25,7 +25,7 @@ class MobilePushHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: palette.surface,
-        border: Border(bottom: BorderSide(color: palette.borderAlpha(8))),
+        border: Border(bottom: BorderSide(color: palette.headLine)),
       ),
       child: SafeArea(
         bottom: false,

@@ -43,14 +43,8 @@ class MobileQuizCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: palette.borderAlpha(10)),
-        boxShadow: [
-          BoxShadow(
-            color: palette.borderAlpha(6),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: palette.cardBorder),
+        boxShadow: palette.sheetShadow,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -90,7 +84,7 @@ class MobileQuizCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.only(top: 14),
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: palette.borderAlpha(8))),
+                border: Border(top: BorderSide(color: palette.rowLine)),
               ),
               child: Text(
                 back,

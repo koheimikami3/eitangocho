@@ -182,7 +182,7 @@ class _SecondaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: palette.surface,
           borderRadius: BorderRadius.circular(11),
-          border: Border.all(color: palette.borderAlpha(14)),
+          border: Border.all(color: palette.buttonBorder),
         ),
         child: Text(
           label,

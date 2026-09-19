@@ -35,7 +35,7 @@ class MobileWordRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: word.isLearned ? palette.surfaceHeader : palette.surface,
-          border: Border(bottom: BorderSide(color: palette.borderAlpha(6))),
+          border: Border(bottom: BorderSide(color: palette.rowLine)),
         ),
         child: Row(
           children: [

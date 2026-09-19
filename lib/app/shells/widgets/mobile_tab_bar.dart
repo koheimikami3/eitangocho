@@ -43,7 +43,7 @@ class MobileTabBar extends ConsumerWidget {
           padding: EdgeInsets.fromLTRB(8, 8, 8, bottomInset),
           decoration: BoxDecoration(
             color: palette.tabBar,
-            border: Border(top: BorderSide(color: palette.borderAlpha(8))),
+            border: Border(top: BorderSide(color: palette.headLine)),
           ),
           child: Row(
             children: [

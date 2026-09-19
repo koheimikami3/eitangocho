@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,8 @@ class MobileAuthorAppCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.borderAlpha(10)),
+          borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+          border: Border.all(color: palette.cardBorder),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(

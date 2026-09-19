@@ -25,7 +25,7 @@ class MobileLearnedCheckbox extends StatelessWidget {
         color: value ? palette.accent : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: value ? palette.accent : palette.borderAlpha(25),
+          color: value ? palette.accent : palette.checkOffBorder,
           width: 1.5,
         ),
       ),

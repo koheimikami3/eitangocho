@@ -1,5 +1,6 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_quiz_rectangle_ad.dart';
@@ -87,8 +88,8 @@ class _ForgotList extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: palette.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: palette.borderAlpha(10)),
+        borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+        border: Border.all(color: palette.cardBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -98,7 +99,7 @@ class _ForgotList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: palette.surfaceHeader,
-              border: Border(bottom: BorderSide(color: palette.borderAlpha(7))),
+              border: Border(bottom: BorderSide(color: palette.rowLine)),
             ),
             child: Text(
               '忘れていた単語(学習中リストに戻りました)',
@@ -113,9 +114,7 @@ class _ForgotList extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: palette.borderAlpha(5)),
-                ),
+                border: Border(bottom: BorderSide(color: palette.rowLine)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -173,7 +172,7 @@ class _ResultButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: filled ? palette.accent : palette.surface,
           borderRadius: BorderRadius.circular(11),
-          border: filled ? null : Border.all(color: palette.borderAlpha(14)),
+          border: filled ? null : Border.all(color: palette.buttonBorder),
         ),
         child: Text(
           label,

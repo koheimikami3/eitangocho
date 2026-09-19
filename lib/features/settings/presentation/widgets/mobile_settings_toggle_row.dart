@@ -36,7 +36,7 @@ class MobileSettingsToggleRow extends StatelessWidget {
               width: 50,
               height: 30,
               decoration: BoxDecoration(
-                color: value ? palette.accent : palette.borderAlpha(18),
+                color: value ? palette.accent : palette.toggleOff,
                 borderRadius: BorderRadius.circular(99),
               ),
               child: AnimatedAlign(
