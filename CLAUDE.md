@@ -15,6 +15,8 @@
 - 外部 API・確定済み設計判断: `docs/design.md`(常時は読み込まない。外部データ取得・
   同期・広告・課金・ビルド / 提出まわりに手を入れる前に該当節を読むこと)。
   追記するときは同ファイル冒頭の「書き方」に従い、溜め込まない
+- ディレクトリ構成・コマンド一覧・リント・疑問の調べ方: `docs/development.md`
+  (常時は読み込まない。構成やコマンドを確認したいときに読む)
 - ストアに掲載したリリースノートの控え: `docs/release-notes.md`
   (提出のたびに追記する。書き方の決まりも同ファイルの冒頭にある)
 - 機能仕様と UI の詳細(レイアウト・配色・寸法)は実装済みアプリと
@@ -33,23 +35,9 @@
 
 ## アーキテクチャ
 
-MVVM ベースの機能別レイヤー構成。DDD 的な重いレイヤリングは行わない。
-
-```
-lib/
-├── components/   # 機能横断の汎用ウィジェット
-├── constants/    # 定数(色、設定値等)
-├── enums/        # 機能横断の enum(品詞等)
-├── utils/        # ヘルパー
-├── providers/    # グローバル Provider(DB インスタンス等)
-├── db/           # drift のテーブル定義・DAO・Database クラス
-└── features/     # 機能別: word / quiz / word_registration / settings / sync /
-                  #         ads / purchase(iOS のみ)/ review
-    └── <feature>/
-        ├── data/          # DAO・外部 API と連携する Riverpod Provider
-        ├── domain/        # Freezed モデル・機能固有 enum
-        └── presentation/  # ページ、State、Notifier、widgets/
-```
+MVVM ベースの機能別レイヤー構成。機能ごとに `lib/features/<feature>/` の下を
+`data/`(DAO・外部 API の Provider)/ `domain/`(Freezed モデル・enum)/
+`presentation/`(Page・State・Notifier・`widgets/`)に分ける。
 
 ### 規約
 
@@ -90,22 +78,7 @@ lib/
 - 行番号(`L42` 等)をコメントにハードコードしないこと。関数名・クラス名など
   意味的な参照を使うこと。
 
-## 技術的な疑問の解決
-
-1. プロジェクト固有の設計: `docs/*.md` や既存コードを参照する
-2. Flutter / Dart / パッケージの使い方: 公式ドキュメントを Web 検索で確認する
-3. それでも不明な場合: ユーザーに質問する
-
-## ビルド・開発コマンド
-
-```bash
-flutter run -d macos                                    # macOS で実行
-flutter run -d <simulator-id>                           # iOS で実行
-dart run build_runner build --delete-conflicting-outputs # コード生成
-flutter test                                            # 全テスト実行
-flutter test test/path/to/specific_test.dart            # 個別テスト実行
-flutter analyze                                         # 静的解析
-```
+## コード生成・依存
 
 - 生成ファイル(`*.g.dart`、`*.freezed.dart`)はコミットする。
   モデル・Provider・drift スキーマ等の生成対象を変更したら build_runner を再実行すること。
@@ -115,12 +88,6 @@ flutter analyze                                         # 静的解析
 
 - テストファイルは `test/` 内で `lib/` 構造をミラーする。
 - テストが失敗した場合、まず生成ファイルが最新かを確認すること。
-
-## リント
-
-`flutter_lints` ベース(`analysis_options.yaml` 参照)。
-コードスタイルはリンタが強制するため、この md には書かない。
-リンタで表現できない規約のみ「規約」「コメント規約」に記載している。
 
 ## Planning
 
@@ -133,24 +100,23 @@ flutter analyze                                         # 静的解析
   - 検証方法(どのテスト・コマンドで確認するか)
   - コミット単位(分割理由も記載)
 - 不明点や設計判断が必要な箇所があれば、実装前にユーザーに質問すること。
-- 大きな変更は、段階的に実装・検証できる単位に分割し、単位ごとにコミットすること。
+- 大きな変更は段階的な単位に分割し、単位ごとにコミットすること
+  (コミットごとにテストは回さない。検証は下記「完了時の検証」のタイミングで行う)。
 - 実装中に想定外の問題が発生した場合は、一旦止まって計画を見直すこと。
 
 ## Subagent Strategy
 
-- 調査・探索タスクはサブエージェントに委譲し、メインコンテキストを清潔に保つこと。
-- 複数の独立した調査は並行してサブエージェントを起動すること。
-- 1 つのサブエージェントには 1 つのタスクを割り当てること。
+- 調査・探索は原則メインで直接行う(grep で当たりを付けて必要箇所だけ読む)。
+- サブエージェントは、ユーザーが求めたとき、または多数のファイルを走査して
+  結論だけ要る調査のときに限り使う。並行起動はしない。
 
-## Verification Before Completion
+## 完了時の検証
 
-- タスク完了を宣言する前に、必ず以下を実行すること:
-  - `flutter analyze` で解析エラー・警告がないことを確認
-  - `flutter test` でテストが通ることを確認
-  - `git diff` で意図しない変更が含まれていないことを確認
+時間がかかるので回数を絞る。
 
-## Compact Instructions
-
-- コンパクション時は、現在のタスクの計画・TODO リスト・判断事項を必ず保持すること。
-- 変更済み / 変更予定のファイル一覧を必ず保持すること。
-- 直近のテスト結果やエラー内容を必ず保持すること。
+- `flutter analyze` と `flutter test -r failures-only` は、**依頼された実装が
+  すべて終わった時点で 1 回だけ**実行する。途中のステップ・コミットごとには実行しない。
+- Dart のコード(`lib/` / `test/`)を変更していない作業(docs・設定・ネイティブのみ)
+  では実行しない。
+- 途中で動作を確かめる必要があるときは、該当する個別テストだけを実行する。
+- `git diff` はまず `--stat` で変更ファイルを確認し、中身は必要なファイルだけ見る。
