@@ -14,9 +14,8 @@
 #
 # 使い方: verify_flutter_version.sh <Flutter-Generated.xcconfig> <pubspec.yaml>
 #
-# **ビルド番号は比較しない**。pubspec 側は +1 固定にしてあり、実際の番号は
-# アップロード時に Xcode が割り当てる(`--build-number` で明示することもある)
-# ため、ずれているのが正常な状態になる。docs/design.md 参照。
+# **ビルド番号は比較しない**。`--build-number` で明示的に上書きする運用が
+# あり、その場合は pubspec とずれているのが正しいため。docs/design.md 参照。
 
 set -euo pipefail
 
