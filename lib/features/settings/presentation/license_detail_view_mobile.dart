@@ -53,7 +53,7 @@ class LicenseDetailViewMobile extends StatelessWidget {
                     for (var i = 0; i < item.texts.length; i++) ...[
                       if (i > 0) ...[
                         const SizedBox(height: 20),
-                        Divider(height: 1, color: palette.borderAlpha(10)),
+                        Divider(height: 1, color: palette.rowLine),
                         const SizedBox(height: 20),
                       ],
                       SelectableText(

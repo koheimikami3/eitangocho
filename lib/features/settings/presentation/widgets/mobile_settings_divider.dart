@@ -13,11 +13,7 @@ class MobileSettingsDivider extends StatelessWidget {
     return Padding(
       // 左右 14 はカード内の行のパディングと同じ。線を行のテキストに揃える。
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Divider(
-        height: 1,
-        thickness: 1,
-        color: context.palette.borderAlpha(7),
-      ),
+      child: Divider(height: 1, thickness: 1, color: context.palette.rowLine),
     );
   }
 }

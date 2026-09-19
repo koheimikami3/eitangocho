@@ -37,7 +37,7 @@ class MobileLabeledField extends StatelessWidget {
     final palette = context.palette;
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(9),
-      borderSide: BorderSide(color: palette.borderAlpha(15)),
+      borderSide: BorderSide(color: palette.inputBorder),
     );
 
     return Column(

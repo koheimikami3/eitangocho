@@ -30,6 +30,10 @@ abstract final class AppDimensions {
   /// iOS の画面外周パディング(デザインの padding:16px)
   static const mobilePadding = 16.0;
 
+  /// iOS のカード(単語カード・設定のセクションなど)の角丸。
+  /// 1.6.0 の刷新案 A で 12 → 13 に上げた(浮いた面のクイズカードは 16 のまま)。
+  static const mobileCardRadius = 13.0;
+
   /// iOS の学習中カードグリッドの間隔
   /// (列数は設定 LearningCardLayout が持つ)
   static const mobileGridGap = 12.0;

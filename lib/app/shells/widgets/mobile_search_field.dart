@@ -16,7 +16,7 @@ class MobileSearchField extends ConsumerWidget {
     final palette = context.palette;
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(9),
-      borderSide: BorderSide(color: palette.borderAlpha(12)),
+      borderSide: BorderSide(color: palette.softBorder),
     );
 
     return TextField(

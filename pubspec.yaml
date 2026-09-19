@@ -26,7 +26,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Xcode の自動繰り上げは iOS でしか効かないので、厳しい macOS に合わせて
 # ここに次の番号を持たせる。使用済み番号の台帳は docs/design.md にある。
 # +7 は 5 と 6 を iOS の 1.5.0 が使ったため(6 が承認された版)。
-version: 1.5.0+7
+version: 1.6.0+8
 
 environment:
   sdk: ^3.12.2

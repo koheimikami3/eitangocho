@@ -105,7 +105,7 @@ class _SheetHeader extends StatelessWidget {
       height: 52,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: palette.borderAlpha(8))),
+        border: Border(bottom: BorderSide(color: palette.headLine)),
       ),
       // タイトルは左右のボタン幅に影響されず中央に置きたいため Stack で重ねる。
       child: Stack(

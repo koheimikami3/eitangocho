@@ -116,7 +116,7 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
           color: palette.surfaceHeader,
           border: Border(
             top: BorderSide(
-              color: palette.borderAlpha(8),
+              color: palette.headLine,
               width: MobileBannerAd._borderWidth,
             ),
           ),

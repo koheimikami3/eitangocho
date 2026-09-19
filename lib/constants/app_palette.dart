@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 ///
 /// macOS 版は [AppColors] のライト固定配色をそのまま使い続ける
 /// (ダーク対応は iOS のみ。macOS 1.0 のリリース済み外観を変えないため)。
-/// 値は Claude Design の iOS プロトタイプ(`docs/design/ios/英単語帳アプリ iOS.dc.html`
-/// の THEME_LIGHT / THEME_DARK / PILLS_LIGHT / PILLS_DARK)が正基準。
+/// 値は Claude Design の iOS プロトタイプ(THEME_LIGHT / THEME_DARK / PILLS_LIGHT /
+/// PILLS_DARK)を起点に、1.6.0 の刷新案 A(輪郭を締める)で面・本文色・輪郭・影を
+/// 更新したもの。
 ///
 /// アクセント色だけはライト / ダークで共通(アイコンと同色の #429ff0)。
 @immutable
@@ -60,27 +61,31 @@ class AppPalette {
   /// アクセント色はライト / ダーク共通。
   Color get accent => AppColors.accent;
 
-  /// 発音ボタンの淡い地(--accSoft)。ダークは地が暗いぶん濃く敷く。
+  /// 発音ボタンの淡い地(--acc-soft)。ダークは地が暗いぶん濃く敷く。
+  ///
+  /// ライトの値は macOS の [AppColors.accentSoft](10%)とは別に持つ
+  /// (刷新案 A で iOS だけ 12% に上げたため)。
   Color get accentSoft =>
-      isDark ? const Color(0x38429FF0) : AppColors.accentSoft;
+      isDark ? const Color(0x38429FF0) : const Color(0x1F429FF0);
 
-  /// [accentSoft] の上に載せる文字・アイコン色(--accText)。
-  /// [accent] より濃い / 明るい値なのは、淡い地の上でコントラストを稼ぐため
-  /// (ライト側の値をデザインから変えた理由は [AppColors.accentOnSoft] 参照)。
+  /// 白地・淡い青地に置く青文字・アイコン色(--acc-text)。
+  /// 発音ボタン・購入を復元・戻るなど、押せる「文字」はすべてこの色にする。
+  ///
+  /// ライトの #1B78C2 は [accentSoft] の上で 4.14:1 と 4.5:1 に届かないが、
+  /// 刷新案 A で [accent] と同じ色相に揃えるデザイン判断として採用した
+  /// (白地の上では 4.65:1)。macOS は [AppColors.accentOnSoft] のまま。
   Color get accentOnSoft =>
-      isDark ? const Color(0xFF7EC2FF) : AppColors.accentOnSoft;
+      isDark ? const Color(0xFF7EC2FF) : const Color(0xFF1B78C2);
 
-  /// 発音ボタンの枠線(--accLine)。ダークは文字色と同じ色相で引く。
+  /// 発音ボタンの枠線(--acc-line)。ダークは文字色と同じ色相で引く。
   Color get accentLine =>
-      isDark ? const Color(0x737EC2FF) : AppColors.accentLine;
+      isDark ? const Color(0x737EC2FF) : const Color(0x6B429FF0);
 
   /// Pro(広告非表示)の購入ボタンの地。ライト / ダーク共通。
   ///
-  /// デザインが広告 / Pro の導線に当てている青は #1E7FD6 だが、白文字を載せると
-  /// 4.15:1 しか出ず、13px のラベルには足りない。発音ボタンのときと同じく
-  /// 色相を保ったまま明度を下げた [AppColors.accentOnSoft] を使う(5.58:1)。
-  /// ダークもデザインは同じ青のままなので、ここもライトと共通にする。
-  Color get proButton => AppColors.accentOnSoft;
+  /// 刷新案 A で、押せる青の「面」は主ボタンと同じ [accent] のベタ + 白文字に
+  /// 統一した(白文字は 2.82:1 だが、主ボタンと同じ扱いとするデザイン判断)。
+  Color get proButton => accent;
 
   /// 購入済みで押せなくなった購入ボタンの地。
   Color get proButtonDone =>
@@ -89,14 +94,92 @@ class AppPalette {
   /// 購入済みの購入ボタンの文字色。ダークだけ 1 段明るいのはデザイン準拠。
   Color get proButtonDoneForeground => textAlpha(isDark ? 60 : 50);
 
+  // ---- 輪郭(刷新案 A)。ライトは純黒ではなく青みの墨 rgba(18,22,32,a) で引く ----
+
+  /// カードの枠線(--card-border)
+  Color get cardBorder => _line(20, 22);
+
+  /// リスト行・カード内の区切り線(--row-line)
+  Color get rowLine => _line(11, 13);
+
+  /// ヘッダー・タブバー・広告帯の境界線(--head-line)
+  Color get headLine => _line(14, 16);
+
+  /// 入力欄の枠線(--input-border)
+  Color get inputBorder => _line(22, 26);
+
+  /// セカンダリボタンの枠線(--btn-border)
+  Color get buttonBorder => _line(22, 26);
+
+  /// 点線枠(--dash-border)
+  Color get dashBorder => _line(28, 30);
+
+  /// 淡い面(surfaceAlt)に添える線(--soft-border)
+  Color get softBorder => _line(12, 14);
+
+  /// 未チェックのチェックボックス・ラジオの枠線(--check-off-border)
+  Color get checkOffBorder => _line(38, 45);
+
+  /// OFF のトグルの地。ライトは墨ではなく黒 18% のまま(デザイン準拠)。
+  Color get toggleOff => isDark ? borderAlpha(22) : borderAlpha(18);
+
+  /// カードの影(--card-shadow)。ライトは 2 段、ダークは暗い地で見えるよう黒 1 段。
+  List<BoxShadow> get cardShadow => isDark
+      ? const [
+          BoxShadow(
+            color: Color(0x66000000), // rgba(0,0,0,0.40)
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ]
+      : const [
+          BoxShadow(
+            color: Color(0x0F121620), // rgba(18,22,32,0.06)
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+          BoxShadow(
+            color: Color(0x0F121620), // rgba(18,22,32,0.06)
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ];
+
+  /// 浮いた面(クイズカード)の影(--card-shadow-lg)
+  List<BoxShadow> get sheetShadow => isDark
+      ? const [
+          BoxShadow(
+            color: Color(0x73000000), // rgba(0,0,0,0.45)
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ]
+      : const [
+          BoxShadow(
+            color: Color(0x14121620), // rgba(18,22,32,0.08)
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+          BoxShadow(
+            color: Color(0x14121620), // rgba(18,22,32,0.08)
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
+        ];
+
+  /// 輪郭の色。ライトは rgba(18,22,32,[light]%)、ダークは白 [dark]%。
+  Color _line(int light, int dark) => isDark
+      ? borderAlpha(dark)
+      : const Color(0xFF121620).withValues(alpha: light / 100);
+
   static const light = AppPalette._(
     brightness: Brightness.light,
-    background: Color(0xFFFFFFFF),
+    background: Color(0xFFFCFDFD),
     surface: Color(0xFFFFFFFF),
-    surfaceAlt: Color(0xFFF7F7F8),
-    surfaceHeader: Color(0xFFFAFAFB),
-    tabBar: Color(0xEBFAFAFB), // rgba(250,250,251,0.92)
-    text: Color(0xFF1D1D1F),
+    surfaceAlt: Color(0xFFF6F7F9),
+    surfaceHeader: Color(0xFFFAFBFC),
+    tabBar: Color(0xF0FFFFFF), // rgba(255,255,255,0.94)
+    text: Color(0xFF15161A),
     danger: Color(0xFFC03030),
     autoFillBadgeBackground: Color(0xFFE2F3E8),
     autoFillBadgeForeground: Color(0xFF1C7A3F),
@@ -107,10 +190,10 @@ class AppPalette {
 
   static const dark = AppPalette._(
     brightness: Brightness.dark,
-    background: Color(0xFF1C1C1E),
-    surface: Color(0xFF2C2C2E),
-    surfaceAlt: Color(0xFF3A3A3C),
-    surfaceHeader: Color(0xFF242426),
+    background: Color(0xFF141416),
+    surface: Color(0xFF232326),
+    surfaceAlt: Color(0xFF2E2E31),
+    surfaceHeader: Color(0xFF1C1C1F),
     tabBar: Color(0xE61C1C1E), // rgba(28,28,30,0.9)
     text: Color(0xFFF5F5F7),
     danger: Color(0xFFFF6B6B),

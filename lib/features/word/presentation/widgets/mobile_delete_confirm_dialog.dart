@@ -69,7 +69,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: palette.borderAlpha(10))),
+                border: Border(top: BorderSide(color: palette.rowLine)),
               ),
               child: IntrinsicHeight(
                 child: Row(
@@ -84,7 +84,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
                     VerticalDivider(
                       width: 1,
                       thickness: 1,
-                      color: palette.borderAlpha(10),
+                      color: palette.rowLine,
                     ),
                     Expanded(
                       child: _AlertAction(

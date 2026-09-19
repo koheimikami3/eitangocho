@@ -33,7 +33,7 @@ class MobileQuizEmptyState extends ConsumerWidget {
             decoration: BoxDecoration(
               color: palette.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: palette.borderAlpha(14)),
+              border: Border.all(color: palette.buttonBorder),
             ),
             child: Text(
               '学習中リストへ',

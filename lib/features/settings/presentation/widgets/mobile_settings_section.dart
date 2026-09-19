@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_subheader.dart';
@@ -41,8 +42,10 @@ class MobileSettingsSection extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: palette.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: palette.borderAlpha(10)),
+              borderRadius: BorderRadius.circular(
+                AppDimensions.mobileCardRadius,
+              ),
+              border: Border.all(color: palette.cardBorder),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(

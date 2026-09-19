@@ -37,7 +37,7 @@ class MobileSettingsRadioRow extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: selected ? palette.accent : Colors.transparent,
                 border: Border.all(
-                  color: selected ? palette.accent : palette.borderAlpha(25),
+                  color: selected ? palette.accent : palette.checkOffBorder,
                   width: 1.5,
                 ),
               ),

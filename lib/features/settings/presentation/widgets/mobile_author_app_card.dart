@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,8 @@ class MobileAuthorAppCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.borderAlpha(10)),
+          borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+          border: Border.all(color: palette.cardBorder),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
@@ -85,19 +86,20 @@ class MobileAuthorAppCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             // 「入手」は App Store のボタンに合わせた見た目のラベルで、
-            // ボタンではない(タップ領域はカード全体)。
+            // ボタンではない(タップ領域はカード全体)。押せる青の面は
+            // accent のベタ + 白文字に統一している(購入ボタンと同じ)。
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: palette.accentSoft,
+                color: palette.accent,
                 borderRadius: BorderRadius.circular(99),
               ),
-              child: Text(
+              child: const Text(
                 '入手',
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: palette.accentOnSoft,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
               ),
             ),

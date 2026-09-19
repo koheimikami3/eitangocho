@@ -1,4 +1,5 @@
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
@@ -57,15 +58,9 @@ class _MobileWordCardState extends State<MobileWordCard> {
         padding: const EdgeInsets.all(13),
         decoration: BoxDecoration(
           color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.borderAlpha(10)),
-          boxShadow: [
-            BoxShadow(
-              color: palette.borderAlpha(4),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+          border: Border.all(color: palette.cardBorder),
+          boxShadow: palette.cardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -121,7 +116,7 @@ class _MobileWordCardState extends State<MobileWordCard> {
             Container(
               padding: const EdgeInsets.only(top: 6),
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: palette.borderAlpha(6))),
+                border: Border(top: BorderSide(color: palette.rowLine)),
               ),
               child: Row(
                 children: [
@@ -291,7 +286,7 @@ class _RevealToggle extends StatelessWidget {
               decoration: BoxDecoration(
                 color: palette.surfaceAlt,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: palette.borderAlpha(8)),
+                border: Border.all(color: palette.softBorder),
               ),
               child: Text(
                 japanese,
@@ -305,7 +300,7 @@ class _RevealToggle extends StatelessWidget {
               ),
             )
           : _DashedBox(
-              color: palette.borderAlpha(18),
+              color: palette.dashBorder,
               child: Padding(
                 padding: const EdgeInsets.all(_hintPadding),
                 child: Text(
