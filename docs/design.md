@@ -274,8 +274,23 @@ CLAUDE.md から参照される設計判断の記録。コードだけからは�
     `macos/Flutter/ephemeral/Flutter-Generated.xcconfig` は Flutter ツールが
     ビルドを走らせたときだけ pubspec から書き出される(どちらも gitignore 対象の
     生成物)。Xcode 単体の Archive は pubspec を読まないため、前回ビルド時の
-    古い値でアーカイブされる。1.3.0 で実際に 1.2.0 のままアーカイブされた
+    古い値でアーカイブされる。1.3.0 で実際に 1.2.0 のままアーカイブされ、
+    1.5.0 の macOS でも 1.4.0 のままビルドされた
     (`flutter test` / `flutter analyze` では再生成されない)
+  - **忘れても気づけるよう、macOS の Runner に検証だけのビルドフェーズを
+    置いた**(`tool/verify_flutter_version.sh`。「Verify Flutter version」)。
+    `Flutter-Generated.xcconfig` の `FLUTTER_BUILD_NAME` が pubspec とずれて
+    いたらビルドを失敗させる。2 回続けて踏んだので、手順として書くだけでは
+    再発すると判断した
+    - **直すのではなく止める**。xcconfig はビルド開始時に読み切られるため、
+      ビルドフェーズから書き直してもそのビルドには反映されない。スキームの
+      pre-action なら間に合う可能性はあるが、環境変数が最小限で失敗しても
+      静かに進むうえ、同じビルドで拾われるかが Xcode のバージョン依存になる。
+      失敗モードが「間違ったバージョンで出荷」なので、確実に落ちる方を選んだ
+    - **ビルド番号は比較しない**。pubspec は `+1` 固定で、実際の番号は
+      アップロード時に決まるため、ずれているのが正常な状態になる
+    - iOS の Runner には置いていない。同じ穴は空いているが、iOS は提出前に
+      `flutter build ios` を通す運用が定着しており、まだ踏んでいない
 
 ## iOS 版の設計判断
 
