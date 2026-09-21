@@ -28,10 +28,12 @@ class LicenseDetailViewMobile extends StatelessWidget {
           constraints: const BoxConstraints(
             maxWidth: AppDimensions.mobileContentMaxWidth,
           ),
+          // ヘッダの影をリストの上に落とすため、並びを下から上にして
+          // ヘッダを最後に描かせる(TabBarShell と同じ)。
           child: Column(
+            verticalDirection: VerticalDirection.up,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const MobilePushHeader(title: 'ライセンス', backLabel: 'ライセンス'),
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(
@@ -68,6 +70,7 @@ class LicenseDetailViewMobile extends StatelessWidget {
                   ],
                 ),
               ),
+              const MobilePushHeader(title: 'ライセンス', backLabel: 'ライセンス'),
             ],
           ),
         ),

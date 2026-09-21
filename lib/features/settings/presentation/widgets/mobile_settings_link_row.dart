@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -16,10 +17,11 @@ class MobileSettingsLinkRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: onTap,
-      child: Padding(
+      style: MobilePressStyle.row,
+      builder: (context, pressed) => Container(
+        color: pressed ? palette.pressBackground : Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         child: Row(
           children: [
