@@ -262,7 +262,7 @@ class _InputStep extends StatelessWidget {
             style: TextStyle(fontSize: 12, color: palette.danger),
           ),
         ],
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         MobilePressable(
           onTap: onSkip,
           style: MobilePressStyle.text,

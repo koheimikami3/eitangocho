@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 /// 影で浮かせた、押せる面(学習中カード・クイズの「忘れていた」ボタン)。
 ///
 /// 押している間は浮きを消して内側に影を入れ、面が沈んだように見せる
-/// (デザインの --elev → --elevPress + 地を --pressBg に)。
+/// (デザインの --elev → --elevPress)。デザインは地も --pressBg に変えるが、
+/// 色まで変わるとちらついて見えるため、地の色は変えない(ユーザー判断)。
 class MobileRaisedSurface extends StatelessWidget {
   const MobileRaisedSurface({
     required this.onTap,
@@ -29,7 +30,7 @@ class MobileRaisedSurface extends StatelessWidget {
       style: MobilePressStyle.card,
       builder: (context, pressed) => Container(
         decoration: BoxDecoration(
-          color: pressed ? palette.pressBackground : palette.surface,
+          color: palette.surface,
           borderRadius: borderRadius,
           boxShadow: pressed ? palette.elevationPressed : palette.elevation,
         ),
