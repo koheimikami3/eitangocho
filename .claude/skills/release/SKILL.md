@@ -47,7 +47,7 @@ flutter test -r failures-only
 - 実装ブランチ上で `pubspec.yaml` の `version:` を `<version>+<build>` に書き換え、
   `chore: bump the version to <version>+<build>` でコミットする
 - main に `--no-ff` でマージし、確認を挟まずに `git branch -d <branch>` で削除する
-- push はしない(ユーザーが求めたときだけ)
+- push はここではせず、7 でタグと一緒に行う
 
 ## 5. リリースノート(★)
 
@@ -98,8 +98,19 @@ Archive するのは、この時点の main の HEAD。そのコミットに注�
 git tag -a v<version> -F <メッセージを書いた一時ファイル>
 ```
 
-- push はしない(ユーザーが求めたときだけ `git push origin v<version>`)
-- 打ったら、Xcode で Archive → 提出するようユーザーに伝える
+タグを打ったら、main とタグを push する。このスキルの実行をもって push の了承とみなす
+(提出したソースとタグをリモートにも残すため。Archive の前に済ませる):
+
+```
+git push origin main
+git push origin v<version>
+```
+
+- push が拒否されたら(リモートが先に進んでいる等)、force は使わずに止めて
+  出力をそのままユーザーに見せる
+- 過去のタグでリモートに無いものがあっても、勝手にまとめて送らない
+  (`git push origin --tags` は使わず、今回のタグだけを送る)
+- 終わったら、Xcode で Archive → 提出するようユーザーに伝える
   (Archive と提出はユーザーが行う)
 
 ## 8. 提出後
@@ -110,8 +121,16 @@ git tag -a v<version> -F <メッセージを書いた一時ファイル>
 - iOS で Xcode がビルド番号を自動で繰り上げた
 - リジェクトされて番号を捨て、再提出した(捨てた番号も書く)
 
-このときも 5 と同じく、文面を見せて確認をとってからコミット・マージする。
+このときも 5 と同じく、文面を見せて確認をとってからコミット・マージし、
+`git push origin main` する。
 
 リジェクト対応でコードを直して再提出するときは、再提出で Archive するコミットに
-タグを付け直す(`git tag -d v<version>` → 7 のコマンドで打ち直す)。
-タグを push 済みの場合は付け直す前にユーザーに確認する(リモートのタグの上書きになるため)。
+タグを付け直す。タグは 7 で push 済みなので、**付け直す前に必ずユーザーに確認する**
+(リモートのタグを消して上書きするため)。了承を得たら:
+
+```
+git tag -d v<version>
+git push origin :refs/tags/v<version>
+```
+
+のあと、7 の手順でタグを打ち直し、main とタグを push する。
