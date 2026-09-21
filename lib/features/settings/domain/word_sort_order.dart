@@ -8,8 +8,8 @@ enum WordSortOrder {
   oldest('登録日が古い順', WordSortGroup.createdAt),
   alphabetical('A → Z', WordSortGroup.alphabet),
   reverseAlphabetical('Z → A', WordSortGroup.alphabet),
-  learningFirst('学習中を先に', WordSortGroup.learned),
-  learnedFirst('学習済みを先に', WordSortGroup.learned),
+  learningFirst('学習中 → 学習済み', WordSortGroup.learned),
+  learnedFirst('学習済み → 学習中', WordSortGroup.learned),
   mostCorrect('覚えた回数が多い順', WordSortGroup.correctCount),
   leastCorrect('覚えた回数が少ない順', WordSortGroup.correctCount);
 
