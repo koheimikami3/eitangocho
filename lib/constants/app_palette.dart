@@ -90,12 +90,6 @@ class AppPalette {
   Color get accentLine =>
       isDark ? const Color(0x737EC2FF) : const Color(0x6B429FF0);
 
-  /// Pro(広告非表示)の購入ボタンの地。ライト / ダーク共通。
-  ///
-  /// 刷新案 A で、押せる青の「面」は主ボタンと同じ [accent] のベタ + 白文字に
-  /// 統一した(白文字は 2.82:1 だが、主ボタンと同じ扱いとするデザイン判断)。
-  Color get proButton => accent;
-
   /// 購入済みで押せなくなった購入ボタンの地。
   Color get proButtonDone =>
       isDark ? const Color(0x1FFFFFFF) : const Color(0xFFECECEF);
@@ -103,80 +97,21 @@ class AppPalette {
   /// 購入済みの購入ボタンの文字色。ダークだけ 1 段明るいのはデザイン準拠。
   Color get proButtonDoneForeground => textAlpha(isDark ? 60 : 50);
 
-  // ---- 輪郭(刷新案 A)。ライトは純黒ではなく青みの墨 rgba(18,22,32,a) で引く ----
-
-  /// カードの枠線(--card-border)
-  Color get cardBorder => _line(20, 22);
+  // ---- 線 ----
 
   /// リスト行・カード内・設定のセクション内の区切り線。
-  /// 立体案は面を影で分けるぶん、区切り線は淡い黒 / 白 7% に戻した
+  /// 立体案は面を影で分けるぶん、区切り線は淡い黒 / 白 7% にした
   /// (デザインの --b05〜--b08 の中間)。
   Color get rowLine => borderAlpha(7);
 
-  /// ヘッダー・タブバー・広告帯の境界線(--head-line)
-  Color get headLine => _line(14, 16);
+  /// 未チェックのチェックボックス・ラジオの枠線。
+  /// ライトは純黒ではなく青みの墨 rgba(18,22,32,0.38) で引く(1.6.0 から据え置き)。
+  Color get checkOffBorder => isDark
+      ? borderAlpha(45)
+      : const Color(0xFF121620).withValues(alpha: 0.38);
 
-  /// 入力欄の枠線(--input-border)
-  Color get inputBorder => _line(22, 26);
-
-  /// セカンダリボタンの枠線(--btn-border)
-  Color get buttonBorder => _line(22, 26);
-
-  /// 点線枠(--dash-border)
-  Color get dashBorder => _line(28, 30);
-
-  /// 淡い面(surfaceAlt)に添える線(--soft-border)
-  Color get softBorder => _line(12, 14);
-
-  /// 未チェックのチェックボックス・ラジオの枠線(--check-off-border)
-  Color get checkOffBorder => _line(38, 45);
-
-  /// OFF のトグルの地。ライトは墨ではなく黒 18% のまま(デザイン準拠)。
+  /// OFF のトグルの地。
   Color get toggleOff => isDark ? borderAlpha(22) : borderAlpha(18);
-
-  /// カードの影(--card-shadow)。ライトは 2 段、ダークは暗い地で見えるよう黒 1 段。
-  List<BoxShadow> get cardShadow => isDark
-      ? const [
-          BoxShadow(
-            color: Color(0x66000000), // rgba(0,0,0,0.40)
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ]
-      : const [
-          BoxShadow(
-            color: Color(0x0F121620), // rgba(18,22,32,0.06)
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-          BoxShadow(
-            color: Color(0x0F121620), // rgba(18,22,32,0.06)
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ];
-
-  /// 浮いた面(クイズカード)の影(--card-shadow-lg)
-  List<BoxShadow> get sheetShadow => isDark
-      ? const [
-          BoxShadow(
-            color: Color(0x73000000), // rgba(0,0,0,0.45)
-            blurRadius: 24,
-            offset: Offset(0, 8),
-          ),
-        ]
-      : const [
-          BoxShadow(
-            color: Color(0x14121620), // rgba(18,22,32,0.08)
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-          BoxShadow(
-            color: Color(0x14121620), // rgba(18,22,32,0.08)
-            blurRadius: 22,
-            offset: Offset(0, 10),
-          ),
-        ];
 
   // ---- 立体案の影 ----
   // 値はデザインの box-shadow をそのまま移したもの(Flutter の blurRadius は
@@ -346,11 +281,6 @@ class AppPalette {
       isDark ? const Color(0x80FF6B6B) : const Color(0x73C03030);
   Color get dangerSoft =>
       isDark ? const Color(0x1FFF6B6B) : const Color(0x12C03030);
-
-  /// 輪郭の色。ライトは rgba(18,22,32,[light]%)、ダークは白 [dark]%。
-  Color _line(int light, int dark) => isDark
-      ? borderAlpha(dark)
-      : const Color(0xFF121620).withValues(alpha: light / 100);
 
   static const light = AppPalette._(
     brightness: Brightness.light,

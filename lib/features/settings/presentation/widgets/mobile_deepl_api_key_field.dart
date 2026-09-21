@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
@@ -39,30 +40,28 @@ class _MobileDeeplApiKeyFieldState
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(9),
-      borderSide: BorderSide(color: palette.inputBorder),
-    );
 
-    return TextField(
-      controller: _controller,
-      onChanged: ref.read(settingsProvider.notifier).setDeeplApiKey,
-      cursorWidth: AppDimensions.mobileCursorWidth,
-      cursorColor: palette.accent,
-      style: TextStyle(fontSize: 14, color: palette.text),
-      decoration: InputDecoration(
-        isDense: true,
-        hintText: 'DeepL API キーを入力',
-        hintStyle: TextStyle(color: palette.textAlpha(30)),
-        filled: true,
-        fillColor: palette.surface,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 11,
+    // 登録シートの入力欄(MobileLabeledField)と同じく、内側の影で沈める。
+    return MobileWell(
+      color: palette.wellBackground,
+      shadows: palette.wellShadow,
+      borderRadius: BorderRadius.circular(9),
+      child: TextField(
+        controller: _controller,
+        onChanged: ref.read(settingsProvider.notifier).setDeeplApiKey,
+        cursorWidth: AppDimensions.mobileCursorWidth,
+        cursorColor: palette.accent,
+        style: TextStyle(fontSize: 14, color: palette.text),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: 'DeepL API キーを入力',
+          hintStyle: TextStyle(color: palette.textAlpha(30)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 11,
+          ),
+          border: InputBorder.none,
         ),
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
       ),
     );
   }
