@@ -100,8 +100,10 @@ class _ForgotList extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            // グレーの見出しは地(background)と見分けが付かなかったため、
+            // 「忘れていた」に合わせて淡い赤の地 + 赤文字にする。
             decoration: BoxDecoration(
-              color: palette.surfaceHeader,
+              color: palette.dangerSoft,
               border: Border(bottom: BorderSide(color: palette.rowLine)),
             ),
             child: Text(
@@ -109,7 +111,7 @@ class _ForgotList extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: palette.textAlpha(55),
+                color: palette.danger,
               ),
             ),
           ),

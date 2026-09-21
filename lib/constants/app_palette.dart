@@ -202,24 +202,25 @@ class AppPalette {
           BoxShadow(color: Color(0x0A101828), spreadRadius: 1),
         ];
 
-  /// ヘッダの下端の線と影(--elevHead)
+  /// ヘッダの下端の線と影(--elevHead)。影はデザインより薄くしている
+  /// (実機でヘッダが浮きすぎて見えたため。ユーザー判断)。
   List<BoxShadow> get headerShadow => isDark
       ? const [
           BoxShadow(color: Color(0x14FFFFFF), offset: Offset(0, 1)),
           BoxShadow(
-            color: Color(0xE6000000),
-            blurRadius: 14,
+            color: Color(0x99000000), // デザインは 0.9
+            blurRadius: 12,
             spreadRadius: -12,
-            offset: Offset(0, 6),
+            offset: Offset(0, 5),
           ),
         ]
       : const [
           BoxShadow(color: Color(0x14101828), offset: Offset(0, 1)),
           BoxShadow(
-            color: Color(0x52101828),
-            blurRadius: 14,
+            color: Color(0x33101828), // デザインは 0.32
+            blurRadius: 12,
             spreadRadius: -13,
-            offset: Offset(0, 6),
+            offset: Offset(0, 5),
           ),
         ];
 

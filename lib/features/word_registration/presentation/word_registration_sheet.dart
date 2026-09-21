@@ -240,7 +240,7 @@ class _InputStep extends StatelessWidget {
             color: palette.textAlpha(50),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         MobileLabeledField(
           label: '英単語 *',
           controller: controller,
@@ -248,7 +248,7 @@ class _InputStep extends StatelessWidget {
           asciiOnly: true,
           onSubmitted: (_) => onAutoFill(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         MobileFilledButton(
           label: '自動入力',
           onPressed: onAutoFill,
@@ -256,13 +256,13 @@ class _InputStep extends StatelessWidget {
           borderRadius: 11,
         ),
         if (errorMessage != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             errorMessage!,
             style: TextStyle(fontSize: 12, color: palette.danger),
           ),
         ],
-        const SizedBox(height: 14),
+        const SizedBox(height: 20),
         MobilePressable(
           onTap: onSkip,
           style: MobilePressStyle.text,
