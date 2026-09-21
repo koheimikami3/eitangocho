@@ -299,7 +299,9 @@ class AppPalette {
     surfaceAlt: Color(0xFFF4F5F8),
     surfaceHeader: Color(0xFFEFF1F5),
     tabBar: Color(0xEBFAFAFB), // rgba(250,250,251,0.92)
-    wellBackground: Color(0xFFFAFBFC),
+    // デザインは #fafbfc だが、白い面との差が小さく入力欄が沈んで見えないため
+    // 一段濃くした(ユーザー判断)。
+    wellBackground: Color(0xFFF1F3F6),
     pressBackground: Color(0xFFE8EBF1),
     text: Color(0xFF1D1D1F),
     danger: Color(0xFFC03030),
