@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
+import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
@@ -26,6 +27,27 @@ void main() {
     expect(settings.uiScale, AppDimensions.defaultUiScale);
     // 学習中カードの既定は 2 列。
     expect(settings.cardLayout, LearningCardLayout.twoColumns);
+    // 全単語の並びの既定は登録日の新しい順(並び替え導入前と同じ)。
+    expect(settings.wordSortOrder, WordSortOrder.newest);
+  });
+
+  test('setWordSortOrder で state が更新され、次回読み込みでも復元される', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
+
+    await container
+        .read(settingsProvider.notifier)
+        .setWordSortOrder(WordSortOrder.mostCorrect);
+    expect(
+      container.read(settingsProvider).requireValue.wordSortOrder,
+      WordSortOrder.mostCorrect,
+    );
+
+    final container2 = ProviderContainer();
+    addTearDown(container2.dispose);
+    final restored = await container2.read(settingsProvider.future);
+    expect(restored.wordSortOrder, WordSortOrder.mostCorrect);
   });
 
   test('setCardLayout で state が更新され、次回読み込みでも復元される', () async {

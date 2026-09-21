@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +20,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyUiScale = 'uiScale';
   static const _keyAppearance = 'appearance';
   static const _keyCardLayout = 'cardLayout';
+  static const _keyWordSortOrder = 'wordSortOrder';
 
   final _prefs = SharedPreferencesAsync();
 
@@ -30,6 +32,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     final uiScale = await _prefs.getDouble(_keyUiScale);
     final appearanceName = await _prefs.getString(_keyAppearance);
     final cardLayoutName = await _prefs.getString(_keyCardLayout);
+    final wordSortOrderName = await _prefs.getString(_keyWordSortOrder);
     return SettingsState(
       quizDirection:
           QuizDirection.values.asNameMap()[directionName] ??
@@ -43,6 +46,9 @@ class SettingsNotifier extends _$SettingsNotifier {
       cardLayout:
           LearningCardLayout.values.asNameMap()[cardLayoutName] ??
           LearningCardLayout.twoColumns,
+      wordSortOrder:
+          WordSortOrder.values.asNameMap()[wordSortOrderName] ??
+          WordSortOrder.newest,
     );
   }
 
@@ -80,6 +86,13 @@ class SettingsNotifier extends _$SettingsNotifier {
     await _prefs.setString(_keyCardLayout, layout.name);
     state = AsyncData(
       (state.value ?? const SettingsState()).copyWith(cardLayout: layout),
+    );
+  }
+
+  Future<void> setWordSortOrder(WordSortOrder order) async {
+    await _prefs.setString(_keyWordSortOrder, order.name);
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(wordSortOrder: order),
     );
   }
 

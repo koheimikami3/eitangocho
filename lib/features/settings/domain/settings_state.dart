@@ -2,6 +2,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
+import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'settings_state.freezed.dart';
@@ -26,5 +27,8 @@ abstract class SettingsState with _$SettingsState {
 
     /// 学習中カードの並び(1 列 / 2 列)。iOS 専用。
     @Default(LearningCardLayout.twoColumns) LearningCardLayout cardLayout,
+
+    /// 全単語一覧の並び順。
+    @Default(WordSortOrder.newest) WordSortOrder wordSortOrder,
   }) = _SettingsState;
 }
