@@ -138,7 +138,9 @@ class TrackingAuthorizer {
 /// 待ち時間をテストから縮められるよう、Provider は手書きにする
 /// ([reviewPrompterProvider] と同じ)。
 final trackingAuthorizerProvider = Provider<TrackingAuthorizer>((ref) {
-  final authorizer = TrackingAuthorizer(client: ref.watch(trackingClientProvider));
+  final authorizer = TrackingAuthorizer(
+    client: ref.watch(trackingClientProvider),
+  );
   ref.onDispose(authorizer.dispose);
   return authorizer;
 });

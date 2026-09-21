@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
 import 'package:flutter/material.dart';
@@ -29,23 +30,12 @@ class MobileLearningEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => showWordRegistrationSheet(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: palette.accent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text(
-                '＋ 単語を登録',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          MobileFilledButton(
+            label: '＋ 単語を登録',
+            onPressed: () => showWordRegistrationSheet(context),
+            fontSize: 14,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            borderRadius: 11,
           ),
         ],
       ),

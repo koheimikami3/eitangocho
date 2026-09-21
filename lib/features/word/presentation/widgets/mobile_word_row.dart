@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
@@ -33,13 +34,18 @@ class MobileWordRow extends StatelessWidget {
     final palette = context.palette;
     final showIpaText = showIpa && word.ipa.isNotEmpty;
 
-    return GestureDetector(
+    return MobilePressable(
       onTap: onTap,
-      child: Container(
+      style: MobilePressStyle.row,
+      builder: (context, pressed) => Container(
         constraints: const BoxConstraints(minHeight: 44),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: word.isLearned ? palette.surfaceHeader : palette.surface,
+          color: pressed
+              ? palette.pressBackground
+              : word.isLearned
+              ? palette.surfaceHeader
+              : palette.surface,
           border: Border(bottom: BorderSide(color: palette.rowLine)),
         ),
         child: Row(

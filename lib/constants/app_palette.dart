@@ -108,8 +108,10 @@ class AppPalette {
   /// カードの枠線(--card-border)
   Color get cardBorder => _line(20, 22);
 
-  /// リスト行・カード内の区切り線(--row-line)
-  Color get rowLine => _line(11, 13);
+  /// リスト行・カード内・設定のセクション内の区切り線。
+  /// 立体案は面を影で分けるぶん、区切り線は淡い黒 / 白 7% に戻した
+  /// (デザインの --b05〜--b08 の中間)。
+  Color get rowLine => borderAlpha(7);
 
   /// ヘッダー・タブバー・広告帯の境界線(--head-line)
   Color get headLine => _line(14, 16);

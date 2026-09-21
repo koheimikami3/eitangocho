@@ -28,7 +28,7 @@ void main() {
     }
   });
 
-  testWidgets('アイコンのみの形はラベルを持たず、幅 44pt × 高さ 34pt を占める', (tester) async {
+  testWidgets('アイコンのみの形はラベルを持たず、幅 44pt × 高さ 30pt を占める', (tester) async {
     await pump(tester, MobilePronunciationButtonVariant.icon);
 
     expect(find.byType(Text), findsNothing);
@@ -46,24 +46,27 @@ void main() {
     // 中央寄せだと円の右端がコンテンツの右端より内側に入り、左端の
     // チェックボックスに対して左寄りに見える(クラスのドキュメント参照)。
     final tapTarget = tester.getRect(find.byType(MobilePronunciationButton));
+    // 外側の Container は押下演出(MobilePressable)のもの。円は最も内側。
     final circle = tester.getRect(
-      find.descendant(
-        of: find.byType(MobilePronunciationButton),
-        matching: find.byType(Container),
-      ),
+      find
+          .descendant(
+            of: find.byType(MobilePronunciationButton),
+            matching: find.byType(Container),
+          )
+          .last,
     );
 
     expect(circle.width, MobilePronunciationButton.circleDiameter);
     expect(circle.right, tapTarget.right);
   });
 
-  testWidgets('クイズの形は「発音を聞く」を出し、高さ 44pt を確保する', (tester) async {
+  testWidgets('クイズの形は「発音を聞く」を出し、高さ 36pt にする', (tester) async {
     await pump(tester, MobilePronunciationButtonVariant.pill);
 
     expect(find.text('発音を聞く'), findsOneWidget);
     expect(
       tester.getSize(find.byType(MobilePronunciationButton)).height,
-      MobilePronunciationButton.minTapTarget,
+      MobilePronunciationButton.pillHeight,
     );
   });
 
