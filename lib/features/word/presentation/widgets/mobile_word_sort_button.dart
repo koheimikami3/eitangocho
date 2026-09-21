@@ -1,16 +1,15 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
-import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_sort_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// iOS 版ヘッダの並び替えボタン(全単語のときだけ検索欄の右に出る)。
+/// iOS 版ヘッダの並び替えボタン(全単語のときだけ検索欄の下の行に出る)。
 ///
-/// 高さは検索欄に合わせて親の Row から受け取り、正方形にする。
-/// 既定(登録日が新しい順)以外で並べているときはアクセント色にして、
-/// 並びを変えたままになっていることが一覧を見ただけで分かるようにする。
+/// 現在の並び順をラベルにしたピル形。どの順で並んでいるかがボタンを見るだけで
+/// 分かるので、既定以外のときに色で知らせる必要は無い(常にアクセント色)。
 class MobileWordSortButton extends ConsumerWidget {
   const MobileWordSortButton({super.key});
 
@@ -22,25 +21,31 @@ class MobileWordSortButton extends ConsumerWidget {
         (s) => s.value?.wordSortOrder ?? const SettingsState().wordSortOrder,
       ),
     );
-    final active = order != WordSortOrder.newest;
 
-    return GestureDetector(
+    return MobilePressable(
       onTap: () => showMobileWordSortSheet(context),
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: Container(
-          decoration: BoxDecoration(
-            color: active ? palette.accentSoft : palette.surfaceAlt,
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color: active ? palette.accentLine : palette.softBorder,
+      builder: (context, pressed) => Container(
+        constraints: const BoxConstraints(minHeight: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+        decoration: BoxDecoration(
+          color: palette.accentSoft,
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: palette.accentLine),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.sort, size: 14, color: palette.accentOnSoft),
+            const SizedBox(width: 6),
+            Text(
+              order.label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: palette.accentOnSoft,
+              ),
             ),
-          ),
-          child: Icon(
-            Icons.swap_vert,
-            size: 20,
-            color: active ? palette.accent : palette.textAlpha(55),
-          ),
+          ],
         ),
       ),
     );
