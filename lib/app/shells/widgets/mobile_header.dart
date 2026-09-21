@@ -5,6 +5,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/features/word/presentation/widgets/mobile_word_sort_button.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,9 +83,22 @@ class MobileHeader extends ConsumerWidget {
                 ),
               ),
               if (showSearchAndAdd)
-                const Padding(
-                  padding: EdgeInsets.only(top: 4, bottom: 10),
-                  child: MobileSearchField(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 10),
+                  child: view == MainView.allWords
+                      // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
+                      // ボタンを検索欄と同じ高さの正方形にするため高さを揃える。
+                      ? const IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(child: MobileSearchField()),
+                              SizedBox(width: 8),
+                              MobileWordSortButton(),
+                            ],
+                          ),
+                        )
+                      : const MobileSearchField(),
                 )
               else
                 const SizedBox(height: 8),

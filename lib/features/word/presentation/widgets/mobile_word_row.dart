@@ -15,6 +15,7 @@ class MobileWordRow extends StatelessWidget {
     required this.showIpa,
     required this.onToggleLearned,
     required this.onTap,
+    this.showCorrectCount = false,
     super.key,
   });
 
@@ -22,6 +23,10 @@ class MobileWordRow extends StatelessWidget {
   final bool showIpa;
   final ValueChanged<bool> onToggleLearned;
   final VoidCallback onTap;
+
+  /// 覚えた回数(correctCount)を単語の横に出すか。
+  /// 普段は出さず、覚えた回数で並べているときだけ並びの根拠として見せる。
+  final bool showCorrectCount;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +78,15 @@ class MobileWordRow extends StatelessWidget {
                             fontSize: 11,
                             fontFamily: 'Menlo',
                             color: palette.textAlpha(45),
+                          ),
+                        ),
+                      if (showCorrectCount)
+                        Text(
+                          '覚えた ${word.correctCount}回',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: palette.accentOnSoft,
                           ),
                         ),
                     ],
