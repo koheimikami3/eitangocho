@@ -41,8 +41,9 @@ class InAppReviewClient implements ReviewClient {
   Future<void> requestReview() => InAppReview.instance.requestReview();
 
   @override
-  Future<void> openStoreListing() =>
-      InAppReview.instance.openStoreListing(appStoreId: ReviewConfig.appStoreId);
+  Future<void> openStoreListing() => InAppReview.instance.openStoreListing(
+    appStoreId: ReviewConfig.appStoreId,
+  );
 }
 
 /// レビュー依頼の実装。テストではフェイクに差し替える。

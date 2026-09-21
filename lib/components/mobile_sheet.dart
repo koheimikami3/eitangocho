@@ -1,3 +1,5 @@
+import 'package:eitangocho/components/mobile_filled_button.dart';
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,7 @@ class MobileSheet extends StatelessWidget {
     this.rightLabel,
     this.onRight,
     this.scrollableBody = true,
+    this.showGrabber = true,
     this.footer,
   });
 
@@ -32,6 +35,10 @@ class MobileSheet extends StatelessWidget {
   /// WebView のように自前で高さいっぱいに広がるものは false にして、
   /// 余白ごとシートの残り高を渡す。
   final bool scrollableBody;
+
+  /// 上端のつまみ(下へスワイプで閉じられる合図)を出すか。
+  /// 閉じるボタンだけで閉じる発音シートは出さない(デザインどおり)。
+  final bool showGrabber;
 
   /// スクロール領域の外側、シート最下部に固定で置くもの。
   /// 今のところ用途はバナー広告だけ(`MobileSheetBannerAd`)。
@@ -59,6 +66,7 @@ class MobileSheet extends StatelessWidget {
           child: Column(
             children: [
               _SheetHeader(
+                showGrabber: showGrabber,
                 title: title,
                 leftLabel: leftLabel,
                 onLeft: onLeft,
@@ -68,7 +76,7 @@ class MobileSheet extends StatelessWidget {
               Expanded(
                 child: scrollableBody
                     ? SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 40),
+                        padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
                         child: child,
                       )
                     : child,
@@ -84,6 +92,7 @@ class MobileSheet extends StatelessWidget {
 
 class _SheetHeader extends StatelessWidget {
   const _SheetHeader({
+    required this.showGrabber,
     required this.title,
     required this.leftLabel,
     required this.onLeft,
@@ -91,6 +100,7 @@ class _SheetHeader extends StatelessWidget {
     required this.onRight,
   });
 
+  final bool showGrabber;
   final String title;
   final String leftLabel;
   final VoidCallback onLeft;
@@ -102,30 +112,48 @@ class _SheetHeader extends StatelessWidget {
     final palette = context.palette;
 
     return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: palette.headLine)),
+        border: Border(bottom: BorderSide(color: palette.borderAlpha(6))),
       ),
-      // タイトルは左右のボタン幅に影響されず中央に置きたいため Stack で重ねる。
-      child: Stack(
-        alignment: Alignment.center,
+      child: Column(
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: palette.text,
+          if (showGrabber) const MobileSheetGrabber(),
+          Container(
+            height: showGrabber ? 46 : 50,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            // タイトルは左右のボタン幅に影響されず中央に置きたいため Stack で重ねる。
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: palette.text,
+                  ),
+                ),
+                Row(
+                  children: [
+                    _SheetAction(label: leftLabel, onTap: onLeft),
+                    const Spacer(),
+                    // 確定操作(登録・保存)は文字ではなくピル形の主ボタンにする。
+                    if (rightLabel != null && onRight != null)
+                      MobileFilledButton(
+                        label: rightLabel!,
+                        onPressed: onRight!,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 7,
+                        ),
+                        borderRadius: 99,
+                      ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          Row(
-            children: [
-              _SheetAction(label: leftLabel, onTap: onLeft),
-              const Spacer(),
-              if (rightLabel != null && onRight != null)
-                _SheetAction(label: rightLabel!, onTap: onRight!, bold: true),
-            ],
           ),
         ],
       ),
@@ -134,30 +162,42 @@ class _SheetHeader extends StatelessWidget {
 }
 
 class _SheetAction extends StatelessWidget {
-  const _SheetAction({
-    required this.label,
-    required this.onTap,
-    this.bold = false,
-  });
+  const _SheetAction({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;
-  final bool bold;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: onTap,
-      child: Padding(
+      style: MobilePressStyle.text,
+      builder: (context, _) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            color: context.palette.accent,
-          ),
+          style: TextStyle(fontSize: 15, color: context.palette.accentOnSoft),
+        ),
+      ),
+    );
+  }
+}
+
+/// シート上端のつまみ(下へスワイプで閉じられる合図)。
+/// 並び替えシートのように [MobileSheet] を使わないシートでも同じものを出す。
+class MobileSheetGrabber extends StatelessWidget {
+  const MobileSheetGrabber({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 7),
+      child: Container(
+        width: 36,
+        height: 5,
+        decoration: BoxDecoration(
+          color: context.palette.borderAlpha(12),
+          borderRadius: BorderRadius.circular(99),
         ),
       ),
     );

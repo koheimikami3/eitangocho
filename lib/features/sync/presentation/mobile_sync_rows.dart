@@ -76,9 +76,7 @@ class _SyncNowRow extends StatelessWidget {
                   fontSize: 14,
                   // カード地に載るアクセント文字は accentOnSoft を使う
                   // (accent のままだと 4.5:1 に届かない)。Pro の復元行と同じ。
-                  color: syncing
-                      ? palette.textAlpha(40)
-                      : palette.accentOnSoft,
+                  color: syncing ? palette.textAlpha(40) : palette.accentOnSoft,
                 ),
               ),
             ),

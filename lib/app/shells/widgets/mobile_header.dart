@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/shells/widgets/mobile_search_field.dart';
+import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -13,7 +14,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// iOS 版のヘッダ。ビュー名・件数・「＋ 登録」ボタン・検索欄。
 ///
 /// 検索欄と登録ボタンは学習中 / 全単語のときだけ出す(デザインの
-/// showSearch / showAdd に対応)。
+/// showSearch / showAdd に対応)。全単語のときだけ検索欄の下に並び替えの行を出す。
+///
+/// 下端は線ではなく影で区切る。影はコンテンツの上に落ちるため、シェル側で
+/// ヘッダをコンテンツより後に描かせている(TabBarShell 参照)。
 class MobileHeader extends ConsumerWidget {
   const MobileHeader({super.key});
 
@@ -27,7 +31,7 @@ class MobileHeader extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: palette.surface,
-        border: Border(bottom: BorderSide(color: palette.headLine)),
+        boxShadow: palette.headerShadow,
       ),
       child: SafeArea(
         bottom: false,
@@ -82,25 +86,18 @@ class MobileHeader extends ConsumerWidget {
                   ],
                 ),
               ),
-              if (showSearchAndAdd)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 10),
-                  child: view == MainView.allWords
-                      // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
-                      // ボタンを検索欄と同じ高さの正方形にするため高さを揃える。
-                      ? const IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Expanded(child: MobileSearchField()),
-                              SizedBox(width: 8),
-                              MobileWordSortButton(),
-                            ],
-                          ),
-                        )
-                      : const MobileSearchField(),
-                )
-              else
+              if (showSearchAndAdd) ...[
+                const Padding(
+                  padding: EdgeInsets.only(top: 4, bottom: 10),
+                  child: MobileSearchField(),
+                ),
+                // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
+                if (view == MainView.allWords)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: _SortRow(),
+                  ),
+              ] else
                 const SizedBox(height: 8),
             ],
           ),
@@ -130,25 +127,39 @@ class _AddWordButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
-    return GestureDetector(
+    return MobileFilledButton(
+      label: '＋ 登録',
       // 登録はタブではなくシートで開く(デザインどおり)。
-      onTap: () => showWordRegistrationSheet(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: palette.accent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Text(
-          '＋ 登録',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      onPressed: () => showWordRegistrationSheet(context),
+      // 文字の大きさは 1.x と同じ 14px・太字(デザインの 13px・w600 は
+      // 小さく見えたため採らない)。
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      borderRadius: 8,
+    );
+  }
+}
+
+/// 全単語の並び替えの行。左に表示中の件数、右に現在の並び順のボタン。
+class _SortRow extends ConsumerWidget {
+  const _SortRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            // 検索で絞り込んだ後の件数(タイトル脇の件数は全件)。
+            '${ref.watch(filteredWordListProvider).length}語を表示中',
+            style: TextStyle(fontSize: 12, color: palette.textAlpha(45)),
           ),
         ),
-      ),
+        const SizedBox(width: 8),
+        const MobileWordSortButton(),
+      ],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
@@ -53,18 +54,18 @@ class MobileQuizResultView extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: _ResultButton(
+              child: MobileFilledButton(
                 label: 'もう一度',
-                filled: true,
-                onTap: () => ref.read(quizPageProvider.notifier).startQuiz(),
+                onPressed: () =>
+                    ref.read(quizPageProvider.notifier).startQuiz(),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _ResultButton(
+              // 立体案では 2 つとも主ボタン(どちらも次の行動として同格)。
+              child: MobileFilledButton(
                 label: '学習中リストへ',
-                filled: false,
-                onTap: () => ref
+                onPressed: () => ref
                     .read(mainPageProvider.notifier)
                     .selectView(MainView.learning),
               ),
@@ -88,13 +89,10 @@ class _ForgotList extends StatelessWidget {
     final radius = BorderRadius.circular(AppDimensions.mobileCardRadius);
 
     return Container(
-      decoration: BoxDecoration(color: palette.surface, borderRadius: radius),
-      // 枠線は中身の上に重ねて描く(foregroundDecoration)。decoration の
-      // border だと中身が枠の内側に四角く置かれ、ヘッダーの背景が上の角丸の
-      // 枠線を塗りつぶしてしまう。
-      foregroundDecoration: BoxDecoration(
+      decoration: BoxDecoration(
+        color: palette.surface,
         borderRadius: radius,
-        border: Border.all(color: palette.cardBorder),
+        boxShadow: palette.elevation,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -102,8 +100,10 @@ class _ForgotList extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            // グレーの見出しは地(background)と見分けが付かなかったため、
+            // 「忘れていた」に合わせて淡い赤の地 + 赤文字にする。
             decoration: BoxDecoration(
-              color: palette.surfaceHeader,
+              color: palette.dangerSoft,
               border: Border(bottom: BorderSide(color: palette.rowLine)),
             ),
             child: Text(
@@ -111,7 +111,7 @@ class _ForgotList extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: palette.textAlpha(55),
+                color: palette.danger,
               ),
             ),
           ),
@@ -156,44 +156,6 @@ class _ForgotList extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _ResultButton extends StatelessWidget {
-  const _ResultButton({
-    required this.label,
-    required this.filled,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool filled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: filled ? palette.accent : palette.surface,
-          borderRadius: BorderRadius.circular(11),
-          border: filled ? null : Border.all(color: palette.buttonBorder),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: filled ? Colors.white : palette.text,
-          ),
-        ),
       ),
     );
   }

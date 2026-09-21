@@ -1,4 +1,6 @@
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/components/mobile_raised_surface.dart';
+import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
@@ -52,103 +54,95 @@ class _MobileWordCardState extends State<MobileWordCard> {
     final showIpa = widget.showIpa && word.ipa.isNotEmpty;
     final hasExample = word.exampleEn.trim().isNotEmpty;
 
-    return GestureDetector(
+    return MobileRaisedSurface(
       onTap: widget.onTap,
-      child: Container(
-        padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
-          border: Border.all(color: palette.cardBorder),
-          boxShadow: palette.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _CardHeader(
-              word: word,
-              showIpa: showIpa,
-              singleColumn: widget.singleColumn,
+      borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+      padding: const EdgeInsets.all(13),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _CardHeader(
+            word: word,
+            showIpa: showIpa,
+            singleColumn: widget.singleColumn,
+          ),
+          const SizedBox(height: 8),
+          _RevealToggle(
+            japanese: word.japanese,
+            revealed: _revealed,
+            onTap: () => setState(() => _revealed = !_revealed),
+          ),
+          const SizedBox(height: 8),
+          // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
+          // 常に固定行数分を確保する(child が無ければ空白のまま)。
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: _exampleFontSize * _exampleLineHeight * _exampleLines,
             ),
-            const SizedBox(height: 8),
-            _RevealToggle(
-              japanese: word.japanese,
-              revealed: _revealed,
-              onTap: () => setState(() => _revealed = !_revealed),
-            ),
-            const SizedBox(height: 8),
-            // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
-            // 常に固定行数分を確保する(child が無ければ空白のまま)。
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight:
-                    _exampleFontSize * _exampleLineHeight * _exampleLines,
-              ),
-              child: hasExample
-                  ? Text(
-                      word.exampleEn,
-                      maxLines: _exampleLines,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: _exampleFontSize,
-                        height: _exampleLineHeight,
-                        color: palette.textAlpha(70),
-                      ),
-                    )
-                  : null,
-            ),
-            if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  word.exampleJa,
-                  style: TextStyle(
-                    fontSize: 11,
-                    height: 1.45,
-                    color: palette.textAlpha(50),
-                  ),
+            child: hasExample
+                ? Text(
+                    word.exampleEn,
+                    maxLines: _exampleLines,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: _exampleFontSize,
+                      height: _exampleLineHeight,
+                      color: palette.textAlpha(70),
+                    ),
+                  )
+                : null,
+          ),
+          if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                word.exampleJa,
+                style: TextStyle(
+                  fontSize: 11,
+                  height: 1.45,
+                  color: palette.textAlpha(50),
                 ),
               ),
-            // フッタ(区切り線 + 覚えた / 発音)は上下の余白を少し詰める。
-            // 発音ボタンが 34pt あり、8 + 8 だと間延びして見えるため。
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.only(top: 6),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: palette.rowLine)),
-              ),
-              child: Row(
-                children: [
-                  // チェック操作をカードのタップ(編集)に伝播させない。
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => widget.onToggleLearned(!word.isLearned),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        MobileLearnedCheckbox(value: word.isLearned),
-                        const SizedBox(width: 6),
-                        Text(
-                          '覚えた',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: palette.textAlpha(60),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  MobilePronunciationButton(
-                    word: word.word,
-                    variant: MobilePronunciationButtonVariant.icon,
-                  ),
-                ],
-              ),
             ),
-          ],
-        ),
+          // フッタ(区切り線 + 覚えた / 発音)は上下の余白を少し詰める。
+          // 発音ボタンが 34pt あり、8 + 8 だと間延びして見えるため。
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.only(top: 6),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: palette.rowLine)),
+            ),
+            child: Row(
+              children: [
+                // チェック操作をカードのタップ(編集)に伝播させない。
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => widget.onToggleLearned(!word.isLearned),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MobileLearnedCheckbox(value: word.isLearned),
+                      const SizedBox(width: 6),
+                      Text(
+                        '覚えた',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: palette.textAlpha(60),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                MobilePronunciationButton(
+                  word: word.word,
+                  variant: MobilePronunciationButtonVariant.icon,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,11 +257,14 @@ class _RevealToggle extends StatelessWidget {
   static const _japaneseFontSize = 13.0;
   static const _hintFontSize = 12.0;
 
-  /// 訳を 1 行表示したときの外形高さ(パディング + 1 行 + 枠線 1px×2)。
-  static const _boxHeight = _padding * 2 + _japaneseFontSize * _lineHeight + 2;
+  static const _radius = 9.0;
 
-  /// 破線側のパディング。枠線を CustomPaint で描く(= 高さを取らない)ぶんと
-  /// 文字が小さいぶんをここで埋め、タップしても高さが変わらないようにする。
+  /// 訳を 1 行表示したときの外形高さ(パディング + 1 行)。
+  /// 表示中の枠は内側の影で描くため、枠線の分の高さは無い。
+  static const _boxHeight = _padding * 2 + _japaneseFontSize * _lineHeight;
+
+  /// 破線側のパディング。文字が小さいぶんをここで埋め、タップしても
+  /// 高さが変わらないようにする(破線は CustomPaint で描くので高さを取らない)。
   /// 訳が 2 行以上になったときは訳側が伸びる(それは許容)。
   static const _hintPadding = (_boxHeight - _hintFontSize * _lineHeight) / 2;
 
@@ -280,27 +277,27 @@ class _RevealToggle extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: revealed
-          ? Container(
-              width: double.infinity,
+          ? MobileWell(
+              color: palette.wellBackground,
+              shadows: palette.wellShadow,
+              borderRadius: BorderRadius.circular(_radius),
               padding: const EdgeInsets.all(_padding),
-              decoration: BoxDecoration(
-                color: palette.surfaceAlt,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: palette.softBorder),
-              ),
-              child: Text(
-                japanese,
-                // 訳が 2 行に折り返したときに 2 行目だけ中央に寄って見えるため、
-                // 左揃えにする(「訳を表示」の方は 1 行固定なので中央のまま)。
-                style: TextStyle(
-                  fontSize: _japaneseFontSize,
-                  height: _lineHeight,
-                  color: palette.text,
+              child: SizedBox(
+                width: double.infinity,
+                child: Text(
+                  japanese,
+                  // 訳が 2 行に折り返したときに 2 行目だけ中央に寄って見えるため、
+                  // 左揃えにする(「訳を表示」の方は 1 行固定なので中央のまま)。
+                  style: TextStyle(
+                    fontSize: _japaneseFontSize,
+                    height: _lineHeight,
+                    color: palette.text,
+                  ),
                 ),
               ),
             )
           : _DashedBox(
-              color: palette.dashBorder,
+              color: palette.borderAlpha(18),
               child: Padding(
                 padding: const EdgeInsets.all(_hintPadding),
                 child: Text(
@@ -309,7 +306,7 @@ class _RevealToggle extends StatelessWidget {
                   style: TextStyle(
                     fontSize: _hintFontSize,
                     height: _lineHeight,
-                    color: palette.textAlpha(40),
+                    color: palette.textAlpha(45),
                   ),
                 ),
               ),
@@ -339,7 +336,7 @@ class _DashedBorderPainter extends CustomPainter {
 
   final Color color;
 
-  static const _radius = 8.0;
+  static const _radius = _RevealToggle._radius;
   static const _dash = 3.0;
   static const _gap = 3.0;
 

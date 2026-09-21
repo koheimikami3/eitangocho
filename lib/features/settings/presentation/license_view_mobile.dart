@@ -33,10 +33,12 @@ class LicenseViewMobile extends ConsumerWidget {
           constraints: const BoxConstraints(
             maxWidth: AppDimensions.mobileContentMaxWidth,
           ),
+          // ヘッダの影をリストの上に落とすため、並びを下から上にして
+          // ヘッダを最後に描かせる(TabBarShell と同じ)。
           child: Column(
+            verticalDirection: VerticalDirection.up,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const MobilePushHeader(title: 'ライセンス', backLabel: '設定'),
               Expanded(
                 child: switch (licenses) {
                   AsyncData(:final value) => _LicenseList(items: value),
@@ -52,6 +54,7 @@ class LicenseViewMobile extends ConsumerWidget {
                   _ => const Center(child: CircularProgressIndicator()),
                 },
               ),
+              const MobilePushHeader(title: 'ライセンス', backLabel: '設定'),
             ],
           ),
         ),

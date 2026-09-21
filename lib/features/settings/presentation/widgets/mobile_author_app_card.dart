@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
@@ -25,14 +26,14 @@ class MobileAuthorAppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: _open,
-      child: Container(
+      style: MobilePressStyle.row,
+      builder: (context, pressed) => Container(
         decoration: BoxDecoration(
-          color: palette.surface,
+          color: pressed ? palette.surfaceAlt : palette.surface,
           borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
-          border: Border.all(color: palette.cardBorder),
+          boxShadow: palette.elevation,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
@@ -91,8 +92,9 @@ class MobileAuthorAppCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: palette.accent,
+                gradient: palette.buttonGradient,
                 borderRadius: BorderRadius.circular(99),
+                boxShadow: palette.buttonShadow,
               ),
               child: const Text(
                 '入手',

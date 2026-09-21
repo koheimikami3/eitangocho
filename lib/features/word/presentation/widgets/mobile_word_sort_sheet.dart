@@ -12,7 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// 出し方(オーバーレイ色など)は登録・編集シートと同じ [showMobileSheet] を使う。
 /// ただし [MobileSheet] は画面高の 88% 固定で 8 行の選択には大きすぎるため、
-/// 中身の高さに合わせた枠をここで組む。
+/// 中身の高さに合わせた枠をここで組む。見た目(下端に付けた上角丸・つまみ・
+/// ヘッダの区切り線)は登録・編集シートに揃える(デザインの浮いたカード形は
+/// ユーザー判断で採らない)。
 Future<void> showMobileWordSortSheet(BuildContext context) {
   return showMobileSheet<void>(
     context: context,
@@ -45,18 +47,27 @@ class MobileWordSortSheet extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 52,
-              alignment: Alignment.center,
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: palette.headLine)),
-              ),
-              child: Text(
-                '並び替え',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: palette.text,
+                border: Border(
+                  bottom: BorderSide(color: palette.borderAlpha(6)),
                 ),
+              ),
+              child: Column(
+                children: [
+                  const MobileSheetGrabber(),
+                  Container(
+                    height: 46,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '並び替え',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: palette.text,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

@@ -53,9 +53,12 @@ class _ShellBody extends ConsumerWidget {
     // タブバーの高さ分だけ下に余白を取る。
     return Stack(
       children: [
+        // ヘッダの影をコンテンツの上に落とすため、ヘッダを後に描かせる。
+        // Column は children の順に描くので、並びを下から上(up)にして
+        // ヘッダを最後に置く(見た目の上下は従来どおり)。
         Column(
+          verticalDirection: VerticalDirection.up,
           children: [
-            const MobileHeader(),
             Expanded(
               // 上のセーフエリアはヘッダが消費済み。下端はタブバーとバナー広告が
               // 重なるので、その分をビュー側のスクロール余白として渡す。
@@ -76,6 +79,7 @@ class _ShellBody extends ConsumerWidget {
                 },
               ),
             ),
+            const MobileHeader(),
           ],
         ),
         const Positioned(

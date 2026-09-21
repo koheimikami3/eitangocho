@@ -1,3 +1,7 @@
+import 'package:eitangocho/components/mobile_field_label.dart';
+import 'package:eitangocho/components/mobile_filled_button.dart';
+import 'package:eitangocho/components/mobile_form_rows.dart';
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_labeled_field.dart';
 import 'package:eitangocho/components/mobile_pos_chip_selector.dart';
 import 'package:eitangocho/components/mobile_sheet.dart';
@@ -176,7 +180,7 @@ class _WordRegistrationSheetState
       // フォームまで進んでいれば入力ステップへ戻す、そうでなければ閉じる。
       leftLabel: isForm ? '戻る' : 'キャンセル',
       onLeft: isForm ? notifier.backToInput : () => Navigator.of(context).pop(),
-      rightLabel: isForm ? '登録する' : null,
+      rightLabel: isForm ? '登録' : null,
       onRight: isForm ? _save : null,
       child: switch (state.step) {
         RegistrationStep.input => _InputStep(
@@ -233,10 +237,10 @@ class _InputStep extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             height: 1.6,
-            color: palette.textAlpha(45),
+            color: palette.textAlpha(50),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         MobileLabeledField(
           label: '英単語 *',
           controller: controller,
@@ -244,42 +248,30 @@ class _InputStep extends StatelessWidget {
           asciiOnly: true,
           onSubmitted: (_) => onAutoFill(),
         ),
-        const SizedBox(height: 14),
-        GestureDetector(
-          onTap: onAutoFill,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 13),
-            decoration: BoxDecoration(
-              color: palette.accent,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text(
-              '自動入力',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
+        const SizedBox(height: 16),
+        MobileFilledButton(
+          label: '自動入力',
+          onPressed: onAutoFill,
+          padding: const EdgeInsets.all(13),
+          borderRadius: 11,
         ),
         if (errorMessage != null) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
             errorMessage!,
             style: TextStyle(fontSize: 12, color: palette.danger),
           ),
         ],
-        const SizedBox(height: 14),
-        GestureDetector(
+        const SizedBox(height: 16),
+        MobilePressable(
           onTap: onSkip,
-          child: Padding(
+          style: MobilePressStyle.text,
+          builder: (context, _) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Text(
               'スキップして手動で入力する',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: palette.accent),
+              style: TextStyle(fontSize: 13, color: palette.accentOnSoft),
             ),
           ),
         ),
@@ -369,62 +361,51 @@ class _FormStep extends StatelessWidget {
           _WarningBanner(message: '例文の日本語訳を取得できませんでした。手動で入力できます。'),
           const SizedBox(height: 14),
         ],
-        MobileLabeledField(
-          label: '英単語 *',
-          controller: wordController,
-          asciiOnly: true,
-        ),
-        const SizedBox(height: 14),
-        // IPA は非 ASCII なので asciiOnly を付けない。
-        MobileLabeledField(
-          label: '発音記号 (IPA)',
-          controller: ipaController,
-          autoFilled: autoIpa,
-        ),
-        const SizedBox(height: 14),
-        MobileLabeledField(
-          label: '日本語訳 *',
-          controller: japaneseController,
-          maxLines: null,
-          autoFilled: autoJapanese,
-        ),
-        const SizedBox(height: 14),
-        Row(
+        MobileFormRows(
           children: [
-            Text(
-              '品詞(複数選択可)',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: palette.textAlpha(60),
-              ),
+            MobileLabeledField(
+              label: '英単語 *',
+              controller: wordController,
+              asciiOnly: true,
             ),
-            if (autoPos) ...[
-              const SizedBox(width: 6),
-              const MobileAutoFillBadge(),
-            ],
+            // IPA は非 ASCII なので asciiOnly を付けない。
+            MobileLabeledField(
+              label: '発音記号 (IPA)',
+              controller: ipaController,
+              autoFilled: autoIpa,
+            ),
+            MobileLabeledField(
+              label: '日本語訳 *',
+              controller: japaneseController,
+              maxLines: null,
+              autoFilled: autoJapanese,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                MobileFieldLabel(label: '品詞(複数選択可)', autoFilled: autoPos),
+                const SizedBox(height: 7),
+                MobilePosChipSelector(
+                  selected: selectedPartsOfSpeech,
+                  onToggle: onTogglePartOfSpeech,
+                ),
+              ],
+            ),
+            MobileLabeledField(
+              label: '英例文',
+              controller: exampleEnController,
+              minLines: 2,
+              maxLines: null,
+              autoFilled: autoExampleEn,
+            ),
+            MobileLabeledField(
+              label: '日本語例文',
+              controller: exampleJaController,
+              minLines: 2,
+              maxLines: null,
+              autoFilled: autoExampleJa,
+            ),
           ],
-        ),
-        const SizedBox(height: 6),
-        MobilePosChipSelector(
-          selected: selectedPartsOfSpeech,
-          onToggle: onTogglePartOfSpeech,
-        ),
-        const SizedBox(height: 14),
-        MobileLabeledField(
-          label: '英例文',
-          controller: exampleEnController,
-          minLines: 2,
-          maxLines: null,
-          autoFilled: autoExampleEn,
-        ),
-        const SizedBox(height: 14),
-        MobileLabeledField(
-          label: '日本語例文',
-          controller: exampleJaController,
-          minLines: 2,
-          maxLines: null,
-          autoFilled: autoExampleJa,
         ),
         if (errorMessage != null) ...[
           const SizedBox(height: 14),
@@ -448,15 +429,26 @@ class _WarningBanner extends StatelessWidget {
     final palette = context.palette;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       decoration: BoxDecoration(
         color: palette.warningBannerBackground,
-        borderRadius: BorderRadius.circular(9),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: palette.warningBannerBorder),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F101828), // rgba(16,24,40,0.06)
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       child: Text(
         message,
-        style: TextStyle(fontSize: 13, color: palette.warningBannerForeground),
+        style: TextStyle(
+          fontSize: 13,
+          height: 1.5,
+          color: palette.warningBannerForeground,
+        ),
       ),
     );
   }

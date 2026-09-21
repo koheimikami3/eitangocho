@@ -42,9 +42,8 @@ class MobileQuizCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
       decoration: BoxDecoration(
         color: palette.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: palette.cardBorder),
-        boxShadow: palette.sheetShadow,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: palette.elevation,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:flutter/material.dart';
@@ -36,55 +37,58 @@ class MobileTabBar extends ConsumerWidget {
       context,
     ).bottom).clamp(_minBottomInset, 40.0);
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(8, 8, 8, bottomInset),
-          decoration: BoxDecoration(
+    // 上端の影はぼかしの ClipRect の外に出す必要があるため、外側で描く。
+    return DecoratedBox(
+      decoration: BoxDecoration(boxShadow: palette.bottomBarShadow),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(8, 8, 8, bottomInset),
             color: palette.tabBar,
-            border: Border(top: BorderSide(color: palette.headLine)),
-          ),
-          child: Row(
-            children: [
-              _TabItem(
-                // デザインは「カードが 2 枚重なった」線画。style(扇状に開いた
-                // カード)より、同じ大きさのカードが 2 枚ずれて重なる
-                // filter_none の方が近い。
-                icon: Icons.filter_none,
-                label: '学習中',
-                selected: view == MainView.learning,
-                onTap: () => ref
-                    .read(mainPageProvider.notifier)
-                    .selectView(MainView.learning),
-              ),
-              _TabItem(
-                icon: Icons.format_list_bulleted,
-                label: '全単語',
-                selected: view == MainView.allWords,
-                onTap: () => ref
-                    .read(mainPageProvider.notifier)
-                    .selectView(MainView.allWords),
-              ),
-              _TabItem(
-                icon: Icons.bolt,
-                label: 'クイズ',
-                selected: view == MainView.quiz,
-                // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
-                onTap: () {
-                  ref.read(quizPageProvider.notifier).startQuiz();
-                  ref.read(mainPageProvider.notifier).selectView(MainView.quiz);
-                },
-              ),
-              _TabItem(
-                icon: Icons.tune,
-                label: '設定',
-                selected: view == MainView.settings,
-                onTap: () => ref
-                    .read(mainPageProvider.notifier)
-                    .selectView(MainView.settings),
-              ),
-            ],
+            child: Row(
+              children: [
+                _TabItem(
+                  // デザインは「カードが 2 枚重なった」線画。style(扇状に開いた
+                  // カード)より、同じ大きさのカードが 2 枚ずれて重なる
+                  // filter_none の方が近い。
+                  icon: Icons.filter_none,
+                  label: '学習中',
+                  selected: view == MainView.learning,
+                  onTap: () => ref
+                      .read(mainPageProvider.notifier)
+                      .selectView(MainView.learning),
+                ),
+                _TabItem(
+                  icon: Icons.format_list_bulleted,
+                  label: '全単語',
+                  selected: view == MainView.allWords,
+                  onTap: () => ref
+                      .read(mainPageProvider.notifier)
+                      .selectView(MainView.allWords),
+                ),
+                _TabItem(
+                  icon: Icons.bolt,
+                  label: 'クイズ',
+                  selected: view == MainView.quiz,
+                  // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
+                  onTap: () {
+                    ref.read(quizPageProvider.notifier).startQuiz();
+                    ref
+                        .read(mainPageProvider.notifier)
+                        .selectView(MainView.quiz);
+                  },
+                ),
+                _TabItem(
+                  icon: Icons.settings_outlined,
+                  label: '設定',
+                  selected: view == MainView.settings,
+                  onTap: () => ref
+                      .read(mainPageProvider.notifier)
+                      .selectView(MainView.settings),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -111,11 +115,12 @@ class _TabItem extends StatelessWidget {
     final color = selected ? palette.accent : palette.textAlpha(40);
 
     return Expanded(
-      child: GestureDetector(
-        // 余白部分をタップしても反応するように、透明部分もヒット対象にする。
-        behavior: HitTestBehavior.opaque,
+      // 余白部分をタップしても反応するように、透明部分もヒット対象にする
+      // (MobilePressable の既定が HitTestBehavior.opaque)。
+      child: MobilePressable(
         onTap: onTap,
-        child: Padding(
+        style: MobilePressStyle.tab,
+        builder: (context, _) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
           child: Column(
             mainAxisSize: MainAxisSize.min,

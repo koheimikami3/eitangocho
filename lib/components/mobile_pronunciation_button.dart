@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_sheet.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_palette.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// [MobilePronunciationButton] の形。
 enum MobilePronunciationButtonVariant {
-  /// 学習中カードのフッタ・全単語リストの行。34px の円形アイコンのみ。
+  /// 学習中カードのフッタ・全単語リストの行。円形アイコンのみ。
   icon,
 
   /// クイズカード。ピル + 「発音を聞く」。
@@ -24,11 +25,11 @@ enum MobilePronunciationButtonVariant {
 /// macOS 版の [PronunciationButton] と役割は同じだが、ホバー演出と Tooltip を
 /// 持たず(タッチでは出ないため)、配色を [AppPalette] から引く。
 ///
-/// アイコンのみの形のタップ領域は **44pt 幅 × 34pt 高**。デザインは負マージンで
+/// アイコンのみの形のタップ領域は **44pt 幅 × 30pt 高**。デザインは負マージンで
 /// レイアウトを膨らませずに 44pt 四方を作っているが、Flutter は親の矩形の外を
 /// ヒットテストしないため同じ手が使えない。高さを 44pt にするとカードのフッタが
 /// そのぶん間延びするので、行の高さに響かない幅だけ広げ、高さは円の直径に
-/// 合わせている(デザインの実効高 30pt に近い)。
+/// 合わせている(デザインの実効高 30pt と同じ)。
 ///
 /// **円はタップ領域の右端に揃える**(中央寄せにしない)。この形は常に行や
 /// カードのフッタの末尾に置かれるため、中央寄せだと円の右端がコンテンツの
@@ -44,51 +45,65 @@ class MobilePronunciationButton extends StatelessWidget {
   final String word;
   final MobilePronunciationButtonVariant variant;
 
-  /// タップ領域の幅、およびピル形の高さ
+  /// アイコンのみの形のタップ領域の幅
   /// (Apple のヒューマンインターフェイスガイドラインの 44pt)。
   static const minTapTarget = 44.0;
 
-  /// アイコンのみの形の円の直径。この形はこの値が高さになる。
-  /// デザインは 34 だが、カードのフッタが詰まって見えるよう少し小さくしている。
-  static const circleDiameter = 32.0;
+  /// ピル形の高さ(デザインの min-height:36px)。
+  static const pillHeight = 36.0;
 
-  static const _iconSize = 16.0;
+  /// アイコンのみの形の円の直径。この形はこの値が高さになる。
+  static const circleDiameter = 30.0;
+
+  static const _iconSize = 15.0;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     final label = variant.label;
-
     final icon = SpeakerIcon(size: _iconSize, color: palette.accentOnSoft);
-    final decoration = BoxDecoration(
-      color: palette.accentSoft,
-      shape: label == null ? BoxShape.circle : BoxShape.rectangle,
-      borderRadius: label == null ? null : BorderRadius.circular(99),
-      border: Border.all(color: palette.accentLine),
-    );
 
-    return GestureDetector(
-      // 円の外側の余白(タップ領域)でも反応させる。
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: () => showMobilePronunciationSheet(context, word),
-      child: label == null
+      builder: (context, _) => label == null
           ? SizedBox(
               width: minTapTarget,
               height: circleDiameter,
               child: Align(
                 alignment: Alignment.centerRight,
+                // 立体案: 淡い青の地ではなく、白からわずかに暗くなる
+                // グラデーションと細い外周線で「押せる丸いボタン」に見せる。
                 child: Container(
                   width: circleDiameter,
                   height: circleDiameter,
-                  decoration: decoration,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [palette.surface, palette.surfaceHeader],
+                    ),
+                    boxShadow: [
+                      BoxShadow(color: palette.borderAlpha(8), spreadRadius: 1),
+                      const BoxShadow(
+                        color: Color(0x0F101828), // rgba(16,24,40,0.06)
+                        blurRadius: 1.5,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
                   child: Center(child: icon),
                 ),
               ),
             )
           : Container(
-              height: minTapTarget,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: decoration,
+              height: pillHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                color: palette.accentSoft,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: palette.accentLine),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -98,7 +113,7 @@ class MobilePronunciationButton extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                       color: palette.accentOnSoft,
                     ),
                   ),

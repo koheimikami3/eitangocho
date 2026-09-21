@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:flutter/material.dart';
@@ -81,14 +82,15 @@ class _PurchaseButton extends StatelessWidget {
     // (購入済みだけでなく、価格を引けなかったときもこちら)。
     final filled = enabled || purchasing;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: enabled ? onTap : null,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      builder: (context, _) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: filled ? palette.proButton : palette.proButtonDone,
-          borderRadius: BorderRadius.circular(8),
+          color: filled ? null : palette.proButtonDone,
+          gradient: filled ? palette.buttonGradient : null,
+          borderRadius: BorderRadius.circular(9),
+          boxShadow: filled ? palette.buttonShadow : null,
         ),
         child: purchasing
             // App Store のダイアログが出るまでの待ちを埋める。文字と同じ高さに

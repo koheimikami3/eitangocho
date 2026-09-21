@@ -35,7 +35,7 @@ class MobileQuizRectangleAd extends StatelessWidget {
               borderRadius: BorderRadius.circular(
                 AppDimensions.mobileCardRadius,
               ),
-              border: Border.all(color: palette.cardBorder),
+              boxShadow: palette.elevation,
             ),
             clipBehavior: Clip.antiAlias,
             child: adView,
