@@ -4,6 +4,7 @@ import 'package:eitangocho/app/widgets/toolbar_search_field.dart';
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/word/presentation/widgets/word_sort_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,7 +41,22 @@ class MainToolbar extends ConsumerWidget {
               color: AppColors.textPrimary,
             ),
           ),
-          const Spacer(),
+          // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
+          // Spacer の代わりに余白ごと受け持ち、右寄せで置く。既定の uiScale で
+          // ウィンドウを最小幅まで狭めると収まらないため、そのときは
+          // WordSortButton が並び順の文字を省略して縮む。
+          if (view == MainView.allWords)
+            const Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 16, right: 10),
+                  child: WordSortButton(),
+                ),
+              ),
+            )
+          else
+            const Spacer(),
           if (showSearch) ...[
             const ToolbarSearchField(),
             const SizedBox(width: 10),

@@ -12,6 +12,7 @@ class WordTableRow extends StatefulWidget {
     required this.onToggleLearned,
     required this.onTap,
     required this.onContextMenu,
+    this.showCorrectCount = false,
     super.key,
   });
 
@@ -21,6 +22,10 @@ class WordTableRow extends StatefulWidget {
 
   /// コンテキストメニューを開く。引数はメニューを出すグローバル座標。
   final ValueChanged<Offset> onContextMenu;
+
+  /// 覚えた回数(correctCount)を単語の下に出すか。
+  /// 普段は出さず、覚えた回数で並べているときだけ並びの根拠として見せる。
+  final bool showCorrectCount;
 
   @override
   State<WordTableRow> createState() => _WordTableRowState();
@@ -70,13 +75,30 @@ class _WordTableRowState extends State<WordTableRow> {
               const SizedBox(width: 12),
               SizedBox(
                 width: 140,
-                child: Text(
-                  word.word,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      word.word,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    // 単語列は幅が狭いため、iOS と違い横ではなく下に置く。
+                    if (widget.showCorrectCount) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        '覚えた ${word.correctCount}回',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.accentOnSoft,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               const SizedBox(width: 12),
