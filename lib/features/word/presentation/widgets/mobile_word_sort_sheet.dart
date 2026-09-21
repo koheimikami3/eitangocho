@@ -12,8 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// 出し方(オーバーレイ色など)は登録・編集シートと同じ [showMobileSheet] を使う。
 /// ただし [MobileSheet] は画面高の 88% 固定で 8 行の選択には大きすぎるため、
-/// 中身の高さに合わせた枠をここで組む。立体案では画面の下端に付けず、
-/// 左右と下を空けて四隅を丸めた浮いたカードにする(iOS のアクションシート風)。
+/// 中身の高さに合わせた枠をここで組む。見た目(下端に付けた上角丸・つまみ・
+/// ヘッダの区切り線)は登録・編集シートに揃える(デザインの浮いたカード形は
+/// ユーザー判断で採らない)。
 Future<void> showMobileWordSortSheet(BuildContext context) {
   return showMobileSheet<void>(
     context: context,
@@ -23,9 +24,6 @@ Future<void> showMobileWordSortSheet(BuildContext context) {
 
 class MobileWordSortSheet extends ConsumerWidget {
   const MobileWordSortSheet({super.key});
-
-  /// 画面の左右・下端との間隔。
-  static const _margin = 8.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,47 +35,43 @@ class MobileWordSortSheet extends ConsumerWidget {
     );
     const orders = WordSortOrder.values;
 
-    return SafeArea(
-      top: false,
-      minimum: const EdgeInsets.only(bottom: _margin),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: _margin),
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            const BoxShadow(
-              color: Color(0x47101828), // rgba(16,24,40,0.28)
-              blurRadius: 30,
-              offset: Offset(0, -6),
-            ),
-            BoxShadow(color: palette.borderAlpha(10), spreadRadius: 0.5),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      child: SafeArea(
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              alignment: Alignment.center,
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: palette.borderAlpha(8)),
+                  bottom: BorderSide(color: palette.borderAlpha(6)),
                 ),
               ),
-              child: Text(
-                '並び替え',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: palette.text,
-                ),
+              child: Column(
+                children: [
+                  const MobileSheetGrabber(),
+                  Container(
+                    height: 46,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '並び替え',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: palette.text,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
+              padding: const EdgeInsets.fromLTRB(2, 4, 2, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
