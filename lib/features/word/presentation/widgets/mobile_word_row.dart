@@ -24,7 +24,7 @@ class MobileWordRow extends StatelessWidget {
   final ValueChanged<bool> onToggleLearned;
   final VoidCallback onTap;
 
-  /// 覚えた回数(correctCount)を単語の横に出すか。
+  /// 覚えた回数(correctCount)を訳の下の行に出すか。
   /// 普段は出さず、覚えた回数で並べているときだけ並びの根拠として見せる。
   final bool showCorrectCount;
 
@@ -80,15 +80,6 @@ class MobileWordRow extends StatelessWidget {
                             color: palette.textAlpha(45),
                           ),
                         ),
-                      if (showCorrectCount)
-                        Text(
-                          '覚えた ${word.correctCount}回',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: palette.accentOnSoft,
-                          ),
-                        ),
                     ],
                   ),
                   const SizedBox(height: 3),
@@ -101,6 +92,19 @@ class MobileWordRow extends StatelessWidget {
                       color: palette.textAlpha(60),
                     ),
                   ),
+                  // 単語の横に並べると、単語の長さ次第で折り返したり
+                  // しなかったりして行ごとに位置が揃わないため、常に独立した行にする。
+                  if (showCorrectCount) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      '覚えた ${word.correctCount}回',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: palette.accentOnSoft,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
