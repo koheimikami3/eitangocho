@@ -1,6 +1,7 @@
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_row.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
@@ -21,6 +22,10 @@ class AllWordsViewMobile extends ConsumerWidget {
     final showIpa =
         ref.watch(settingsProvider).value?.showIpa ??
         const SettingsState().showIpa;
+    final sortGroup =
+        (ref.watch(settingsProvider).value?.wordSortOrder ??
+                const SettingsState().wordSortOrder)
+            .group;
 
     if (words.isEmpty) {
       return Center(
@@ -44,6 +49,7 @@ class AllWordsViewMobile extends ConsumerWidget {
         return MobileWordRow(
           word: word,
           showIpa: showIpa,
+          showCorrectCount: sortGroup == WordSortGroup.correctCount,
           onToggleLearned: (isLearned) => ref
               .read(databaseProvider)
               .wordDao

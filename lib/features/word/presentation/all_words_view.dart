@@ -1,4 +1,7 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
@@ -15,6 +18,10 @@ class AllWordsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final words = ref.watch(filteredWordListProvider);
+    final sortGroup =
+        (ref.watch(settingsProvider).value?.wordSortOrder ??
+                const SettingsState().wordSortOrder)
+            .group;
 
     // ビューが最小テーブル幅より狭いときは横スクロールにする
     // (プロトタイプの min-width + overflow:auto 準拠。UI スケールを上げた
@@ -43,6 +50,8 @@ class AllWordsView extends ConsumerWidget {
                             .wordDao
                             .setLearned(word.id, isLearned: isLearned),
                         onTap: () => showEditWordDialog(context, ref, word),
+                        showCorrectCount:
+                            sortGroup == WordSortGroup.correctCount,
                         onContextMenu: (position) =>
                             showWordContextMenu(context, ref, word, position),
                       );

@@ -85,10 +85,15 @@ class _ForgotList extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
 
+    final radius = BorderRadius.circular(AppDimensions.mobileCardRadius);
+
     return Container(
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+      decoration: BoxDecoration(color: palette.surface, borderRadius: radius),
+      // 枠線は中身の上に重ねて描く(foregroundDecoration)。decoration の
+      // border だと中身が枠の内側に四角く置かれ、ヘッダーの背景が上の角丸の
+      // 枠線を塗りつぶしてしまう。
+      foregroundDecoration: BoxDecoration(
+        borderRadius: radius,
         border: Border.all(color: palette.cardBorder),
       ),
       clipBehavior: Clip.antiAlias,
@@ -110,12 +115,18 @@ class _ForgotList extends StatelessWidget {
               ),
             ),
           ),
-          for (final word in words)
+          for (var i = 0; i < words.length; i++)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: palette.rowLine)),
-              ),
+              // 区切り線は行と行の間だけ。最後の行にも引くとカードの下枠と
+              // 2 本並んで太く見える。
+              decoration: i < words.length - 1
+                  ? BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: palette.rowLine),
+                      ),
+                    )
+                  : null,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
@@ -123,7 +134,7 @@ class _ForgotList extends StatelessWidget {
                   SizedBox(
                     width: 100,
                     child: Text(
-                      word.word,
+                      words[i].word,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -134,7 +145,7 @@ class _ForgotList extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      word.japanese,
+                      words[i].japanese,
                       style: TextStyle(
                         fontSize: 13,
                         color: palette.textAlpha(60),
