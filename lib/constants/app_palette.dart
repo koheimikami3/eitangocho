@@ -300,8 +300,9 @@ class AppPalette {
     surfaceHeader: Color(0xFFEFF1F5),
     tabBar: Color(0xEBFAFAFB), // rgba(250,250,251,0.92)
     // デザインは #fafbfc だが、白い面との差が小さく入力欄が沈んで見えないため
-    // 一段濃くした(ユーザー判断)。
-    wellBackground: Color(0xFFF1F3F6),
+    // 地(background)と同じ色にした。沈めた面は「面に開いた穴から地が見える」
+    // 扱いにし、白 → 地 → surfaceHeader → pressBackground の段階を保つ。
+    wellBackground: Color(0xFFF4F5F8),
     pressBackground: Color(0xFFE8EBF1),
     text: Color(0xFF1D1D1F),
     danger: Color(0xFFC03030),
