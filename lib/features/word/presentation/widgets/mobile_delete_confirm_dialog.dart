@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -120,10 +121,11 @@ class _AlertAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return MobilePressable(
       onTap: onTap,
-      child: Padding(
+      style: MobilePressStyle.row,
+      builder: (context, pressed) => Container(
+        color: pressed ? context.palette.pressBackground : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 13),
         child: Text(
           label,

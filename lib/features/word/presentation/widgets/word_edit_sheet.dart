@@ -1,5 +1,8 @@
 import 'package:drift/drift.dart' show Value;
+import 'package:eitangocho/components/mobile_field_label.dart';
+import 'package:eitangocho/components/mobile_form_rows.dart';
 import 'package:eitangocho/components/mobile_labeled_field.dart';
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pos_chip_selector.dart';
 import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/constants/app_palette.dart';
@@ -136,47 +139,47 @@ class _WordEditSheetState extends State<_WordEditSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MobileLabeledField(
-            label: '英単語 *',
-            controller: _wordController,
-            asciiOnly: true,
-          ),
-          const SizedBox(height: 14),
-          // IPA は非 ASCII なので asciiOnly を付けない。
-          MobileLabeledField(label: '発音記号 (IPA)', controller: _ipaController),
-          const SizedBox(height: 14),
-          MobileLabeledField(
-            label: '日本語訳 *',
-            controller: _japaneseController,
-            maxLines: null,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            '品詞(複数選択可)',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: palette.textAlpha(60),
-            ),
-          ),
-          const SizedBox(height: 6),
-          MobilePosChipSelector(
-            selected: _selectedPartsOfSpeech,
-            onToggle: _togglePartOfSpeech,
-          ),
-          const SizedBox(height: 14),
-          MobileLabeledField(
-            label: '英例文',
-            controller: _exampleEnController,
-            minLines: 2,
-            maxLines: null,
-          ),
-          const SizedBox(height: 14),
-          MobileLabeledField(
-            label: '日本語例文',
-            controller: _exampleJaController,
-            minLines: 2,
-            maxLines: null,
+          MobileFormRows(
+            children: [
+              MobileLabeledField(
+                label: '英単語 *',
+                controller: _wordController,
+                asciiOnly: true,
+              ),
+              // IPA は非 ASCII なので asciiOnly を付けない。
+              MobileLabeledField(
+                label: '発音記号 (IPA)',
+                controller: _ipaController,
+              ),
+              MobileLabeledField(
+                label: '日本語訳 *',
+                controller: _japaneseController,
+                maxLines: null,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const MobileFieldLabel(label: '品詞(複数選択可)'),
+                  const SizedBox(height: 7),
+                  MobilePosChipSelector(
+                    selected: _selectedPartsOfSpeech,
+                    onToggle: _togglePartOfSpeech,
+                  ),
+                ],
+              ),
+              MobileLabeledField(
+                label: '英例文',
+                controller: _exampleEnController,
+                minLines: 2,
+                maxLines: null,
+              ),
+              MobileLabeledField(
+                label: '日本語例文',
+                controller: _exampleJaController,
+                minLines: 2,
+                maxLines: null,
+              ),
+            ],
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 14),
@@ -185,16 +188,15 @@ class _WordEditSheetState extends State<_WordEditSheet> {
               style: TextStyle(fontSize: 12, color: palette.danger),
             ),
           ],
-          const SizedBox(height: 22),
-          GestureDetector(
+          const SizedBox(height: 24),
+          MobilePressable(
             onTap: _delete,
-            child: Container(
+            builder: (context, pressed) => Container(
               padding: const EdgeInsets.symmetric(vertical: 13),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: palette.danger.withValues(alpha: 0.35),
-                ),
+                color: pressed ? palette.dangerSoft : palette.surface,
+                borderRadius: BorderRadius.circular(11),
+                border: Border.all(color: palette.dangerLine),
               ),
               child: Text(
                 'この単語を削除',

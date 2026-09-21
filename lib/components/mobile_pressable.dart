@@ -13,7 +13,10 @@ enum MobilePressStyle {
   tab(scale: 0.94, opacity: 0.6),
 
   /// リストの行。形は変えず、地の色だけを呼び出し側が変える。
-  row(scale: 1, opacity: 1);
+  row(scale: 1, opacity: 1),
+
+  /// シートの「キャンセル」「閉じる」など文字だけのボタン。薄くなるだけ。
+  text(scale: 1, opacity: 0.4);
 
   const MobilePressStyle({
     required this.scale,

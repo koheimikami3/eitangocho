@@ -15,6 +15,7 @@ Future<void> showMobilePronunciationSheet(BuildContext context, String word) {
       onLeft: () => Navigator.of(sheetContext).pop(),
       // WebView 自身が残り高いっぱいに広がるため、スクロール枠には載せない。
       scrollableBody: false,
+      showGrabber: false,
       child: MobilePronunciationWebView(word: word),
     ),
   );
