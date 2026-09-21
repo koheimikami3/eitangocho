@@ -11,8 +11,9 @@ class MobileFormRows extends StatelessWidget {
 
   final List<Widget> children;
 
-  /// 項目の上下の余白(デザインの padding:14px 0)。
-  static const _verticalPadding = 14.0;
+  /// 項目の上下の余白。デザインは 14 だが、区切り線との間が詰まって見えたため
+  /// ユーザー判断で広げた。
+  static const _verticalPadding = 18.0;
 
   @override
   Widget build(BuildContext context) {

@@ -117,18 +117,7 @@ class _SheetHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          if (showGrabber)
-            Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: Container(
-                width: 36,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: palette.borderAlpha(12),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-            ),
+          if (showGrabber) const MobileSheetGrabber(),
           Container(
             height: showGrabber ? 46 : 50,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -188,6 +177,27 @@ class _SheetAction extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(fontSize: 15, color: context.palette.accentOnSoft),
+        ),
+      ),
+    );
+  }
+}
+
+/// シート上端のつまみ(下へスワイプで閉じられる合図)。
+/// 並び替えシートのように [MobileSheet] を使わないシートでも同じものを出す。
+class MobileSheetGrabber extends StatelessWidget {
+  const MobileSheetGrabber({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 7),
+      child: Container(
+        width: 36,
+        height: 5,
+        decoration: BoxDecoration(
+          color: context.palette.borderAlpha(12),
+          borderRadius: BorderRadius.circular(99),
         ),
       ),
     );

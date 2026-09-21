@@ -131,9 +131,12 @@ class _AddWordButton extends StatelessWidget {
       label: '＋ 登録',
       // 登録はタブではなくシートで開く(デザインどおり)。
       onPressed: () => showWordRegistrationSheet(context),
-      fontSize: 13,
+      // 文字の大きさは 1.x と同じ 14px・太字(デザインの 13px・w600 は
+      // 小さく見えたため採らない)。
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      borderRadius: 9,
+      borderRadius: 8,
     );
   }
 }

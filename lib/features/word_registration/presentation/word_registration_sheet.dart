@@ -180,7 +180,7 @@ class _WordRegistrationSheetState
       // フォームまで進んでいれば入力ステップへ戻す、そうでなければ閉じる。
       leftLabel: isForm ? '戻る' : 'キャンセル',
       onLeft: isForm ? notifier.backToInput : () => Navigator.of(context).pop(),
-      rightLabel: isForm ? '登録する' : null,
+      rightLabel: isForm ? '登録' : null,
       onRight: isForm ? _save : null,
       child: switch (state.step) {
         RegistrationStep.input => _InputStep(

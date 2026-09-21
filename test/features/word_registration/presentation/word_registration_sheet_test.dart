@@ -97,7 +97,7 @@ void main() {
       expect(find.text('自動入力'), findsOneWidget);
       expect(find.text('スキップして手動で入力する'), findsOneWidget);
       // フォームに進むまで「登録する」は出さない。
-      expect(find.text('登録する'), findsNothing);
+      expect(find.text('登録'), findsNothing);
     });
   });
 
@@ -107,7 +107,7 @@ void main() {
       await tester.tap(find.text('自動入力'));
       await tester.pumpAndSettle();
 
-      expect(find.text('登録する'), findsOneWidget);
+      expect(find.text('登録'), findsOneWidget);
       expect(find.text('偶然の幸運'), findsOneWidget);
       // 取得できた項目には「自動入力」バッジが付く。
       expect(find.text('自動入力'), findsWidgets);
@@ -120,7 +120,7 @@ void main() {
       await tester.tap(find.text('スキップして手動で入力する'));
       await tester.pumpAndSettle();
 
-      expect(find.text('登録する'), findsOneWidget);
+      expect(find.text('登録'), findsOneWidget);
       // 英単語は引き継ぐが、取得結果は入らない。
       expect(find.text('ephemeral'), findsOneWidget);
       expect(find.text('偶然の幸運'), findsNothing);
@@ -153,7 +153,7 @@ void main() {
       await tester.tap(find.text('自動入力'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('登録する'));
+      await tester.tap(find.text('登録'));
       await tester.pumpAndSettle();
 
       expect(find.text('単語を登録'), findsNothing);
