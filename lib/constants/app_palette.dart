@@ -118,42 +118,44 @@ class AppPalette {
   // CSS の blur と同じ尺度)。CSS にある面の上端の白いハイライト(inset)は、
   // 白地ではほぼ見えないため省く。
 
-  /// 地の上に浮かせる面(カード・設定のセクション・クイズカード)の影(--elev)
+  /// 地の上に浮かせる面(カード・設定のセクション・クイズカード)の影(--elev)。
+  /// 1 つ目はデザインではほぼ透明なリングだが、面の縁をはっきりさせるため
+  /// [raisedOutline](押下時と同じ輪郭)に置き換えている(ユーザー判断)。
   List<BoxShadow> get elevation => isDark
-      ? const [
-          BoxShadow(color: Color(0x08FFFFFF), spreadRadius: 0.5),
-          BoxShadow(
+      ? [
+          raisedOutline,
+          const BoxShadow(
             color: Color(0x52000000),
             blurRadius: 2,
             offset: Offset(0, 1),
           ),
-          BoxShadow(
+          const BoxShadow(
             color: Color(0x73000000),
             blurRadius: 14,
             spreadRadius: -8,
             offset: Offset(0, 6),
           ),
-          BoxShadow(
+          const BoxShadow(
             color: Color(0x99000000),
             blurRadius: 28,
             spreadRadius: -22,
             offset: Offset(0, 14),
           ),
         ]
-      : const [
-          BoxShadow(color: Color(0x02101828), spreadRadius: 0.5),
-          BoxShadow(
+      : [
+          raisedOutline,
+          const BoxShadow(
             color: Color(0x08101828),
             blurRadius: 1.5,
             offset: Offset(0, 1),
           ),
-          BoxShadow(
+          const BoxShadow(
             color: Color(0x1A101828),
             blurRadius: 12,
             spreadRadius: -8,
             offset: Offset(0, 5),
           ),
-          BoxShadow(
+          const BoxShadow(
             color: Color(0x24101828),
             blurRadius: 24,
             spreadRadius: -18,
@@ -161,12 +163,19 @@ class AppPalette {
           ),
         ];
 
+  /// 浮かせた面の外周の細い輪郭(0.5px のリング)。常時・押下中とも出す。
+  /// 濃さはデザインの押下時(12%)より少し濃い 16%(ユーザー判断)。
+  BoxShadow get raisedOutline => BoxShadow(
+    color: isDark ? const Color(0x29FFFFFF) : const Color(0x29101828),
+    spreadRadius: 0.5,
+  );
+
   /// 押下中の面の外側の影(--elevPress の inset 以外)。浮きを消して輪郭だけ残す。
   List<BoxShadow> get elevationPressed => isDark
-      ? const [BoxShadow(color: Color(0x1FFFFFFF), spreadRadius: 0.5)]
-      : const [
-          BoxShadow(color: Color(0x1F101828), spreadRadius: 0.5),
-          BoxShadow(
+      ? [raisedOutline]
+      : [
+          raisedOutline,
+          const BoxShadow(
             color: Color(0x1A101828),
             blurRadius: 2,
             offset: Offset(0, 1),
