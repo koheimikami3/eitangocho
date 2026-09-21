@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/constants/app_palette.dart';
@@ -25,25 +26,13 @@ class MobileQuizEmptyState extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        GestureDetector(
-          onTap: () =>
+        MobileFilledButton(
+          label: '学習中リストへ',
+          onPressed: () =>
               ref.read(mainPageProvider.notifier).selectView(MainView.learning),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              color: palette.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: palette.buttonBorder),
-            ),
-            child: Text(
-              '学習中リストへ',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: palette.accent,
-              ),
-            ),
-          ),
+          fontSize: 14,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          borderRadius: 11,
         ),
       ],
     );

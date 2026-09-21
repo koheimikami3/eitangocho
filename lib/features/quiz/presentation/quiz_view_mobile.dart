@@ -1,3 +1,5 @@
+import 'package:eitangocho/components/mobile_filled_button.dart';
+import 'package:eitangocho/components/mobile_raised_surface.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
@@ -97,7 +99,7 @@ class _ActiveQuiz extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         if (!state.revealed)
-          _PrimaryButton(label: '答えを表示', onTap: notifier.reveal)
+          MobileFilledButton(label: '答えを表示', onPressed: notifier.reveal)
         else ...[
           Row(
             children: [
@@ -110,9 +112,9 @@ class _ActiveQuiz extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _PrimaryButton(
+                child: MobileFilledButton(
                   label: '覚えている',
-                  onTap: notifier.answerKnew,
+                  onPressed: notifier.answerKnew,
                 ),
               ),
             ],
@@ -129,38 +131,7 @@ class _ActiveQuiz extends StatelessWidget {
   }
 }
 
-/// アクセント色の塗りボタン(クイズの主操作)。
-class _PrimaryButton extends StatelessWidget {
-  const _PrimaryButton({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: context.palette.accent,
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 枠線のみのボタン(クイズの副操作)。
+/// 影で浮かせた面のボタン(クイズの副操作)。
 class _SecondaryButton extends StatelessWidget {
   const _SecondaryButton({
     required this.label,
@@ -175,23 +146,17 @@ class _SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return GestureDetector(
+    return MobileRaisedSurface(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(11),
-          border: Border.all(color: palette.buttonBorder),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: color ?? palette.text,
-          ),
+      borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.all(14),
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: color ?? palette.text,
         ),
       ),
     );

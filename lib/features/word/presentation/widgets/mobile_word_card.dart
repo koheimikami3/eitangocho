@@ -1,5 +1,5 @@
-import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/components/mobile_raised_surface.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
@@ -54,116 +54,95 @@ class _MobileWordCardState extends State<MobileWordCard> {
     final showIpa = widget.showIpa && word.ipa.isNotEmpty;
     final hasExample = word.exampleEn.trim().isNotEmpty;
 
-    final radius = BorderRadius.circular(AppDimensions.mobileCardRadius);
-
-    // 押している間は浮きを消して内側に影を入れ、面が沈んだように見せる。
-    return MobilePressable(
+    return MobileRaisedSurface(
       onTap: widget.onTap,
-      style: MobilePressStyle.card,
-      builder: (context, pressed) => Container(
-        decoration: BoxDecoration(
-          color: pressed ? palette.pressBackground : palette.surface,
-          borderRadius: radius,
-          boxShadow: pressed ? palette.elevationPressed : palette.elevation,
-        ),
-        child: CustomPaint(
-          painter: pressed
-              ? InsetShadowPainter(
-                  shadows: palette.pressedInsetShadow,
-                  borderRadius: radius,
-                )
-              : null,
-          child: Padding(
-            padding: const EdgeInsets.all(13),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _CardHeader(
-                  word: word,
-                  showIpa: showIpa,
-                  singleColumn: widget.singleColumn,
-                ),
-                const SizedBox(height: 8),
-                _RevealToggle(
-                  japanese: word.japanese,
-                  revealed: _revealed,
-                  onTap: () => setState(() => _revealed = !_revealed),
-                ),
-                const SizedBox(height: 8),
-                // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
-                // 常に固定行数分を確保する(child が無ければ空白のまま)。
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight:
-                        _exampleFontSize * _exampleLineHeight * _exampleLines,
-                  ),
-                  child: hasExample
-                      ? Text(
-                          word.exampleEn,
-                          maxLines: _exampleLines,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: _exampleFontSize,
-                            height: _exampleLineHeight,
-                            color: palette.textAlpha(70),
-                          ),
-                        )
-                      : null,
-                ),
-                if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      word.exampleJa,
-                      style: TextStyle(
-                        fontSize: 11,
-                        height: 1.45,
-                        color: palette.textAlpha(50),
-                      ),
+      borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+      padding: const EdgeInsets.all(13),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _CardHeader(
+            word: word,
+            showIpa: showIpa,
+            singleColumn: widget.singleColumn,
+          ),
+          const SizedBox(height: 8),
+          _RevealToggle(
+            japanese: word.japanese,
+            revealed: _revealed,
+            onTap: () => setState(() => _revealed = !_revealed),
+          ),
+          const SizedBox(height: 8),
+          // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
+          // 常に固定行数分を確保する(child が無ければ空白のまま)。
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: _exampleFontSize * _exampleLineHeight * _exampleLines,
+            ),
+            child: hasExample
+                ? Text(
+                    word.exampleEn,
+                    maxLines: _exampleLines,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: _exampleFontSize,
+                      height: _exampleLineHeight,
+                      color: palette.textAlpha(70),
                     ),
-                  ),
-                // フッタ(区切り線 + 覚えた / 発音)は上下の余白を少し詰める。
-                // 発音ボタンが 34pt あり、8 + 8 だと間延びして見えるため。
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.only(top: 6),
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: palette.rowLine)),
-                  ),
+                  )
+                : null,
+          ),
+          if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                word.exampleJa,
+                style: TextStyle(
+                  fontSize: 11,
+                  height: 1.45,
+                  color: palette.textAlpha(50),
+                ),
+              ),
+            ),
+          // フッタ(区切り線 + 覚えた / 発音)は上下の余白を少し詰める。
+          // 発音ボタンが 34pt あり、8 + 8 だと間延びして見えるため。
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.only(top: 6),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: palette.rowLine)),
+            ),
+            child: Row(
+              children: [
+                // チェック操作をカードのタップ(編集)に伝播させない。
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => widget.onToggleLearned(!word.isLearned),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // チェック操作をカードのタップ(編集)に伝播させない。
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => widget.onToggleLearned(!word.isLearned),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            MobileLearnedCheckbox(value: word.isLearned),
-                            const SizedBox(width: 6),
-                            Text(
-                              '覚えた',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: palette.textAlpha(60),
-                              ),
-                            ),
-                          ],
+                      MobileLearnedCheckbox(value: word.isLearned),
+                      const SizedBox(width: 6),
+                      Text(
+                        '覚えた',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: palette.textAlpha(60),
                         ),
-                      ),
-                      const Spacer(),
-                      MobilePronunciationButton(
-                        word: word.word,
-                        variant: MobilePronunciationButtonVariant.icon,
                       ),
                     ],
                   ),
                 ),
+                const Spacer(),
+                MobilePronunciationButton(
+                  word: word.word,
+                  variant: MobilePronunciationButtonVariant.icon,
+                ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
