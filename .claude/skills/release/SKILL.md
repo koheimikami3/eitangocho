@@ -87,13 +87,17 @@ flutter build macos --config-only
 Archive するのは、この時点の main の HEAD。そのコミットに注釈付きタグを打つ
 (提出したソースを後から特定できるようにするため)。
 
+既存のタグ(`git tag -l --format='%(contents)' v1.5.0` などで確認できる)と書式を揃える:
+
+- タグ名はバージョンだけ(`v1.7.0`)。片方のプラットフォームだけの版でも同じ形
+- メッセージの 1 行目は `v<version> — <変更点の英語の短い要約>`(em dash、カンマ区切り)
+- 補足があれば空行を挟んで本文に英語で書く(リジェクトで番号を捨てた、片方の
+  プラットフォームだけの版、iOS と macOS でビルド番号が違う、など)
+
 ```
-git tag -a v<version> -m "Release <version> (build <build>)"
+git tag -a v<version> -F <メッセージを書いた一時ファイル>
 ```
 
-- タグ名はバージョンだけ(`v1.7.0`)。片方のプラットフォームだけの版でも同じ形にし、
-  メッセージに「iOS only」などを添える。iOS と macOS でビルド番号が違う場合は
-  メッセージに両方書く
 - push はしない(ユーザーが求めたときだけ `git push origin v<version>`)
 - 打ったら、Xcode で Archive → 提出するようユーザーに伝える
   (Archive と提出はユーザーが行う)
