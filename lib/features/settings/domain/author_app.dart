@@ -7,7 +7,7 @@ abstract final class AuthorApp {
   static const name = 'サブリス';
 
   /// 何をするアプリかの 1 行説明。
-  static const tagline = 'サブスクと固定費を、リストで管理';
+  static const tagline = 'サブスクと固定費をリストで管理';
 
   /// 価格と対応端末。iPhone 専用なので macOS には出さない
   /// (この枠を出すのは iOS だけ)。
