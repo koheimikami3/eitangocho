@@ -8,7 +8,7 @@ import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view_mobile.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_card.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
@@ -99,15 +99,21 @@ void main() {
     expect(find.text('感想やご要望はレビューでお知らせください。'), findsNothing);
   });
 
-  testWidgets('作者の他のアプリにサブリスを出す', (tester) async {
+  testWidgets('作者の他のアプリを AuthorApp.all のぶんだけ出す', (tester) async {
     await pumpSettings(tester);
 
     expect(find.text('作者の他のアプリ'), findsOneWidget);
-    expect(find.byType(MobileAuthorAppCard), findsOneWidget);
-    expect(find.text(AuthorApp.name), findsOneWidget);
-    expect(find.text(AuthorApp.tagline), findsOneWidget);
-    expect(find.text(AuthorApp.availability), findsOneWidget);
-    expect(find.text('入手'), findsOneWidget);
+    expect(
+      find.byType(MobileAuthorAppRow),
+      findsNWidgets(AuthorApp.all.length),
+    );
+    for (final app in AuthorApp.all) {
+      expect(find.text(app.name), findsOneWidget);
+      expect(find.text(app.tagline), findsOneWidget);
+    }
+    // 価格と対応端末はどのアプリも同じ文言なので、本数ぶん出る。
+    expect(find.text('無料 · iPhone'), findsNWidgets(AuthorApp.all.length));
+    expect(find.text('入手'), findsNWidgets(AuthorApp.all.length));
     expect(find.text('App Store が開きます。'), findsNothing);
   });
 
