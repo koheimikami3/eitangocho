@@ -39,6 +39,45 @@ flutter analyze                                         # 静的解析
 強制するため md には書かない。リンタで表現できない規約だけ CLAUDE.md の
 「規約」「コメント規約」に置く。
 
+## アプリアイコン
+
+編集するのは `shared/AppIcon.icon`(Icon Composer で開く)。レイヤー素材は `.icon` の
+中の `Assets/` にあるので、別の場所に原本を置く必要はない。方針は
+[design.md](design.md) の「アプリアイコン」。
+
+新しい絵に差し替えるとき:
+
+1. Icon Composer で New(Canvas 1024 × 1024)。対応プラットフォームは iOS と macOS の両方
+2. 前景レイヤーを**下から**追加する。背景は読み込まない
+3. レイヤーの Fill は白 `#FFFFFF` / 100%
+4. **`Group` を選んで** Liquid Glass を設定: Specular ON / Blur OFF /
+   Translucency ON 40% / Shadow Neutral 50%。レイヤー選択時に出る `Effects` は別物
+5. **`Icon`(キャンバス)を選んで**背景を Solid で指定。インスペクタ右上のスコープを
+   切り替えて Default と Dark の 2 つを入れる
+   - 16 進入力は macOS のカラーパネル → 左から 2 番目のタブ → RGB スライダ →
+     「16進カラー #」。カラーホイールのタブには入力欄が無い
+6. **File → Save As** で `shared/AppIcon.icon` に保存する。`.icon` は書類形式そのもの
+   なので **Export ではない**
+7. `shared/AppIcon-dev.icon` の `Assets/` を新しい素材で置き換え、`icon.json` の
+   `image-name` / `name` を合わせる。色指定は反転のまま変えない
+
+`icon.json` の `layers` は**先頭が一番上のレイヤー**。追加した順とは逆になるので、
+手で並べ替えるときに取り違えやすい。
+
+確認:
+
+```bash
+flutter build macos --release              # AppIcon
+flutter build macos --debug                # AppIcon-dev
+flutter build ios --release --no-codesign
+flutter build ios --debug --no-codesign
+
+APP="build/macos/Build/Products/Release/シンプル英単語帳.app"
+plutil -extract CFBundleIconName raw "$APP/Contents/Info.plist"   # AppIcon
+# 旧 OS 向けに actool が描いた絵を見る
+iconutil -c iconset "$APP/Contents/Resources/AppIcon.icns" -o /tmp/appicon.iconset
+```
+
 ## 技術的な疑問の解決
 
 1. プロジェクト固有の設計: `docs/*.md` や既存コードを参照する

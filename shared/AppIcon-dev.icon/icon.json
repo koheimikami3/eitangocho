@@ -1,0 +1,46 @@
+{
+  "fill-specializations" : [
+    {
+      "value" : {
+        "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
+      }
+    }
+  ],
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "srgb:0.25882,0.62353,0.94118,1.00000"
+          },
+          "image-name" : "Eitangocho-02-FrontCard.png",
+          "name" : "Eitangocho-02-FrontCard"
+        },
+        {
+          "fill" : {
+            "solid" : "srgb:0.25882,0.62353,0.94118,1.00000"
+          },
+          "image-name" : "Eitangocho-01-BackCard.png",
+          "name" : "Eitangocho-01-BackCard"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.4
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

@@ -86,7 +86,6 @@
   (`AppIcon-dev`)・iCloud コンテナを分けて、本番のデータを触らない。設定は
   `macos/Runner/Configs/*.xcconfig` と `ios/Flutter/*.xcconfig`
   - pbxproj では、変数を含む値を引用符で囲む(囲まないとパースエラーになる)
-  - iOS のアイコンだけアルファチャンネルを落とす(App Store Connect が弾く)
 - **表示名**: macOS は `PRODUCT_NAME`(= `.app` のファイル名)で決まる。Dock・Finder は
   `CFBundleDisplayName` を見ないため。実行ファイル名は `EXECUTABLE_NAME` で ASCII に
   固定する。iOS は `APP_DISPLAY_NAME` で「英単語帳」(ホーム画面で省略されない長さ)
@@ -103,6 +102,25 @@
 - iOS の JSON 書き出しは自前の `DocumentExportPlugin.swift` で行う
   (`file_selector_ios` に保存パネルが無いため)。iCloud のネイティブ実装は `shared/` に置き、
   両プロジェクトから参照する
+
+## アプリアイコン
+
+- **正基準は `shared/AppIcon.icon` / `shared/AppIcon-dev.icon`(Icon Composer 形式)**。
+  ios / macos 両プロジェクトから同じファイルを参照する。片方だけ直す事故を防ぐため、
+  `IcloudFileStorePlugin.swift` と同じく `shared/` に 1 個だけ置く
+- **アセットカタログにフラット PNG を併置しない。** `.icon` は同名の appiconset を
+  完全に置き換え、旧 OS 向けの絵も `.icon` から actool が描く。併置しても成果物には
+  入らないので「旧 OS 用の予備」にならない
+  (`ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS` は代替アイコン用の設定で、無関係)
+- **名前は `APP_ICON_NAME`(Release `AppIcon` / Debug `AppIcon-dev`)と揃える。**
+  揃っていない `.icon` は使われない
+- **前景は白 1 色のレイヤー 2 枚(カード)で、"abc" と横線は透過の抜き。**
+  背景はレイヤーにせずキャンバスの Solid で指定する(Default `#429FF0` / Dark `#10304F`)。
+  背景をレイヤーにすると Liquid Glass の対象になり、Dark / Mono の自動生成が崩れる
+- **2 枚を統合しない。** 統合するとガラスのハイライトが一体化して奥行きが消える
+- **dev は同じレイヤーのまま色だけ反転する**(背景 `#FFFFFF` / レイヤー `#429FF0`)。
+  構造・位置・ガラス設定を本番と確実に揃えるため、Icon Composer で作り直さず
+  `icon.json` の色指定だけを差し替える
 
 ## 広告(iOS のみ)
 
