@@ -1,16 +1,19 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
-import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// 設定の「作者の他のアプリ」に出すカード。タップで App Store を開く。
+/// 設定の「作者の他のアプリ」に出す 1 行。タップで App Store を開く。
 ///
 /// **iOS 専用**。紹介するアプリが iPhone 専用で、macOS から踏んでも
 /// インストールできないため([AuthorApp] 参照)。
-class MobileAuthorAppCard extends StatelessWidget {
-  const MobileAuthorAppCard({super.key});
+///
+/// カードの地・角丸・影・行間の区切り線は [MobileSettingsSection] が持つ。
+class MobileAuthorAppRow extends StatelessWidget {
+  const MobileAuthorAppRow({required this.app, super.key});
+
+  final AuthorApp app;
 
   /// App Store を外部で開く。
   ///
@@ -18,7 +21,7 @@ class MobileAuthorAppCard extends StatelessWidget {
   /// `platformDefault` は iOS ではアプリ内 Safari になり、App Store アプリに
   /// 渡らない(発音リンクと同じ理由。google_translate_url.dart 参照)。
   Future<void> _open() => launchUrl(
-    Uri.parse(AuthorApp.appStoreUrl),
+    Uri.parse(app.appStoreUrl),
     mode: LaunchMode.externalApplication,
   );
 
@@ -30,11 +33,8 @@ class MobileAuthorAppCard extends StatelessWidget {
       onTap: _open,
       style: MobilePressStyle.row,
       builder: (context, pressed) => Container(
-        decoration: BoxDecoration(
-          color: pressed ? palette.surfaceAlt : palette.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
-          boxShadow: palette.elevation,
-        ),
+        color: pressed ? palette.pressBackground : Colors.transparent,
+        // 左右 14 は MobileSettingsDivider と同じ。区切り線を行に揃える。
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
@@ -50,7 +50,7 @@ class MobileAuthorAppCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.asset(AuthorApp.iconAsset, width: 52, height: 52),
+              child: Image.asset(app.iconAsset, width: 52, height: 52),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -58,7 +58,7 @@ class MobileAuthorAppCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AuthorApp.name,
+                    app.name,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -67,7 +67,7 @@ class MobileAuthorAppCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    AuthorApp.tagline,
+                    app.tagline,
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.4,
@@ -76,7 +76,7 @@ class MobileAuthorAppCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    AuthorApp.availability,
+                    app.availability,
                     style: TextStyle(
                       fontSize: 11,
                       color: palette.textAlpha(40),
@@ -87,7 +87,7 @@ class MobileAuthorAppCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             // 「入手」は App Store のボタンに合わせた見た目のラベルで、
-            // ボタンではない(タップ領域はカード全体)。押せる青の面は
+            // ボタンではない(タップ領域は行全体)。押せる青の面は
             // accent のベタ + 白文字に統一している(購入ボタンと同じ)。
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),

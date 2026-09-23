@@ -5,11 +5,12 @@ import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
-import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_card.dart';
+import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
@@ -147,9 +148,11 @@ class SettingsViewMobile extends ConsumerWidget {
         const SizedBox(height: 22),
         // 紹介先が iPhone 専用アプリのため、この枠は iOS 版にしか無い
         // (macOS から踏んでもインストールできない)。
-        const MobileSettingsSection(
+        MobileSettingsSection(
           title: '作者の他のアプリ',
-          child: MobileAuthorAppCard(),
+          rows: [
+            for (final app in AuthorApp.all) MobileAuthorAppRow(app: app),
+          ],
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(
