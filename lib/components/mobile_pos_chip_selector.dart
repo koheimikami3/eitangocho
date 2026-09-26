@@ -41,9 +41,10 @@ class MobilePosChipSelector extends StatelessWidget {
                     color: isSelected ? background : palette.surface,
                     borderRadius: BorderRadius.circular(99),
                     // 選択中は文字色で縁取り、未選択は淡い縁 + 小さな影で
-                    // 「押せる面」に見せる。
+                    // 「押せる面」に見せる。縁の濃さは入力欄の枠
+                    // (AppPalette.wellShadow)と揃える。
                     border: Border.all(
-                      color: isSelected ? foreground : palette.borderAlpha(16),
+                      color: isSelected ? foreground : palette.borderAlpha(28),
                     ),
                     boxShadow: isSelected
                         ? null

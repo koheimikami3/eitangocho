@@ -71,26 +71,18 @@ class MobilePronunciationButton extends StatelessWidget {
               height: circleDiameter,
               child: Align(
                 alignment: Alignment.centerRight,
-                // 立体案: 淡い青の地ではなく、白からわずかに暗くなる
-                // グラデーションと細い外周線で「押せる丸いボタン」に見せる。
+                // 淡い青の地 + 青の細い縁のフラットな丸にする。2.0.0 の立体案では
+                // 白からのグラデーションと外周線で膨らみを出していたが、
+                // 2.2.0 で画面全体をフラット寄りにしたのに合わせて変えた。
+                // 地だけだと品詞バッジと同じ見た目になりボタンに見えないため、
+                // ピル形と同じ縁を付けて配色も揃える(ユーザー判断)。
                 child: Container(
                   width: circleDiameter,
                   height: circleDiameter,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [palette.surface, palette.surfaceHeader],
-                    ),
-                    boxShadow: [
-                      BoxShadow(color: palette.borderAlpha(8), spreadRadius: 1),
-                      const BoxShadow(
-                        color: Color(0x0F101828), // rgba(16,24,40,0.06)
-                        blurRadius: 1.5,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
+                    color: palette.accentSoft,
+                    border: Border.all(color: palette.accentLine),
                   ),
                   child: Center(child: icon),
                 ),

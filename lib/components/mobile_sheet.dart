@@ -19,9 +19,14 @@ class MobileSheet extends StatelessWidget {
     this.scrollableBody = true,
     this.showGrabber = true,
     this.footer,
+    this.titleFontSize = 15,
   });
 
   final String title;
+
+  /// ヘッダのタイトルの文字サイズ。発音シートは単語そのものを見出しに出すため
+  /// 大きくする。
+  final double titleFontSize;
   final String leftLabel;
   final VoidCallback onLeft;
 
@@ -68,6 +73,7 @@ class MobileSheet extends StatelessWidget {
               _SheetHeader(
                 showGrabber: showGrabber,
                 title: title,
+                titleFontSize: titleFontSize,
                 leftLabel: leftLabel,
                 onLeft: onLeft,
                 rightLabel: rightLabel,
@@ -94,6 +100,7 @@ class _SheetHeader extends StatelessWidget {
   const _SheetHeader({
     required this.showGrabber,
     required this.title,
+    required this.titleFontSize,
     required this.leftLabel,
     required this.onLeft,
     required this.rightLabel,
@@ -102,6 +109,7 @@ class _SheetHeader extends StatelessWidget {
 
   final bool showGrabber;
   final String title;
+  final double titleFontSize;
   final String leftLabel;
   final VoidCallback onLeft;
   final String? rightLabel;
@@ -128,7 +136,7 @@ class _SheetHeader extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.bold,
                     color: palette.text,
                   ),

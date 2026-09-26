@@ -40,8 +40,8 @@ void main() {
     expect(AppPalette.light.isDark, isFalse);
     expect(AppPalette.dark.isDark, isTrue);
 
-    // 立体案の --bg / --text の値。
-    expect(AppPalette.light.background, const Color(0xFFF4F5F8));
+    // --bg(ライトは 2.2.0 の値)/ --text の値。
+    expect(AppPalette.light.background, const Color(0xFFF7F8FA));
     expect(AppPalette.dark.background, const Color(0xFF131315));
     expect(AppPalette.light.text, const Color(0xFF1D1D1F));
     expect(AppPalette.dark.text, const Color(0xFFF5F5F7));

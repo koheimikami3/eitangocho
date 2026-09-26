@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 /// [MobilePressable] の押下演出。値はデザインの `:active` スタイル。
 enum MobilePressStyle {
-  /// 浮いた面(カード・面ボタン)。少し沈んで縮む。地と影は呼び出し側が
-  /// builder の pressed で切り替える。
-  card(scale: 0.972, opacity: 1, offsetY: 1),
+  /// 浮いた面(カード・面ボタン)。縮むだけで、地・影・位置は変えない
+  /// (2.2.0 で沈み込みをやめた。ユーザー判断)。
+  card(scale: 0.972, opacity: 1),
 
   /// 主ボタン・ピル形ボタン。縮んで薄くなる。
   button(scale: 0.965, opacity: 0.72),
@@ -18,20 +18,15 @@ enum MobilePressStyle {
   /// シートの「キャンセル」「閉じる」など文字だけのボタン。薄くなるだけ。
   text(scale: 1, opacity: 0.4);
 
-  const MobilePressStyle({
-    required this.scale,
-    required this.opacity,
-    this.offsetY = 0,
-  });
+  const MobilePressStyle({required this.scale, required this.opacity});
 
   final double scale;
   final double opacity;
-  final double offsetY;
 }
 
 /// 押している間だけ見た目を変える iOS 版のタップ領域。
 ///
-/// 縮小・透過・沈み込みは [style] に従ってここで行い、地の色や影の切り替えは
+/// 縮小・透過は [style] に従ってここで行い、地の色や影の切り替えは
 /// [builder] に pressed を渡して呼び出し側に任せる(面ごとに違うため)。
 class MobilePressable extends StatefulWidget {
   const MobilePressable({
@@ -81,8 +76,7 @@ class _MobilePressableState extends State<MobilePressable> {
           curve: Curves.easeOut,
           transformAlignment: Alignment.center,
           transform: pressed
-              ? (Matrix4.translationValues(0, style.offsetY, 0)
-                  ..scaleByDouble(style.scale, style.scale, 1, 1))
+              ? Matrix4.diagonal3Values(style.scale, style.scale, 1)
               : Matrix4.identity(),
           child: widget.builder(context, pressed),
         ),

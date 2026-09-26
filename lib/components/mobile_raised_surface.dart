@@ -1,13 +1,11 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
-import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
 /// 影で浮かせた、押せる面(学習中カード・クイズの「忘れていた」ボタン)。
 ///
-/// 押している間は浮きを消して内側に影を入れ、面が沈んだように見せる
-/// (デザインの --elev → --elevPress)。デザインは地も --pressBg に変えるが、
-/// 色まで変わるとちらついて見えるため、地の色は変えない(ユーザー判断)。
+/// 押している間は縮むだけで、地・影は変えない。2.0.0 では浮きを消して内側に
+/// 影を入れ、沈んだように見せていたが、2.2.0 でやめた(ユーザー判断)。
 class MobileRaisedSurface extends StatelessWidget {
   const MobileRaisedSurface({
     required this.onTap,
@@ -32,17 +30,9 @@ class MobileRaisedSurface extends StatelessWidget {
         decoration: BoxDecoration(
           color: palette.surface,
           borderRadius: borderRadius,
-          boxShadow: pressed ? palette.elevationPressed : palette.elevation,
+          boxShadow: palette.elevation,
         ),
-        child: CustomPaint(
-          painter: pressed
-              ? InsetShadowPainter(
-                  shadows: palette.pressedInsetShadow,
-                  borderRadius: borderRadius,
-                )
-              : null,
-          child: Padding(padding: padding, child: child),
-        ),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }
