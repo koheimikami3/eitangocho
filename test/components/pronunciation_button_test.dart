@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -9,10 +10,12 @@ void main() {
     PronunciationButtonVariant variant,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: PronunciationButton(word: 'apple', variant: variant),
+      ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: PronunciationButton(word: 'apple', variant: variant),
+            ),
           ),
         ),
       ),

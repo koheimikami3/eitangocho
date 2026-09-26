@@ -30,6 +30,9 @@ class MainFlutterWindow: NSWindow {
     RegisterGeneratedPlugins(registry: flutterViewController)
     // iCloud 同期は plugin ではなく自前の MethodChannel なので個別に登録する。
     IcloudFileStorePlugin.register(with: flutterViewController.engine.binaryMessenger)
+    // 発音確認のウィンドウも同じく自前の MethodChannel。
+    PronunciationWindowPlugin.register(
+      with: flutterViewController.engine.binaryMessenger, parentWindow: self)
 
     super.awakeFromNib()
   }
