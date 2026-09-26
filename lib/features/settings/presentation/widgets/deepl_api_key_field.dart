@@ -49,6 +49,9 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
             hintText: 'DeepL API キーを入力',
             // LabeledTextField と同様、ヒント色は明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
+            // LabeledTextField と同様、地のグレーが透けないよう白で塗る。
+            filled: true,
+            fillColor: Colors.white,
             // 他の一行フィールドと同様に上下へ余裕を持たせる
             // (プロトタイプの 8px から拡張)。
             contentPadding: const EdgeInsets.symmetric(

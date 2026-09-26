@@ -34,7 +34,9 @@ abstract final class AppColors {
   static const inputBackground = Color(0xFFF7F7F8);
   static const tableHeaderBackground = Color(0xFFFAFAFB);
   static const learnedRowBackground = Color(0xFFFAFAFB);
-  static const rowHoverBackground = Color(0xFFF2F6FC);
+  // ホバーの地は無彩色のグレーで統一する(2.2.0 で青み #F2F6FC から変更。
+  // 設定の行などのホバー [inputBackground] と同じ値)。
+  static const rowHoverBackground = Color(0xFFF7F7F8);
   static const border = Color(0x14000000); // rgba(0,0,0,0.08)
   static const borderStrong = Color(0x24000000); // rgba(0,0,0,0.14)
   static const inputBorder = Color(0x26000000); // rgba(0,0,0,0.15)

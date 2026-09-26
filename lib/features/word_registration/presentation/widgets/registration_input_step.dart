@@ -57,36 +57,24 @@ class RegistrationInputStep extends StatelessWidget {
   }
 }
 
-/// 「スキップして手動で入力する」リンク(hover で下線)。
-class _SkipLink extends StatefulWidget {
+/// 「スキップして手動で入力する」リンク。
+///
+/// hover での下線は 2.2.0 でやめた(文字色とカーソルで押せると分かるため。
+/// ユーザー判断)。
+class _SkipLink extends StatelessWidget {
   const _SkipLink({required this.onTap});
 
   final VoidCallback onTap;
 
   @override
-  State<_SkipLink> createState() => _SkipLinkState();
-}
-
-class _SkipLinkState extends State<_SkipLink> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: widget.onTap,
-        child: Text(
+        onTap: onTap,
+        child: const Text(
           'スキップして手動で入力する',
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.accent,
-            decoration: _isHovered
-                ? TextDecoration.underline
-                : TextDecoration.none,
-          ),
+          style: TextStyle(fontSize: 13, color: AppColors.accent),
         ),
       ),
     );
