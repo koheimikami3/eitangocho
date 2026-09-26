@@ -14,6 +14,16 @@ final wordListProvider = StreamProvider<List<Word>>(
   (ref) => ref.watch(databaseProvider).wordDao.watchAll(),
 );
 
+/// 単語一覧を初回読み込み中か。
+///
+/// 読み込み前の一覧は各派生 Provider で空リスト扱いになるため、これを見ずに
+/// isEmpty だけで判定すると、起動直後に空状態(「単語がまだありません」)が
+/// 一瞬出てしまう。ビューはこれが true の間は読み込み中の表示を出す。
+final wordListLoadingProvider = Provider<bool>((ref) {
+  final words = ref.watch(wordListProvider);
+  return words.isLoading && !words.hasValue;
+});
+
 /// ツールバー検索でフィルタし、設定の並び順([WordSortOrder])で並べた一覧
 /// (全単語ビュー用)。
 /// 英単語は大文字小文字を無視した部分一致、日本語訳はそのまま部分一致(プロトタイプ準拠)。

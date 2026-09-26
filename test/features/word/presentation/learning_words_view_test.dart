@@ -64,6 +64,29 @@ void main() {
     });
   });
 
+  testWidgets('読み込みが終わるまでは空状態ではなく読み込み中を表示する', (tester) async {
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: Scaffold(body: LearningWordsView())),
+        ),
+      );
+      // drift の watch() が初回発火する前(runWithView の待ちを挟まない)。
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(LearningEmptyState), findsNothing);
+
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.byType(LearningEmptyState), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox());
+      container.dispose();
+      await db.close();
+    });
+  });
+
   testWidgets('学習中が 0 件だと空状態が表示される', (tester) async {
     await runWithView(tester, () async {
       expect(find.byType(LearningEmptyState), findsOneWidget);

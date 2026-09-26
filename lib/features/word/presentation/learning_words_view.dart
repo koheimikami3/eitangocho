@@ -3,6 +3,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/card_in.dart';
 import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
@@ -25,6 +26,11 @@ class LearningWordsView extends ConsumerWidget {
         ref.watch(settingsProvider).value?.showIpa ??
         const SettingsState().showIpa;
 
+    if (ref.watch(wordListLoadingProvider)) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.accent),
+      );
+    }
     if (words.isEmpty) return const LearningEmptyState();
 
     return SingleChildScrollView(

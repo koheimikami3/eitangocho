@@ -1,3 +1,4 @@
+import 'package:eitangocho/components/mobile_loading_indicator.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
@@ -27,14 +28,21 @@ class AllWordsViewMobile extends ConsumerWidget {
                 const SettingsState().wordSortOrder)
             .group;
 
+    if (ref.watch(wordListLoadingProvider)) {
+      return const MobileLoadingIndicator();
+    }
     if (words.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Text(
-            '単語がまだありません。',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: palette.textAlpha(45)),
+      // タブバーとバナー広告が重なる分を除いた、見えている領域の中央に置く。
+      return Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Text(
+              '単語がまだありません。',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: palette.textAlpha(45)),
+            ),
           ),
         ),
       );
