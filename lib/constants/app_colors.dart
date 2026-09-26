@@ -9,7 +9,6 @@ abstract final class AppColors {
   /// 主ボタンのホバー中のグラデーション(上 → 下)。通常時は iOS と同じ
   /// AppPalette.light.buttonGradient で、それを同じ向きのまま一段暗くしたもの。
   static const buttonGradientHover = [Color(0xFF3F9CEF), accentHover];
-  static const cardHoverBorder = Color(0xA6429FF0); // rgba(66,159,240,0.65)
 
   // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。
   static const accentSoft = Color(0x1A429FF0); // rgba(66,159,240,0.10)

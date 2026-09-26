@@ -1,3 +1,5 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_divider.dart';
 import 'package:flutter/material.dart';
 
@@ -7,16 +9,14 @@ class SettingsCard extends StatelessWidget {
 
   final List<Widget> children;
 
-  /// カード枠線色(プロトタイプの rgba(0,0,0,0.10))。
-  static const _border = Color(0x1A000000);
-
   @override
   Widget build(BuildContext context) {
     return Container(
+      // iOS の設定セクションと同じく枠線なし + 淡い影(2.2.0)。
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: _border),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+        boxShadow: AppPalette.light.elevation,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(

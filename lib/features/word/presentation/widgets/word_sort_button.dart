@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// macOS 版ツールバーの並び替えボタン(全単語のときだけ検索欄の左に出る)。
 ///
 /// 今の並びを「並び順: ○○ ▾」と文字で出し、押すとメニューで選ばせる。
-/// 見た目は隣の検索欄(ToolbarSearchField)の塗りと角丸に揃える。
+/// 見た目は iOS の並び替えボタンと同じ、淡い青の地 + 青の縁のピル(2.2.0)。
 class WordSortButton extends ConsumerWidget {
   const WordSortButton({super.key});
 
@@ -26,10 +26,11 @@ class WordSortButton extends ConsumerWidget {
       child: GestureDetector(
         onTap: () => _showMenu(context, ref, order),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: AppColors.inputBackground,
-            borderRadius: BorderRadius.circular(7),
+            color: AppColors.accentSoft,
+            borderRadius: BorderRadius.circular(99),
+            border: Border.all(color: AppColors.accentLine),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -41,7 +42,8 @@ class WordSortButton extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.accentOnSoft,
                   ),
                 ),
               ),
@@ -49,7 +51,7 @@ class WordSortButton extends ConsumerWidget {
               const Icon(
                 Icons.expand_more,
                 size: 16,
-                color: AppColors.textTertiary,
+                color: AppColors.accentOnSoft,
               ),
             ],
           ),

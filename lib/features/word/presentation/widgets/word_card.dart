@@ -1,5 +1,7 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
@@ -37,6 +39,17 @@ class _WordCardState extends State<WordCard> {
   bool _isHovered = false;
 
   // 英例文は行数差でカード高さがばらつくため、常に 2 行分の高さを確保する。
+  /// ホバー中の影。通常の影に、下へ広く落ちる影を 1 枚足す。
+  static final _hoverShadow = [
+    ...AppPalette.light.elevation,
+    const BoxShadow(
+      color: Color(0x14101828), // rgba(16,24,40,0.08)
+      blurRadius: 16,
+      spreadRadius: -4,
+      offset: Offset(0, 6),
+    ),
+  ];
+
   static const _exampleFontSize = 13.0;
   static const _exampleLineHeight = 1.5;
   static const _exampleAreaHeight =
@@ -57,21 +70,12 @@ class _WordCardState extends State<WordCard> {
             widget.onContextMenu(details.globalPosition),
         child: Container(
           padding: const EdgeInsets.all(16),
+          // iOS のカードと同じく枠線なし + 淡い影で浮かせる(2.2.0)。
+          // ホバーは青い枠をやめ、影を一段足して少し持ち上げる。
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: _isHovered
-                  ? AppColors.cardHoverBorder
-                  : const Color(0x1A000000),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Color(_isHovered ? 0x12000000 : 0x0A000000),
-                blurRadius: _isHovered ? 8 : 2,
-                offset: Offset(0, _isHovered ? 2 : 1),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+            boxShadow: _isHovered ? _hoverShadow : AppPalette.light.elevation,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,10 +241,11 @@ class _RevealAreaState extends State<_RevealArea> {
                     horizontal: 10,
                     vertical: 8,
                   ),
+                  // macOS の入力欄と同じ白地 + 枠(iOS の訳の表示枠に対応)。
                   decoration: BoxDecoration(
-                    color: AppColors.inputBackground,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(7),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: AppColors.inputBorder),
                   ),
                   child: Text(
                     widget.japanese,
