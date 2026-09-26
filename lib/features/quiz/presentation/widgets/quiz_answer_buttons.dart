@@ -1,5 +1,5 @@
 import 'package:eitangocho/components/app_filled_button.dart';
-import 'package:eitangocho/components/app_outlined_button.dart';
+import 'package:eitangocho/components/app_raised_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -22,10 +22,10 @@ class QuizAnswerButtons extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: AppOutlinedButton(
+              // iOS と同じく、枠線ではなく影で浮かせた面の副ボタンにする。
+              child: AppRaisedButton(
                 label: '忘れていた',
                 textColor: AppColors.danger,
-                hoverBackground: AppColors.dangerHoverBackground,
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: onForgot,

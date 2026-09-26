@@ -1,7 +1,6 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/app_filled_button.dart';
-import 'package:eitangocho/components/app_outlined_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
@@ -58,7 +57,8 @@ class QuizResultView extends ConsumerWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: AppOutlinedButton(
+              // iOS と同じく 2 つとも主ボタン(どちらも次の行動として同格)。
+              child: AppFilledButton(
                 label: '学習中リストへ',
                 verticalPadding: 11,
                 borderRadius: 9,

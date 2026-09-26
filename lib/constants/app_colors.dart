@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   static const accent = Color(0xFF429FF0); // 主要アクション
   static const accentHover = Color(0xFF2B8EE0);
+
+  /// 主ボタンのホバー中のグラデーション(上 → 下)。通常時は iOS と同じ
+  /// AppPalette.light.buttonGradient で、それを同じ向きのまま一段暗くしたもの。
+  static const buttonGradientHover = [Color(0xFF3F9CEF), accentHover];
   static const cardHoverBorder = Color(0xA6429FF0); // rgba(66,159,240,0.65)
 
   // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。

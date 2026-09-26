@@ -1,14 +1,19 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
-/// プロトタイプ様式の塗りボタン(白文字・角丸)。
+/// 塗りボタン(白文字・角丸)。
+///
+/// 既定はアクセント色の主ボタンで、iOS の MobileFilledButton と同じ
+/// グラデーション + 影にする(2.2.0 で iOS の意匠に揃えた)。
+/// [color] を渡すと(削除の赤など)その単色で塗る。
 class AppFilledButton extends StatefulWidget {
   const AppFilledButton({
     required this.label,
     required this.onPressed,
     super.key,
-    this.color = AppColors.accent,
-    this.hoverColor = AppColors.accentHover,
+    this.color,
+    this.hoverColor,
     this.verticalPadding = 9,
     this.fontSize = 14,
     this.borderRadius = 8,
@@ -16,8 +21,10 @@ class AppFilledButton extends StatefulWidget {
 
   final String label;
   final VoidCallback onPressed;
-  final Color color;
-  final Color hoverColor;
+
+  /// 単色で塗るときの色とホバー色。null ならアクセント色のグラデーション。
+  final Color? color;
+  final Color? hoverColor;
   // AppOutlinedButton と組み合わせて使う画面で高さを揃えるためのパラメータ。
   // デフォルトはダイアログ・登録フォーム系(プロトタイプの標準ボタン)の値。
   final double verticalPadding;
@@ -45,10 +52,7 @@ class _AppFilledButtonState extends State<AppFilledButton> {
             horizontal: 14,
             vertical: widget.verticalPadding,
           ),
-          decoration: BoxDecoration(
-            color: _isHovered ? widget.hoverColor : widget.color,
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-          ),
+          decoration: _decoration(),
           child: Text(
             widget.label,
             // ボタン幅がラベル幅より広い場面(全幅ボタン等)でも中央寄せにする。
@@ -66,6 +70,30 @@ class _AppFilledButtonState extends State<AppFilledButton> {
           ),
         ),
       ),
+    );
+  }
+
+  BoxDecoration _decoration() {
+    final radius = BorderRadius.circular(widget.borderRadius);
+    final color = widget.color;
+    if (color != null) {
+      return BoxDecoration(
+        color: _isHovered ? widget.hoverColor ?? color : color,
+        borderRadius: radius,
+      );
+    }
+    // macOS はライト固定なので AppPalette.light の値を直接使う。
+    const palette = AppPalette.light;
+    return BoxDecoration(
+      gradient: _isHovered
+          ? const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppColors.buttonGradientHover,
+            )
+          : palette.buttonGradient,
+      borderRadius: radius,
+      boxShadow: palette.buttonShadow,
     );
   }
 }
