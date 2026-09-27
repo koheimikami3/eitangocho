@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 /// 内側の影で沈めた角丸の面(デザインの box-shadow: inset 相当)。
 ///
 /// Flutter の [BoxShadow] は inset を描けないため、[InsetShadowPainter] で
-/// 面の内側に影を描く。入力欄・訳の表示枠(`AppPalette.wellShadow`)と、
-/// 押下中のカード(`AppPalette.pressedInsetShadow`)で使う。
+/// 面の内側に影を描く。入力欄・訳の表示枠(`AppPalette.wellShadow`)で使う
+/// (ライトは内側の 1px の枠線だけを描く)。
 class MobileWell extends StatelessWidget {
   const MobileWell({
     required this.color,

@@ -1,6 +1,6 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
-import 'package:eitangocho/components/app_outlined_button.dart';
+import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,9 +25,9 @@ class QuizEmptyState extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          AppOutlinedButton(
+          // iOS と同じく主ボタンにする(次に取る行動がこれしかないため)。
+          AppFilledButton(
             label: '学習中リストへ',
-            textColor: AppColors.accent,
             fontSize: 13,
             onPressed: () => ref
                 .read(mainPageProvider.notifier)

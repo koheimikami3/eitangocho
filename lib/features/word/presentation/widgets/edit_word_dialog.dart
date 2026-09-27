@@ -113,124 +113,148 @@ class _EditWordDialogState extends State<_EditWordDialog> {
     if (deleted && mounted) Navigator.of(context).pop();
   }
 
+  static const _horizontalPadding = 24.0;
+
   @override
   Widget build(BuildContext context) {
+    // 高さは固定の上限を持たず、ウィンドウに収まる範囲まで広げる(Dialog が
+    // 画面の縁に余白を残して制約する)。それでも入り切らないときは入力欄だけを
+    // スクロールさせ、保存・キャンセル・削除は常に下端に見えるようにする
+    // (以前は上限 640 の中で全体をスクロールしており、ボタンが見切れていた)。
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 640),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
-          child: SizedBox(
-            width: AppDimensions.formWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '単語を編集',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+      child: SizedBox(
+        width: AppDimensions.formWidth + _horizontalPadding * 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  _horizontalPadding,
+                  22,
+                  _horizontalPadding,
+                  0,
                 ),
-                const SizedBox(height: 16),
-                Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: LabeledTextField(
-                        label: '英単語 *',
-                        controller: _wordController,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: LabeledTextField(
-                        label: '発音記号 (IPA)',
-                        controller: _ipaController,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                LabeledTextField(
-                  label: '日本語訳 *',
-                  controller: _japaneseController,
-                  maxLines: null,
-                ),
-                const SizedBox(height: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      '品詞(複数選択可)',
+                      '単語を編集',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    PosChipSelector(
-                      selected: _selectedPartsOfSpeech,
-                      onToggle: (pos) => setState(() {
-                        _selectedPartsOfSpeech =
-                            _selectedPartsOfSpeech.contains(pos)
-                            ? (Set<PartOfSpeech>.from(_selectedPartsOfSpeech)
-                                ..remove(pos))
-                            : (Set<PartOfSpeech>.from(_selectedPartsOfSpeech)
-                                ..add(pos));
-                      }),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: LabeledTextField(
+                            label: '英単語 *',
+                            controller: _wordController,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: LabeledTextField(
+                            label: '発音記号 (IPA)',
+                            controller: _ipaController,
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 16),
+                    LabeledTextField(
+                      label: '日本語訳 *',
+                      controller: _japaneseController,
+                      maxLines: null,
+                    ),
+                    const SizedBox(height: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '品詞(複数選択可)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        PosChipSelector(
+                          selected: _selectedPartsOfSpeech,
+                          onToggle: (pos) => setState(() {
+                            _selectedPartsOfSpeech =
+                                _selectedPartsOfSpeech.contains(pos)
+                                ? (Set<PartOfSpeech>.from(
+                                    _selectedPartsOfSpeech,
+                                  )..remove(pos))
+                                : (Set<PartOfSpeech>.from(
+                                    _selectedPartsOfSpeech,
+                                  )..add(pos));
+                          }),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    LabeledTextField(
+                      label: '英例文',
+                      controller: _exampleEnController,
+                      minLines: 2,
+                      maxLines: null,
+                    ),
+                    const SizedBox(height: 16),
+                    LabeledTextField(
+                      label: '日本語例文',
+                      controller: _exampleJaController,
+                      minLines: 2,
+                      maxLines: null,
+                    ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.danger,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 16),
-                LabeledTextField(
-                  label: '英例文',
-                  controller: _exampleEnController,
-                  minLines: 2,
-                  maxLines: null,
-                ),
-                const SizedBox(height: 16),
-                LabeledTextField(
-                  label: '日本語例文',
-                  controller: _exampleJaController,
-                  minLines: 2,
-                  maxLines: null,
-                ),
-                if (_errorMessage != null) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    _errorMessage!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.danger,
-                    ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                _horizontalPadding,
+                16,
+                _horizontalPadding,
+                22,
+              ),
+              child: Row(
+                children: [
+                  AppFilledButton(label: '保存', onPressed: _save),
+                  const SizedBox(width: 10),
+                  AppOutlinedButton(
+                    label: 'キャンセル',
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const Spacer(),
+                  AppOutlinedButton(
+                    label: '削除...',
+                    textColor: AppColors.danger,
+                    hoverBackground: AppColors.dangerHoverBackground,
+                    onPressed: _delete,
                   ),
                 ],
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    AppFilledButton(label: '保存', onPressed: _save),
-                    const SizedBox(width: 10),
-                    AppOutlinedButton(
-                      label: 'キャンセル',
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    const Spacer(),
-                    AppOutlinedButton(
-                      label: '削除...',
-                      textColor: AppColors.danger,
-                      hoverBackground: AppColors.dangerHoverBackground,
-                      onPressed: _delete,
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

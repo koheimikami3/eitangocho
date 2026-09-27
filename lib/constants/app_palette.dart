@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 /// 値は Claude Design の iOS プロトタイプ(THEME_LIGHT / THEME_DARK)を起点に、
 /// 2.0.0 の「立体案」で面・本文色・影を更新したもの。立体案は輪郭を枠線ではなく
 /// 影で出す: 地の上の面は [elevation] で浮かせ、入力欄などは [wellShadow]
-/// (内側の影。描画は MobileWell)で沈める。品詞バッジの配色は 1.x から変えない。
+/// (内側の影。描画は MobileWell)で沈める。ただしライトの入力欄は 2.2.0 で
+/// 白地 + 薄い枠線だけにした。品詞バッジの配色は 1.x から変えない。
 ///
 /// アクセント色だけはライト / ダークで共通(アイコンと同色の #429ff0)。
 @immutable
@@ -48,6 +49,7 @@ class AppPalette {
   final Color tabBar;
 
   /// 入力欄など内側の影で沈めた面(--wellBg)。ダークは面より暗くして沈んで見せる。
+  /// ライトは 2.2.0 から沈めずに白地にしている。
   final Color wellBackground;
 
   /// 押下中のカード・行の地(--pressBg)
@@ -119,8 +121,11 @@ class AppPalette {
   // 白地ではほぼ見えないため省く。
 
   /// 地の上に浮かせる面(カード・設定のセクション・クイズカード)の影(--elev)。
-  /// 1 つ目はデザインではほぼ透明なリングだが、面の縁をはっきりさせるため
-  /// [raisedOutline](押下時と同じ輪郭)に置き換えている(ユーザー判断)。
+  /// ダークの 1 つ目はデザインではほぼ透明なリングだが、面の縁をはっきりさせるため
+  /// [raisedOutline] に置き換えている(ユーザー判断)。
+  /// ライトは 2.2.0 で、枠線(輪郭リング)なしの淡い影だけで浮かせる
+  /// フラットな見た目に変えた。下に落ちる影は参考画像の実測から採り、
+  /// 四辺に回る影を 1 枚足している(ユーザー判断)。
   List<BoxShadow> get elevation => isDark
       ? [
           raisedOutline,
@@ -142,57 +147,33 @@ class AppPalette {
             offset: Offset(0, 14),
           ),
         ]
-      : [
-          raisedOutline,
-          const BoxShadow(
-            color: Color(0x08101828),
-            blurRadius: 1.5,
-            offset: Offset(0, 1),
+      : const [
+          // 四辺にごく近く回る淡い影。下に落ちる影だけだと上辺と左右の縁が
+          // 地に溶けるため、2.1.0 の輪郭リングの代わりに縁を締める。
+          BoxShadow(
+            color: Color(0x0D101828), // rgba(16,24,40,0.05)
+            blurRadius: 3,
           ),
-          const BoxShadow(
-            color: Color(0x1A101828),
-            blurRadius: 12,
-            spreadRadius: -8,
-            offset: Offset(0, 5),
-          ),
-          const BoxShadow(
-            color: Color(0x24101828),
-            blurRadius: 24,
-            spreadRadius: -18,
-            offset: Offset(0, 12),
+          BoxShadow(
+            // 他の影・線と同じ青みの墨(#101828)で落とし、地と馴染ませる。
+            color: Color(0x0F101828), // rgba(16,24,40,0.06)
+            blurRadius: 8,
+            offset: Offset(0, 3),
           ),
         ];
 
-  /// 浮かせた面の外周の細い輪郭(0.5px のリング)。常時・押下中とも出す。
+  /// 浮かせた面の外周の細い輪郭(0.5px のリング)。ダークのみ出す
+  /// (ライトは 2.2.0 で枠線なしにした)。
   /// 濃さはデザインの押下時(12%)より少し濃い 16%(ユーザー判断)。
-  BoxShadow get raisedOutline => BoxShadow(
-    color: isDark ? const Color(0x29FFFFFF) : const Color(0x29101828),
-    spreadRadius: 0.5,
-  );
-
-  /// 押下中の面の外側の影(--elevPress の inset 以外)。浮きを消して輪郭だけ残す。
-  List<BoxShadow> get elevationPressed => isDark
-      ? [raisedOutline]
-      : [
-          raisedOutline,
-          const BoxShadow(
-            color: Color(0x1A101828),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ];
-
-  /// 押下中の面の内側の影(--elevPress の inset)。MobileWell で描く。
-  List<BoxShadow> get pressedInsetShadow => [
-    BoxShadow(
-      color: isDark ? const Color(0xA6000000) : const Color(0x12101828),
-      blurRadius: 3,
-      offset: const Offset(0, 1),
-    ),
-  ];
+  BoxShadow get raisedOutline =>
+      const BoxShadow(color: Color(0x29FFFFFF), spreadRadius: 0.5);
 
   /// 入力欄など沈めた面の内側の影(--well)。MobileWell で描く。
-  /// 2 つ目(blur 0・spread 1)は内側に引く 1px の輪郭。
+  /// ダークの 2 つ目(blur 0・spread 1)は内側に引く 1px の輪郭。
+  /// ライトは 2.2.0 で、地の色・枠・内側の影が重なって重く見えたため、
+  /// 影をやめて 1px の輪郭だけにした。16% では平面的に見えたため、輪郭を
+  /// はっきり出す 28% にした。品詞チップの未選択の縁(borderAlpha(28))と
+  /// 揃えて入力部品の見た目を統一する(ユーザー判断)。
   List<BoxShadow> get wellShadow => isDark
       ? const [
           BoxShadow(
@@ -202,14 +183,7 @@ class AppPalette {
           ),
           BoxShadow(color: Color(0x0FFFFFFF), spreadRadius: 1),
         ]
-      : const [
-          BoxShadow(
-            color: Color(0x0D101828),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-          BoxShadow(color: Color(0x0A101828), spreadRadius: 1),
-        ];
+      : const [BoxShadow(color: Color(0x47000000), spreadRadius: 1)];
 
   /// ヘッダの下端の線と影(--elevHead)。影はデザインより薄くしている
   /// (実機でヘッダが浮きすぎて見えたため。ユーザー判断)。
@@ -294,16 +268,20 @@ class AppPalette {
 
   static const light = AppPalette._(
     brightness: Brightness.light,
-    background: Color(0xFFF4F5F8),
+    // 2.2.0 で #F4F5F8 から #F7F8FA に薄めた。参考画像(タイムライン)の
+    // #F8F8FA に近いが、白いカードとの差がわずかに残る濃さにとどめた。
+    // 青みは 2.1.0 までより控えめにした(#F6F8FB は青みが強く見えた。ユーザー判断)。
+    background: Color(0xFFF7F8FA),
     surface: Color(0xFFFFFFFF),
-    surfaceAlt: Color(0xFFF4F5F8),
+    surfaceAlt: Color(0xFFF7F8FA),
     surfaceHeader: Color(0xFFEFF1F5),
     tabBar: Color(0xEBFAFAFB), // rgba(250,250,251,0.92)
-    // デザインは #fafbfc だが、白い面との差が小さく入力欄が沈んで見えないため
-    // 地(background)と同じ色にした。沈めた面は「面に開いた穴から地が見える」
-    // 扱いにし、白 → 地 → surfaceHeader → pressBackground の段階を保つ。
-    wellBackground: Color(0xFFF4F5F8),
-    pressBackground: Color(0xFFE8EBF1),
+    // 2.1.0 までは入力欄を沈めて見せるため地(background)と同じ色にしていたが、
+    // 2.2.0 で白地 + 薄い枠線に変えた(wellShadow のコメント参照)。
+    wellBackground: Color(0xFFFFFFFF),
+    // 2.2.0 で #E8EBF1 から、地(#F7F8FA)に合わせて青みを抑えた薄い色にした。
+    // 学習済みの行(surfaceHeader)を押したときにも差が出るよう、それよりは濃く保つ。
+    pressBackground: Color(0xFFEDEEF1),
     text: Color(0xFF1D1D1F),
     danger: Color(0xFFC03030),
     autoFillBadgeBackground: Color(0xFFE2F3E8),

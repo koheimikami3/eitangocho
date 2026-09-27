@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
 /// クイズの出題カード(幅 480 中央)。進捗・表面・IPA・答え表示ボタン、
@@ -56,17 +57,11 @@ class QuizCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 44),
           constraints: const BoxConstraints(minHeight: 220),
+          // iOS のクイズカードと同じく枠線なし + 淡い影(2.2.0)。
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0x1A000000)),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x0F000000),
-                blurRadius: 12,
-                offset: Offset(0, 2),
-              ),
-            ],
+            boxShadow: AppPalette.light.elevation,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

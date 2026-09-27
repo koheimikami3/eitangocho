@@ -1,7 +1,10 @@
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_colors.dart';
-import 'package:eitangocho/utils/google_translate_url.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/utils/pronunciation_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// [PronunciationButton] の形。置かれる場所ごとにデザインが違う。
 enum PronunciationButtonVariant {
@@ -52,25 +55,23 @@ enum PronunciationButtonVariant {
     quizPill => 6,
   };
 
-  /// アイコンのみは角丸 8、ラベル付きはピル。
-  double get borderRadius => switch (this) {
-    tableIcon => 8,
-    cardPill || quizPill => 99,
-  };
+  /// すべて丸(ラベル付きはピル、アイコンのみは円)。アイコンのみは
+  /// 2.2.0 で角丸 8 から円にし、iOS の発音ボタンと形を揃えた。
+  double get borderRadius => 99;
 }
 
-/// 発音確認ボタン(機能横断コンポーネント)。Google 翻訳を外部ブラウザで開く。
+/// 発音確認ボタン(機能横断コンポーネント)。Google 翻訳をアプリ内の別ウィンドウで開く。
 ///
-/// iOS 版([MobilePronunciationButton])はアプリ内の WebView で完結するが、
+/// iOS 版([MobilePronunciationButton])は画面内の WebView で完結するが、
 /// macOS は Flutter の platform view がまだジェスチャに対応しておらず、
-/// WebView を埋め込んでも再生ボタンを押せないため外部ブラウザに出す
-/// (docs/design.md 参照)。
+/// 埋め込むと再生ボタンを押せないため、ネイティブのウィンドウに出す
+/// ([openPronunciationWindow]。docs/design.md 参照)。
 ///
 /// 配色は macOS がライト固定のため [AppColors] から直接引く。
 ///
 /// 自身がタップを消費するため、カード・行のクリック(編集モーダル)には
 /// 伝播しない。
-class PronunciationButton extends StatefulWidget {
+class PronunciationButton extends ConsumerStatefulWidget {
   const PronunciationButton({
     required this.word,
     required this.variant,
@@ -81,10 +82,11 @@ class PronunciationButton extends StatefulWidget {
   final PronunciationButtonVariant variant;
 
   @override
-  State<PronunciationButton> createState() => _PronunciationButtonState();
+  ConsumerState<PronunciationButton> createState() =>
+      _PronunciationButtonState();
 }
 
-class _PronunciationButtonState extends State<PronunciationButton> {
+class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
   bool _isHovered = false;
 
   @override
@@ -97,7 +99,14 @@ class _PronunciationButtonState extends State<PronunciationButton> {
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => openGoogleTranslateInBrowser(widget.word),
+        // ページもアプリと同じ拡大率(ブラウザズーム相当の uiScale)で表示する。
+        // 押したときだけ読むので build では watch しない。
+        onTap: () => openPronunciationWindow(
+          widget.word,
+          zoom:
+              ref.read(settingsProvider).value?.uiScale ??
+              AppDimensions.defaultUiScale,
+        ),
         child: Container(
           height: variant.height,
           // アイコンのみの形は正方形にする。

@@ -60,6 +60,9 @@ class LabeledTextField extends StatelessWidget {
             hintText: hintText,
             // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
+            // 塗りなしだと画面の地のグレーが透けるため、白で塗る。
+            filled: true,
+            fillColor: Colors.white,
             // 自動入力ボタン等と高さを揃えつつ、上下に余裕を持たせる。
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,

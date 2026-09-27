@@ -7,8 +7,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// ボトムシート([showMobilePronunciationSheet])の中身として使う。
 ///
 /// **iOS 専用**。macOS は Flutter の platform view がまだジェスチャに対応して
-/// おらず、埋め込んでも再生ボタンを押せないため外部ブラウザに出している
-/// (docs/design.md 参照)。
+/// おらず、埋め込んでも再生ボタンを押せないため、ネイティブの別ウィンドウに
+/// 出している(openPronunciationWindow。docs/design.md 参照)。
 class MobilePronunciationWebView extends StatefulWidget {
   const MobilePronunciationWebView({required this.word, super.key});
 

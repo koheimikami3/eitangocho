@@ -31,8 +31,11 @@ class ToolbarSearchField extends ConsumerWidget {
         decoration: InputDecoration(
           isDense: true,
           hintText: '検索',
+          // 他の入力欄(LabeledTextField)と同じく白地 + 枠線にする。
+          // 以前は枠なしの塗り潰しだったが、ツールバーの地と色が近く
+          // 欄の範囲が分からなかった。
           filled: true,
-          fillColor: AppColors.inputBackground,
+          fillColor: Colors.white,
           // 上下に余裕を持たせる(ツールバー高さ 52 に収まる範囲)。
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
@@ -40,13 +43,17 @@ class ToolbarSearchField extends ConsumerWidget {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.inputBorder),
           ),
-          // 塗り潰し検索欄はフォーカス時も枠なしを維持する
-          // (既定の黒枠が出るのを防ぐ)。
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(7),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          // フォーカス時も枠色は変えず通常時と同じにする
+          // (Material 既定の太い黒枠が出るのを防ぐ)。
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.inputBorder),
           ),
         ),
       ),

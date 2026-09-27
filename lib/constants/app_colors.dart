@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   static const accent = Color(0xFF429FF0); // 主要アクション
   static const accentHover = Color(0xFF2B8EE0);
-  static const cardHoverBorder = Color(0xA6429FF0); // rgba(66,159,240,0.65)
+
+  /// 主ボタンのホバー中のグラデーション(上 → 下)。通常時は iOS と同じ
+  /// AppPalette.light.buttonGradient で、それを同じ向きのまま一段暗くしたもの。
+  static const buttonGradientHover = [Color(0xFF3F9CEF), accentHover];
 
   // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。
   static const accentSoft = Color(0x1A429FF0); // rgba(66,159,240,0.10)
@@ -34,7 +37,9 @@ abstract final class AppColors {
   static const inputBackground = Color(0xFFF7F7F8);
   static const tableHeaderBackground = Color(0xFFFAFAFB);
   static const learnedRowBackground = Color(0xFFFAFAFB);
-  static const rowHoverBackground = Color(0xFFF2F6FC);
+  // ホバーの地は無彩色のグレーで統一する(2.2.0 で青み #F2F6FC から変更。
+  // 設定の行などのホバー [inputBackground] と同じ値)。
+  static const rowHoverBackground = Color(0xFFF7F7F8);
   static const border = Color(0x14000000); // rgba(0,0,0,0.08)
   static const borderStrong = Color(0x24000000); // rgba(0,0,0,0.14)
   static const inputBorder = Color(0x26000000); // rgba(0,0,0,0.15)

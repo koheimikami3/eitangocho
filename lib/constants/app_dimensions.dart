@@ -31,8 +31,9 @@ abstract final class AppDimensions {
   static const mobilePadding = 16.0;
 
   /// iOS のカード(単語カード・設定のセクションなど)の角丸。
-  /// 2.0.0 の立体案で 11 にした(浮いた面のクイズカードは 14)。
-  static const mobileCardRadius = 11.0;
+  /// 2.0.0 の立体案で 11、2.2.0 で参考画像に合わせて 8 にした
+  /// (浮いた面のクイズカードは 14 のまま)。
+  static const mobileCardRadius = 8.0;
 
   /// iOS の学習中カードグリッドの間隔
   /// (列数は設定 LearningCardLayout が持つ)

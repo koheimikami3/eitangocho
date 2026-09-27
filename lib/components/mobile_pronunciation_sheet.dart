@@ -11,6 +11,7 @@ Future<void> showMobilePronunciationSheet(BuildContext context, String word) {
     context: context,
     builder: (sheetContext) => MobileSheet(
       title: word,
+      titleFontSize: 17,
       leftLabel: '閉じる',
       onLeft: () => Navigator.of(sheetContext).pop(),
       // WebView 自身が残り高いっぱいに広がるため、スクロール枠には載せない。

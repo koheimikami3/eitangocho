@@ -21,7 +21,7 @@ class PosChipSelector extends StatelessWidget {
       children: [
         for (final pos in PartOfSpeech.values)
           _Chip(
-            label: pos.label,
+            pos: pos,
             isSelected: selected.contains(pos),
             onTap: () => onToggle(pos),
           ),
@@ -32,34 +32,38 @@ class PosChipSelector extends StatelessWidget {
 
 class _Chip extends StatelessWidget {
   const _Chip({
-    required this.label,
+    required this.pos,
     required this.isSelected,
     required this.onTap,
   });
 
-  final String label;
+  final PartOfSpeech pos;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    // 選択中は品詞バッジと同じ配色にし、文字色で縁取る
+    // (iOS の MobilePosChipSelector と揃える。2.2.0 で単色の青から変更)。
+    final background = pos.badgeBackground;
+    final foreground = pos.badgeForeground;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accent : Colors.white,
+          color: isSelected ? background : Colors.white,
           borderRadius: BorderRadius.circular(99),
           border: Border.all(
-            color: isSelected ? AppColors.accent : AppColors.inputBorder,
+            color: isSelected ? foreground : AppColors.inputBorder,
           ),
         ),
         child: Text(
-          label,
+          pos.label,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xA6000000),
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            color: isSelected ? foreground : const Color(0xA6000000),
           ),
         ),
       ),

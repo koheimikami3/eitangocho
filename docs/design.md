@@ -69,9 +69,11 @@
 - `ITSAppUsesNonExemptEncryption = false`(独自の暗号実装が無い)
 - **CocoaPods は使わない(SPM のみ)**。ネイティブ SDK を含むパッケージは、
   SPM に対応した版以降しか選べない
-- **発音**: iOS はアプリ内 WebView、macOS は外部ブラウザで開く。macOS の platform view
-  はジェスチャに未対応で、埋め込むと再生ボタンを押せないため。外部で開くときは
-  `LaunchMode.externalApplication` を明示する(既定だと iOS ではアプリ内 Safari になる)
+- **発音**: iOS はアプリ内 WebView(シート)、macOS はアプリ内の別ウィンドウに置いた
+  ネイティブの WKWebView(`macos/Runner/PronunciationWindowPlugin.swift`)で開く。
+  macOS の platform view はジェスチャに未対応で、Flutter の画面に埋め込むと再生ボタンを
+  押せないため。外部ブラウザは予備で、開くときは `LaunchMode.externalApplication` を
+  明示する(既定だと iOS ではアプリ内 Safari になる)
   - debug の iOS で hot restart した後に出る WebView のアサーションは無害
     (ネイティブ側の WKWebView が生き残るため。コールドスタートでは出ない)
 - **コントラスト**: デザインの色が 4.5:1 に届かないときは、色相を保ったまま明度を

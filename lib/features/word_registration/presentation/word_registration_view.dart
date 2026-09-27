@@ -294,7 +294,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
               onPressed: () =>
                   ref.read(wordRegistrationProvider.notifier).backToInput(),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 12),
             _TextActionButton(label: 'キャンセル', onTap: _cancel),
           ],
         ),

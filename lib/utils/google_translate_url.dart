@@ -6,10 +6,10 @@ Uri googleTranslateUrl(String word) => Uri.parse(
   '&text=${Uri.encodeComponent(word)}&op=translate',
 );
 
-/// Google 翻訳を外部ブラウザで開く(macOS 版の発音確認導線)。
+/// Google 翻訳を外部ブラウザで開く。
 ///
-/// iOS はアプリ内の WebView で完結するが、macOS は platform view の制約で
-/// WebView 内を操作できないため外部ブラウザに出す(docs/design.md 参照)。
+/// macOS 版の発音確認はアプリ内の別ウィンドウ(openPronunciationWindow)で開き、
+/// これはそのチャンネルが使えないときの予備にだけ使う。
 ///
 /// **`LaunchMode.externalApplication` を明示するのが要点**。既定の
 /// `platformDefault` は iOS では SFSafariViewController(アプリ内 Safari)に

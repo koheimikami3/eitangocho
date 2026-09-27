@@ -1,7 +1,9 @@
+import 'package:eitangocho/components/mobile_loading_indicator.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/card_in.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learning_empty_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_card.dart';
@@ -23,6 +25,9 @@ class LearningWordsViewMobile extends ConsumerWidget {
     final showIpa = settings.showIpa;
     final columns = settings.cardLayout.columns;
 
+    if (ref.watch(wordListLoadingProvider)) {
+      return const MobileLoadingIndicator();
+    }
     if (words.isEmpty) return const MobileLearningEmptyState();
 
     return ListView(

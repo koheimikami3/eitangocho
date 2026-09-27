@@ -1,36 +1,28 @@
-import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
-/// iOS 版フォームの項目を縦に並べ、項目と項目の間に区切り線を引く
-/// (単語の登録・編集シート)。
+/// iOS 版フォームの項目を縦に並べる(単語の登録・編集シート)。
 ///
-/// 立体案では入力欄を内側の影で沈めて枠線を持たないため、間隔だけだと項目の
-/// 境目がぼやける。各項目の上下に余白を取り、間に淡い線を入れて区切る。
+/// 2.0.0 では入力欄に枠線がなく項目の境目がぼやけるため、項目の間に淡い
+/// 区切り線を引いていた。2.2.0 で入力欄に枠を付けたので線はやめ、余白だけで
+/// 区切る(ユーザー判断)。
 class MobileFormRows extends StatelessWidget {
   const MobileFormRows({required this.children, super.key});
 
   final List<Widget> children;
 
-  /// 項目の上下の余白。デザインは 14 だが、区切り線との間が詰まって見えたため
-  /// ユーザー判断で広げた。
-  static const _verticalPadding = 18.0;
+  /// 項目の上下の余白。区切り線があった頃は 18 に広げていたが、線をやめて
+  /// 間が空きすぎたため、デザインの 14 に戻した(ユーザー判断)。
+  static const _verticalPadding = 14.0;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var i = 0; i < children.length; i++)
-          Container(
+        for (final child in children)
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: _verticalPadding),
-            // 最後の項目の下には引かない(下に続くのはエラー文や削除ボタン)。
-            decoration: i < children.length - 1
-                ? BoxDecoration(
-                    border: Border(bottom: BorderSide(color: palette.rowLine)),
-                  )
-                : null,
-            child: children[i],
+            child: child,
           ),
       ],
     );
