@@ -2,6 +2,8 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:flutter/material.dart';
@@ -81,17 +83,14 @@ class _ForgotList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // iOS の忘れた単語一覧と同じく、枠線なし + 影の面に、淡い赤の見出しを
+    // 載せる(2.2.0)。macOS はライト固定なので AppPalette.light を直接使う。
+    const palette = AppPalette.light;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      // 枠線は中身の上に重ねて描く(foregroundDecoration)。decoration の
-      // border だと中身が枠の内側に四角く置かれ、ヘッダーの背景が上の角丸の
-      // 枠線を塗りつぶしてしまう。
-      foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0x1A000000)),
+        borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+        boxShadow: palette.elevation,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -99,16 +98,16 @@ class _ForgotList extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: const BoxDecoration(
-              color: AppColors.tableHeaderBackground,
-              border: Border(bottom: BorderSide(color: Color(0x12000000))),
+            decoration: BoxDecoration(
+              color: palette.dangerSoft,
+              border: Border(bottom: BorderSide(color: palette.rowLine)),
             ),
             child: const Text(
               '忘れていた単語(学習中リストに戻りました)',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textSecondary,
+                color: AppColors.danger,
               ),
             ),
           ),
@@ -118,9 +117,9 @@ class _ForgotList extends StatelessWidget {
               // 区切り線は行と行の間だけ。最後の行にも引くとカードの下枠と
               // 2 本並んで太く見える。
               decoration: i < words.length - 1
-                  ? const BoxDecoration(
+                  ? BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: Color(0x0D000000)),
+                        bottom: BorderSide(color: palette.rowLine),
                       ),
                     )
                   : null,
