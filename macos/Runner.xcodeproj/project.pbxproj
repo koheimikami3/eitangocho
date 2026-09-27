@@ -28,6 +28,7 @@
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		E1C10UD0000000000000A001 /* IcloudFileStorePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */; };
 		E1C10UD0000000000000A007 /* PronunciationWindowPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A008 /* PronunciationWindowPlugin.swift */; };
+		E1C10UD0000000000000A009 /* WindowControlPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A00A /* WindowControlPlugin.swift */; };
 		E1C10UD0000000000000A003 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A004 /* AppIcon.icon */; };
 		E1C10UD0000000000000A005 /* AppIcon-dev.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A006 /* AppIcon-dev.icon */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
@@ -75,6 +76,7 @@
 		33CC11122044BFA00003C045 /* MainFlutterWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFlutterWindow.swift; sourceTree = "<group>"; };
 		E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IcloudFileStorePlugin.swift; path = "../../shared/IcloudFileStorePlugin.swift"; sourceTree = "<group>"; };
 		E1C10UD0000000000000A008 /* PronunciationWindowPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationWindowPlugin.swift; sourceTree = "<group>"; };
+		E1C10UD0000000000000A00A /* WindowControlPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowControlPlugin.swift; sourceTree = "<group>"; };
 		E1C10UD0000000000000A004 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = AppIcon.icon; path = "../../shared/AppIcon.icon"; sourceTree = "<group>"; };
 		E1C10UD0000000000000A006 /* AppIcon-dev.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = "AppIcon-dev.icon"; path = "../../shared/AppIcon-dev.icon"; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
 				E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */,
 				E1C10UD0000000000000A008 /* PronunciationWindowPlugin.swift */,
+				E1C10UD0000000000000A00A /* WindowControlPlugin.swift */,
 				E1C10UD0000000000000A004 /* AppIcon.icon */,
 				E1C10UD0000000000000A006 /* AppIcon-dev.icon */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
@@ -386,6 +389,7 @@
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				E1C10UD0000000000000A001 /* IcloudFileStorePlugin.swift in Sources */,
 				E1C10UD0000000000000A007 /* PronunciationWindowPlugin.swift in Sources */,
+				E1C10UD0000000000000A009 /* WindowControlPlugin.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
 			);

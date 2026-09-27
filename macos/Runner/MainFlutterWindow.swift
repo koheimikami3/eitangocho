@@ -33,6 +33,9 @@ class MainFlutterWindow: NSWindow {
     // 発音確認のウィンドウも同じく自前の MethodChannel。
     PronunciationWindowPlugin.register(
       with: flutterViewController.engine.binaryMessenger, parentWindow: self)
+    // タイトルバー相当の位置でのドラッグ・ダブルクリックも同じく自前の MethodChannel。
+    WindowControlPlugin.register(
+      with: flutterViewController.engine.binaryMessenger, window: self)
 
     super.awakeFromNib()
   }

@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/sidebar_item.dart';
+import 'package:eitangocho/app/widgets/window_drag_area.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
@@ -28,7 +29,9 @@ class AppSidebar extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 52),
+          // 信号機ボタンの並ぶ上端はタイトルバーとして振る舞わせる
+          // (ドラッグで移動、ダブルクリックで拡大 / 元に戻す)。
+          const WindowDragArea(child: SizedBox(height: 52)),
           const Padding(
             padding: EdgeInsets.fromLTRB(18, 6, 0, 2),
             child: Align(
