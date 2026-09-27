@@ -27,3 +27,12 @@ class CloudUnavailableException implements Exception {
   @override
   String toString() => message;
 }
+
+/// 端末のコピーがクラウドの最新版にならず、同期を見送ったときの失敗。
+///
+/// 古いコピーを読んで書き戻すと、他端末の新しい版を踏み潰して競合版に追いやるため、
+/// 最新化を待ちきれなかったときは読み書きせずにこれを投げる。
+/// 一時的な状態なので、[SyncNotifier] は少し待って再試行する。
+class CloudNotReadyException extends CloudUnavailableException {
+  const CloudNotReadyException(super.message);
+}

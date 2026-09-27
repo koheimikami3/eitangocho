@@ -19,13 +19,18 @@ public final class IcloudFileStorePlugin: NSObject {
   /// Dart 側(icloud_file_store.dart)と合わせる。
   private static let channelName = "eitangocho/icloud"
 
-  /// コンテナ内のファイル名。Documents 配下に置くと iCloud Drive の
-  /// アプリフォルダとしてユーザーからも見える。
+  /// コンテナ内のファイル名。Info.plist で NSUbiquitousContainers を公開していないため、
+  /// Documents 配下でも「ファイル」アプリや Finder には表示されない。
   private static let fileName = "eitangocho-sync.json"
 
   /// ファイル操作を回すキュー。ubiquity container の解決も含めて
   /// 主スレッドをブロックしうるため、すべてここで実行する。
   private let queue = DispatchQueue(label: "eitangocho.icloud", qos: .userInitiated)
+
+  /// 端末のコピーが最新版になるのを待つ上限と、状態を見直す間隔。
+  /// 待つのはこのキューの上なので主スレッドは止まらない。
+  private static let downloadTimeout: TimeInterval = 15
+  private static let pollInterval: TimeInterval = 0.5
 
   public static func register(with messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(name: channelName, binaryMessenger: messenger)
@@ -85,12 +90,12 @@ public final class IcloudFileStorePlugin: NSObject {
   }
 
   private func read(url: URL, reply: @escaping (Any?) -> Void) {
-    // まだローカルに実体が無い(クラウドにしかない)場合があるため、
-    // ダウンロードを促してから読む。
-    if !FileManager.default.fileExists(atPath: url.path) {
-      try? FileManager.default.startDownloadingUbiquitousItem(at: url)
-      // ダウンロード待ちは NSFileCoordinator の読み取りが面倒を見る。
-      // それでも実体が現れない場合は「未作成」として nil を返す。
+    // NSFileCoordinator の読み取りは、端末に古いコピーがあるとダウンロードの完了を
+    // 待たずにそれを返す。古い内容を読んで書き戻すと他端末の新しい版を競合版に
+    // 追いやってしまうため、最新になるまで待ち、待ちきれなければ読まずに見送る。
+    guard waitUntilCurrent(url) else {
+      reply(Self.notCurrentError())
+      return
     }
 
     var coordinatorError: NSError?
@@ -118,6 +123,13 @@ public final class IcloudFileStorePlugin: NSObject {
   }
 
   private func write(contents: String, url: URL, reply: @escaping (Any?) -> Void) {
+    // 読んでから書くまでの間に他端末の新しい版が届き始めていたら、書かずに見送る
+    // (read の待ちと同じ理由。ここで書くとその版が競合版になる)。
+    guard isCurrent(url) else {
+      reply(Self.notCurrentError())
+      return
+    }
+
     var coordinatorError: NSError?
     var writeError: Error?
 
@@ -161,5 +173,43 @@ public final class IcloudFileStorePlugin: NSObject {
       return
     }
     reply(millis)
+  }
+
+  /// 端末のコピーがクラウドの最新版か。
+  ///
+  /// 状態を取れないのは、クラウドにまだ同期ファイルが無いとき。古いコピーを
+  /// 掴む恐れは無いので最新として扱う(初回の同期でファイルを作れるように)。
+  private func isCurrent(_ url: URL) -> Bool {
+    // URL は属性をキャッシュするため、取り直して最新の値を見る。
+    var freshURL = url
+    freshURL.removeAllCachedResourceValues()
+    guard
+      let status = try? freshURL.resourceValues(
+        forKeys: [.ubiquitousItemDownloadingStatusKey]
+      ).ubiquitousItemDownloadingStatus
+    else { return true }
+    return status == .current
+  }
+
+  /// 端末のコピーが最新版になるまで待つ。上限までに最新にならなければ false。
+  private func waitUntilCurrent(_ url: URL) -> Bool {
+    // 端末にコピーがあっても、これを呼ぶとクラウドの版とのすり合わせを急がせられる。
+    // 呼ばずに OS 任せにすると、数分たってもダウンロードが終わらないことがあった。
+    try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+    let deadline = Date().addingTimeInterval(Self.downloadTimeout)
+    while !isCurrent(url) {
+      guard Date() < deadline else { return false }
+      Thread.sleep(forTimeInterval: Self.pollInterval)
+    }
+    return true
+  }
+
+  /// 最新化を待ちきれずに見送ったときのエラー。コードは Dart 側
+  /// (icloud_file_store.dart)が再試行すべき失敗として見分けるのに使う。
+  private static func notCurrentError() -> FlutterError {
+    FlutterError(
+      code: "not-current",
+      message: "iCloud から最新のデータを取得できなかったため、同期を見送りました。",
+      details: nil)
   }
 }

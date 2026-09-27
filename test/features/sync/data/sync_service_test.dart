@@ -20,8 +20,13 @@ class InMemoryCloudFileStore implements CloudFileStore {
 
   int writeCount = 0;
 
+  /// read / write で投げる失敗(最新化を待ちきれず見送った場合などの再現用)。
+  Exception? readError;
+  Exception? writeError;
+
   @override
   Future<String?> read() async {
+    if (readError != null) throw readError!;
     final value = contents;
     final hook = onAfterRead;
     onAfterRead = null;
@@ -34,6 +39,7 @@ class InMemoryCloudFileStore implements CloudFileStore {
 
   @override
   Future<void> write(String value) async {
+    if (writeError != null) throw writeError!;
     contents = value;
     // 実際のファイルシステムと同じく、書くたびに更新日時が進む。
     modifiedAt = (modifiedAt ?? DateTime.utc(2026)).add(
@@ -260,5 +266,15 @@ void main() {
 
     expect(cloudDeletions(), isEmpty);
     expect(await db.wordDao.getDeletions(), isEmpty);
+  });
+
+  test('最新のデータを取得できずに読み取りを見送ったら、書き戻さない', () async {
+    await addWord('apple', 'りんご');
+    store.readError = const CloudNotReadyException('同期を見送りました。');
+
+    await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
+
+    expect(store.writeCount, 0);
+    expect(store.contents, isNull);
   });
 }

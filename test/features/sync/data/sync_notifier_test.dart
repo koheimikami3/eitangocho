@@ -15,11 +15,13 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 /// 呼ばれた回数を数えるだけの保管先。失敗も再現できる。
 class _CountingStore implements CloudFileStore {
   String? contents;
+  int readCount = 0;
   int writeCount = 0;
   Exception? failWith;
 
   @override
   Future<String?> read() async {
+    readCount++;
     if (failWith != null) throw failWith!;
     return contents;
   }
@@ -51,11 +53,12 @@ void main() {
 
   tearDown(() async => db.close());
 
-  /// [debounce] / [resumeMinInterval] は本番の 5 秒・60 秒だとテストが待てないため、
-  /// トリガを検証するテストからだけ縮める。
+  /// [debounce] / [resumeMinInterval] / [notReadyRetryDelay] は本番の 5 秒・60 秒・
+  /// 30 秒だとテストが待てないため、トリガを検証するテストからだけ縮める。
   ProviderContainer makeContainer({
     Duration debounce = const Duration(seconds: 5),
     Duration resumeMinInterval = const Duration(seconds: 60),
+    Duration notReadyRetryDelay = const Duration(seconds: 30),
   }) {
     final container = ProviderContainer(
       overrides: [
@@ -65,6 +68,7 @@ void main() {
           () => SyncNotifier(
             debounce: debounce,
             resumeMinInterval: resumeMinInterval,
+            notReadyRetryDelay: notReadyRetryDelay,
           ),
         ),
       ],
@@ -125,6 +129,51 @@ void main() {
     expect(state.syncing, isFalse);
     expect(state.errorMessage, 'iCloud が利用できません。');
     expect(state.lastSyncedAt, isNull);
+  });
+
+  group('最新のデータを取得できずに見送ったとき', () {
+    const notReady = CloudNotReadyException('同期を見送りました。');
+    const retryDelay = Duration(milliseconds: 50);
+
+    test('エラーメッセージを持ち、1 回だけ再試行する', () async {
+      store.failWith = notReady;
+      final container = makeContainer(notReadyRetryDelay: retryDelay);
+
+      await container.read(syncProvider.notifier).setEnabled(enabled: true);
+      expect(container.read(syncProvider).errorMessage, '同期を見送りました。');
+      expect(store.readCount, 1);
+
+      // 再試行も見送りになるが、それ以上は予約しない。
+      await Future<void>.delayed(retryDelay * 6);
+      expect(store.readCount, 2);
+      expect(store.writeCount, 0);
+    });
+
+    test('再試行で同期できればエラーが消える', () async {
+      store.failWith = notReady;
+      final container = makeContainer(notReadyRetryDelay: retryDelay);
+      await container.read(syncProvider.notifier).setEnabled(enabled: true);
+
+      store.failWith = null;
+      await Future<void>.delayed(retryDelay * 3);
+
+      final state = container.read(syncProvider);
+      expect(state.errorMessage, isNull);
+      expect(state.lastSyncedAt, isNotNull);
+      expect(store.writeCount, 1);
+    });
+
+    test('無効にしたら予約済みの再試行は走らない', () async {
+      store.failWith = notReady;
+      final container = makeContainer(notReadyRetryDelay: retryDelay);
+      final notifier = container.read(syncProvider.notifier);
+      await notifier.setEnabled(enabled: true);
+
+      await notifier.setEnabled(enabled: false);
+      await Future<void>.delayed(retryDelay * 3);
+
+      expect(store.readCount, 1);
+    });
   });
 
   group('ローカル変更のトリガ', () {

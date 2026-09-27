@@ -37,7 +37,10 @@ class IcloudFileStore implements CloudFileStore {
     try {
       return await body();
     } on PlatformException catch (e) {
-      throw CloudUnavailableException(e.message ?? 'iCloud との通信に失敗しました。');
+      final message = e.message ?? 'iCloud との通信に失敗しました。';
+      // コードはネイティブ側(IcloudFileStorePlugin.swift)の notCurrentError と合わせる。
+      if (e.code == 'not-current') throw CloudNotReadyException(message);
+      throw CloudUnavailableException(message);
     } on MissingPluginException {
       // iCloud 未対応のプラットフォームで呼ばれた場合。
       throw const CloudUnavailableException('このプラットフォームでは iCloud 同期を利用できません。');
