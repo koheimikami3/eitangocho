@@ -4,7 +4,7 @@
 // 両方の Xcode プロジェクトから参照している(片方だけ直す事故を防ぐため)。
 //
 // icloud_storage 系のパッケージを使わないのは、必要な操作が
-// 「コンテナ URL の取得 / 1 ファイルの読み書き / 更新日時」の 3 つだけで、
+// 「コンテナ URL の取得 / 1 ファイルの読み書き / 更新日時 / 競合版の扱い」だけで、
 // 更新の止まった外部依存を増やすより自前で持つ方が小さいと判断したため。
 
 import Foundation
@@ -31,6 +31,11 @@ public final class IcloudFileStorePlugin: NSObject {
   /// 待つのはこのキューの上なので主スレッドは止まらない。
   private static let downloadTimeout: TimeInterval = 15
   private static let pollInterval: TimeInterval = 0.5
+
+  /// readConflicts で Dart に渡した競合版。resolveConflicts が id から引く。
+  /// NSFileVersion はチャンネルで運べないため、こちらで持って id だけを渡す。
+  /// queue の上でしか触らないので排他は要らない。
+  private var pendingConflicts: [String: NSFileVersion] = [:]
 
   public static func register(with messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(name: channelName, binaryMessenger: messenger)
@@ -68,6 +73,11 @@ public final class IcloudFileStorePlugin: NSObject {
         self.write(contents: contents, url: url, reply: reply)
       case "lastModified":
         self.lastModified(url: url, reply: reply)
+      case "readConflicts":
+        self.readConflicts(url: url, reply: reply)
+      case "resolveConflicts":
+        let ids = (call.arguments as? [String: Any])?["ids"] as? [String] ?? []
+        self.resolveConflicts(ids: ids, url: url, reply: reply)
       default:
         reply(FlutterMethodNotImplemented)
       }
@@ -173,6 +183,62 @@ public final class IcloudFileStorePlugin: NSObject {
       return
     }
     reply(millis)
+  }
+
+  /// 未解決の競合版を、id・内容・書かれた日時(epoch ミリ秒)の一覧で返す。
+  private func readConflicts(url: URL, reply: @escaping (Any?) -> Void) {
+    // 同期のたびに読み直すので、前回渡した分は捨てる。
+    pendingConflicts = [:]
+    var items: [[String: Any]] = []
+    for version in NSFileVersion.unresolvedConflictVersionsOfItem(at: url) ?? [] {
+      // 読めない版は渡さない(片付けられずに残り、次の同期で読み直される)。
+      guard let contents = try? String(contentsOf: version.url, encoding: .utf8)
+      else { continue }
+      let id = UUID().uuidString
+      pendingConflicts[id] = version
+      var item: [String: Any] = ["id": id, "contents": contents]
+      if let date = version.modificationDate {
+        item["modifiedAt"] = Int(date.timeIntervalSince1970 * 1000)
+      }
+      items.append(item)
+    }
+    reply(items)
+  }
+
+  /// readConflicts で渡した競合版のうち、ids のものだけを解決済みにして消す。
+  ///
+  /// NSFileVersion.removeOtherVersionsOfItem を使わないのは、読み取り後に届いた
+  /// (まだ取り込んでいない)競合版まで消してしまうため。
+  private func resolveConflicts(ids: [String], url: URL, reply: @escaping (Any?) -> Void) {
+    let versions = ids.compactMap { pendingConflicts.removeValue(forKey: $0) }
+    guard !versions.isEmpty else {
+      reply(nil)
+      return
+    }
+
+    var coordinatorError: NSError?
+    var removeError: Error?
+
+    NSFileCoordinator().coordinate(
+      writingItemAt: url, options: [], error: &coordinatorError
+    ) { _ in
+      for version in versions {
+        version.isResolved = true
+        do {
+          try version.remove()
+        } catch {
+          removeError = error
+        }
+      }
+    }
+
+    if let error = coordinatorError ?? (removeError as NSError?) {
+      reply(
+        FlutterError(
+          code: "resolve-failed", message: error.localizedDescription, details: nil))
+      return
+    }
+    reply(nil)
   }
 
   /// 端末のコピーがクラウドの最新版か。

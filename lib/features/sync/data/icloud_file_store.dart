@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 /// iCloud Drive のアプリコンテナに置いた同期ファイルを読み書きする実装。
 ///
 /// 実処理はネイティブ側(shared/IcloudFileStorePlugin.swift)。ファイル名と
-/// コンテナの解決はネイティブが持ち、Dart はチャンネル越しに 3 操作を呼ぶだけ。
+/// コンテナの解決はネイティブが持ち、Dart はチャンネル越しに操作を呼ぶだけ。
 class IcloudFileStore implements CloudFileStore {
   const IcloudFileStore({this.channel = _defaultChannel});
 
@@ -30,6 +30,30 @@ class IcloudFileStore implements CloudFileStore {
     if (millis == null) return null;
     return DateTime.fromMillisecondsSinceEpoch(millis);
   }
+
+  @override
+  Future<List<CloudConflict>> readConflicts() async {
+    final items = await _invoke(
+      () => channel.invokeListMethod<Map<Object?, Object?>>('readConflicts'),
+    );
+    return [
+      for (final item in items ?? const <Map<Object?, Object?>>[])
+        CloudConflict(
+          id: item['id']! as String,
+          contents: item['contents']! as String,
+          // ネイティブは epoch ミリ秒で返す(lastModified と同じ)。
+          modifiedAt: switch (item['modifiedAt']) {
+            final int millis => DateTime.fromMillisecondsSinceEpoch(millis),
+            _ => null,
+          },
+        ),
+    ];
+  }
+
+  @override
+  Future<void> resolveConflicts(List<String> ids) => _invoke(
+    () => channel.invokeMethod<void>('resolveConflicts', {'ids': ids}),
+  );
 
   /// PlatformException を UI に出せる例外へ翻訳する。
   /// ネイティブ側が日本語メッセージを載せているので、それをそのまま使う。

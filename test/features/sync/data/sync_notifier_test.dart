@@ -30,6 +30,12 @@ class _CountingStore implements CloudFileStore {
   Future<DateTime?> lastModified() async => null;
 
   @override
+  Future<List<CloudConflict>> readConflicts() async => const [];
+
+  @override
+  Future<void> resolveConflicts(List<String> ids) async {}
+
+  @override
   Future<void> write(String value) async {
     if (failWith != null) throw failWith!;
     contents = value;
