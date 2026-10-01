@@ -26,6 +26,7 @@
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
+		45F4921DA89DED0A254AEA61 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E1DDD36E7BAA5A035B384DCF /* GoogleService-Info.plist */; };
 		E1C10UD0000000000000A001 /* IcloudFileStorePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */; };
 		E1C10UD0000000000000A007 /* PronunciationWindowPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A008 /* PronunciationWindowPlugin.swift */; };
 		E1C10UD0000000000000A009 /* WindowControlPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000A00A /* WindowControlPlugin.swift */; };
@@ -77,6 +78,7 @@
 		E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IcloudFileStorePlugin.swift; path = "../../shared/IcloudFileStorePlugin.swift"; sourceTree = "<group>"; };
 		E1C10UD0000000000000A008 /* PronunciationWindowPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationWindowPlugin.swift; sourceTree = "<group>"; };
 		E1C10UD0000000000000A00A /* WindowControlPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowControlPlugin.swift; sourceTree = "<group>"; };
+		E1DDD36E7BAA5A035B384DCF /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E1C10UD0000000000000A004 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = AppIcon.icon; path = "../../shared/AppIcon.icon"; sourceTree = "<group>"; };
 		E1C10UD0000000000000A006 /* AppIcon-dev.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = "AppIcon-dev.icon"; path = "../../shared/AppIcon-dev.icon"; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				331C80D6294CF71000263BE5 /* RunnerTests */,
 				33CC10EE2044A3C60003C045 /* Products */,
 				D73912EC22F37F3D000D13A0 /* Frameworks */,
+				E1DDD36E7BAA5A035B384DCF /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -308,6 +311,7 @@
 				E1C10UD0000000000000A003 /* AppIcon.icon in Resources */,
 				E1C10UD0000000000000A005 /* AppIcon-dev.icon in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+				45F4921DA89DED0A254AEA61 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
