@@ -54,27 +54,49 @@ class SyncService {
   /// 手順:
   ///   1. クラウドの更新日時を控える
   ///   2. クラウドの JSON を読み、ローカルへマージする
-  ///   3. マージ後のローカル全体を書き戻す
-  ///   4. 書き戻す直前に 1 の更新日時が変わっていたら、他端末が書いたので
+  ///   3. 競合版も読み、同じくマージする
+  ///   4. マージ後のローカル全体を書き戻す
+  ///   5. 書き戻す直前に 1 の更新日時が変わっていたら、他端末が書いたので
   ///      その内容を取りこぼさないよう最初からやり直す
+  ///   6. 書き戻せたら、3 で取り込んだ競合版を片付ける
   Future<SyncOutcome> sync() async {
     for (var attempt = 0; ; attempt++) {
       final before = await store.lastModified();
 
-      final remote = await store.read();
-      var outcome = const SyncOutcome.none();
-      if (remote != null && remote.trim().isNotEmpty) {
-        // 同期ではこちらの削除ログを尊重する(まだ削除を知らないクラウドの
-        // スナップショットから、消したはずの単語を復活させないため)。
+      var added = 0;
+      var updated = 0;
+      var deleted = 0;
+      // 同期ではこちらの削除ログを尊重する(まだ削除を知らないクラウドの
+      // スナップショットから、消したはずの単語を復活させないため)。
+      Future<void> merge(String json) async {
         final result = await exportService.importJson(
-          remote,
+          json,
           respectLocalDeletions: true,
         );
-        outcome = SyncOutcome(
-          added: result.added,
-          updated: result.updated,
-          deleted: result.deleted,
-        );
+        added += result.added;
+        updated += result.updated;
+        deleted += result.deleted;
+      }
+
+      final remote = await store.read();
+      if (remote != null && remote.trim().isNotEmpty) await merge(remote);
+
+      // 競合版には、古い内容での上書きで現行版から外れた他端末の変更が残っている。
+      // 取り込みは updatedAt が新しいときだけ上書きするので、古い版を
+      // 取り込んでも巻き戻らない。
+      final conflicts = await store.readConflicts();
+      final conflictCutoff = DateTime.now().subtract(_deletionRetention);
+      for (final conflict in conflicts) {
+        // 削除ログの保持期間より古い版は、掃除済みの削除を知らないまま
+        // 単語を復活させうるので、取り込まずに片付けだけ行う。
+        final modifiedAt = conflict.modifiedAt;
+        if (modifiedAt != null && modifiedAt.isBefore(conflictCutoff)) continue;
+        if (conflict.contents.trim().isEmpty) continue;
+        try {
+          await merge(conflict.contents);
+        } on WordExportFormatException {
+          // 壊れた版は取り込みようがない。残すと毎回失敗するので片付けだけ行う。
+        }
       }
 
       // 古い削除ログを掃除してから書き出す(スナップショットに載せないため)。
@@ -87,7 +109,12 @@ class SyncService {
       if (attempt < _maxRetries && _changedSince(before, now)) continue;
 
       await store.write(await exportService.exportJson());
-      return outcome;
+      // 片付けるのは、取り込んだ内容を書き戻せた後に限る。先に消すと、書き戻しに
+      // 失敗したときにその変更がどこにも残らなくなる。
+      if (conflicts.isNotEmpty) {
+        await store.resolveConflicts([for (final c in conflicts) c.id]);
+      }
+      return SyncOutcome(added: added, updated: updated, deleted: deleted);
     }
   }
 

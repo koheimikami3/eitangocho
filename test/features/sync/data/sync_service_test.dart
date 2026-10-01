@@ -20,8 +20,21 @@ class InMemoryCloudFileStore implements CloudFileStore {
 
   int writeCount = 0;
 
+  /// 未解決の競合版。resolveConflicts で消えた id は [resolvedIds] に残る。
+  List<CloudConflict> conflicts = [];
+  final resolvedIds = <String>[];
+
+  /// readConflicts の直後に差し込む処理。取り込み後に新しい競合版が届く状況を
+  /// 作るのに使う(1 度だけ発火する)。
+  Future<void> Function()? onAfterReadConflicts;
+
+  /// read / write で投げる失敗(最新化を待ちきれず見送った場合などの再現用)。
+  Exception? readError;
+  Exception? writeError;
+
   @override
   Future<String?> read() async {
+    if (readError != null) throw readError!;
     final value = contents;
     final hook = onAfterRead;
     onAfterRead = null;
@@ -33,7 +46,26 @@ class InMemoryCloudFileStore implements CloudFileStore {
   Future<DateTime?> lastModified() async => modifiedAt;
 
   @override
+  Future<List<CloudConflict>> readConflicts() async {
+    final value = [...conflicts];
+    final hook = onAfterReadConflicts;
+    onAfterReadConflicts = null;
+    await hook?.call();
+    return value;
+  }
+
+  @override
+  Future<void> resolveConflicts(List<String> ids) async {
+    conflicts = [
+      for (final c in conflicts)
+        if (!ids.contains(c.id)) c,
+    ];
+    resolvedIds.addAll(ids);
+  }
+
+  @override
   Future<void> write(String value) async {
+    if (writeError != null) throw writeError!;
     contents = value;
     // 実際のファイルシステムと同じく、書くたびに更新日時が進む。
     modifiedAt = (modifiedAt ?? DateTime.utc(2026)).add(
@@ -260,5 +292,142 @@ void main() {
 
     expect(cloudDeletions(), isEmpty);
     expect(await db.wordDao.getDeletions(), isEmpty);
+  });
+
+  test('最新のデータを取得できずに読み取りを見送ったら、書き戻さない', () async {
+    await addWord('apple', 'りんご');
+    store.readError = const CloudNotReadyException('同期を見送りました。');
+
+    await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
+
+    expect(store.writeCount, 0);
+    expect(store.contents, isNull);
+  });
+
+  group('競合版', () {
+    /// 単語 1 つだけを持つ同期ファイルの JSON。
+    String snapshotWith(String word, String japanese, {DateTime? updatedAt}) =>
+        jsonEncode({
+          'version': 2,
+          'exportedAt': DateTime.now().toUtc().toIso8601String(),
+          'words': [
+            {
+              'word': word,
+              'japanese': japanese,
+              if (updatedAt != null)
+                'updatedAt': updatedAt.toUtc().toIso8601String(),
+            },
+          ],
+        });
+
+    CloudConflict conflict(
+      String id,
+      String contents, {
+      DateTime? modifiedAt,
+    }) => CloudConflict(
+      id: id,
+      contents: contents,
+      modifiedAt: modifiedAt ?? DateTime.now(),
+    );
+
+    test('競合版にだけある単語と、新しい編集が取り込まれる', () async {
+      await addWord('apple', 'ローカルの訳');
+      final local = (await db.wordDao.getAll()).single;
+      store.conflicts = [
+        conflict('a', snapshotWith('banana', 'バナナ')),
+        conflict(
+          'b',
+          snapshotWith(
+            'apple',
+            '競合版の訳',
+            updatedAt: local.updatedAt.add(const Duration(days: 1)),
+          ),
+        ),
+      ];
+
+      final outcome = await service.sync();
+
+      expect(outcome.added, 1);
+      expect(outcome.updated, 1);
+      final words = {
+        for (final w in await db.wordDao.getAll()) w.word: w.japanese,
+      };
+      expect(words, {'apple': '競合版の訳', 'banana': 'バナナ'});
+      // 取り込んだ内容は書き戻したスナップショットにも載る。
+      expect(cloudWords(), containsAll(<String>['apple', 'banana']));
+    });
+
+    test('競合版の古い編集では巻き戻らない', () async {
+      await addWord('apple', 'ローカルの訳');
+      final local = (await db.wordDao.getAll()).single;
+      store.conflicts = [
+        conflict(
+          'a',
+          snapshotWith(
+            'apple',
+            '古い訳',
+            updatedAt: local.updatedAt.subtract(const Duration(days: 1)),
+          ),
+        ),
+      ];
+
+      await service.sync();
+
+      expect((await db.wordDao.getAll()).single.japanese, 'ローカルの訳');
+    });
+
+    test('書き戻し後に、読み取った競合版だけが片付けられる', () async {
+      store.conflicts = [conflict('a', snapshotWith('banana', 'バナナ'))];
+      // 取り込みの後に、別の競合版が届いたことにする。
+      store.onAfterReadConflicts = () async {
+        store.conflicts = [
+          ...store.conflicts,
+          conflict('late', snapshotWith('cherry', 'さくらんぼ')),
+        ];
+      };
+
+      await service.sync();
+
+      expect(store.resolvedIds, ['a']);
+      expect(store.conflicts.map((c) => c.id), ['late']);
+    });
+
+    test('書き戻しに失敗したら競合版は片付けない', () async {
+      store.conflicts = [conflict('a', snapshotWith('banana', 'バナナ'))];
+      store.writeError = const CloudNotReadyException('同期を見送りました。');
+
+      await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
+
+      expect(store.resolvedIds, isEmpty);
+      expect(store.conflicts, hasLength(1));
+    });
+
+    test('削除ログの保持期間より古い競合版は、取り込まずに片付ける', () async {
+      store.conflicts = [
+        conflict(
+          'old',
+          snapshotWith('banana', 'バナナ'),
+          modifiedAt: DateTime.now().subtract(const Duration(days: 181)),
+        ),
+      ];
+
+      final outcome = await service.sync();
+
+      expect(outcome.added, 0);
+      expect(await db.wordDao.getAll(), isEmpty);
+      expect(store.resolvedIds, ['old']);
+    });
+
+    test('壊れた競合版は取り込まずに片付け、同期は続ける', () async {
+      store.conflicts = [
+        conflict('broken', '{not json'),
+        conflict('ok', snapshotWith('banana', 'バナナ')),
+      ];
+
+      await service.sync();
+
+      expect((await db.wordDao.getAll()).single.word, 'banana');
+      expect(store.resolvedIds, containsAll(<String>['broken', 'ok']));
+    });
   });
 }

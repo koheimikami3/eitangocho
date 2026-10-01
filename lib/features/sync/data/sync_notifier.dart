@@ -15,12 +15,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// [SyncService] が行い、ここは「いつ走らせるか」と結果の保持だけを担う。
 ///
 /// 走らせる契機は 4 つ: 起動時 / フォアグラウンド復帰時 / ローカル変更後
-/// (デバウンス)/ 設定画面の「今すぐ同期」。
+/// (デバウンス)/ 設定画面の「今すぐ同期」。最新のデータを取得できずに見送ったときは、
+/// 加えて 1 回だけ再試行する。
 class SyncNotifier extends Notifier<SyncState> {
-  /// [debounce] と [resumeMinInterval] は既定値が本番値で、テストからだけ縮める。
+  /// [debounce] / [resumeMinInterval] / [notReadyRetryDelay] は既定値が本番値で、
+  /// テストからだけ縮める。
   SyncNotifier({
     this.debounce = const Duration(seconds: 5),
     this.resumeMinInterval = const Duration(seconds: 60),
+    this.notReadyRetryDelay = const Duration(seconds: 30),
   });
 
   static const _keyEnabled = 'syncEnabled';
@@ -35,9 +38,17 @@ class SyncNotifier extends Notifier<SyncState> {
   /// フォーカスを移すだけで iCloud への書き戻しが走ってしまう。
   final Duration resumeMinInterval;
 
+  /// 最新のデータを取得できずに同期を見送ってから、再試行するまでの待ち時間。
+  /// 見送ったままだと、この端末の変更が次の契機(復帰など)まで iCloud に上がらない。
+  final Duration notReadyRetryDelay;
+
   final _prefs = SharedPreferencesAsync();
 
   Timer? _debounceTimer;
+  Timer? _retryTimer;
+
+  /// 再試行として実行中の同期か。再試行も見送りになったとき、重ねて予約しないために持つ。
+  bool _retrying = false;
   StreamSubscription<Set<TableUpdate>>? _localChanges;
 
   late final Future<void> _restored;
@@ -93,6 +104,7 @@ class SyncNotifier extends Notifier<SyncState> {
   void _unwatchLocalChanges() {
     _debounceTimer?.cancel();
     _debounceTimer = null;
+    _cancelRetry();
     _localChanges?.cancel();
     _localChanges = null;
   }
@@ -109,6 +121,28 @@ class SyncNotifier extends Notifier<SyncState> {
     if (state.syncing) return;
     _debounceTimer?.cancel();
     _debounceTimer = Timer(debounce, syncNow);
+  }
+
+  /// 見送った同期の再試行を 1 回だけ予約する。
+  ///
+  /// 再試行も見送りになったら重ねて予約しない。取得が長引いているときに
+  /// 再試行を回し続けないためで、以後は通常の契機に任せる。
+  void _scheduleRetry() {
+    if (_retrying || _retryTimer != null) return;
+    _retryTimer = Timer(notReadyRetryDelay, () async {
+      _retryTimer = null;
+      _retrying = true;
+      try {
+        await syncNow();
+      } finally {
+        _retrying = false;
+      }
+    });
+  }
+
+  void _cancelRetry() {
+    _retryTimer?.cancel();
+    _retryTimer = null;
   }
 
   /// フォアグラウンドに戻ったとき。前回同期から時間が経っていれば同期する。
@@ -162,7 +196,13 @@ class SyncNotifier extends Notifier<SyncState> {
       final now = DateTime.now();
       await _prefs.setInt(_keyLastSyncedAt, now.millisecondsSinceEpoch);
       if (!ref.mounted) return;
+      // 他の契機で同期できたので、予約済みの再試行は要らない。
+      _cancelRetry();
       state = state.copyWith(syncing: false, lastSyncedAt: now);
+    } on CloudNotReadyException catch (e) {
+      if (!ref.mounted) return;
+      state = state.copyWith(syncing: false, errorMessage: e.message);
+      _scheduleRetry();
     } on CloudUnavailableException catch (e) {
       if (!ref.mounted) return;
       state = state.copyWith(syncing: false, errorMessage: e.message);
