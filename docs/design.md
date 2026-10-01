@@ -129,6 +129,16 @@
   構造・位置・ガラス設定を本番と確実に揃えるため、Icon Composer で作り直さず
   `icon.json` の色指定だけを差し替える
 
+## 計測
+
+- Firebase Analytics(プロジェクト `eitangocho-8d6dd`)で、自動収集イベントだけを取る。
+  **Firebase に登録するのは本番の Bundle ID だけ**で、debug は初期化しない。
+  dev 用の Firebase プロジェクトは持たない(本番の計測に開発中の起動を混ぜないため)
+- iOS と macOS は Bundle ID が同じなので、Firebase 上は 1 つの Apple アプリを共有する
+- `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする
+- `flutterfire configure` は pbxproj を丸ごと書き直して並び順を崩す。再実行したら、
+  plist の追加分だけを残して他の差分は戻す
+
 ## 広告(iOS のみ)
 
 - **広告・ATT・課金・レビューの失敗でアプリを止めない**。例外は握りつぶし、
