@@ -22,6 +22,18 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.3.0 (build 14)
+
+iOS・macOS 共通。
+
+```
+軽微な改善を行いました。
+```
+
+中身は Firebase Analytics の導入(アクティブユーザー数の計測)だけで、利用者から見える変化は無い。
+
+---
+
 ## 2.2.1 (build 13)
 
 iOS・macOS 共通。
