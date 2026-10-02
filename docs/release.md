@@ -36,16 +36,21 @@ flutter test -r failures-only
 
 ## Archive 前の手順
 
-出すプラットフォームの分だけ実行する:
+出すプラットフォームの分だけ、**macOS → iOS の順で**実行する:
 
 ```
-flutter build ios --config-only
 flutter build macos --config-only
+flutter build ios --config-only
 ```
+
+macOS の実行は、iOS 側の生成パッケージ(`FlutterGeneratedPluginSwiftPackage`)の
+最低 OS を Flutter の初期値 13.0 に戻す。Firebase は iOS 15.0 を要求するため、
+iOS を後に実行して 15.0 に上げ直す(Flutter の既知の不具合 #162196)。
 
 macOS は `tool/verify_flutter_version.sh` がビルド時に xcconfig のずれを検知して止める
 (書き直しても同じビルドには反映されないため、直さずに止める)。止まったら
-`flutter build macos --config-only` を実行してから Archive し直す。
+`flutter build macos --config-only` を実行してから Archive し直す。iOS をまだ
+Archive していなければ、続けて `flutter build ios --config-only` も実行する。
 
 ## タグ本文の補足
 
