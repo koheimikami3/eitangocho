@@ -201,6 +201,100 @@ void main() {
 
   // 削除ログ(version 2)。既存の他テストは version 1 のファイルを使っており、
   // 後方互換(v1 を deletions 無しとして取り込めること)もそこで担保している。
+  group('lastReviewedAt', () {
+    // drift の DateTime は秒精度で保存されるため、比較に使う日時は秒単位にする。
+    final older = DateTime(2026, 9, 1, 10);
+    final newer = DateTime(2026, 9, 2, 10);
+
+    /// apple を登録し、lastReviewedAt を [reviewedAt] にした既存行を返す。
+    Future<Word> seedApple(DateTime? reviewedAt) async {
+      final id = await db.wordDao.insertWord(
+        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      );
+      await (db.update(db.words)..where((t) => t.id.equals(id))).write(
+        WordsCompanion(lastReviewedAt: Value(reviewedAt)),
+      );
+      return (await db.wordDao.getAll()).single;
+    }
+
+    test('内容が古いファイルでも、新しい lastReviewedAt だけは取り込む', () async {
+      final existing = await seedApple(older);
+
+      final result = await service.importJson(
+        _buildExportJson([
+          _entryJson(
+            word: 'apple',
+            japanese: 'リンゴ',
+            updatedAt: existing.updatedAt.subtract(const Duration(days: 1)),
+            lastReviewedAt: newer,
+          ),
+        ]),
+      );
+
+      // 内容は変えていないので「変更なし」に数える。
+      expect(result.updated, 0);
+      expect(result.unchanged, 1);
+      final after = (await db.wordDao.getAll()).single;
+      expect(after.lastReviewedAt, newer);
+      expect(after.japanese, 'りんご');
+      expect(after.updatedAt, existing.updatedAt);
+    });
+
+    test('未回答の単語にもファイル側の lastReviewedAt を取り込む', () async {
+      final existing = await seedApple(null);
+
+      await service.importJson(
+        _buildExportJson([
+          _entryJson(
+            word: 'apple',
+            japanese: 'りんご',
+            updatedAt: existing.updatedAt,
+            lastReviewedAt: older,
+          ),
+        ]),
+      );
+
+      expect((await db.wordDao.getAll()).single.lastReviewedAt, older);
+    });
+
+    test('ファイル側の lastReviewedAt が古ければ書き換えない', () async {
+      final existing = await seedApple(newer);
+
+      await service.importJson(
+        _buildExportJson([
+          _entryJson(
+            word: 'apple',
+            japanese: 'りんご',
+            updatedAt: existing.updatedAt.subtract(const Duration(days: 1)),
+            lastReviewedAt: older,
+          ),
+        ]),
+      );
+
+      expect((await db.wordDao.getAll()).single.lastReviewedAt, newer);
+    });
+
+    test('内容がファイル側の勝ちでも、lastReviewedAt は古くしない', () async {
+      final existing = await seedApple(newer);
+
+      final result = await service.importJson(
+        _buildExportJson([
+          _entryJson(
+            word: 'apple',
+            japanese: 'リンゴ',
+            updatedAt: existing.updatedAt.add(const Duration(days: 1)),
+            lastReviewedAt: older,
+          ),
+        ]),
+      );
+
+      expect(result.updated, 1);
+      final after = (await db.wordDao.getAll()).single;
+      expect(after.japanese, 'リンゴ');
+      expect(after.lastReviewedAt, newer);
+    });
+  });
+
   group('削除ログ', () {
     Future<int> insertWord(String word, {required DateTime updatedAt}) async {
       final id = await db.wordDao.insertWord(
@@ -371,11 +465,14 @@ Map<String, dynamic> _entryJson({
   required String word,
   required String japanese,
   required DateTime updatedAt,
+  DateTime? lastReviewedAt,
 }) {
   return {
     'word': word,
     'japanese': japanese,
     'updatedAt': updatedAt.toUtc().toIso8601String(),
     'createdAt': updatedAt.toUtc().toIso8601String(),
+    if (lastReviewedAt != null)
+      'lastReviewedAt': lastReviewedAt.toUtc().toIso8601String(),
   };
 }

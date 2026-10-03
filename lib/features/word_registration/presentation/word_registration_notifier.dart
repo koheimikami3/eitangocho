@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
@@ -138,6 +141,12 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
             audioUrl: Value(state.fetched?.audioUrl ?? ''),
           ),
         );
+    // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。
+    // macOS / iOS で共有するこの Notifier を呼び出し口にする。true を返すと
+    // 呼び出し側がシートを閉じる(macOS は学習中リストへ切り替える)ので、
+    // 依頼は ReviewConfig.promptDelay だけ待ってその後に出る。
+    // 依頼の成否は登録に関係しないので待たない。
+    unawaited(ref.read(reviewPrompterProvider).onWordRegistered());
     return true;
   }
 }

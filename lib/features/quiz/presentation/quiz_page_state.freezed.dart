@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$QuizPageState {
 
- QuizPhase get phase;/// セッション開始時に学習済み単語をシャッフルしたスナップショット。
+ QuizPhase get phase;/// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)の
+/// スナップショット。
 /// セッション中の learned 変更・編集・削除は進行に影響させない。
  List<Word> get questions; int get index; bool get revealed; int get okCount; List<Word> get forgotWords;
 /// Create a copy of QuizPageState
@@ -217,10 +218,12 @@ class _QuizPageState implements QuizPageState {
   
 
 @override@JsonKey() final  QuizPhase phase;
-/// セッション開始時に学習済み単語をシャッフルしたスナップショット。
+/// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)の
+/// スナップショット。
 /// セッション中の learned 変更・編集・削除は進行に影響させない。
  final  List<Word> _questions;
-/// セッション開始時に学習済み単語をシャッフルしたスナップショット。
+/// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)の
+/// スナップショット。
 /// セッション中の learned 変更・編集・削除は進行に影響させない。
 @override@JsonKey() List<Word> get questions {
   if (_questions is EqualUnmodifiableListView) return _questions;

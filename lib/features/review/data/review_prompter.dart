@@ -8,8 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// レビュー依頼を「いつ出すか」を決める。
 ///
-/// 出すのはクイズを最後まで終えた直後だけ([onQuizCompleted])。条件は
-/// [ReviewConfig] にまとめてある。
+/// 出すのはクイズを最後まで終えた直後([onQuizCompleted])と、登録単語数が
+/// 節目に達した保存直後([onWordRegistered])だけ。条件は [ReviewConfig] に
+/// まとめてある。
 ///
 /// **レビューの失敗でアプリを止めない**(辞書・広告と同じ方針)。判定も呼び出しも
 /// 例外を握ってログだけ出す。レビューが出ないだけで単語帳としては使えるため。
@@ -27,7 +28,7 @@ class ReviewPrompter {
   final ReviewClient client;
   final WordDao wordDao;
 
-  /// 結果画面が出てから依頼を出すまでの待ち時間。
+  /// 契機の画面遷移から依頼を出すまでの待ち時間。
   final Duration promptDelay;
 
   /// 遅延生成にするのは、`SharedPreferencesAsync()` の生成自体がプラグイン
@@ -55,23 +56,24 @@ class ReviewPrompter {
         return;
       }
 
-      // 結果画面の描画とアニメーションが落ち着いてからシートを重ねる。
-      await Future<void>.delayed(promptDelay);
+      await _request('累計クイズ完了 $completions 回');
+    } on Object catch (error) {
+      reviewLog('レビュー依頼に失敗しました: $error');
+    }
+  }
 
-      if (!await client.isAvailable()) {
-        reviewLog('この端末ではレビュー依頼を出せません');
-        return;
-      }
+  /// 単語登録の保存直後に呼ぶ。登録単語数がちょうど節目
+  /// ([ReviewConfig.wordCountMilestones])になったときだけ依頼を出す。
+  ///
+  /// 「ちょうど」で見るので、節目を一度越えた後は削除して登録し直さない限り
+  /// 再び当たらない(当たっても [ReviewConfig.requestInterval] が止める)。
+  Future<void> onWordRegistered() async {
+    try {
+      final wordCount = await wordDao.countWords();
+      if (!ReviewConfig.wordCountMilestones.contains(wordCount)) return;
+      if (await _isWithinInterval()) return;
 
-      await client.requestReview();
-      // **表示されたかは OS が教えてくれない**ため、呼べた時点で「依頼した」と
-      // 記録する(クォータで出なかった回も 1 回と数える)。ここを表示の確認まで
-      // 待つ手段は無い。
-      await _prefs.setInt(
-        _keyLastRequestedAt,
-        DateTime.now().millisecondsSinceEpoch,
-      );
-      reviewLog('レビュー依頼を出しました(累計クイズ完了 $completions 回)');
+      await _request('登録単語 $wordCount 語');
     } on Object catch (error) {
       reviewLog('レビュー依頼に失敗しました: $error');
     }
@@ -125,17 +127,44 @@ class ReviewPrompter {
       return false;
     }
 
+    return !await _isWithinInterval();
+  }
+
+  /// 前回の依頼から [ReviewConfig.requestInterval] が経っていないか。
+  /// 経っていなければログを残す。
+  Future<bool> _isWithinInterval() async {
     final lastMillis = await _prefs.getInt(_keyLastRequestedAt);
-    if (lastMillis != null) {
-      final elapsed = DateTime.now().difference(
-        DateTime.fromMillisecondsSinceEpoch(lastMillis),
-      );
-      if (elapsed < ReviewConfig.requestInterval) {
-        reviewLog('前回の依頼から ${elapsed.inDays} 日しか経っていないため見送ります');
-        return false;
-      }
+    if (lastMillis == null) return false;
+    final elapsed = DateTime.now().difference(
+      DateTime.fromMillisecondsSinceEpoch(lastMillis),
+    );
+    if (elapsed < ReviewConfig.requestInterval) {
+      reviewLog('前回の依頼から ${elapsed.inDays} 日しか経っていないため見送ります');
+      return true;
     }
-    return true;
+    return false;
+  }
+
+  /// 待ち時間を置いてから依頼を出し、依頼した日時を記録する。
+  /// [reason] はログに出す契機の説明。例外は呼び出し側で握る。
+  Future<void> _request(String reason) async {
+    // 契機の画面遷移とアニメーションが落ち着いてからシートを重ねる。
+    await Future<void>.delayed(promptDelay);
+
+    if (!await client.isAvailable()) {
+      reviewLog('この端末ではレビュー依頼を出せません');
+      return;
+    }
+
+    await client.requestReview();
+    // **表示されたかは OS が教えてくれない**ため、呼べた時点で「依頼した」と
+    // 記録する(クォータで出なかった回も 1 回と数える)。ここを表示の確認まで
+    // 待つ手段は無い。
+    await _prefs.setInt(
+      _keyLastRequestedAt,
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    reviewLog('レビュー依頼を出しました($reason)');
   }
 }
 

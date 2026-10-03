@@ -40,10 +40,11 @@ void main() {
   }
 
   /// 前回の依頼日時を直接書き込む(ReviewPrompter のキーと同じもの)。
-  Future<void> setLastRequested(Duration ago) => SharedPreferencesAsync().setInt(
-    'reviewLastRequestedAt',
-    DateTime.now().subtract(ago).millisecondsSinceEpoch,
-  );
+  Future<void> setLastRequested(Duration ago) =>
+      SharedPreferencesAsync().setInt(
+        'reviewLastRequestedAt',
+        DateTime.now().subtract(ago).millisecondsSinceEpoch,
+      );
 
   /// 成績・出題数の条件を満たすセッションを [times] 回終える。
   Future<void> completeGoodSessions(ReviewPrompter prompter, int times) async {
@@ -160,5 +161,58 @@ void main() {
     await prompter.openStoreListing();
 
     expect(client.openStoreListingCount, 1);
+  });
+
+  group('登録単語数の節目', () {
+    /// 1 語登録して onWordRegistered を呼ぶ(単語登録の保存と同じ順序)。
+    Future<void> register(ReviewPrompter prompter, String word) async {
+      await db.wordDao.insertWord(
+        WordsCompanion(word: Value(word), japanese: const Value('訳')),
+      );
+      await prompter.onWordRegistered();
+    }
+
+    test('50 語目の登録で依頼し、前後の語数では出さない', () async {
+      await seedWords(48);
+      final prompter = createPrompter();
+
+      await register(prompter, 'w49');
+      expect(client.requestCount, 0, reason: '49 語目は節目ではない');
+
+      await register(prompter, 'w50');
+      expect(client.requestCount, 1);
+
+      await register(prompter, 'w51');
+      expect(client.requestCount, 1);
+    });
+
+    test('100 語目の登録でも依頼する', () async {
+      await seedWords(99);
+      final prompter = createPrompter();
+
+      await register(prompter, 'w100');
+
+      expect(client.requestCount, 1);
+    });
+
+    test('前回の依頼から 120 日経っていなければ節目でも依頼しない', () async {
+      await seedWords(49);
+      await setLastRequested(const Duration(days: 30));
+      final prompter = createPrompter();
+
+      await register(prompter, 'w50');
+
+      expect(client.requestCount, 0);
+    });
+
+    test('節目での依頼も前回の依頼として記録し、クイズ側の依頼を間隔で止める', () async {
+      await seedWords(49);
+      final prompter = createPrompter();
+
+      await register(prompter, 'w50');
+      await completeGoodSessions(prompter, 3);
+
+      expect(client.requestCount, 1);
+    });
   });
 }

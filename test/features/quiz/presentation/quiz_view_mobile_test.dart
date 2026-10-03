@@ -122,7 +122,7 @@ void main() {
       expect(find.text('復習完了'), findsOneWidget);
       expect(find.text('覚えている 0語 / 忘れていた 1語'), findsOneWidget);
       expect(find.text('忘れていた単語(学習中リストに戻りました)'), findsOneWidget);
-      expect(find.text('もう一度'), findsOneWidget);
+      expect(find.text('続ける'), findsOneWidget);
     });
   });
 }

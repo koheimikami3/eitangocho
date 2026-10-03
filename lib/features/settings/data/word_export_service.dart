@@ -88,6 +88,7 @@ class WordExportService {
   /// - 一致なし: 新規追加(ファイルの createdAt/updatedAt を維持)
   /// - 一致あり: ファイル側 updatedAt が新しいときだけ上書き(word 表記・
   ///   createdAt は DB 側を維持)。それ以外は変更なし扱い
+  /// - lastReviewedAt だけは単語の勝敗と切り離し、ファイルと DB の新しい方を採る
   /// - word/japanese の欠落・型不正・空文字はスキップして続行する
   /// - ファイル内に同一単語が複数あれば、updatedAt が新しい方だけを採用する
   /// - 削除ログ(v2 の deletions)は、同じキーの単語がローカルにあり
@@ -146,6 +147,8 @@ class WordExportService {
 
     final inserts = <WordsCompanion>[];
     final updates = <(int, WordsCompanion)>[];
+    // lastReviewedAt だけを進める更新。内容の更新ではないので updated に数えない。
+    final reviewedAtUpdates = <(int, WordsCompanion)>[];
     // ファイル内重複を先に解決するための、キーごとの採用候補。
     final plannedByKey = <String, _PlannedEntry>{};
     var skipped = 0;
@@ -209,8 +212,30 @@ class WordExportService {
         inserts.add(_toInsertCompanion(plan));
       } else if (plan.updatedAt.isAfter(existing.updatedAt)) {
         // word・createdAt は書かない(DB 側の表記・作成日時を維持する)。
-        updates.add((existing.id, _toUpdateCompanion(plan)));
+        updates.add((
+          existing.id,
+          _toUpdateCompanion(
+            plan,
+            lastReviewedAt: _laterOf(
+              plan.entry.lastReviewedAt,
+              existing.lastReviewedAt,
+            ),
+          ),
+        ));
       } else {
+        // 内容はこちらが新しくても、クイズの回答はファイル側が新しいことがある。
+        // 回答は updatedAt を動かさないため、lastReviewedAt だけは単語の勝敗と
+        // 切り離して新しい方を採る(端末ごとに出題の一巡がずれないように)。
+        // 内容は変えていないので、件数は「変更なし」に数える。
+        final fileReviewedAt = plan.entry.lastReviewedAt;
+        if (fileReviewedAt != null &&
+            (existing.lastReviewedAt == null ||
+                fileReviewedAt.isAfter(existing.lastReviewedAt!))) {
+          reviewedAtUpdates.add((
+            existing.id,
+            WordsCompanion(lastReviewedAt: Value(fileReviewedAt)),
+          ));
+        }
         unchanged++;
       }
     }
@@ -232,7 +257,7 @@ class WordExportService {
 
     await _db.wordDao.importWords(
       inserts: inserts,
-      updates: updates,
+      updates: [...updates, ...reviewedAtUpdates],
       deleteIds: deleteIds,
       // ローカルに単語が無い分も含め、ログはすべて取り込む
       // (この端末を経由して第 3 の端末へ削除を伝播させるため)。
@@ -326,7 +351,11 @@ class WordExportService {
 
   /// 既存レコードの更新用。word・createdAt は含めない
   /// (DB 側の表記・作成日時を維持するため)。
-  WordsCompanion _toUpdateCompanion(_PlannedEntry plan) {
+  /// [lastReviewedAt] はファイルと DB の新しい方(importJson で決める)。
+  WordsCompanion _toUpdateCompanion(
+    _PlannedEntry plan, {
+    required DateTime? lastReviewedAt,
+  }) {
     return WordsCompanion(
       japanese: Value(plan.japanese),
       ipa: Value(plan.entry.ipa),
@@ -335,7 +364,7 @@ class WordExportService {
       exampleJa: Value(plan.entry.exampleJa),
       audioUrl: Value(plan.entry.audioUrl),
       isLearned: Value(plan.entry.isLearned),
-      lastReviewedAt: Value(plan.entry.lastReviewedAt),
+      lastReviewedAt: Value(lastReviewedAt),
       correctCount: Value(plan.entry.correctCount),
       updatedAt: Value(plan.updatedAt),
     );

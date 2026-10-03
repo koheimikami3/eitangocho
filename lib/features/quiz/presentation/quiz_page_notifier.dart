@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/quiz/domain/quiz_question_selection.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -21,9 +22,11 @@ class QuizPageNotifier extends _$QuizPageNotifier {
   @override
   QuizPageState build() => const QuizPageState();
 
-  /// 学習済み単語をシャッフルして新セッションを開始する(常に新しい順序)。
+  /// 学習済み単語から 1 セッション分を選んで新セッションを開始する
+  /// (選び方は [selectQuizQuestions])。結果画面の「続ける」もここを呼ぶ。
+  /// 直前に答えた単語は日時が新しくなって後ろに回るため、次の単語が出る。
   void startQuiz() {
-    final questions = [...ref.read(learnedWordsProvider)]..shuffle();
+    final questions = selectQuizQuestions(ref.read(learnedWordsProvider));
     state = QuizPageState(
       phase: questions.isEmpty ? QuizPhase.empty : QuizPhase.active,
       questions: questions,

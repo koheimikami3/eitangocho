@@ -55,7 +55,7 @@ class MobileQuizResultView extends ConsumerWidget {
           children: [
             Expanded(
               child: MobileFilledButton(
-                label: 'もう一度',
+                label: '続ける',
                 onPressed: () =>
                     ref.read(quizPageProvider.notifier).startQuiz(),
               ),
