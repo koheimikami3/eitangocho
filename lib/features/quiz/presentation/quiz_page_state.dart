@@ -11,7 +11,8 @@ abstract class QuizPageState with _$QuizPageState {
   const factory QuizPageState({
     @Default(QuizPhase.empty) QuizPhase phase,
 
-    /// セッション開始時に学習済み単語をシャッフルしたスナップショット。
+    /// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)の
+    /// スナップショット。
     /// セッション中の learned 変更・編集・削除は進行に影響させない。
     @Default(<Word>[]) List<Word> questions,
     @Default(0) int index,

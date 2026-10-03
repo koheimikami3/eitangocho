@@ -62,7 +62,7 @@ final class QuizPageNotifierProvider
   }
 }
 
-String _$quizPageNotifierHash() => r'bd1e2e8ec108570f16074e8e68c17d8201fc3c4e';
+String _$quizPageNotifierHash() => r'a75ca956cf449fe7d08f251c66d61c7c0f7fc7fd';
 
 /// フラッシュクイズの進行を管理する。プロトタイプの startQuiz / quizAnswer /
 /// quizForgot のロジックに準拠する。

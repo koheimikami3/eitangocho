@@ -21,7 +21,8 @@ class Words extends Table {
   TextColumn get audioUrl => text().withDefault(const Constant(''))();
   BoolColumn get isLearned => boolean().withDefault(const Constant(false))();
 
-  /// クイズ実績(Phase 2 で更新開始。UI には出さない)
+  /// クイズ実績(Phase 2 で更新開始。UI には出さない)。
+  /// lastReviewedAt はクイズの出題順(selectQuizQuestions)に使う
   DateTimeColumn get lastReviewedAt => dateTime().nullable()();
   IntColumn get correctCount => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();

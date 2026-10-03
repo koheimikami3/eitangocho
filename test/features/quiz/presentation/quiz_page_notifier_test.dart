@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/quiz/domain/quiz_question_selection.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -51,14 +52,14 @@ void main() {
     return container;
   }
 
-  test('startQuiz は学習済み全件をシャッフルして出題する', () async {
-    final container = await setupLearned(3);
+  test('startQuiz は学習済みから出題数分を選んで出題する', () async {
+    final container = await setupLearned(quizQuestionCount + 1);
 
     container.read(quizPageProvider.notifier).startQuiz();
 
     final state = container.read(quizPageProvider);
     expect(state.phase, QuizPhase.active);
-    expect(state.questions, hasLength(3));
+    expect(state.questions, hasLength(quizQuestionCount));
     expect(state.index, 0);
     expect(state.revealed, isFalse);
   });

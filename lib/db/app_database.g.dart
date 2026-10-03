@@ -361,7 +361,8 @@ class Word extends DataClass implements Insertable<Word> {
   final String audioUrl;
   final bool isLearned;
 
-  /// クイズ実績(Phase 2 で更新開始。UI には出さない)
+  /// クイズ実績(Phase 2 で更新開始。UI には出さない)。
+  /// lastReviewedAt はクイズの出題順(selectQuizQuestions)に使う
   final DateTime? lastReviewedAt;
   final int correctCount;
   final DateTime createdAt;

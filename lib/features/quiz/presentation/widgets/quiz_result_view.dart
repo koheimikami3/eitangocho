@@ -50,7 +50,7 @@ class QuizResultView extends ConsumerWidget {
           children: [
             Expanded(
               child: AppFilledButton(
-                label: 'もう一度',
+                label: '続ける',
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: () =>
