@@ -111,9 +111,10 @@ class SyncNotifier extends Notifier<SyncState> {
 
   /// words / deleted_words が変わったとき。デバウンスして同期を予約する。
   ///
-  /// クイズの回答も words の更新なのでここに来る。実績は updatedAt を動かさず
-  /// 受信側では何も起きないが、書き戻し自体はバックアップとして意味があり、
-  /// 連続回答はデバウンスで 1 回に畳まれるため除外しない。
+  /// クイズの回答も words の更新なのでここに来る。回答は updatedAt を動かさないが、
+  /// 受信側は lastReviewedAt だけを新しい方に揃える(WordExportService.importJson)
+  /// ので、出題の一巡を端末間で共有するために同期する。連続回答はデバウンスで
+  /// 1 回に畳まれる。
   void _onLocalChange() {
     if (!state.enabled) return;
     // 同期自身の取り込みで再トリガしないよう、実行中の通知は捨てる
