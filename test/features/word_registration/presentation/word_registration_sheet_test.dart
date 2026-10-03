@@ -15,6 +15,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 
 import '../../ads/ads_test_overrides.dart';
 import '../../purchase/purchase_test_overrides.dart';
+import '../../review/review_test_overrides.dart';
 
 /// 常に同じ結果を返す WordInfoProvider(ネットワークに出ないため)。
 class _FakeWordInfoProvider implements WordInfoProvider {
@@ -53,6 +54,7 @@ void main() {
         ),
         adsDisabled,
         purchasesDisabled,
+        reviewDisabled,
       ],
     );
     try {

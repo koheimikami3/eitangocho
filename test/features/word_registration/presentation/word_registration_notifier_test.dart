@@ -14,6 +14,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../review/review_test_overrides.dart';
+
 /// autoFill のテスト用フェイク(実 API を呼ばない)。
 class _FakeWordInfoProvider implements WordInfoProvider {
   _FakeWordInfoProvider(this._handler);
@@ -32,6 +34,7 @@ void main() {
     final c = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
+        reviewDisabled,
         if (wordInfoProvider != null)
           wordInfoProviderProvider.overrideWithValue(wordInfoProvider),
       ],
