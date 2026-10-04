@@ -1,5 +1,6 @@
 import 'package:eitangocho/components/mobile_pronunciation_web_view.dart';
 import 'package:eitangocho/components/mobile_sheet.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の発音確認シート。Google 翻訳をアプリ内の WebView で開く。
@@ -12,7 +13,7 @@ Future<void> showMobilePronunciationSheet(BuildContext context, String word) {
     builder: (sheetContext) => MobileSheet(
       title: word,
       titleFontSize: 17,
-      leftLabel: '閉じる',
+      leftLabel: sheetContext.l10n.close,
       onLeft: () => Navigator.of(sheetContext).pop(),
       // WebView 自身が残り高いっぱいに広がるため、スクロール枠には載せない。
       scrollableBody: false,

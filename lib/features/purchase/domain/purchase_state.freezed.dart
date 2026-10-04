@@ -21,9 +21,9 @@ mixin _$PurchaseState {
 /// 取得前・取得失敗は null。価格が無いときは購入させない。
  String? get priceText;/// 購入処理の実行中か。
  bool get purchasing;/// 復元処理の実行中か。
- bool get restoring;/// 購入行に一時表示するメッセージ(失敗時のみ)。
- String? get purchaseMessage;/// 復元行の右端に一時表示するメッセージ。
- String? get restoreMessage;
+ bool get restoring;/// 購入に失敗した(購入行に一時表示する)。
+ bool get purchaseFailed;/// 復元行の右端に一時表示する状況。文言は表示側が言語に合わせて出す。
+ RestoreStatus? get restoreStatus;
 /// Create a copy of PurchaseState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +34,16 @@ $PurchaseStateCopyWith<PurchaseState> get copyWith => _$PurchaseStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurchaseState&&(identical(other.available, available) || other.available == available)&&(identical(other.proUnlocked, proUnlocked) || other.proUnlocked == proUnlocked)&&(identical(other.priceText, priceText) || other.priceText == priceText)&&(identical(other.purchasing, purchasing) || other.purchasing == purchasing)&&(identical(other.restoring, restoring) || other.restoring == restoring)&&(identical(other.purchaseMessage, purchaseMessage) || other.purchaseMessage == purchaseMessage)&&(identical(other.restoreMessage, restoreMessage) || other.restoreMessage == restoreMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurchaseState&&(identical(other.available, available) || other.available == available)&&(identical(other.proUnlocked, proUnlocked) || other.proUnlocked == proUnlocked)&&(identical(other.priceText, priceText) || other.priceText == priceText)&&(identical(other.purchasing, purchasing) || other.purchasing == purchasing)&&(identical(other.restoring, restoring) || other.restoring == restoring)&&(identical(other.purchaseFailed, purchaseFailed) || other.purchaseFailed == purchaseFailed)&&(identical(other.restoreStatus, restoreStatus) || other.restoreStatus == restoreStatus));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,available,proUnlocked,priceText,purchasing,restoring,purchaseMessage,restoreMessage);
+int get hashCode => Object.hash(runtimeType,available,proUnlocked,priceText,purchasing,restoring,purchaseFailed,restoreStatus);
 
 @override
 String toString() {
-  return 'PurchaseState(available: $available, proUnlocked: $proUnlocked, priceText: $priceText, purchasing: $purchasing, restoring: $restoring, purchaseMessage: $purchaseMessage, restoreMessage: $restoreMessage)';
+  return 'PurchaseState(available: $available, proUnlocked: $proUnlocked, priceText: $priceText, purchasing: $purchasing, restoring: $restoring, purchaseFailed: $purchaseFailed, restoreStatus: $restoreStatus)';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $PurchaseStateCopyWith<$Res>  {
   factory $PurchaseStateCopyWith(PurchaseState value, $Res Function(PurchaseState) _then) = _$PurchaseStateCopyWithImpl;
 @useResult
 $Res call({
- bool available, bool proUnlocked, String? priceText, bool purchasing, bool restoring, String? purchaseMessage, String? restoreMessage
+ bool available, bool proUnlocked, String? priceText, bool purchasing, bool restoring, bool purchaseFailed, RestoreStatus? restoreStatus
 });
 
 
@@ -71,16 +71,16 @@ class _$PurchaseStateCopyWithImpl<$Res>
 
 /// Create a copy of PurchaseState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? available = null,Object? proUnlocked = null,Object? priceText = freezed,Object? purchasing = null,Object? restoring = null,Object? purchaseMessage = freezed,Object? restoreMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? available = null,Object? proUnlocked = null,Object? priceText = freezed,Object? purchasing = null,Object? restoring = null,Object? purchaseFailed = null,Object? restoreStatus = freezed,}) {
   return _then(_self.copyWith(
 available: null == available ? _self.available : available // ignore: cast_nullable_to_non_nullable
 as bool,proUnlocked: null == proUnlocked ? _self.proUnlocked : proUnlocked // ignore: cast_nullable_to_non_nullable
 as bool,priceText: freezed == priceText ? _self.priceText : priceText // ignore: cast_nullable_to_non_nullable
 as String?,purchasing: null == purchasing ? _self.purchasing : purchasing // ignore: cast_nullable_to_non_nullable
 as bool,restoring: null == restoring ? _self.restoring : restoring // ignore: cast_nullable_to_non_nullable
-as bool,purchaseMessage: freezed == purchaseMessage ? _self.purchaseMessage : purchaseMessage // ignore: cast_nullable_to_non_nullable
-as String?,restoreMessage: freezed == restoreMessage ? _self.restoreMessage : restoreMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as bool,purchaseFailed: null == purchaseFailed ? _self.purchaseFailed : purchaseFailed // ignore: cast_nullable_to_non_nullable
+as bool,restoreStatus: freezed == restoreStatus ? _self.restoreStatus : restoreStatus // ignore: cast_nullable_to_non_nullable
+as RestoreStatus?,
   ));
 }
 
@@ -165,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  String? purchaseMessage,  String? restoreMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  bool purchaseFailed,  RestoreStatus? restoreStatus)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PurchaseState() when $default != null:
-return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseMessage,_that.restoreMessage);case _:
+return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseFailed,_that.restoreStatus);case _:
   return orElse();
 
 }
@@ -186,10 +186,10 @@ return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  String? purchaseMessage,  String? restoreMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  bool purchaseFailed,  RestoreStatus? restoreStatus)  $default,) {final _that = this;
 switch (_that) {
 case _PurchaseState():
-return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseMessage,_that.restoreMessage);case _:
+return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseFailed,_that.restoreStatus);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +206,10 @@ return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  String? purchaseMessage,  String? restoreMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool available,  bool proUnlocked,  String? priceText,  bool purchasing,  bool restoring,  bool purchaseFailed,  RestoreStatus? restoreStatus)?  $default,) {final _that = this;
 switch (_that) {
 case _PurchaseState() when $default != null:
-return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseMessage,_that.restoreMessage);case _:
+return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasing,_that.restoring,_that.purchaseFailed,_that.restoreStatus);case _:
   return null;
 
 }
@@ -221,7 +221,7 @@ return $default(_that.available,_that.proUnlocked,_that.priceText,_that.purchasi
 
 
 class _PurchaseState implements PurchaseState {
-  const _PurchaseState({this.available = false, this.proUnlocked = false, this.priceText, this.purchasing = false, this.restoring = false, this.purchaseMessage, this.restoreMessage});
+  const _PurchaseState({this.available = false, this.proUnlocked = false, this.priceText, this.purchasing = false, this.restoring = false, this.purchaseFailed = false, this.restoreStatus});
   
 
 /// 課金を扱える環境か(iOS かつ SDK キーが設定済み)。
@@ -236,10 +236,10 @@ class _PurchaseState implements PurchaseState {
 @override@JsonKey() final  bool purchasing;
 /// 復元処理の実行中か。
 @override@JsonKey() final  bool restoring;
-/// 購入行に一時表示するメッセージ(失敗時のみ)。
-@override final  String? purchaseMessage;
-/// 復元行の右端に一時表示するメッセージ。
-@override final  String? restoreMessage;
+/// 購入に失敗した(購入行に一時表示する)。
+@override@JsonKey() final  bool purchaseFailed;
+/// 復元行の右端に一時表示する状況。文言は表示側が言語に合わせて出す。
+@override final  RestoreStatus? restoreStatus;
 
 /// Create a copy of PurchaseState
 /// with the given fields replaced by the non-null parameter values.
@@ -251,16 +251,16 @@ _$PurchaseStateCopyWith<_PurchaseState> get copyWith => __$PurchaseStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PurchaseState&&(identical(other.available, available) || other.available == available)&&(identical(other.proUnlocked, proUnlocked) || other.proUnlocked == proUnlocked)&&(identical(other.priceText, priceText) || other.priceText == priceText)&&(identical(other.purchasing, purchasing) || other.purchasing == purchasing)&&(identical(other.restoring, restoring) || other.restoring == restoring)&&(identical(other.purchaseMessage, purchaseMessage) || other.purchaseMessage == purchaseMessage)&&(identical(other.restoreMessage, restoreMessage) || other.restoreMessage == restoreMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PurchaseState&&(identical(other.available, available) || other.available == available)&&(identical(other.proUnlocked, proUnlocked) || other.proUnlocked == proUnlocked)&&(identical(other.priceText, priceText) || other.priceText == priceText)&&(identical(other.purchasing, purchasing) || other.purchasing == purchasing)&&(identical(other.restoring, restoring) || other.restoring == restoring)&&(identical(other.purchaseFailed, purchaseFailed) || other.purchaseFailed == purchaseFailed)&&(identical(other.restoreStatus, restoreStatus) || other.restoreStatus == restoreStatus));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,available,proUnlocked,priceText,purchasing,restoring,purchaseMessage,restoreMessage);
+int get hashCode => Object.hash(runtimeType,available,proUnlocked,priceText,purchasing,restoring,purchaseFailed,restoreStatus);
 
 @override
 String toString() {
-  return 'PurchaseState(available: $available, proUnlocked: $proUnlocked, priceText: $priceText, purchasing: $purchasing, restoring: $restoring, purchaseMessage: $purchaseMessage, restoreMessage: $restoreMessage)';
+  return 'PurchaseState(available: $available, proUnlocked: $proUnlocked, priceText: $priceText, purchasing: $purchasing, restoring: $restoring, purchaseFailed: $purchaseFailed, restoreStatus: $restoreStatus)';
 }
 
 
@@ -271,7 +271,7 @@ abstract mixin class _$PurchaseStateCopyWith<$Res> implements $PurchaseStateCopy
   factory _$PurchaseStateCopyWith(_PurchaseState value, $Res Function(_PurchaseState) _then) = __$PurchaseStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool available, bool proUnlocked, String? priceText, bool purchasing, bool restoring, String? purchaseMessage, String? restoreMessage
+ bool available, bool proUnlocked, String? priceText, bool purchasing, bool restoring, bool purchaseFailed, RestoreStatus? restoreStatus
 });
 
 
@@ -288,16 +288,16 @@ class __$PurchaseStateCopyWithImpl<$Res>
 
 /// Create a copy of PurchaseState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? available = null,Object? proUnlocked = null,Object? priceText = freezed,Object? purchasing = null,Object? restoring = null,Object? purchaseMessage = freezed,Object? restoreMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? available = null,Object? proUnlocked = null,Object? priceText = freezed,Object? purchasing = null,Object? restoring = null,Object? purchaseFailed = null,Object? restoreStatus = freezed,}) {
   return _then(_PurchaseState(
 available: null == available ? _self.available : available // ignore: cast_nullable_to_non_nullable
 as bool,proUnlocked: null == proUnlocked ? _self.proUnlocked : proUnlocked // ignore: cast_nullable_to_non_nullable
 as bool,priceText: freezed == priceText ? _self.priceText : priceText // ignore: cast_nullable_to_non_nullable
 as String?,purchasing: null == purchasing ? _self.purchasing : purchasing // ignore: cast_nullable_to_non_nullable
 as bool,restoring: null == restoring ? _self.restoring : restoring // ignore: cast_nullable_to_non_nullable
-as bool,purchaseMessage: freezed == purchaseMessage ? _self.purchaseMessage : purchaseMessage // ignore: cast_nullable_to_non_nullable
-as String?,restoreMessage: freezed == restoreMessage ? _self.restoreMessage : restoreMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as bool,purchaseFailed: null == purchaseFailed ? _self.purchaseFailed : purchaseFailed // ignore: cast_nullable_to_non_nullable
+as bool,restoreStatus: freezed == restoreStatus ? _self.restoreStatus : restoreStatus // ignore: cast_nullable_to_non_nullable
+as RestoreStatus?,
   ));
 }
 

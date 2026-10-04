@@ -1,9 +1,12 @@
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('チップの並びは 名詞 → 動詞 → 形容詞 → 副詞 → その他', () {
-    expect(PartOfSpeech.values.map((p) => p.label), [
+    final l10n = lookupAppLocalizations(const Locale('ja'));
+    expect(PartOfSpeech.values.map((p) => p.label(l10n)), [
       '名詞',
       '動詞',
       '形容詞',

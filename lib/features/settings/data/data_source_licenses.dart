@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 
 /// 辞書・例文データの出典を [LicenseRegistry] に登録する。
 ///
+/// 見出し(パッケージ名の欄)は出典名だけにする。登録時には表示言語が
+/// 分からず訳せないため、どの言語でも通じる固有名に留めている。
+///
 /// pub パッケージのライセンスは Flutter が自動収集するが、同梱データと
 /// 外部 API 由来のデータは自分で足さないと一覧に出ない。CC BY / CC BY-SA は
 /// **帰属表示が義務**で、有料化・広告表示でも免除されない(docs/design.md)。
@@ -11,7 +14,7 @@ import 'package:flutter/foundation.dart';
 void registerDataSourceLicenses() {
   LicenseRegistry.addLicense(() async* {
     yield const LicenseEntryWithLineBreaks(
-      ['Wiktionary / kaikki.org(発音記号・品詞・例文)'],
+      ['Wiktionary / kaikki.org'],
       'This app uses dictionary data extracted from the English Wiktionary '
       'by the Wiktextract project, distributed at kaikki.org.\n\n'
       'Wiktionary content is licensed under the Creative Commons '
@@ -26,14 +29,14 @@ void registerDataSourceLicenses() {
     );
 
     yield const LicenseEntryWithLineBreaks(
-      ['Tatoeba(例文と対訳)'],
+      ['Tatoeba'],
       'Sentences are from Tatoeba (https://tatoeba.org), released under '
       'CC-BY 2.0 FR.\n\n'
       'https://creativecommons.org/licenses/by/2.0/fr/',
     );
 
     yield const LicenseEntryWithLineBreaks(
-      ['EJDict-hand(英和辞書データ)'],
+      ['EJDict-hand'],
       'This app bundles the EJDict-hand English-Japanese dictionary data, '
       'released into the public domain under CC0 1.0 Universal.\n\n'
       'https://github.com/kujirahand/EJDict\n'
@@ -41,7 +44,7 @@ void registerDataSourceLicenses() {
     );
 
     yield const LicenseEntryWithLineBreaks(
-      ['Google 翻訳(発音の確認)'],
+      ['Google Translate'],
       'Pronunciation is checked by opening Google Translate in the system '
       'browser. No Google API is called from within this app.\n\n'
       'https://translate.google.com/',

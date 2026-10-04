@@ -5,6 +5,7 @@ import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,9 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            locale: const Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: Builder(
                 builder: (context) => TextButton(

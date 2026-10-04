@@ -1,6 +1,7 @@
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/word_backup_actions.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,12 +40,12 @@ class _MobileDataBackupRowsState extends ConsumerState<MobileDataBackupRows> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         MobileSettingsLinkRow(
-          label: 'データを書き出す',
+          label: context.l10n.exportData,
           onTap: () => _run(exportWordsToFile),
         ),
         const MobileSettingsDivider(),
         MobileSettingsLinkRow(
-          label: 'データを読み込む',
+          label: context.l10n.importData,
           onTap: () => _run(importWordsFromFile),
         ),
       ],

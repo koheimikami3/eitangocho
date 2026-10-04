@@ -2,6 +2,8 @@ import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_sheet.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// [MobilePronunciationButton] の形。
@@ -13,9 +15,9 @@ enum MobilePronunciationButtonVariant {
   pill;
 
   /// ラベル。アイコンのみの形は null。
-  String? get label => switch (this) {
+  String? label(AppLocalizations l10n) => switch (this) {
     icon => null,
-    pill => '発音を聞く',
+    pill => l10n.listenPronunciation,
   };
 }
 
@@ -60,7 +62,7 @@ class MobilePronunciationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final label = variant.label;
+    final label = variant.label(context.l10n);
     final icon = SpeakerIcon(size: _iconSize, color: palette.accentOnSoft);
 
     return MobilePressable(

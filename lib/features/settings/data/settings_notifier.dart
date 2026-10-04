@@ -3,7 +3,9 @@ import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
+import 'package:eitangocho/utils/app_locale.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +23,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyAppearance = 'appearance';
   static const _keyCardLayout = 'cardLayout';
   static const _keyWordSortOrder = 'wordSortOrder';
+  static const _keyTranslationLanguage = 'translationLanguage';
 
   final _prefs = SharedPreferencesAsync();
 
@@ -33,6 +36,9 @@ class SettingsNotifier extends _$SettingsNotifier {
     final appearanceName = await _prefs.getString(_keyAppearance);
     final cardLayoutName = await _prefs.getString(_keyCardLayout);
     final wordSortOrderName = await _prefs.getString(_keyWordSortOrder);
+    final translationLanguageName = await _prefs.getString(
+      _keyTranslationLanguage,
+    );
     return SettingsState(
       quizDirection:
           QuizDirection.values.asNameMap()[directionName] ??
@@ -49,6 +55,20 @@ class SettingsNotifier extends _$SettingsNotifier {
       wordSortOrder:
           WordSortOrder.values.asNameMap()[wordSortOrderName] ??
           WordSortOrder.newest,
+      // 未保存なら端末の言語から決め、保存はしない。既存の利用者(日本語の
+      // 端末)は ja になり、OS のアプリ別の言語設定を変えたときも追従する。
+      translationLanguage:
+          TranslationLanguage.values.asNameMap()[translationLanguageName] ??
+          AppLocale.deviceDefaultTranslationLanguage,
+    );
+  }
+
+  Future<void> setTranslationLanguage(TranslationLanguage language) async {
+    await _prefs.setString(_keyTranslationLanguage, language.name);
+    state = AsyncData(
+      (state.value ?? const SettingsState()).copyWith(
+        translationLanguage: language,
+      ),
     );
   }
 

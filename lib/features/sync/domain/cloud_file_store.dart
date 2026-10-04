@@ -48,14 +48,33 @@ class CloudConflict {
   final DateTime? modifiedAt;
 }
 
-/// クラウドが使えないときの失敗。UI にそのまま出せる日本語メッセージを持つ。
+/// クラウドが使えないときの失敗。
+///
+/// 文言は持たせず、[reason] から表示側(syncFailureText)が言語に合わせて出す。
+/// [detail] は OS が返した説明など、理由だけでは伝わらない補足(あれば)。
 class CloudUnavailableException implements Exception {
-  const CloudUnavailableException(this.message);
+  const CloudUnavailableException(this.reason, [this.detail]);
 
-  final String message;
+  final CloudFailureReason reason;
+  final String? detail;
 
   @override
-  String toString() => message;
+  String toString() => detail ?? reason.name;
+}
+
+/// 同期が失敗した理由。
+enum CloudFailureReason {
+  /// iCloud Drive にサインインしていないなど、iCloud を使えない。
+  noICloud,
+
+  /// 端末のコピーを最新化できず、同期を見送った([CloudNotReadyException])。
+  notCurrent,
+
+  /// iCloud に対応していないプラットフォーム。
+  unsupportedPlatform,
+
+  /// それ以外(読み書きの失敗など)。
+  failed,
 }
 
 /// 端末のコピーがクラウドの最新版にならず、同期を見送ったときの失敗。
@@ -64,5 +83,6 @@ class CloudUnavailableException implements Exception {
 /// 最新化を待ちきれなかったときは読み書きせずにこれを投げる。
 /// 一時的な状態なので、[SyncNotifier] は少し待って再試行する。
 class CloudNotReadyException extends CloudUnavailableException {
-  const CloudNotReadyException(super.message);
+  const CloudNotReadyException([String? detail])
+    : super(CloudFailureReason.notCurrent, detail);
 }

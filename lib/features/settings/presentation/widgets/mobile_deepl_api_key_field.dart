@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -54,7 +55,7 @@ class _MobileDeeplApiKeyFieldState
         style: TextStyle(fontSize: 14, color: palette.text),
         decoration: InputDecoration(
           isDense: true,
-          hintText: 'DeepL API キーを入力',
+          hintText: context.l10n.deeplKeyHint,
           hintStyle: TextStyle(color: palette.textAlpha(30)),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,

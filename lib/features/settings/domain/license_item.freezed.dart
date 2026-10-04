@@ -14,8 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LicenseItem {
 
- String get name;/// 一覧に出す種別(`MIT License` など)。判別できなければ件数表記。
- String get summary;/// 詳細画面に出す全文。1 要素 = 1 ライセンス。
+ String get name;/// 一覧に出す種別(`MIT License` など)。判別できなければ null で、
+/// 表示側が件数表記(licenseCount)に置き換える。
+ String? get summary;/// 詳細画面に出す全文。1 要素 = 1 ライセンス。
  List<String> get texts;
 /// Create a copy of LicenseItem
 /// with the given fields replaced by the non-null parameter values.
@@ -47,7 +48,7 @@ abstract mixin class $LicenseItemCopyWith<$Res>  {
   factory $LicenseItemCopyWith(LicenseItem value, $Res Function(LicenseItem) _then) = _$LicenseItemCopyWithImpl;
 @useResult
 $Res call({
- String name, String summary, List<String> texts
+ String name, String? summary, List<String> texts
 });
 
 
@@ -64,11 +65,11 @@ class _$LicenseItemCopyWithImpl<$Res>
 
 /// Create a copy of LicenseItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? summary = null,Object? texts = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? summary = freezed,Object? texts = null,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,summary: null == summary ? _self.summary : summary // ignore: cast_nullable_to_non_nullable
-as String,texts: null == texts ? _self.texts : texts // ignore: cast_nullable_to_non_nullable
+as String,summary: freezed == summary ? _self.summary : summary // ignore: cast_nullable_to_non_nullable
+as String?,texts: null == texts ? _self.texts : texts // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -154,7 +155,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String summary,  List<String> texts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? summary,  List<String> texts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LicenseItem() when $default != null:
 return $default(_that.name,_that.summary,_that.texts);case _:
@@ -175,7 +176,7 @@ return $default(_that.name,_that.summary,_that.texts);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String summary,  List<String> texts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? summary,  List<String> texts)  $default,) {final _that = this;
 switch (_that) {
 case _LicenseItem():
 return $default(_that.name,_that.summary,_that.texts);case _:
@@ -195,7 +196,7 @@ return $default(_that.name,_that.summary,_that.texts);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String summary,  List<String> texts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? summary,  List<String> texts)?  $default,) {final _that = this;
 switch (_that) {
 case _LicenseItem() when $default != null:
 return $default(_that.name,_that.summary,_that.texts);case _:
@@ -214,8 +215,9 @@ class _LicenseItem implements LicenseItem {
   
 
 @override final  String name;
-/// 一覧に出す種別(`MIT License` など)。判別できなければ件数表記。
-@override final  String summary;
+/// 一覧に出す種別(`MIT License` など)。判別できなければ null で、
+/// 表示側が件数表記(licenseCount)に置き換える。
+@override final  String? summary;
 /// 詳細画面に出す全文。1 要素 = 1 ライセンス。
  final  List<String> _texts;
 /// 詳細画面に出す全文。1 要素 = 1 ライセンス。
@@ -256,7 +258,7 @@ abstract mixin class _$LicenseItemCopyWith<$Res> implements $LicenseItemCopyWith
   factory _$LicenseItemCopyWith(_LicenseItem value, $Res Function(_LicenseItem) _then) = __$LicenseItemCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String summary, List<String> texts
+ String name, String? summary, List<String> texts
 });
 
 
@@ -273,11 +275,11 @@ class __$LicenseItemCopyWithImpl<$Res>
 
 /// Create a copy of LicenseItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? summary = null,Object? texts = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? summary = freezed,Object? texts = null,}) {
   return _then(_LicenseItem(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,summary: null == summary ? _self.summary : summary // ignore: cast_nullable_to_non_nullable
-as String,texts: null == texts ? _self._texts : texts // ignore: cast_nullable_to_non_nullable
+as String,summary: freezed == summary ? _self.summary : summary // ignore: cast_nullable_to_non_nullable
+as String?,texts: null == texts ? _self._texts : texts // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }

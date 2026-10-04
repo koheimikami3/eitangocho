@@ -9,6 +9,7 @@ import 'package:eitangocho/features/quiz/presentation/widgets/mobile_quiz_result
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -99,13 +100,16 @@ class _ActiveQuiz extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         if (!state.revealed)
-          MobileFilledButton(label: '答えを表示', onPressed: notifier.reveal)
+          MobileFilledButton(
+            label: context.l10n.showAnswer,
+            onPressed: notifier.reveal,
+          )
         else ...[
           Row(
             children: [
               Expanded(
                 child: _SecondaryButton(
-                  label: '忘れていた',
+                  label: context.l10n.quizForgot,
                   color: palette.danger,
                   onTap: notifier.answerForgot,
                 ),
@@ -113,7 +117,7 @@ class _ActiveQuiz extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: MobileFilledButton(
-                  label: '覚えている',
+                  label: context.l10n.quizRemembered,
                   onPressed: notifier.answerKnew,
                 ),
               ),
@@ -121,7 +125,7 @@ class _ActiveQuiz extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            '「忘れていた」を選ぶと学習中リストに戻ります',
+            context.l10n.quizForgotHint,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 11, color: palette.textAlpha(38)),
           ),

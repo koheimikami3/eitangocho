@@ -4,6 +4,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,6 +60,9 @@ void main() {
           // MaterialApp 既定のグローバルショートカット(矢印キーのフォーカス
           // トラバーサル等)がテストの意図しない干渉を起こさないよう無効化する。
           child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             shortcuts: <ShortcutActivator, Intent>{},
             home: Scaffold(body: QuizView()),
           ),

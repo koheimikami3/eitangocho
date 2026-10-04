@@ -103,7 +103,7 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     if (!state.available || state.purchasing || state.proUnlocked) return;
     if (state.priceText == null) return;
 
-    state = state.copyWith(purchasing: true, purchaseMessage: null);
+    state = state.copyWith(purchasing: true, purchaseFailed: false);
     final outcome = await ref.read(purchasesClientProvider).purchase();
     if (!ref.mounted) return;
 
@@ -114,10 +114,7 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
       case PurchaseOutcome.cancelled:
         state = state.copyWith(purchasing: false);
       case PurchaseOutcome.failed:
-        state = state.copyWith(
-          purchasing: false,
-          purchaseMessage: '購入できませんでした',
-        );
+        state = state.copyWith(purchasing: false, purchaseFailed: true);
         _scheduleMessageClear();
     }
   }
@@ -132,19 +129,27 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     if (!ref.mounted) return;
     if (!state.available || state.restoring) return;
 
-    state = state.copyWith(restoring: true, restoreMessage: '確認中…');
+    state = state.copyWith(
+      restoring: true,
+      restoreStatus: RestoreStatus.checking,
+    );
     try {
       final unlocked = await ref.read(purchasesClientProvider).restore();
       if (!ref.mounted) return;
       state = state.copyWith(
         restoring: false,
         proUnlocked: unlocked,
-        restoreMessage: unlocked ? '復元しました' : '購入履歴が見つかりません',
+        restoreStatus: unlocked
+            ? RestoreStatus.restored
+            : RestoreStatus.notFound,
       );
     } on Object catch (error) {
       purchaseLog('復元に失敗しました: $error');
       if (!ref.mounted) return;
-      state = state.copyWith(restoring: false, restoreMessage: '復元できませんでした');
+      state = state.copyWith(
+        restoring: false,
+        restoreStatus: RestoreStatus.failed,
+      );
     }
     _scheduleMessageClear();
   }
@@ -154,7 +159,7 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     _messageTimer?.cancel();
     _messageTimer = Timer(messageDuration, () {
       if (!ref.mounted) return;
-      state = state.copyWith(purchaseMessage: null, restoreMessage: null);
+      state = state.copyWith(purchaseFailed: false, restoreStatus: null);
     });
   }
 }

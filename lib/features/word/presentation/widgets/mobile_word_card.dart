@@ -7,6 +7,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_pos_badge.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_shrinking_ipa_text.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の学習中カード 1 枚(設定に応じて 1 列 / 2 列グリッドに並ぶ)。
@@ -127,7 +128,7 @@ class _MobileWordCardState extends State<MobileWordCard> {
                       MobileLearnedCheckbox(value: word.isLearned),
                       const SizedBox(width: 6),
                       Text(
-                        '覚えた',
+                        context.l10n.rememberedCheck,
                         style: TextStyle(
                           fontSize: 11,
                           color: palette.textAlpha(60),
@@ -303,7 +304,7 @@ class _RevealToggle extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(_hintPadding),
                 child: Text(
-                  '訳を表示',
+                  context.l10n.showMeaning,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: _hintFontSize,

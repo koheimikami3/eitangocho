@@ -4,6 +4,7 @@ import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dar
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
@@ -27,6 +28,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_setting
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/presentation/mobile_sync_rows.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,6 +50,8 @@ class SettingsViewMobile extends ConsumerWidget {
     // ロード前は既定値でフォールバックする。
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
+    final l10n = context.l10n;
+    final translationLanguage = ref.watch(translationLanguageProvider);
 
     return ListView(
       padding: EdgeInsets.fromLTRB(
@@ -66,25 +70,25 @@ class SettingsViewMobile extends ConsumerWidget {
           const SizedBox(height: 22),
         ],
         MobileSettingsSection(
-          title: '表示',
+          title: l10n.sectionDisplay,
           rows: [
-            const MobileSettingsSubheader(label: 'テーマ'),
+            MobileSettingsSubheader(label: l10n.theme),
             for (final appearance in AppAppearance.values)
               MobileSettingsRadioRow(
-                label: appearance.label,
+                label: appearance.label(l10n),
                 selected: settings.appearance == appearance,
                 onTap: () => notifier.setAppearance(appearance),
               ),
-            const MobileSettingsSubheader(label: '学習中カードの並び'),
+            MobileSettingsSubheader(label: l10n.cardLayout),
             for (final layout in LearningCardLayout.values)
               MobileSettingsRadioRow(
-                label: layout.label,
+                label: layout.label(l10n),
                 selected: settings.cardLayout == layout,
                 onTap: () => notifier.setCardLayout(layout),
                 trailing: MobileCardLayoutPreview(layout: layout),
               ),
             MobileSettingsToggleRow(
-              label: '発音記号(IPA)を表示',
+              label: l10n.showIpa,
               value: settings.showIpa,
               onChanged: notifier.setShowIpa,
             ),
@@ -92,11 +96,11 @@ class SettingsViewMobile extends ConsumerWidget {
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(
-          title: 'クイズ',
+          title: l10n.sectionQuiz,
           rows: [
             for (final direction in QuizDirection.values)
               MobileSettingsRadioRow(
-                label: direction.label,
+                label: direction.label(l10n, translationLanguage),
                 selected: settings.quizDirection == direction,
                 onTap: () => notifier.setQuizDirection(direction),
               ),
@@ -129,40 +133,47 @@ class SettingsViewMobile extends ConsumerWidget {
         const SizedBox(height: 22),
         // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの持ち出しを
         // 扱うため 1 枚のカードにまとめる(デザイン準拠)。
-        const MobileSettingsSection(
-          title: 'データ',
-          rows: [MobileSyncRows(), MobileDataBackupRows()],
+        MobileSettingsSection(
+          title: l10n.sectionData,
+          rows: const [MobileSyncRows(), MobileDataBackupRows()],
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(
-          title: 'サポート',
+          title: l10n.sectionSupport,
           rows: [
             // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
             // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
             MobileSettingsLinkRow(
-              label: 'App Store でレビューを書く',
+              label: l10n.writeReview,
               onTap: () => ref.read(reviewPrompterProvider).openStoreListing(),
             ),
           ],
         ),
-        const SizedBox(height: 22),
         // 紹介先が iPhone 専用アプリのため、この枠は iOS 版にしか無い
         // (macOS から踏んでもインストールできない)。
-        MobileSettingsSection(
-          title: '作者の他のアプリ',
-          rows: [for (final app in AuthorApp.all) MobileAuthorAppRow(app: app)],
-        ),
+        //
+        // 日本語の画面でだけ出す。紹介先はどちらも日本語のみのアプリで、
+        // 他の言語の利用者に薦めても使えないため。
+        if (Localizations.localeOf(context).languageCode == 'ja') ...[
+          const SizedBox(height: 22),
+          MobileSettingsSection(
+            title: l10n.sectionAuthorApps,
+            rows: [
+              for (final app in AuthorApp.all) MobileAuthorAppRow(app: app),
+            ],
+          ),
+        ],
         const SizedBox(height: 22),
         MobileSettingsSection(
-          title: '情報',
+          title: l10n.sectionInfo,
           rows: [
             MobileSettingsValueRow(
-              label: 'バージョン',
+              label: l10n.version,
               // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
               value: ref.watch(appVersionProvider).value ?? '',
             ),
             MobileSettingsLinkRow(
-              label: 'ライセンス',
+              label: l10n.licenses,
               onTap: () => LicenseViewMobile.push(context),
             ),
           ],

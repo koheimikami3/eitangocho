@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/data/word_export_service.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// インポート結果(追加/更新/変更なし/スキップ件数)を表示するダイアログ。
@@ -18,22 +19,22 @@ Future<void> showImportResultDialog(BuildContext context, ImportResult result) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'インポートが完了しました',
-                style: TextStyle(
+              Text(
+                context.l10n.importDoneTitle,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
-              Text('追加 ${result.added} 件'),
-              Text('更新 ${result.updated} 件'),
-              Text('変更なし ${result.unchanged} 件'),
-              Text('スキップ ${result.skipped} 件'),
+              Text(context.l10n.importAdded(result.added)),
+              Text(context.l10n.importUpdated(result.updated)),
+              Text(context.l10n.importUnchanged(result.unchanged)),
+              Text(context.l10n.importSkipped(result.skipped)),
               const SizedBox(height: 16),
               AppFilledButton(
-                label: '閉じる',
+                label: context.l10n.close,
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -45,7 +46,10 @@ Future<void> showImportResultDialog(BuildContext context, ImportResult result) {
 }
 
 /// インポートに失敗したときのエラーダイアログ。
-Future<void> showImportErrorDialog(BuildContext context, String message) {
+Future<void> showImportErrorDialog(
+  BuildContext context,
+  WordExportFormatError error,
+) {
   return showDialog<void>(
     context: context,
     builder: (context) => Dialog(
@@ -58,22 +62,26 @@ Future<void> showImportErrorDialog(BuildContext context, String message) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'インポートできませんでした',
-                style: TextStyle(
+              Text(
+                context.l10n.importFailedTitle,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                message,
-                style: const TextStyle(color: AppColors.textSecondary),
-              ),
+              Text(switch (error) {
+                WordExportFormatError.invalidJson =>
+                  context.l10n.importErrorInvalidJson,
+                WordExportFormatError.invalidFormat =>
+                  context.l10n.importErrorInvalidFormat,
+                WordExportFormatError.unsupportedVersion =>
+                  context.l10n.importErrorUnsupportedVersion,
+              }, style: const TextStyle(color: AppColors.textSecondary)),
               const SizedBox(height: 16),
               AppFilledButton(
-                label: '閉じる',
+                label: context.l10n.close,
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],

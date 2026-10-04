@@ -1,5 +1,6 @@
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/utils/google_translate_url.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -83,7 +84,7 @@ class _MobilePronunciationWebViewState
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'ページを読み込めませんでした。\n通信状況を確認してから、もう一度お試しください。',
+                context.l10n.pageLoadFailed,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
@@ -102,7 +103,7 @@ class _MobilePronunciationWebViewState
                     vertical: 8,
                   ),
                   child: Text(
-                    '再読み込み',
+                    context.l10n.reload,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_field_label.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版のラベル付き入力欄。
@@ -15,7 +16,7 @@ class MobileLabeledField extends StatelessWidget {
     required this.label,
     required this.controller,
     super.key,
-    this.hintText = '手動で入力してください',
+    this.hintText,
     this.minLines,
     this.maxLines = 1,
     this.autoFilled = false,
@@ -25,7 +26,9 @@ class MobileLabeledField extends StatelessWidget {
 
   final String label;
   final TextEditingController controller;
-  final String hintText;
+
+  /// 空欄のときのヒント。省略時は「手動で入力してください」(manualInputHint)。
+  final String? hintText;
   final int? minLines;
   final int? maxLines;
   final bool autoFilled;
@@ -69,7 +72,7 @@ class MobileLabeledField extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: palette.text),
             decoration: InputDecoration(
               isDense: true,
-              hintText: hintText,
+              hintText: hintText ?? context.l10n.manualInputHint,
               hintStyle: TextStyle(color: palette.textAlpha(30)),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,

@@ -4,6 +4,7 @@ import 'package:eitangocho/features/settings/data/document_exporter.dart';
 import 'package:eitangocho/features/settings/data/word_export_service.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/import_result_dialog.dart';
 import 'package:eitangocho/utils/app_platform.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +60,7 @@ Future<void> exportWordsToFile(BuildContext context, WidgetRef ref) async {
   if (context.mounted) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('エクスポートしました')));
+    ).showSnackBar(SnackBar(content: Text(context.l10n.exportDone)));
   }
 }
 
@@ -73,6 +74,6 @@ Future<void> importWordsFromFile(BuildContext context, WidgetRef ref) async {
     final result = await ref.read(wordExportServiceProvider).importJson(source);
     if (context.mounted) await showImportResultDialog(context, result);
   } on WordExportFormatException catch (e) {
-    if (context.mounted) await showImportErrorDialog(context, e.message);
+    if (context.mounted) await showImportErrorDialog(context, e.error);
   }
 }

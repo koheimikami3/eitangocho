@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,7 +28,7 @@ class MobileSearchField extends ConsumerWidget {
         style: TextStyle(fontSize: 15, color: palette.text),
         decoration: InputDecoration(
           isDense: true,
-          hintText: '検索',
+          hintText: context.l10n.search,
           hintStyle: TextStyle(color: palette.textAlpha(30)),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,

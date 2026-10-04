@@ -5,6 +5,7 @@ import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,7 +54,7 @@ class MobileTabBar extends ConsumerWidget {
                   // カード)より、同じ大きさのカードが 2 枚ずれて重なる
                   // filter_none の方が近い。
                   icon: Icons.filter_none,
-                  label: '学習中',
+                  label: context.l10n.navLearning,
                   selected: view == MainView.learning,
                   onTap: () => ref
                       .read(mainPageProvider.notifier)
@@ -61,7 +62,7 @@ class MobileTabBar extends ConsumerWidget {
                 ),
                 _TabItem(
                   icon: Icons.format_list_bulleted,
-                  label: '全単語',
+                  label: context.l10n.navAllWords,
                   selected: view == MainView.allWords,
                   onTap: () => ref
                       .read(mainPageProvider.notifier)
@@ -69,7 +70,7 @@ class MobileTabBar extends ConsumerWidget {
                 ),
                 _TabItem(
                   icon: Icons.bolt,
-                  label: 'クイズ',
+                  label: context.l10n.navQuizShort,
                   selected: view == MainView.quiz,
                   // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
                   onTap: () {
@@ -81,7 +82,7 @@ class MobileTabBar extends ConsumerWidget {
                 ),
                 _TabItem(
                   icon: Icons.settings_outlined,
-                  label: '設定',
+                  label: context.l10n.navSettings,
                   selected: view == MainView.settings,
                   onTap: () => ref
                       .read(mainPageProvider.notifier)

@@ -5,6 +5,7 @@ import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_radio_row.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -59,7 +60,7 @@ class MobileWordSortSheet extends ConsumerWidget {
                     height: 46,
                     alignment: Alignment.center,
                     child: Text(
-                      '並び替え',
+                      context.l10n.sortSheetTitle,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -80,7 +81,7 @@ class MobileWordSortSheet extends ConsumerWidget {
                     if (i > 0 && orders[i - 1].group != orders[i].group)
                       const MobileSettingsDivider(),
                     MobileSettingsRadioRow(
-                      label: orders[i].label,
+                      label: orders[i].label(context.l10n),
                       selected: orders[i] == current,
                       onTap: () {
                         ref

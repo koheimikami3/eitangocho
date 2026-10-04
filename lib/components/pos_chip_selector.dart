@@ -1,5 +1,6 @@
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// 品詞の複数選択チップ(横並び・折り返し)。
@@ -59,7 +60,7 @@ class _Chip extends StatelessWidget {
           ),
         ),
         child: Text(
-          pos.label,
+          pos.label(context.l10n),
           style: TextStyle(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,

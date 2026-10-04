@@ -296,7 +296,7 @@ void main() {
 
   test('最新のデータを取得できずに読み取りを見送ったら、書き戻さない', () async {
     await addWord('apple', 'りんご');
-    store.readError = const CloudNotReadyException('同期を見送りました。');
+    store.readError = const CloudNotReadyException();
 
     await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
 
@@ -394,7 +394,7 @@ void main() {
 
     test('書き戻しに失敗したら競合版は片付けない', () async {
       store.conflicts = [conflict('a', snapshotWith('banana', 'バナナ'))];
-      store.writeError = const CloudNotReadyException('同期を見送りました。');
+      store.writeError = const CloudNotReadyException();
 
       await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
 

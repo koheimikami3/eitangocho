@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// 辞書から自動入力された項目を示す小さなバッジ。
@@ -15,7 +16,7 @@ class MobileAutoFillBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
-        '自動入力',
+        context.l10n.autoFill,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,

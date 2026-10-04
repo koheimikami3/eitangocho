@@ -1,5 +1,6 @@
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
+import 'package:eitangocho/features/purchase/domain/purchase_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -84,7 +85,7 @@ void main() {
     final state = container.read(purchaseProvider);
     expect(state.proUnlocked, isTrue);
     expect(state.purchasing, isFalse);
-    expect(state.purchaseMessage, isNull);
+    expect(state.purchaseFailed, isFalse);
   });
 
   test('購入をキャンセルしても何も表示しない', () async {
@@ -95,7 +96,7 @@ void main() {
 
     final state = container.read(purchaseProvider);
     expect(state.proUnlocked, isFalse);
-    expect(state.purchaseMessage, isNull);
+    expect(state.purchaseFailed, isFalse);
   });
 
   test('購入に失敗するとメッセージを出し、しばらくして消す', () async {
@@ -104,11 +105,11 @@ void main() {
 
     await container.read(purchaseProvider.notifier).buy();
 
-    expect(container.read(purchaseProvider).purchaseMessage, '購入できませんでした');
+    expect(container.read(purchaseProvider).purchaseFailed, isTrue);
 
     await Future<void>.delayed(const Duration(milliseconds: 30));
 
-    expect(container.read(purchaseProvider).purchaseMessage, isNull);
+    expect(container.read(purchaseProvider).purchaseFailed, isFalse);
   });
 
   test('価格が取れていないときは購入させない', () async {
@@ -137,7 +138,7 @@ void main() {
 
     final state = container.read(purchaseProvider);
     expect(state.proUnlocked, isTrue);
-    expect(state.restoreMessage, '復元しました');
+    expect(state.restoreStatus, RestoreStatus.restored);
     expect(state.restoring, isFalse);
   });
 
@@ -148,7 +149,7 @@ void main() {
 
     final state = container.read(purchaseProvider);
     expect(state.proUnlocked, isFalse);
-    expect(state.restoreMessage, '購入履歴が見つかりません');
+    expect(state.restoreStatus, RestoreStatus.notFound);
   });
 
   test('復元に失敗してもアプリは動き続ける', () async {
@@ -158,7 +159,7 @@ void main() {
     await container.read(purchaseProvider.notifier).restore();
 
     final state = container.read(purchaseProvider);
-    expect(state.restoreMessage, '復元できませんでした');
+    expect(state.restoreStatus, RestoreStatus.failed);
     expect(state.restoring, isFalse);
   });
 

@@ -1,6 +1,7 @@
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/domain/license_item.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,9 @@ void main() {
       ProviderScope(
         overrides: [licenseListProvider.overrideWith((ref) async => licenses)],
         child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(

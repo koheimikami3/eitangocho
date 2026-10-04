@@ -2,6 +2,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_shrinking_ipa_text.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_card.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -31,6 +32,9 @@ void main() {
     String? ipa,
   }) => tester.pumpWidget(
     MaterialApp(
+      locale: const Locale('ja'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: Center(
           child: SizedBox(

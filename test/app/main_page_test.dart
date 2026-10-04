@@ -6,7 +6,7 @@ import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/learning_words_view_mobile.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show MediaQuery, Size;
+import 'package:flutter/material.dart' show Locale, MediaQuery, Size;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
@@ -49,6 +49,10 @@ void main() {
     tester.view.physicalSize = physicalSize;
     tester.view.devicePixelRatio = devicePixelRatio;
     addTearDown(tester.view.reset);
+    // 表示言語は端末の言語で決まる。テスト環境の既定(en_US)だと英語に
+    // なるため、日本語の端末として振る舞わせる。
+    tester.platformDispatcher.localesTestValue = const [Locale('ja')];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     try {
       await tester.pumpWidget(
         ProviderScope(

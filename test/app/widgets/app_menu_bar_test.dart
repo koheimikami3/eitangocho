@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/app_menu_bar.dart';
 import 'package:eitangocho/app/widgets/toolbar_search_field.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,7 @@ void main() {
     test('⌘N の項目は onRegister に配線される', () {
       var registered = false;
       final menus = AppMenuBar.buildMenus(
+        l10n: lookupAppLocalizations(const Locale('ja')),
         onRegister: () => registered = true,
         onSearch: () {},
       );
@@ -35,6 +37,7 @@ void main() {
     test('検索フィールドがあるとき ⌘F は onSearch に配線される', () {
       var searched = false;
       final menus = AppMenuBar.buildMenus(
+        l10n: lookupAppLocalizations(const Locale('ja')),
         onRegister: () {},
         onSearch: () => searched = true,
       );
@@ -46,7 +49,11 @@ void main() {
     });
 
     test('検索フィールドが無いとき(onSearch=null)⌘F は無効になる', () {
-      final menus = AppMenuBar.buildMenus(onRegister: () {}, onSearch: null);
+      final menus = AppMenuBar.buildMenus(
+        l10n: lookupAppLocalizations(const Locale('ja')),
+        onRegister: () {},
+        onSearch: null,
+      );
 
       // onSelected が null だと項目もショートカットも無効になる。
       expect(itemOf(menus, '編集', '検索').onSelected, isNull);
@@ -57,6 +64,9 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
+          locale: Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: AppMenuBar(
             child: Text('body', textDirection: TextDirection.ltr),
           ),
@@ -72,6 +82,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Consumer(
               builder: (context, ref, _) {

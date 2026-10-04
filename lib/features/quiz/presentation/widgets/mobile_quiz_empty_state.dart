@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +18,7 @@ class MobileQuizEmptyState extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '復習対象の単語がまだありません。\n単語を学習済みにするとここに表示されます。',
+          context.l10n.quizEmpty,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -27,7 +28,7 @@ class MobileQuizEmptyState extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         MobileFilledButton(
-          label: '学習中リストへ',
+          label: context.l10n.toLearningList,
           onPressed: () =>
               ref.read(mainPageProvider.notifier).selectView(MainView.learning),
           fontSize: 14,

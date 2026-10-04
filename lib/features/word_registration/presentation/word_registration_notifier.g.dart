@@ -42,7 +42,7 @@ final class WordRegistrationNotifierProvider
 }
 
 String _$wordRegistrationNotifierHash() =>
-    r'3ec2d3ae97963c3ed83142094acbe7d5f3096a28';
+    r'04628d60b32db034beb55c0c1fbabd2a6aadd825';
 
 abstract class _$WordRegistrationNotifier
     extends $Notifier<WordRegistrationState> {

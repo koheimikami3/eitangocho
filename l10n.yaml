@@ -1,0 +1,6 @@
+# 画面の文言(gen-l10n)。テンプレートは日本語で、en / zh / zh_Hant を並べる。
+arb-dir: lib/l10n
+template-arb-file: app_ja.arb
+output-dir: lib/l10n
+output-localization-file: app_localizations.dart
+nullable-getter: false

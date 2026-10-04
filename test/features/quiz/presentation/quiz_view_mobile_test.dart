@@ -4,6 +4,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view_mobile.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: QuizViewMobile())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: QuizViewMobile()),
+          ),
         ),
       );
       await tester.pump();

@@ -1,6 +1,7 @@
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,9 +25,9 @@ class UiScaleSlider extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       child: Row(
         children: [
-          const Text(
-            '表示サイズ',
-            style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
+          Text(
+            context.l10n.uiScale,
+            style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
           ),
           const SizedBox(width: 12),
           Expanded(

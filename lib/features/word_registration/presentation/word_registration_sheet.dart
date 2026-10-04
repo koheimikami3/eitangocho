@@ -8,9 +8,12 @@ import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
+import 'package:eitangocho/features/word_registration/presentation/registration_messages.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_notifier.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -173,27 +176,39 @@ class _WordRegistrationSheetState
     final state = ref.watch(wordRegistrationProvider);
     final notifier = ref.read(wordRegistrationProvider.notifier);
     final isForm = state.step == RegistrationStep.form;
+    final l10n = context.l10n;
+    final language = ref.watch(translationLanguageProvider);
+    final languageLabel = language.shortLabel(l10n);
+    final error = state.error;
+    final errorMessage = error == null
+        ? null
+        : registrationErrorText(l10n, error, language);
+    final notice = state.notice;
 
     return MobileSheet(
-      title: '単語を登録',
+      title: l10n.navRegistration,
       footer: const MobileSheetBannerAd(),
       // フォームまで進んでいれば入力ステップへ戻す、そうでなければ閉じる。
-      leftLabel: isForm ? '戻る' : 'キャンセル',
+      leftLabel: isForm ? l10n.back : l10n.cancel,
       onLeft: isForm ? notifier.backToInput : () => Navigator.of(context).pop(),
-      rightLabel: isForm ? '登録' : null,
+      rightLabel: isForm ? l10n.registerShort : null,
       onRight: isForm ? _save : null,
       child: switch (state.step) {
         RegistrationStep.input => _InputStep(
           controller: _wordController,
-          errorMessage: state.errorMessage,
+          languageLabel: languageLabel,
+          errorMessage: errorMessage,
           onAutoFill: () => notifier.autoFill(_wordController.text),
           onSkip: notifier.skipToManual,
         ),
         RegistrationStep.loading => const _LoadingStep(),
         RegistrationStep.form => _FormStep(
-          warningMessage: state.warningMessage,
+          warningMessage: notice == null
+              ? null
+              : registrationNoticeText(l10n, notice, language),
           translationFailed: state.translationFailed,
-          errorMessage: state.errorMessage,
+          languageLabel: languageLabel,
+          errorMessage: errorMessage,
           wordController: _wordController,
           ipaController: _ipaController,
           meaningController: _meaningController,
@@ -215,12 +230,16 @@ class _WordRegistrationSheetState
 class _InputStep extends StatelessWidget {
   const _InputStep({
     required this.controller,
+    required this.languageLabel,
     required this.errorMessage,
     required this.onAutoFill,
     required this.onSkip,
   });
 
   final TextEditingController controller;
+
+  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
+  final String languageLabel;
   final String? errorMessage;
   final VoidCallback onAutoFill;
   final VoidCallback onSkip;
@@ -228,12 +247,13 @@ class _InputStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '英単語を入力すると、発音記号・日本語訳・例文などを辞書から自動取得します。',
+          l10n.registrationIntro(languageLabel),
           style: TextStyle(
             fontSize: 12,
             height: 1.6,
@@ -242,7 +262,7 @@ class _InputStep extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         MobileLabeledField(
-          label: '英単語 *',
+          label: l10n.fieldWord,
           controller: controller,
           hintText: 'apple',
           asciiOnly: true,
@@ -250,7 +270,7 @@ class _InputStep extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         MobileFilledButton(
-          label: '自動入力',
+          label: l10n.autoFill,
           onPressed: onAutoFill,
           padding: const EdgeInsets.all(13),
           borderRadius: 11,
@@ -269,7 +289,7 @@ class _InputStep extends StatelessWidget {
           builder: (context, _) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Text(
-              'スキップして手動で入力する',
+              l10n.skipToManual,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: palette.accentOnSoft),
             ),
@@ -302,7 +322,7 @@ class _LoadingStep extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            '辞書データを取得中...',
+            context.l10n.fetchingDictionary,
             style: TextStyle(fontSize: 13, color: palette.textAlpha(50)),
           ),
         ],
@@ -315,6 +335,7 @@ class _FormStep extends StatelessWidget {
   const _FormStep({
     required this.warningMessage,
     required this.translationFailed,
+    required this.languageLabel,
     required this.errorMessage,
     required this.wordController,
     required this.ipaController,
@@ -332,6 +353,9 @@ class _FormStep extends StatelessWidget {
 
   final String? warningMessage;
   final bool translationFailed;
+
+  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
+  final String languageLabel;
   final String? errorMessage;
   final TextEditingController wordController;
   final TextEditingController ipaController;
@@ -349,6 +373,7 @@ class _FormStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -358,24 +383,24 @@ class _FormStep extends StatelessWidget {
           const SizedBox(height: 14),
         ],
         if (translationFailed) ...[
-          _WarningBanner(message: '例文の日本語訳を取得できませんでした。手動で入力できます。'),
+          _WarningBanner(message: l10n.exampleTranslationFailed(languageLabel)),
           const SizedBox(height: 14),
         ],
         MobileFormRows(
           children: [
             MobileLabeledField(
-              label: '英単語 *',
+              label: l10n.fieldWord,
               controller: wordController,
               asciiOnly: true,
             ),
             // IPA は非 ASCII なので asciiOnly を付けない。
             MobileLabeledField(
-              label: '発音記号 (IPA)',
+              label: l10n.fieldIpa,
               controller: ipaController,
               autoFilled: autoIpa,
             ),
             MobileLabeledField(
-              label: '日本語訳 *',
+              label: l10n.fieldMeaning(languageLabel),
               controller: meaningController,
               maxLines: null,
               autoFilled: autoMeaning,
@@ -383,7 +408,10 @@ class _FormStep extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                MobileFieldLabel(label: '品詞(複数選択可)', autoFilled: autoPos),
+                MobileFieldLabel(
+                  label: l10n.fieldPartsOfSpeech,
+                  autoFilled: autoPos,
+                ),
                 const SizedBox(height: 7),
                 MobilePosChipSelector(
                   selected: selectedPartsOfSpeech,
@@ -392,14 +420,14 @@ class _FormStep extends StatelessWidget {
               ],
             ),
             MobileLabeledField(
-              label: '英例文',
+              label: l10n.fieldExampleEn,
               controller: exampleEnController,
               minLines: 2,
               maxLines: null,
               autoFilled: autoExampleEn,
             ),
             MobileLabeledField(
-              label: '日本語例文',
+              label: l10n.fieldExampleTranslation(languageLabel),
               controller: exampleTranslationController,
               minLines: 2,
               maxLines: null,

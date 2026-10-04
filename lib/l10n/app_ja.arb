@@ -1,0 +1,393 @@
+{
+  "@@locale": "ja",
+  "translationLanguageName": "{language, select, ja{日本語} zhHant{中国語(繁体字)} other{}}",
+  "@translationLanguageName": {
+    "description": "訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "translationLanguageShortName": "{language, select, ja{日本語} zhHant{中国語} other{}}",
+  "@translationLanguageShortName": {
+    "description": "訳の言語の短い名前(項目名・出題方向に差し込む)",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "navLearning": "学習中",
+  "navLearningWords": "学習中の単語",
+  "navAllWords": "全単語",
+  "navQuiz": "フラッシュクイズ",
+  "navQuizShort": "クイズ",
+  "@navQuizShort": {
+    "description": "タブバーの短いラベル"
+  },
+  "navRegistration": "単語を登録",
+  "navSettings": "設定",
+  "wordCount": "{count}語",
+  "@wordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "showingWordCount": "{count}語を表示中",
+  "@showingWordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addShort": "＋ 登録",
+  "@addShort": {
+    "description": "ヘッダーの登録ボタン"
+  },
+  "addWord": "＋ 単語を登録",
+  "search": "検索",
+  "menuWords": "単語",
+  "@menuWords": {
+    "description": "macOS のメニュー名"
+  },
+  "menuEdit": "編集",
+  "@menuEdit": {
+    "description": "macOS のメニュー名"
+  },
+  "menuWindow": "ウィンドウ",
+  "@menuWindow": {
+    "description": "macOS のメニュー名"
+  },
+  "sidebarTitle": "単語帳",
+  "sidebarSavedLocally": "ローカル DB に保存済み",
+  "posNoun": "名詞",
+  "posVerb": "動詞",
+  "posAdjective": "形容詞",
+  "posAdverb": "副詞",
+  "posOther": "その他",
+  "posSeparator": "・",
+  "@posSeparator": {
+    "description": "複数品詞を 1 つのバッジに並べるときの区切り"
+  },
+  "fieldWord": "英単語 *",
+  "fieldIpa": "発音記号 (IPA)",
+  "fieldMeaning": "{language}訳 *",
+  "@fieldMeaning": {
+    "description": "language は translationLanguageShortName",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldPartsOfSpeech": "品詞(複数選択可)",
+  "fieldExampleEn": "英例文",
+  "fieldExampleTranslation": "{language}例文",
+  "@fieldExampleTranslation": {
+    "description": "language は translationLanguageShortName",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "manualInputHint": "手動で入力してください",
+  "registrationIntro": "英単語を入力すると、発音記号・{language}訳・例文などを辞書から自動取得します。",
+  "@registrationIntro": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "autoFill": "自動入力",
+  "skipToManual": "スキップして手動で入力する",
+  "fetchingDictionary": "辞書データを取得中...",
+  "exampleTranslationFailed": "例文の{language}訳を取得できませんでした。手動で入力できます。",
+  "@exampleTranslationFailed": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "exampleTranslationFailedShort": "例文の翻訳に失敗しました(手動で入力できます)",
+  "registerButton": "登録する",
+  "registerShort": "登録",
+  "back": "戻る",
+  "cancel": "キャンセル",
+  "close": "閉じる",
+  "save": "保存",
+  "noticeNotFound": "辞書に見つかりませんでした。手動で入力できます。",
+  "noticeMeaningNotFound": "{language}訳は辞書に見つかりませんでした(手動で入力してください)",
+  "@noticeMeaningNotFound": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "noticeOnlyMeaningFound": "発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)",
+  "errorDuplicate": "「{word}」は既に登録されています。",
+  "@errorDuplicate": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEmptyWord": "英単語を入力してください。",
+  "errorFetchFailed": "辞書データの取得に失敗しました。通信環境を確認してください。",
+  "errorRequiredFields": "英単語と{language}訳は必須です。",
+  "@errorRequiredFields": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "editWordTitle": "単語を編集",
+  "deleteThisWord": "この単語を削除",
+  "editEllipsis": "編集...",
+  "deleteEllipsis": "削除...",
+  "deleteConfirmTitle": "「{word}」を削除しますか?",
+  "@deleteConfirmTitle": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteConfirmBody": "この操作は取り消せません。",
+  "deleteConfirmCancel": "やめる",
+  "deleteConfirmOk": "削除する",
+  "noExample": "例文なし",
+  "markLearned": "学習済みにする",
+  "showMeaningWithLanguage": "{language}訳を表示",
+  "@showMeaningWithLanguage": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "showMeaning": "訳を表示",
+  "correctCount": "覚えた {count}回",
+  "@correctCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rememberedCheck": "覚えた",
+  "@rememberedCheck": {
+    "description": "学習中カードのチェックの横の文言"
+  },
+  "learningHint": "チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。",
+  "noWordsYet": "単語がまだありません。",
+  "learningEmpty": "学習中の単語はありません。\n単語を登録しましょう。",
+  "sortOrderLabel": "並び順: {order}",
+  "@sortOrderLabel": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "sortSheetTitle": "並び替え",
+  "sortNewest": "登録日が新しい順",
+  "sortOldest": "登録日が古い順",
+  "sortLearningFirst": "学習中 → 学習済み",
+  "sortLearnedFirst": "学習済み → 学習中",
+  "sortMostCorrect": "覚えた回数が多い順",
+  "sortLeastCorrect": "覚えた回数が少ない順",
+  "tableLearned": "学習済み",
+  "tableWord": "単語",
+  "tableIpa": "発音記号",
+  "tablePartOfSpeech": "品詞",
+  "tableMeaning": "{language}訳",
+  "@tableMeaning": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "tableExample": "例文",
+  "tablePronunciation": "発音",
+  "showAnswer": "答えを表示",
+  "quizForgot": "忘れていた",
+  "quizRemembered": "覚えている",
+  "quizForgotHint": "「忘れていた」を選ぶと学習中リストに戻ります",
+  "quizEmpty": "復習対象の単語がまだありません。\n単語を学習済みにするとここに表示されます。",
+  "toLearningList": "学習中リストへ",
+  "quizDone": "復習完了",
+  "quizSummary": "覚えている {ok}語 / 忘れていた {forgot}語",
+  "@quizSummary": {
+    "placeholders": {
+      "ok": {
+        "type": "int"
+      },
+      "forgot": {
+        "type": "int"
+      }
+    }
+  },
+  "quizContinue": "続ける",
+  "quizForgotWordsHeader": "忘れていた単語(学習中リストに戻りました)",
+  "quizDirectionFromEnglish": "英語 → {language}",
+  "@quizDirectionFromEnglish": {
+    "description": "language は translationLanguageShortName",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "quizDirectionToEnglish": "{language} → 英語",
+  "@quizDirectionToEnglish": {
+    "description": "language は translationLanguageShortName",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionDisplay": "表示",
+  "theme": "テーマ",
+  "appearanceLight": "ライト",
+  "appearanceDark": "ダーク",
+  "cardLayout": "学習中カードの並び",
+  "layoutTwoColumns": "2列(コンパクト)",
+  "layoutOneColumn": "1列(横幅いっぱい)",
+  "showIpa": "発音記号(IPA)を表示",
+  "sectionQuiz": "クイズ",
+  "sectionTranslation": "訳の言語",
+  "translationLanguageCaption": "新しく登録する単語の訳を、この言語で取得します。登録済みの単語の訳は変わりません。",
+  "sectionData": "データ",
+  "sectionSupport": "サポート",
+  "writeReview": "App Store でレビューを書く",
+  "sectionAuthorApps": "作者の他のアプリ",
+  "@sectionAuthorApps": {
+    "description": "日本語の画面でだけ出す"
+  },
+  "getApp": "入手",
+  "sectionInfo": "情報",
+  "version": "バージョン",
+  "licenses": "ライセンス",
+  "licenseCount": "{count, plural, =1{ライセンス} other{{count} 件のライセンス}}",
+  "@licenseCount": {
+    "description": "ライセンス種別を判別できなかったときの要約",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "licenseLoadFailed": "ライセンス情報を読み込めませんでした。",
+  "licenseAutoGenerated": "この一覧はビルド時に自動生成されます。",
+  "uiScale": "表示サイズ",
+  "exportDone": "エクスポートしました",
+  "exportData": "データを書き出す",
+  "exportDataEllipsis": "データを書き出す...",
+  "importData": "データを読み込む",
+  "importDataEllipsis": "データを読み込む...",
+  "importDoneTitle": "インポートが完了しました",
+  "importAdded": "追加 {count} 件",
+  "@importAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importUpdated": "更新 {count} 件",
+  "@importUpdated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importUnchanged": "変更なし {count} 件",
+  "@importUnchanged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkipped": "スキップ {count} 件",
+  "@importSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailedTitle": "インポートできませんでした",
+  "importErrorInvalidJson": "JSON として読み込めませんでした。",
+  "importErrorInvalidFormat": "JSON の形式が不正です。",
+  "importErrorUnsupportedVersion": "対応していないバージョンのファイルです。",
+  "deeplKeyHint": "DeepL API キーを入力",
+  "deeplDescription": "DeepL API Free のキーを設定すると、自動入力時に英例文の{language}訳を取得します。未設定の場合、例文の訳はスキップされます。",
+  "@deeplDescription": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "icloudSync": "iCloud 同期",
+  "syncNow": "今すぐ同期",
+  "syncing": "同期中...",
+  "neverSynced": "まだ同期していません",
+  "lastSynced": "最終同期: {time}",
+  "@lastSynced": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "syncErrorNoICloud": "iCloud が利用できません。設定で iCloud Drive にサインインしてください。",
+  "syncErrorNotCurrent": "iCloud から最新のデータを取得できなかったため、同期を見送りました。",
+  "syncErrorUnsupported": "このプラットフォームでは iCloud 同期を利用できません。",
+  "syncErrorFailed": "同期に失敗しました: {detail}",
+  "@syncErrorFailed": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "removeAds": "広告を非表示にする",
+  "proPurchasedCaption": "Pro を購入済みです",
+  "priceUnavailable": "価格を取得できませんでした",
+  "oneTimePrice": "買い切り {price}",
+  "@oneTimePrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "purchased": "購入済み",
+  "purchase": "購入",
+  "restorePurchases": "購入を復元",
+  "purchaseFailed": "購入できませんでした",
+  "restoreChecking": "確認中…",
+  "restoreDone": "復元しました",
+  "restoreNotFound": "購入履歴が見つかりません",
+  "restoreFailed": "復元できませんでした",
+  "listenPronunciation": "発音を聞く",
+  "pronunciationShort": "発音",
+  "pronunciationTooltip": "Google 翻訳で発音を確認",
+  "pageLoadFailed": "ページを読み込めませんでした。\n通信状況を確認してから、もう一度お試しください。",
+  "reload": "再読み込み"
+}

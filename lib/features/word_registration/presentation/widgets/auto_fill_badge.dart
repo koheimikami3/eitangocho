@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// 自動取得できた項目のラベル横に出すピルバッジ(プロトタイプ準拠)。
@@ -13,9 +14,9 @@ class AutoFillBadge extends StatelessWidget {
         color: AppColors.autoFillBadgeBackground,
         borderRadius: BorderRadius.circular(99),
       ),
-      child: const Text(
-        '自動入力',
-        style: TextStyle(
+      child: Text(
+        context.l10n.autoFill,
+        style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: AppColors.autoFillBadgeForeground,

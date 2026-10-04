@@ -55,19 +55,28 @@ class IcloudFileStore implements CloudFileStore {
     () => channel.invokeMethod<void>('resolveConflicts', {'ids': ids}),
   );
 
-  /// PlatformException を UI に出せる例外へ翻訳する。
-  /// ネイティブ側が日本語メッセージを載せているので、それをそのまま使う。
+  /// PlatformException を理由付きの例外へ翻訳する。
+  ///
+  /// ネイティブ側のメッセージは日本語固定なので、表示には使わずコードで
+  /// 理由を決める(文言は表示側が言語に合わせて出す)。コードはネイティブ側
+  /// (IcloudFileStorePlugin.swift)と合わせる。読み書きの失敗は OS が
+  /// 端末の言語で返す説明(localizedDescription)なので、補足として残す。
   Future<T> _invoke<T>(Future<T> Function() body) async {
     try {
       return await body();
     } on PlatformException catch (e) {
-      final message = e.message ?? 'iCloud との通信に失敗しました。';
-      // コードはネイティブ側(IcloudFileStorePlugin.swift)の notCurrentError と合わせる。
-      if (e.code == 'not-current') throw CloudNotReadyException(message);
-      throw CloudUnavailableException(message);
+      throw switch (e.code) {
+        'no-icloud' => const CloudUnavailableException(
+          CloudFailureReason.noICloud,
+        ),
+        'not-current' => const CloudNotReadyException(),
+        _ => CloudUnavailableException(CloudFailureReason.failed, e.message),
+      };
     } on MissingPluginException {
       // iCloud 未対応のプラットフォームで呼ばれた場合。
-      throw const CloudUnavailableException('このプラットフォームでは iCloud 同期を利用できません。');
+      throw const CloudUnavailableException(
+        CloudFailureReason.unsupportedPlatform,
+      );
     }
   }
 }

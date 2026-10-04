@@ -1,3 +1,4 @@
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// 品詞。DB には [name] を CSV 連結した文字列で保存する
@@ -18,16 +19,22 @@ import 'package:flutter/material.dart';
 ///   名詞をいちばん静かな青に、いちばんまれな副詞を紫にしている
 /// - 文字は 10px と小さいので、チップ背景に対して 4.5:1 以上を確保する
 enum PartOfSpeech {
-  noun('名詞', Color(0xFFE6F4FE), Color(0xFF026A9D)),
-  verb('動詞', Color(0xFFE6F8E6), Color(0xFF097F23)),
-  adjective('形容詞', Color(0xFFFFEDEB), Color(0xFF90101A)),
-  adverb('副詞', Color(0xFFF7EEFE), Color(0xFF67298C)),
-  other('その他', Color(0xFFECECEF), Color(0xFF68696B));
+  noun(Color(0xFFE6F4FE), Color(0xFF026A9D)),
+  verb(Color(0xFFE6F8E6), Color(0xFF097F23)),
+  adjective(Color(0xFFFFEDEB), Color(0xFF90101A)),
+  adverb(Color(0xFFF7EEFE), Color(0xFF67298C)),
+  other(Color(0xFFECECEF), Color(0xFF68696B));
 
-  const PartOfSpeech(this.label, this.badgeBackground, this.badgeForeground);
+  const PartOfSpeech(this.badgeBackground, this.badgeForeground);
 
-  /// 表示用の日本語ラベル
-  final String label;
+  /// 表示用ラベル
+  String label(AppLocalizations l10n) => switch (this) {
+    noun => l10n.posNoun,
+    verb => l10n.posVerb,
+    adjective => l10n.posAdjective,
+    adverb => l10n.posAdverb,
+    other => l10n.posOther,
+  };
 
   /// ライトのバッジ背景色(ダークは AppPalette.posBadge)
   final Color badgeBackground;
@@ -38,7 +45,8 @@ enum PartOfSpeech {
 
 /// 複数品詞の表示用連結(例: 「名詞・動詞」)
 extension PartOfSpeechListLabel on List<PartOfSpeech> {
-  String get joinedLabel => map((p) => p.label).join('・');
+  String joinedLabel(AppLocalizations l10n) =>
+      map((p) => p.label(l10n)).join(l10n.posSeparator);
 }
 
 extension PartOfSpeechSelection on Set<PartOfSpeech> {

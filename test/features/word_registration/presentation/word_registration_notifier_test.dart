@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
+import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
@@ -70,8 +71,8 @@ void main() {
 
     expect(result, isFalse);
     expect(
-      container.read(wordRegistrationProvider).errorMessage,
-      '英単語と日本語訳は必須です。',
+      container.read(wordRegistrationProvider).error,
+      const RegistrationError.requiredFields(),
     );
     expect(await db.wordDao.watchAll().first, isEmpty);
   });
@@ -90,8 +91,8 @@ void main() {
 
     expect(result, isFalse);
     expect(
-      container.read(wordRegistrationProvider).errorMessage,
-      '英単語と日本語訳は必須です。',
+      container.read(wordRegistrationProvider).error,
+      const RegistrationError.requiredFields(),
     );
   });
 
@@ -207,7 +208,7 @@ void main() {
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '英単語を入力してください。');
+      expect(state.error, const RegistrationError.emptyWord());
     });
 
     test('成功すると form へ遷移し fetched と品詞が反映される', () async {
@@ -251,7 +252,7 @@ void main() {
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '辞書データの取得に失敗しました。通信環境を確認してください。');
+      expect(state.error, const RegistrationError.fetchFailed());
     });
 
     // DeepL のキーは条件に含めない。設定 UI を隠したいま、キーを条件にすると
@@ -398,7 +399,7 @@ void main() {
       final state = container.read(wordRegistrationProvider);
       expect(fetchCalled, isFalse);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '「apple」は既に登録されています。');
+      expect(state.error, const RegistrationError.duplicate('apple'));
     });
 
     test('大文字違い・前後空白でも autoFill は弾く', () async {
@@ -412,8 +413,8 @@ void main() {
           .autoFill('  Apple ');
 
       expect(
-        container.read(wordRegistrationProvider).errorMessage,
-        '「apple」は既に登録されています。',
+        container.read(wordRegistrationProvider).error,
+        const RegistrationError.duplicate('apple'),
       );
     });
 
@@ -433,8 +434,8 @@ void main() {
 
       expect(result, isFalse);
       expect(
-        container.read(wordRegistrationProvider).errorMessage,
-        '「apple」は既に登録されています。',
+        container.read(wordRegistrationProvider).error,
+        const RegistrationError.duplicate('apple'),
       );
       expect(await db.wordDao.watchAll().first, hasLength(1));
     });

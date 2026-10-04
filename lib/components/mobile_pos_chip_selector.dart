@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の品詞選択チップ(複数選択可)。
@@ -57,7 +58,7 @@ class MobilePosChipSelector extends StatelessWidget {
                           ],
                   ),
                   child: Text(
-                    pos.label,
+                    pos.label(context.l10n),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: TextStyle(

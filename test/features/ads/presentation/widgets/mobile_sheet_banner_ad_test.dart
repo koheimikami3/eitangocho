@@ -1,5 +1,6 @@
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_ad_slot.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,6 +16,9 @@ void main() {
       ProviderScope(
         overrides: [adsDisabled, purchasesDisabled],
         child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           // Scaffold を挟まないのは、body に渡す MediaQuery から
           // viewInsets.bottom を取り除いてしまうため(実際の置き場所は
           // ボトムシートの中で、キーボードの高さがそのまま届く)。

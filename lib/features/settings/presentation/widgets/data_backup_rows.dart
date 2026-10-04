@@ -1,6 +1,7 @@
 import 'package:eitangocho/features/settings/presentation/widgets/settings_divider.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_link_row.dart';
 import 'package:eitangocho/features/settings/presentation/word_backup_actions.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,12 +39,12 @@ class _DataBackupRowsState extends ConsumerState<DataBackupRows> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SettingsLinkRow(
-          label: 'データを書き出す...',
+          label: context.l10n.exportDataEllipsis,
           onTap: () => _run(exportWordsToFile),
         ),
         const SettingsDivider(),
         SettingsLinkRow(
-          label: 'データを読み込む...',
+          label: context.l10n.importDataEllipsis,
           onTap: () => _run(importWordsFromFile),
         ),
       ],

@@ -10,13 +10,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// エクスポート/インポート対象の JSON フォーマットが不正なときの例外
 /// (未知の version・トップレベルの型不正・JSON 自体のパース失敗)。
 class WordExportFormatException implements Exception {
-  const WordExportFormatException(this.message);
+  const WordExportFormatException(this.error);
 
-  final String message;
+  /// 何が不正だったか。文言は表示側(showImportErrorDialog)が言語に合わせて出す。
+  final WordExportFormatError error;
 
   @override
-  String toString() => message;
+  String toString() => 'WordExportFormatException: ${error.name}';
 }
+
+/// [WordExportFormatException] の種類。
+enum WordExportFormatError { invalidJson, invalidFormat, unsupportedVersion }
 
 /// インポート結果の件数。
 class ImportResult {
@@ -111,18 +115,24 @@ class WordExportService {
     try {
       decoded = jsonDecode(source);
     } on FormatException {
-      throw const WordExportFormatException('JSON として読み込めませんでした。');
+      throw const WordExportFormatException(WordExportFormatError.invalidJson);
     }
 
     if (decoded is! Map<String, dynamic>) {
-      throw const WordExportFormatException('JSON の形式が不正です。');
+      throw const WordExportFormatException(
+        WordExportFormatError.invalidFormat,
+      );
     }
     if (!_supportedVersions.contains(decoded['version'])) {
-      throw const WordExportFormatException('対応していないバージョンのファイルです。');
+      throw const WordExportFormatException(
+        WordExportFormatError.unsupportedVersion,
+      );
     }
     final rawWords = decoded['words'];
     if (rawWords is! List) {
-      throw const WordExportFormatException('JSON の形式が不正です。');
+      throw const WordExportFormatException(
+        WordExportFormatError.invalidFormat,
+      );
     }
     // v1 には deletions が無い。型が違う場合も欠落と同じく空として扱い、
     // 単語本体の取り込みまで巻き添えで失敗させない。

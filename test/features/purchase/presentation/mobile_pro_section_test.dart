@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
 import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +28,12 @@ void main() {
             () => PurchaseNotifier(messageDuration: messageDuration),
           ),
         ],
-        child: const MaterialApp(home: Scaffold(body: MobileProSection())),
+        child: const MaterialApp(
+          locale: Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: MobileProSection()),
+        ),
       ),
     );
     // build 内の初期化(configure → 購読 → 価格取得)を終わらせる。

@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_setting
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/sync/presentation/sync_status_text.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,7 +27,7 @@ class MobileSyncRows extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         MobileSettingsToggleRow(
-          label: 'iCloud 同期',
+          label: context.l10n.icloudSync,
           value: state.enabled,
           onChanged: (value) => notifier.setEnabled(enabled: value),
         ),
@@ -34,12 +35,12 @@ class MobileSyncRows extends ConsumerWidget {
           const MobileSettingsDivider(),
           _SyncNowRow(
             syncing: state.syncing,
-            status: syncStatusText(state),
+            status: syncStatusText(context.l10n, state),
             onTap: notifier.syncNow,
           ),
-          if (state.errorMessage != null) ...[
+          if (state.failure case final failure?) ...[
             const MobileSettingsDivider(),
-            _SyncErrorRow(message: state.errorMessage!),
+            _SyncErrorRow(message: syncFailureText(context.l10n, failure)),
           ],
         ],
       ],
@@ -71,7 +72,7 @@ class _SyncNowRow extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                '今すぐ同期',
+                context.l10n.syncNow,
                 style: TextStyle(
                   fontSize: 14,
                   // カード地に載るアクセント文字は accentOnSoft を使う

@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/components/app_raised_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// 答え表示後の回答ボタン列(忘れていた / 覚えている)+ 注記。
@@ -24,7 +25,7 @@ class QuizAnswerButtons extends StatelessWidget {
             Expanded(
               // iOS と同じく、枠線ではなく影で浮かせた面の副ボタンにする。
               child: AppRaisedButton(
-                label: '忘れていた',
+                label: context.l10n.quizForgot,
                 textColor: AppColors.danger,
                 verticalPadding: 11,
                 borderRadius: 9,
@@ -34,7 +35,7 @@ class QuizAnswerButtons extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: AppFilledButton(
-                label: '覚えている',
+                label: context.l10n.quizRemembered,
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: onKnew,
@@ -43,8 +44,8 @@ class QuizAnswerButtons extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        const Text(
-          '「忘れていた」を選ぶと学習中リストに戻ります',
+        Text(
+          context.l10n.quizForgotHint,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 11, color: AppColors.textTertiary),
         ),

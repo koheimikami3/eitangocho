@@ -3,6 +3,7 @@ import 'package:eitangocho/components/app_outlined_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,7 +26,7 @@ Future<bool> showDeleteConfirmDialog(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '「${word.word}」を削除しますか?',
+                context.l10n.deleteConfirmTitle(word.word),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 15,
@@ -34,24 +35,27 @@ Future<bool> showDeleteConfirmDialog(
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'この操作は取り消せません。',
+              Text(
+                context.l10n.deleteConfirmBody,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: AppOutlinedButton(
-                      label: 'やめる',
+                      label: context.l10n.deleteConfirmCancel,
                       onPressed: () => Navigator.of(context).pop(false),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: AppFilledButton(
-                      label: '削除する',
+                      label: context.l10n.deleteConfirmOk,
                       color: AppColors.danger,
                       hoverColor: AppColors.dangerHover,
                       onPressed: () => Navigator.of(context).pop(true),

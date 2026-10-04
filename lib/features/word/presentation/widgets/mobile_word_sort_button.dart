@@ -3,6 +3,7 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_sort_sheet.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +39,7 @@ class MobileWordSortButton extends ConsumerWidget {
             Icon(Icons.sort, size: 14, color: palette.accentOnSoft),
             const SizedBox(width: 6),
             Text(
-              order.label,
+              order.label(context.l10n),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

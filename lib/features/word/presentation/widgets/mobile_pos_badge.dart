@@ -1,5 +1,6 @@
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の品詞バッジ(ピル)。
@@ -26,7 +27,9 @@ class MobilePosBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
-        partsOfSpeech.isEmpty ? pos.label : partsOfSpeech.joinedLabel,
+        partsOfSpeech.isEmpty
+            ? pos.label(context.l10n)
+            : partsOfSpeech.joinedLabel(context.l10n),
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,

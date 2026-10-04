@@ -1,4 +1,5 @@
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,15 +15,15 @@ void main() {
     audioUrl: '',
   );
 
-  group('warningMessage', () {
+  group('notice', () {
     test('全部埋まっていれば出さない', () {
-      expect(const WordRegistrationState(fetched: full).warningMessage, isNull);
+      expect(const WordRegistrationState(fetched: full).notice, isNull);
     });
 
     test('未収録なら手動入力を促す', () {
       expect(
-        const WordRegistrationState(notFound: true).warningMessage,
-        '辞書に見つかりませんでした。手動で入力できます。',
+        const WordRegistrationState(notFound: true).notice,
+        RegistrationNotice.notFound,
       );
     });
 
@@ -30,7 +31,7 @@ void main() {
     test('訳が空なら、他が埋まっていても訳の不足を先に伝える', () {
       final state = WordRegistrationState(fetched: full.copyWith(meaning: ''));
 
-      expect(state.warningMessage, '日本語訳は辞書に見つかりませんでした(手動で入力してください)');
+      expect(state.notice, RegistrationNotice.meaningNotFound);
     });
 
     test('訳だけ取れたときは IPA と例文の不足を伝える', () {
@@ -38,11 +39,11 @@ void main() {
         fetched: full.copyWith(ipa: '', exampleEn: ''),
       );
 
-      expect(state.warningMessage, '発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)');
+      expect(state.notice, RegistrationNotice.onlyMeaningFound);
     });
 
     test('手動入力へスキップしたときは出さない', () {
-      expect(const WordRegistrationState().warningMessage, isNull);
+      expect(const WordRegistrationState().notice, isNull);
     });
   });
 }

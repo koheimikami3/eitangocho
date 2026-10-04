@@ -175,7 +175,7 @@ class SyncNotifier extends Notifier<SyncState> {
     await _restored;
     await _prefs.setBool(_keyEnabled, enabled);
     if (!ref.mounted) return;
-    state = state.copyWith(enabled: enabled, errorMessage: null);
+    state = state.copyWith(enabled: enabled, failure: null);
     if (enabled) {
       _watchLocalChanges();
       await syncNow();
@@ -191,7 +191,7 @@ class SyncNotifier extends Notifier<SyncState> {
     await _restored;
     if (!ref.mounted) return;
     if (!state.enabled || state.syncing) return;
-    state = state.copyWith(syncing: true, errorMessage: null);
+    state = state.copyWith(syncing: true, failure: null);
     try {
       await ref.read(syncServiceProvider).sync();
       final now = DateTime.now();
@@ -202,16 +202,22 @@ class SyncNotifier extends Notifier<SyncState> {
       state = state.copyWith(syncing: false, lastSyncedAt: now);
     } on CloudNotReadyException catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(syncing: false, errorMessage: e.message);
+      state = state.copyWith(syncing: false, failure: _failureOf(e));
       _scheduleRetry();
     } on CloudUnavailableException catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(syncing: false, errorMessage: e.message);
+      state = state.copyWith(syncing: false, failure: _failureOf(e));
     } on Object catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(syncing: false, errorMessage: '同期に失敗しました: $e');
+      state = state.copyWith(
+        syncing: false,
+        failure: SyncFailure(reason: CloudFailureReason.failed, detail: '$e'),
+      );
     }
   }
+
+  static SyncFailure _failureOf(CloudUnavailableException e) =>
+      SyncFailure(reason: e.reason, detail: e.detail);
 }
 
 /// riverpod_generator は drift 生成型に依存する Provider を
