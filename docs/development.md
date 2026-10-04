@@ -14,6 +14,7 @@ lib/
 ├── utils/        # ヘルパー
 ├── providers/    # グローバル Provider(DB インスタンス等)
 ├── db/           # drift のテーブル定義・DAO・Database クラス
+├── l10n/         # 画面の文言(ARB。app_ja.arb がテンプレート)と生成された AppLocalizations
 └── features/     # 機能別: word / quiz / word_registration / settings / sync /
                   #         ads / purchase(iOS のみ)/ review / analytics
     └── <feature>/
@@ -28,6 +29,7 @@ lib/
 flutter run -d macos                                    # macOS で実行
 flutter run -d <simulator-id>                           # iOS で実行
 dart run build_runner build --delete-conflicting-outputs # コード生成
+flutter gen-l10n                                        # ARB から文言クラスを生成(pub get でも走る)
 flutter test -r failures-only                           # 全テスト実行(失敗だけ表示)
 flutter test test/path/to/specific_test.dart            # 個別テスト実行
 flutter analyze                                         # 静的解析
