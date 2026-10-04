@@ -1,0 +1,3 @@
+/* Info.plist の日本語(開発言語)の値と同じ。アプリ名は Info.plist の
+   APP_DISPLAY_NAME(Debug は「dev」付き)をそのまま使うので、ここには書かない。 */
+"NSUserTrackingUsageDescription" = "アプリ内に表示する広告を、あなたの興味に合ったものにするために使用します。";

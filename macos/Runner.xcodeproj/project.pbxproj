@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		E1C10UD0000000000000E005 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1C10UD0000000000000E001 /* InfoPlist.strings */; };
 		331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294CF71000263BE5 /* RunnerTests.swift */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
@@ -66,6 +67,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E1C10UD0000000000000E002 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E1C10UD0000000000000E003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E1C10UD0000000000000E004 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh-Hant; path = zh-Hant.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		331C80D5294CF71000263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C80D7294CF71000263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		333000ED22D3DE5D00554162 /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 		33FAB671232836740065AC1E /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				E1C10UD0000000000000E001 /* InfoPlist.strings */,
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
 				E1C10UD0000000000000A002 /* IcloudFileStorePlugin.swift */,
@@ -280,6 +285,8 @@
 			knownRegions = (
 				en,
 				Base,
+				ja,
+				"zh-Hant",
 			);
 			mainGroup = 33CC10E42044A3C60003C045;
 			packageReferences = (
@@ -308,6 +315,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1C10UD0000000000000E005 /* InfoPlist.strings in Resources */,
 				E1C10UD0000000000000A003 /* AppIcon.icon in Resources */,
 				E1C10UD0000000000000A005 /* AppIcon-dev.icon in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
@@ -422,6 +430,16 @@
 			);
 			name = MainMenu.xib;
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		E1C10UD0000000000000E001 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E1C10UD0000000000000E002 /* ja */,
+				E1C10UD0000000000000E003 /* en */,
+				E1C10UD0000000000000E004 /* zh-Hant */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
