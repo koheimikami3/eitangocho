@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/kaikki_response.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
 import 'package:http/http.dart' as http;
@@ -22,8 +23,11 @@ class KaikkiApiClient {
   static const _userAgent =
       'eitangocho (https://github.com/koheimikami3/eitangocho)';
 
-  /// 訳語のうち残す言語(kaikki の `lang_code`)。
-  static const _japaneseLangCode = 'ja';
+  /// 訳語のうち残す言語(kaikki の `lang_code`)。訳の言語のどれでも
+  /// キャッシュから引けるよう、対応言語の分はすべて残す。
+  static final _keptLangCodes = {
+    for (final language in TranslationLanguage.values) language.kaikkiLangCode,
+  };
 
   /// 正規化済みの JSON 配列文字列を返す(キャッシュにそのまま保存する形)。
   /// 未収録は null、それ以外の失敗は [WordInfoException]。
@@ -90,8 +94,8 @@ class KaikkiApiClient {
   /// bring forth ... — Leigh Hunt」のような長文で単語帳には使えないうえ、
   /// キャッシュサイズの大半を占めるため。
   ///
-  /// 訳語は日本語だけ残す。全言語ぶんを持っており(`give up` は 1 品詞に
-  /// 243 件)、そのまま保存するとキャッシュを縮めた意味が無くなる。
+  /// 訳語は訳の言語の分だけ残す。全言語ぶんを持っており(`give up` は
+  /// 1 品詞に 243 件)、そのまま保存するとキャッシュを縮めた意味が無くなる。
   static List<KaikkiEntry> _parseJsonl(String body) {
     final entries = <KaikkiEntry>[];
     for (final line in const LineSplitter().convert(body)) {
@@ -118,7 +122,7 @@ class KaikkiApiClient {
           ],
           translations: [
             for (final translation in entry.translations)
-              if (translation.langCode == _japaneseLangCode) translation,
+              if (_keptLangCodes.contains(translation.langCode)) translation,
           ],
         ),
       );

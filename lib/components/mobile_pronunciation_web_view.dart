@@ -1,7 +1,9 @@
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// iOS 版の発音確認用 WebView。Google 翻訳を表示する。
@@ -10,19 +12,25 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// **iOS 専用**。macOS は Flutter の platform view がまだジェスチャに対応して
 /// おらず、埋め込んでも再生ボタンを押せないため、ネイティブの別ウィンドウに
 /// 出している(openPronunciationWindow。docs/design.md 参照)。
-class MobilePronunciationWebView extends StatefulWidget {
+class MobilePronunciationWebView extends ConsumerStatefulWidget {
   const MobilePronunciationWebView({required this.word, super.key});
 
   final String word;
 
   @override
-  State<MobilePronunciationWebView> createState() =>
+  ConsumerState<MobilePronunciationWebView> createState() =>
       _MobilePronunciationWebViewState();
 }
 
 class _MobilePronunciationWebViewState
-    extends State<MobilePronunciationWebView> {
+    extends ConsumerState<MobilePronunciationWebView> {
   late final WebViewController _controller;
+
+  /// 開いた時点の訳の言語で引く(シートを開いている間に変わることはない)。
+  late final Uri _url = googleTranslateUrl(
+    widget.word,
+    ref.read(translationLanguageProvider),
+  );
   bool _isLoading = true;
   bool _hasError = false;
 
@@ -56,7 +64,7 @@ class _MobilePronunciationWebViewState
           },
         ),
       )
-      ..loadRequest(googleTranslateUrl(widget.word));
+      ..loadRequest(_url);
   }
 
   void _update({required bool loading, bool? error}) {
@@ -69,7 +77,7 @@ class _MobilePronunciationWebViewState
 
   void _reload() {
     _update(loading: true, error: false);
-    _controller.loadRequest(googleTranslateUrl(widget.word));
+    _controller.loadRequest(_url);
   }
 
   @override

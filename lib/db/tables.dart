@@ -22,6 +22,14 @@ class Words extends Table {
   TextColumn get exampleTranslation =>
       text().named('example_ja').withDefault(const Constant(''))();
 
+  /// [meaning] / [exampleTranslation] の言語(TranslationLanguage.storageCode)。
+  ///
+  /// 登録時の訳の言語を記録する。訳の言語を切り替えた利用者の単語帳には
+  /// 複数の言語の訳が混ざるため、どの訳が何語かを後から判別できるようにする。
+  /// v3 までの単語は日本語訳しか無いので既定は ja。
+  TextColumn get translationLanguage =>
+      text().withDefault(const Constant('ja'))();
+
   /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
   /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、
   /// 既存データと iCloud 同期の JSON フォーマットを壊さないため残している。

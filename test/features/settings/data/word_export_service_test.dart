@@ -162,6 +162,33 @@ void main() {
     );
   });
 
+  // 多言語化。v2.5.0 より前の版が書いたファイルには translationLanguage が無い。
+  test('translationLanguage の無い行は日本語として取り込み、ある行はそのまま持ち回す', () async {
+    final json = jsonEncode({
+      'version': 1,
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
+      'words': [
+        {'word': 'apple', 'japanese': 'りんご'},
+        {'word': 'achieve', 'japanese': '實現', 'translationLanguage': 'zh-Hant'},
+      ],
+    });
+
+    await service.importJson(json);
+
+    final byWord = {
+      for (final w in await db.wordDao.getAll()) w.word: w.translationLanguage,
+    };
+    expect(byWord, {'apple': 'ja', 'achieve': 'zh-Hant'});
+
+    // 書き出しにも載り、JSON のキーは訳の言語によらず japanese のまま。
+    final exported = jsonDecode(await service.exportJson()) as Map;
+    final achieve = (exported['words'] as List).cast<Map>().firstWhere(
+      (w) => w['word'] == 'achieve',
+    );
+    expect(achieve['japanese'], '實現');
+    expect(achieve['translationLanguage'], 'zh-Hant');
+  });
+
   test('未知の partsOfSpeech 名は捨てて既知の値だけ復元する', () async {
     final json = jsonEncode({
       'version': 1,

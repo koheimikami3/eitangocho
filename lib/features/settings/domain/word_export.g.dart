@@ -58,6 +58,7 @@ _WordExportEntry _$WordExportEntryFromJson(Map<String, dynamic> json) =>
           const <String>[],
       exampleEn: json['exampleEn'] as String? ?? '',
       exampleTranslation: json['exampleJa'] as String? ?? '',
+      translationLanguage: json['translationLanguage'] as String? ?? 'ja',
       audioUrl: json['audioUrl'] as String? ?? '',
       isLearned: json['isLearned'] as bool? ?? false,
       lastReviewedAt: const NullableUtcDateTimeConverter().fromJson(
@@ -81,6 +82,7 @@ Map<String, dynamic> _$WordExportEntryToJson(
   'partsOfSpeech': instance.partsOfSpeech,
   'exampleEn': instance.exampleEn,
   'exampleJa': instance.exampleTranslation,
+  'translationLanguage': instance.translationLanguage,
   'audioUrl': instance.audioUrl,
   'isLearned': instance.isLearned,
   'lastReviewedAt': const NullableUtcDateTimeConverter().toJson(

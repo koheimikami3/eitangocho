@@ -41,8 +41,13 @@ Map<String, dynamic> _$TatoebaSentenceToJson(_TatoebaSentence instance) =>
 _TatoebaTranslation _$TatoebaTranslationFromJson(Map<String, dynamic> json) =>
     _TatoebaTranslation(
       lang: json['lang'] as String?,
+      script: json['script'] as String?,
       text: json['text'] as String?,
     );
 
 Map<String, dynamic> _$TatoebaTranslationToJson(_TatoebaTranslation instance) =>
-    <String, dynamic>{'lang': instance.lang, 'text': instance.text};
+    <String, dynamic>{
+      'lang': instance.lang,
+      'script': instance.script,
+      'text': instance.text,
+    };

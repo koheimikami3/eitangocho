@@ -1,4 +1,5 @@
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'word_info.freezed.dart';
@@ -13,6 +14,9 @@ abstract class WordInfo with _$WordInfo {
     @Default('') String meaning,
     @Default('') String exampleEn,
     @Default('') String exampleTranslation,
+
+    /// [meaning] / [exampleTranslation] を何語で取得したか(words に保存する)。
+    @Default(TranslationLanguage.ja) TranslationLanguage translationLanguage,
 
     /// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
     /// (docs/design.md)。words の同名カラムを埋める経路だけ残している。

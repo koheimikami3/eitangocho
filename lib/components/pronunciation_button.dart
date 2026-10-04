@@ -2,6 +2,7 @@ import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:eitangocho/utils/pronunciation_window.dart';
@@ -105,6 +106,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
         // 押したときだけ読むので build では watch しない。
         onTap: () => openPronunciationWindow(
           widget.word,
+          ref.read(translationLanguageProvider),
           zoom:
               ref.read(settingsProvider).value?.uiScale ??
               AppDimensions.defaultUiScale,

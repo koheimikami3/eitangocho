@@ -1,9 +1,11 @@
+import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
@@ -70,6 +72,36 @@ class SettingsView extends ConsumerWidget {
                         selected: settings.quizDirection == direction,
                         onTap: () => notifier.setQuizDirection(direction),
                       ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: l10n.sectionTranslation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SettingsCard(
+                      children: [
+                        for (final language in TranslationLanguage.values)
+                          SettingsRadioRow(
+                            label: language.label(l10n),
+                            selected: translationLanguage == language,
+                            onTap: () =>
+                                notifier.setTranslationLanguage(language),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // 説明文の意匠は DeepL の欄(DeeplApiKeyField)に合わせる。
+                    Text(
+                      l10n.translationLanguageCaption,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        height: 1.6,
+                        color: AppColors.textQuaternary,
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -14,6 +14,7 @@ Word _word(String word, String meaning, {bool isLearned = false}) => Word(
   partsOfSpeech: const <PartOfSpeech>[],
   exampleEn: '',
   exampleTranslation: '',
+  translationLanguage: 'ja',
   audioUrl: '',
   isLearned: isLearned,
   correctCount: 0,

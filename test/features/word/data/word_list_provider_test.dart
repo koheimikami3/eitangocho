@@ -23,6 +23,7 @@ Word _word(
   partsOfSpeech: const <PartOfSpeech>[],
   exampleEn: '',
   exampleTranslation: '',
+  translationLanguage: 'ja',
   audioUrl: '',
   isLearned: isLearned,
   correctCount: correctCount,

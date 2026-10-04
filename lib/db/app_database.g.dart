@@ -85,6 +85,18 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         requiredDuringInsert: false,
         defaultValue: const Constant(''),
       );
+  static const VerificationMeta _translationLanguageMeta =
+      const VerificationMeta('translationLanguage');
+  @override
+  late final GeneratedColumn<String> translationLanguage =
+      GeneratedColumn<String>(
+        'translation_language',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('ja'),
+      );
   static const VerificationMeta _audioUrlMeta = const VerificationMeta(
     'audioUrl',
   );
@@ -167,6 +179,7 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     partsOfSpeech,
     exampleEn,
     exampleTranslation,
+    translationLanguage,
     audioUrl,
     isLearned,
     lastReviewedAt,
@@ -223,6 +236,15 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         exampleTranslation.isAcceptableOrUnknown(
           data['example_ja']!,
           _exampleTranslationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('translation_language')) {
+      context.handle(
+        _translationLanguageMeta,
+        translationLanguage.isAcceptableOrUnknown(
+          data['translation_language']!,
+          _translationLanguageMeta,
         ),
       );
     }
@@ -311,6 +333,10 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         DriftSqlType.string,
         data['${effectivePrefix}example_ja'],
       )!,
+      translationLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}translation_language'],
+      )!,
       audioUrl: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}audio_url'],
@@ -364,6 +390,13 @@ class Word extends DataClass implements Insertable<Word> {
   /// 英例文の訳。[meaning] と同じ理由で SQL の列名は `example_ja` のまま。
   final String exampleTranslation;
 
+  /// [meaning] / [exampleTranslation] の言語(TranslationLanguage.storageCode)。
+  ///
+  /// 登録時の訳の言語を記録する。訳の言語を切り替えた利用者の単語帳には
+  /// 複数の言語の訳が混ざるため、どの訳が何語かを後から判別できるようにする。
+  /// v3 までの単語は日本語訳しか無いので既定は ja。
+  final String translationLanguage;
+
   /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
   /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、
   /// 既存データと iCloud 同期の JSON フォーマットを壊さないため残している。
@@ -384,6 +417,7 @@ class Word extends DataClass implements Insertable<Word> {
     required this.partsOfSpeech,
     required this.exampleEn,
     required this.exampleTranslation,
+    required this.translationLanguage,
     required this.audioUrl,
     required this.isLearned,
     this.lastReviewedAt,
@@ -405,6 +439,7 @@ class Word extends DataClass implements Insertable<Word> {
     }
     map['example_en'] = Variable<String>(exampleEn);
     map['example_ja'] = Variable<String>(exampleTranslation);
+    map['translation_language'] = Variable<String>(translationLanguage);
     map['audio_url'] = Variable<String>(audioUrl);
     map['is_learned'] = Variable<bool>(isLearned);
     if (!nullToAbsent || lastReviewedAt != null) {
@@ -425,6 +460,7 @@ class Word extends DataClass implements Insertable<Word> {
       partsOfSpeech: Value(partsOfSpeech),
       exampleEn: Value(exampleEn),
       exampleTranslation: Value(exampleTranslation),
+      translationLanguage: Value(translationLanguage),
       audioUrl: Value(audioUrl),
       isLearned: Value(isLearned),
       lastReviewedAt: lastReviewedAt == null && nullToAbsent
@@ -453,6 +489,9 @@ class Word extends DataClass implements Insertable<Word> {
       exampleTranslation: serializer.fromJson<String>(
         json['exampleTranslation'],
       ),
+      translationLanguage: serializer.fromJson<String>(
+        json['translationLanguage'],
+      ),
       audioUrl: serializer.fromJson<String>(json['audioUrl']),
       isLearned: serializer.fromJson<bool>(json['isLearned']),
       lastReviewedAt: serializer.fromJson<DateTime?>(json['lastReviewedAt']),
@@ -472,6 +511,7 @@ class Word extends DataClass implements Insertable<Word> {
       'partsOfSpeech': serializer.toJson<List<PartOfSpeech>>(partsOfSpeech),
       'exampleEn': serializer.toJson<String>(exampleEn),
       'exampleTranslation': serializer.toJson<String>(exampleTranslation),
+      'translationLanguage': serializer.toJson<String>(translationLanguage),
       'audioUrl': serializer.toJson<String>(audioUrl),
       'isLearned': serializer.toJson<bool>(isLearned),
       'lastReviewedAt': serializer.toJson<DateTime?>(lastReviewedAt),
@@ -489,6 +529,7 @@ class Word extends DataClass implements Insertable<Word> {
     List<PartOfSpeech>? partsOfSpeech,
     String? exampleEn,
     String? exampleTranslation,
+    String? translationLanguage,
     String? audioUrl,
     bool? isLearned,
     Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -503,6 +544,7 @@ class Word extends DataClass implements Insertable<Word> {
     partsOfSpeech: partsOfSpeech ?? this.partsOfSpeech,
     exampleEn: exampleEn ?? this.exampleEn,
     exampleTranslation: exampleTranslation ?? this.exampleTranslation,
+    translationLanguage: translationLanguage ?? this.translationLanguage,
     audioUrl: audioUrl ?? this.audioUrl,
     isLearned: isLearned ?? this.isLearned,
     lastReviewedAt: lastReviewedAt.present
@@ -525,6 +567,9 @@ class Word extends DataClass implements Insertable<Word> {
       exampleTranslation: data.exampleTranslation.present
           ? data.exampleTranslation.value
           : this.exampleTranslation,
+      translationLanguage: data.translationLanguage.present
+          ? data.translationLanguage.value
+          : this.translationLanguage,
       audioUrl: data.audioUrl.present ? data.audioUrl.value : this.audioUrl,
       isLearned: data.isLearned.present ? data.isLearned.value : this.isLearned,
       lastReviewedAt: data.lastReviewedAt.present
@@ -548,6 +593,7 @@ class Word extends DataClass implements Insertable<Word> {
           ..write('partsOfSpeech: $partsOfSpeech, ')
           ..write('exampleEn: $exampleEn, ')
           ..write('exampleTranslation: $exampleTranslation, ')
+          ..write('translationLanguage: $translationLanguage, ')
           ..write('audioUrl: $audioUrl, ')
           ..write('isLearned: $isLearned, ')
           ..write('lastReviewedAt: $lastReviewedAt, ')
@@ -567,6 +613,7 @@ class Word extends DataClass implements Insertable<Word> {
     partsOfSpeech,
     exampleEn,
     exampleTranslation,
+    translationLanguage,
     audioUrl,
     isLearned,
     lastReviewedAt,
@@ -585,6 +632,7 @@ class Word extends DataClass implements Insertable<Word> {
           other.partsOfSpeech == this.partsOfSpeech &&
           other.exampleEn == this.exampleEn &&
           other.exampleTranslation == this.exampleTranslation &&
+          other.translationLanguage == this.translationLanguage &&
           other.audioUrl == this.audioUrl &&
           other.isLearned == this.isLearned &&
           other.lastReviewedAt == this.lastReviewedAt &&
@@ -601,6 +649,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
   final Value<List<PartOfSpeech>> partsOfSpeech;
   final Value<String> exampleEn;
   final Value<String> exampleTranslation;
+  final Value<String> translationLanguage;
   final Value<String> audioUrl;
   final Value<bool> isLearned;
   final Value<DateTime?> lastReviewedAt;
@@ -615,6 +664,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
     this.partsOfSpeech = const Value.absent(),
     this.exampleEn = const Value.absent(),
     this.exampleTranslation = const Value.absent(),
+    this.translationLanguage = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.isLearned = const Value.absent(),
     this.lastReviewedAt = const Value.absent(),
@@ -630,6 +680,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
     this.partsOfSpeech = const Value.absent(),
     this.exampleEn = const Value.absent(),
     this.exampleTranslation = const Value.absent(),
+    this.translationLanguage = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.isLearned = const Value.absent(),
     this.lastReviewedAt = const Value.absent(),
@@ -648,6 +699,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
     Expression<String>? partsOfSpeech,
     Expression<String>? exampleEn,
     Expression<String>? exampleTranslation,
+    Expression<String>? translationLanguage,
     Expression<String>? audioUrl,
     Expression<bool>? isLearned,
     Expression<DateTime>? lastReviewedAt,
@@ -663,6 +715,8 @@ class WordsCompanion extends UpdateCompanion<Word> {
       if (partsOfSpeech != null) 'parts_of_speech': partsOfSpeech,
       if (exampleEn != null) 'example_en': exampleEn,
       if (exampleTranslation != null) 'example_ja': exampleTranslation,
+      if (translationLanguage != null)
+        'translation_language': translationLanguage,
       if (audioUrl != null) 'audio_url': audioUrl,
       if (isLearned != null) 'is_learned': isLearned,
       if (lastReviewedAt != null) 'last_reviewed_at': lastReviewedAt,
@@ -680,6 +734,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
     Value<List<PartOfSpeech>>? partsOfSpeech,
     Value<String>? exampleEn,
     Value<String>? exampleTranslation,
+    Value<String>? translationLanguage,
     Value<String>? audioUrl,
     Value<bool>? isLearned,
     Value<DateTime?>? lastReviewedAt,
@@ -695,6 +750,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
       partsOfSpeech: partsOfSpeech ?? this.partsOfSpeech,
       exampleEn: exampleEn ?? this.exampleEn,
       exampleTranslation: exampleTranslation ?? this.exampleTranslation,
+      translationLanguage: translationLanguage ?? this.translationLanguage,
       audioUrl: audioUrl ?? this.audioUrl,
       isLearned: isLearned ?? this.isLearned,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
@@ -730,6 +786,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
     if (exampleTranslation.present) {
       map['example_ja'] = Variable<String>(exampleTranslation.value);
     }
+    if (translationLanguage.present) {
+      map['translation_language'] = Variable<String>(translationLanguage.value);
+    }
     if (audioUrl.present) {
       map['audio_url'] = Variable<String>(audioUrl.value);
     }
@@ -761,6 +820,7 @@ class WordsCompanion extends UpdateCompanion<Word> {
           ..write('partsOfSpeech: $partsOfSpeech, ')
           ..write('exampleEn: $exampleEn, ')
           ..write('exampleTranslation: $exampleTranslation, ')
+          ..write('translationLanguage: $translationLanguage, ')
           ..write('audioUrl: $audioUrl, ')
           ..write('isLearned: $isLearned, ')
           ..write('lastReviewedAt: $lastReviewedAt, ')
@@ -1509,6 +1569,7 @@ typedef $$WordsTableCreateCompanionBuilder =
       Value<List<PartOfSpeech>> partsOfSpeech,
       Value<String> exampleEn,
       Value<String> exampleTranslation,
+      Value<String> translationLanguage,
       Value<String> audioUrl,
       Value<bool> isLearned,
       Value<DateTime?> lastReviewedAt,
@@ -1525,6 +1586,7 @@ typedef $$WordsTableUpdateCompanionBuilder =
       Value<List<PartOfSpeech>> partsOfSpeech,
       Value<String> exampleEn,
       Value<String> exampleTranslation,
+      Value<String> translationLanguage,
       Value<String> audioUrl,
       Value<bool> isLearned,
       Value<DateTime?> lastReviewedAt,
@@ -1574,6 +1636,11 @@ class $$WordsTableFilterComposer extends Composer<_$AppDatabase, $WordsTable> {
 
   ColumnFilters<String> get exampleTranslation => $composableBuilder(
     column: $table.exampleTranslation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get translationLanguage => $composableBuilder(
+    column: $table.translationLanguage,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1652,6 +1719,11 @@ class $$WordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get translationLanguage => $composableBuilder(
+    column: $table.translationLanguage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get audioUrl => $composableBuilder(
     column: $table.audioUrl,
     builder: (column) => ColumnOrderings(column),
@@ -1718,6 +1790,11 @@ class $$WordsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get translationLanguage => $composableBuilder(
+    column: $table.translationLanguage,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get audioUrl =>
       $composableBuilder(column: $table.audioUrl, builder: (column) => column);
 
@@ -1776,6 +1853,7 @@ class $$WordsTableTableManager
                 Value<List<PartOfSpeech>> partsOfSpeech = const Value.absent(),
                 Value<String> exampleEn = const Value.absent(),
                 Value<String> exampleTranslation = const Value.absent(),
+                Value<String> translationLanguage = const Value.absent(),
                 Value<String> audioUrl = const Value.absent(),
                 Value<bool> isLearned = const Value.absent(),
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -1790,6 +1868,7 @@ class $$WordsTableTableManager
                 partsOfSpeech: partsOfSpeech,
                 exampleEn: exampleEn,
                 exampleTranslation: exampleTranslation,
+                translationLanguage: translationLanguage,
                 audioUrl: audioUrl,
                 isLearned: isLearned,
                 lastReviewedAt: lastReviewedAt,
@@ -1806,6 +1885,7 @@ class $$WordsTableTableManager
                 Value<List<PartOfSpeech>> partsOfSpeech = const Value.absent(),
                 Value<String> exampleEn = const Value.absent(),
                 Value<String> exampleTranslation = const Value.absent(),
+                Value<String> translationLanguage = const Value.absent(),
                 Value<String> audioUrl = const Value.absent(),
                 Value<bool> isLearned = const Value.absent(),
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -1820,6 +1900,7 @@ class $$WordsTableTableManager
                 partsOfSpeech: partsOfSpeech,
                 exampleEn: exampleEn,
                 exampleTranslation: exampleTranslation,
+                translationLanguage: translationLanguage,
                 audioUrl: audioUrl,
                 isLearned: isLearned,
                 lastReviewedAt: lastReviewedAt,

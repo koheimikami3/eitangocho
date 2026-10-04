@@ -16,6 +16,7 @@ void main() {
     partsOfSpeech: const [],
     exampleEn: '',
     exampleTranslation: '',
+    translationLanguage: 'ja',
     audioUrl: '',
     isLearned: false,
     correctCount: 0,

@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,27 @@ void main() {
     expect(settings.cardLayout, LearningCardLayout.twoColumns);
     // 全単語の並びの既定は登録日の新しい順(並び替え導入前と同じ)。
     expect(settings.wordSortOrder, WordSortOrder.newest);
+    // 訳の言語は端末の言語から決まる。テスト環境(en_US)は日本語になる。
+    expect(settings.translationLanguage, TranslationLanguage.ja);
+  });
+
+  test('setTranslationLanguage で state が更新され、次回読み込みでも復元される', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
+
+    await container
+        .read(settingsProvider.notifier)
+        .setTranslationLanguage(TranslationLanguage.zhHant);
+    expect(
+      container.read(settingsProvider).requireValue.translationLanguage,
+      TranslationLanguage.zhHant,
+    );
+
+    final container2 = ProviderContainer();
+    addTearDown(container2.dispose);
+    final restored = await container2.read(settingsProvider.future);
+    expect(restored.translationLanguage, TranslationLanguage.zhHant);
   });
 
   test('setWordSortOrder で state が更新され、次回読み込みでも復元される', () async {

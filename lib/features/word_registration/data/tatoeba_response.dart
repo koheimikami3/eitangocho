@@ -27,10 +27,15 @@ abstract class TatoebaSentence with _$TatoebaSentence {
       _$TatoebaSentenceFromJson(json);
 }
 
+/// 英文の訳。[script] は文字体系(中国語の `Hant` / `Hans` など)で、
+/// 文字体系の区別が無い言語では null になる。
 @freezed
 abstract class TatoebaTranslation with _$TatoebaTranslation {
-  const factory TatoebaTranslation({String? lang, String? text}) =
-      _TatoebaTranslation;
+  const factory TatoebaTranslation({
+    String? lang,
+    String? script,
+    String? text,
+  }) = _TatoebaTranslation;
 
   factory TatoebaTranslation.fromJson(Map<String, dynamic> json) =>
       _$TatoebaTranslationFromJson(json);

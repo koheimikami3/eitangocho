@@ -4,6 +4,8 @@ import 'package:drift/drift.dart' show Value;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
@@ -121,6 +123,10 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
 
     // 自動取得できた並び(辞書の主用法が先頭)を保ち、手動で足した品詞は
     // 規定順で後ろに置く。チップのタップ順には依存させない。
+    // 自動入力した言語。手動入力なら今の訳の言語で書いたとみなす。
+    final TranslationLanguage language =
+        state.fetched?.translationLanguage ??
+        ref.read(translationLanguageProvider);
     final partsOfSpeech = state.selectedPartsOfSpeech.isEmpty
         ? const [PartOfSpeech.other]
         : state.selectedPartsOfSpeech.ordered(
@@ -141,6 +147,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
             // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
             // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
             audioUrl: Value(state.fetched?.audioUrl ?? ''),
+            translationLanguage: Value(language.storageCode),
           ),
         );
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。

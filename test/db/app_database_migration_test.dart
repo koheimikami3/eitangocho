@@ -43,7 +43,7 @@ void createV1Schema(Database raw) {
     ..execute('PRAGMA user_version = 1');
 }
 
-/// v2 相当のスキーマ(v1 + deleted_words)。
+/// v2 相当のスキーマ(v1 + deleted_words)。v3 はテーブル構造が同じ。
 void createV2Schema(Database raw) {
   createV1Schema(raw);
   raw
@@ -78,7 +78,7 @@ void main() {
     await db.wordDao.deleteWord(id);
     expect((await db.wordDao.getDeletions()).single.word, 'apple');
 
-    expect(raw.userVersion, 3);
+    expect(raw.userVersion, 4);
   });
 
   // 辞書ソースを Free Dictionary から kaikki に入れ替えた際の後始末。
@@ -101,7 +101,32 @@ void main() {
 
     expect((await db.wordDao.getAll()).single.word, 'apple');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 3);
+    expect(raw.userVersion, 4);
+  });
+
+  // 多言語化。キャッシュは訳語を日本語だけに絞っていたため捨てる。
+  test('v3 の DB を開くと訳の言語の列が ja で追加され、辞書キャッシュが空になる', () async {
+    final raw = sqlite3.openInMemory();
+    createV2Schema(raw);
+    raw
+      ..execute('PRAGMA user_version = 3')
+      ..execute(
+        'INSERT INTO words (word, japanese, created_at, updated_at) '
+        "VALUES ('apple', 'りんご', 0, 0)",
+      )
+      ..execute(
+        'INSERT INTO dictionary_cache_entries (word, response_json, fetched_at) '
+        """VALUES ('apple', '[{"word":"apple"}]', 0)""",
+      );
+
+    final db = AppDatabase.forTesting(NativeDatabase.opened(raw));
+    addTearDown(db.close);
+
+    final word = (await db.wordDao.getAll()).single;
+    expect(word.meaning, 'りんご');
+    expect(word.translationLanguage, 'ja');
+    expect(await db.dictionaryCacheDao.find('apple'), isNull);
+    expect(raw.userVersion, 4);
   });
 
   test('新規 DB は最新スキーマで作られ、deleted_words が使える', () async {

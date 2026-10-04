@@ -50,6 +50,11 @@ abstract class WordExportEntry with _$WordExportEntry {
     @Default(<String>[]) List<String> partsOfSpeech,
     @Default('') String exampleEn,
     @JsonKey(name: 'exampleJa') @Default('') String exampleTranslation,
+
+    /// 訳の言語(words.translation_language と同じ値)。v2.5.0 より前の版が
+    /// 書いたファイルには無いので、無ければ日本語として読む。未知の値も
+    /// そのまま持ち回す(新しい版が足した言語を古い版で消さないため)。
+    @Default('ja') String translationLanguage,
     @Default('') String audioUrl,
     @Default(false) bool isLearned,
     @NullableUtcDateTimeConverter() DateTime? lastReviewedAt,
