@@ -105,7 +105,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldWord => '英文單字 *';
 
   @override
-  String get fieldIpa => '音標 (IPA)';
+  String get fieldIpa => '音標（IPA）';
 
   @override
   String fieldMeaning(String language) {
@@ -113,7 +113,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get fieldPartsOfSpeech => '詞性(可複選)';
+  String get fieldPartsOfSpeech => '詞性（可複選）';
 
   @override
   String get fieldExampleEn => '英文例句';
@@ -138,7 +138,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get skipToManual => '略過，改為手動輸入';
 
   @override
-  String get fetchingDictionary => '正在查詢字典...';
+  String get fetchingDictionary => '正在查詢字典⋯';
 
   @override
   String exampleTranslationFailed(String language) {
@@ -146,7 +146,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可以手動輸入）';
+  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
 
   @override
   String get registerButton => '新增';
@@ -167,15 +167,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get save => '儲存';
 
   @override
-  String get noticeNotFound => '字典裡找不到這個單字，可以手動輸入。';
+  String get noticeNotFound => '字典中找不到這個單字，可以手動輸入。';
 
   @override
   String noticeMeaningNotFound(String language) {
-    return '字典裡找不到$language翻譯（請手動輸入）';
+    return '字典中找不到$language翻譯（請手動輸入）';
   }
 
   @override
-  String get noticeOnlyMeaningFound => '字典裡找不到音標和例句（只自動填入翻譯）';
+  String get noticeOnlyMeaningFound => '字典中找不到音標和例句（只自動填入翻譯）';
 
   @override
   String errorDuplicate(String word) {
@@ -190,7 +190,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String errorRequiredFields(String language) {
-    return '英文單字和$language翻譯為必填。';
+    return '英文單字和$language翻譯為必填欄位。';
   }
 
   @override
@@ -200,10 +200,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteThisWord => '刪除這個單字';
 
   @override
-  String get editEllipsis => '編輯...';
+  String get editEllipsis => '編輯⋯';
 
   @override
-  String get deleteEllipsis => '刪除...';
+  String get deleteEllipsis => '刪除⋯';
 
   @override
   String deleteConfirmTitle(String word) {
@@ -211,7 +211,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get deleteConfirmBody => '這個動作無法復原。';
+  String get deleteConfirmBody => '此動作無法復原。';
 
   @override
   String get deleteConfirmCancel => '取消';
@@ -239,10 +239,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get rememberedCheck => '學會了';
+  String get rememberedCheck => '已學會';
 
   @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。點一下卡片即可編輯（按右鍵開啟選單）。';
+  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
 
   @override
   String get noWordsYet => '還沒有單字。';
@@ -345,7 +345,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sectionDisplay => '顯示';
 
   @override
-  String get theme => '主題';
+  String get theme => '外觀';
 
   @override
   String get appearanceLight => '淺色';
@@ -354,7 +354,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceDark => '深色';
 
   @override
-  String get cardLayout => '學習中卡片的排列';
+  String get cardLayout => '學習中卡片的排列方式';
 
   @override
   String get layoutTwoColumns => '2 欄（精簡）';
@@ -425,13 +425,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportData => '匯出資料';
 
   @override
-  String get exportDataEllipsis => '匯出資料...';
+  String get exportDataEllipsis => '匯出資料⋯';
 
   @override
   String get importData => '匯入資料';
 
   @override
-  String get importDataEllipsis => '匯入資料...';
+  String get importDataEllipsis => '匯入資料⋯';
 
   @override
   String get importDoneTitle => '匯入完成';
@@ -483,7 +483,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncNow => '立即同步';
 
   @override
-  String get syncing => '同步中...';
+  String get syncing => '同步中⋯';
 
   @override
   String get neverSynced => '尚未同步';
@@ -497,7 +497,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncErrorNoICloud => '無法使用 iCloud。請在「設定」中登入 iCloud 雲碟。';
 
   @override
-  String get syncErrorNotCurrent => '無法從 iCloud 取得最新資料，因此暫不同步。';
+  String get syncErrorNotCurrent => '無法從 iCloud 取得最新資料，因此略過這次同步。';
 
   @override
   String get syncErrorUnsupported => '這個平台無法使用 iCloud 同步。';
@@ -534,7 +534,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get purchaseFailed => '無法完成購買';
 
   @override
-  String get restoreChecking => '確認中…';
+  String get restoreChecking => '確認中⋯';
 
   @override
   String get restoreDone => '已回復';
@@ -552,7 +552,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pronunciationShort => '發音';
 
   @override
-  String get pronunciationTooltip => '在 Google 翻譯確認發音';
+  String get pronunciationTooltip => '用 Google 翻譯確認發音';
 
   @override
   String get pageLoadFailed => '無法載入頁面。\n請確認網路連線後再試一次。';
@@ -662,7 +662,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get fieldWord => '英文單字 *';
 
   @override
-  String get fieldIpa => '音標 (IPA)';
+  String get fieldIpa => '音標（IPA）';
 
   @override
   String fieldMeaning(String language) {
@@ -670,7 +670,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get fieldPartsOfSpeech => '詞性(可複選)';
+  String get fieldPartsOfSpeech => '詞性（可複選）';
 
   @override
   String get fieldExampleEn => '英文例句';
@@ -695,7 +695,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get skipToManual => '略過，改為手動輸入';
 
   @override
-  String get fetchingDictionary => '正在查詢字典...';
+  String get fetchingDictionary => '正在查詢字典⋯';
 
   @override
   String exampleTranslationFailed(String language) {
@@ -703,7 +703,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可以手動輸入）';
+  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
 
   @override
   String get registerButton => '新增';
@@ -724,15 +724,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get save => '儲存';
 
   @override
-  String get noticeNotFound => '字典裡找不到這個單字，可以手動輸入。';
+  String get noticeNotFound => '字典中找不到這個單字，可以手動輸入。';
 
   @override
   String noticeMeaningNotFound(String language) {
-    return '字典裡找不到$language翻譯（請手動輸入）';
+    return '字典中找不到$language翻譯（請手動輸入）';
   }
 
   @override
-  String get noticeOnlyMeaningFound => '字典裡找不到音標和例句（只自動填入翻譯）';
+  String get noticeOnlyMeaningFound => '字典中找不到音標和例句（只自動填入翻譯）';
 
   @override
   String errorDuplicate(String word) {
@@ -747,7 +747,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String errorRequiredFields(String language) {
-    return '英文單字和$language翻譯為必填。';
+    return '英文單字和$language翻譯為必填欄位。';
   }
 
   @override
@@ -757,10 +757,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get deleteThisWord => '刪除這個單字';
 
   @override
-  String get editEllipsis => '編輯...';
+  String get editEllipsis => '編輯⋯';
 
   @override
-  String get deleteEllipsis => '刪除...';
+  String get deleteEllipsis => '刪除⋯';
 
   @override
   String deleteConfirmTitle(String word) {
@@ -768,7 +768,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get deleteConfirmBody => '這個動作無法復原。';
+  String get deleteConfirmBody => '此動作無法復原。';
 
   @override
   String get deleteConfirmCancel => '取消';
@@ -796,10 +796,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get rememberedCheck => '學會了';
+  String get rememberedCheck => '已學會';
 
   @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。點一下卡片即可編輯（按右鍵開啟選單）。';
+  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
 
   @override
   String get noWordsYet => '還沒有單字。';
@@ -902,7 +902,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get sectionDisplay => '顯示';
 
   @override
-  String get theme => '主題';
+  String get theme => '外觀';
 
   @override
   String get appearanceLight => '淺色';
@@ -911,7 +911,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get appearanceDark => '深色';
 
   @override
-  String get cardLayout => '學習中卡片的排列';
+  String get cardLayout => '學習中卡片的排列方式';
 
   @override
   String get layoutTwoColumns => '2 欄（精簡）';
@@ -982,13 +982,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get exportData => '匯出資料';
 
   @override
-  String get exportDataEllipsis => '匯出資料...';
+  String get exportDataEllipsis => '匯出資料⋯';
 
   @override
   String get importData => '匯入資料';
 
   @override
-  String get importDataEllipsis => '匯入資料...';
+  String get importDataEllipsis => '匯入資料⋯';
 
   @override
   String get importDoneTitle => '匯入完成';
@@ -1040,7 +1040,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get syncNow => '立即同步';
 
   @override
-  String get syncing => '同步中...';
+  String get syncing => '同步中⋯';
 
   @override
   String get neverSynced => '尚未同步';
@@ -1054,7 +1054,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get syncErrorNoICloud => '無法使用 iCloud。請在「設定」中登入 iCloud 雲碟。';
 
   @override
-  String get syncErrorNotCurrent => '無法從 iCloud 取得最新資料，因此暫不同步。';
+  String get syncErrorNotCurrent => '無法從 iCloud 取得最新資料，因此略過這次同步。';
 
   @override
   String get syncErrorUnsupported => '這個平台無法使用 iCloud 同步。';
@@ -1091,7 +1091,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get purchaseFailed => '無法完成購買';
 
   @override
-  String get restoreChecking => '確認中…';
+  String get restoreChecking => '確認中⋯';
 
   @override
   String get restoreDone => '已回復';
@@ -1109,7 +1109,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get pronunciationShort => '發音';
 
   @override
-  String get pronunciationTooltip => '在 Google 翻譯確認發音';
+  String get pronunciationTooltip => '用 Google 翻譯確認發音';
 
   @override
   String get pageLoadFailed => '無法載入頁面。\n請確認網路連線後再試一次。';
