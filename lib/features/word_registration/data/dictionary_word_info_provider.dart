@@ -74,12 +74,12 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
 
     // 2. EJDict の訳(取込完了を待ってから引く)
     await _ensureEjdictImported();
-    final japanese = await _ejdictDao.lookup(normalized);
+    final meaning = await _ejdictDao.lookup(normalized);
 
     // 3. 辞書が両方空振りで、しかも通信に失敗していたならエラーにする。
     //    「取得できない」を「辞書に未収録」と誤解させないため。オフラインなら
     //    続く Tatoeba も失敗するので、ここで打ち切ってよい。
-    if (entries == null && japanese == null && kaikkiFailure != null) {
+    if (entries == null && meaning == null && kaikkiFailure != null) {
       throw kaikkiFailure;
     }
 
@@ -87,7 +87,7 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     // EJDict は英和辞典の語義で情報量が多く、kaikki 側は訳語の列挙なので
     // 出番は EJDict が持たない見出し(句動詞がほぼこれに当たる)だけになる。
     var info = _mapEntries(normalized, entries ?? const []);
-    if (japanese != null) info = info.copyWith(japanese: japanese);
+    if (meaning != null) info = info.copyWith(meaning: meaning);
 
     // 4. Tatoeba の例文を優先する。和訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
@@ -99,21 +99,24 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     //    この経路に来るのは実質そういう句と綴り間違いだけ。
     final example = await _tatoebaClient.findExample(normalized);
     if (example != null) {
-      info = info.copyWith(exampleEn: example.en, exampleJa: example.ja);
+      info = info.copyWith(
+        exampleEn: example.en,
+        exampleTranslation: example.translation,
+      );
     }
 
     // 5. 辞書にも例文にも何も無ければ未収録として扱う(手動入力へ倒す)。
-    if (entries == null && japanese == null && example == null) return null;
+    if (entries == null && meaning == null && example == null) return null;
 
     // 6. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
-    if (info.exampleEn.isNotEmpty && info.exampleJa.isEmpty) {
+    if (info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {
         final translated = await _deeplClient.translateToJapanese(
           info.exampleEn,
           apiKey,
         );
-        info = info.copyWith(exampleJa: translated ?? '');
+        info = info.copyWith(exampleTranslation: translated ?? '');
       }
     }
     return info;
@@ -130,7 +133,7 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       word: word,
       ipa: _selectIpa(entries),
       partsOfSpeech: partsOfSpeech,
-      japanese: _selectJapanese(entries),
+      meaning: _selectJapanese(entries),
       exampleEn: _selectExample(entries, word),
     );
   }

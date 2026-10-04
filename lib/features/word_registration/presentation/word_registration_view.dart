@@ -29,17 +29,17 @@ class WordRegistrationView extends ConsumerStatefulWidget {
 class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   final _wordController = TextEditingController();
   final _ipaController = TextEditingController();
-  final _japaneseController = TextEditingController();
+  final _meaningController = TextEditingController();
   final _exampleEnController = TextEditingController();
-  final _exampleJaController = TextEditingController();
+  final _exampleTranslationController = TextEditingController();
 
   // 「自動入力」バッジの表示フラグ。プレフィル時に立て、ユーザーが
   // その項目を空にしたら消す(プロトタイプ準拠)。View の揮発状態でよい。
   var _autoIpa = false;
-  var _autoJapanese = false;
+  var _autoMeaning = false;
   var _autoPos = false;
   var _autoExampleEn = false;
-  var _autoExampleJa = false;
+  var _autoExampleTranslation = false;
 
   @override
   void initState() {
@@ -51,11 +51,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         (v) => _autoIpa = v,
       ),
     );
-    _japaneseController.addListener(
+    _meaningController.addListener(
       () => _clearBadgeIfEmpty(
-        _japaneseController,
-        () => _autoJapanese,
-        (v) => _autoJapanese = v,
+        _meaningController,
+        () => _autoMeaning,
+        (v) => _autoMeaning = v,
       ),
     );
     _exampleEnController.addListener(
@@ -65,11 +65,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         (v) => _autoExampleEn = v,
       ),
     );
-    _exampleJaController.addListener(
+    _exampleTranslationController.addListener(
       () => _clearBadgeIfEmpty(
-        _exampleJaController,
-        () => _autoExampleJa,
-        (v) => _autoExampleJa = v,
+        _exampleTranslationController,
+        () => _autoExampleTranslation,
+        (v) => _autoExampleTranslation = v,
       ),
     );
   }
@@ -88,9 +88,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   void dispose() {
     _wordController.dispose();
     _ipaController.dispose();
-    _japaneseController.dispose();
+    _meaningController.dispose();
     _exampleEnController.dispose();
-    _exampleJaController.dispose();
+    _exampleTranslationController.dispose();
     super.dispose();
   }
 
@@ -100,14 +100,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
     setState(() {
       _wordController.text = info.word;
       _ipaController.text = info.ipa;
-      _japaneseController.text = info.japanese;
+      _meaningController.text = info.meaning;
       _exampleEnController.text = info.exampleEn;
-      _exampleJaController.text = info.exampleJa;
+      _exampleTranslationController.text = info.exampleTranslation;
       _autoIpa = info.ipa.isNotEmpty;
-      _autoJapanese = info.japanese.isNotEmpty;
+      _autoMeaning = info.meaning.isNotEmpty;
       _autoPos = info.partsOfSpeech.isNotEmpty;
       _autoExampleEn = info.exampleEn.isNotEmpty;
-      _autoExampleJa = info.exampleJa.isNotEmpty;
+      _autoExampleTranslation = info.exampleTranslation.isNotEmpty;
     });
   }
 
@@ -115,14 +115,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   void _resetFormFields() {
     setState(() {
       _ipaController.clear();
-      _japaneseController.clear();
+      _meaningController.clear();
       _exampleEnController.clear();
-      _exampleJaController.clear();
+      _exampleTranslationController.clear();
       _autoIpa = false;
-      _autoJapanese = false;
+      _autoMeaning = false;
       _autoPos = false;
       _autoExampleEn = false;
-      _autoExampleJa = false;
+      _autoExampleTranslation = false;
     });
   }
 
@@ -132,9 +132,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         .save(
           word: _wordController.text,
           ipa: _ipaController.text,
-          japanese: _japaneseController.text,
+          meaning: _meaningController.text,
           exampleEn: _exampleEnController.text,
-          exampleJa: _exampleJaController.text,
+          exampleTranslation: _exampleTranslationController.text,
         );
     if (saved && mounted) {
       ref.read(mainPageProvider.notifier).selectView(MainView.learning);
@@ -227,9 +227,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         const SizedBox(height: 16),
         LabeledTextField(
           label: '日本語訳 *',
-          controller: _japaneseController,
+          controller: _meaningController,
           maxLines: null,
-          trailing: _autoJapanese ? const AutoFillBadge() : null,
+          trailing: _autoMeaning ? const AutoFillBadge() : null,
         ),
         const SizedBox(height: 16),
         Column(
@@ -272,10 +272,10 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         const SizedBox(height: 16),
         LabeledTextField(
           label: '日本語例文',
-          controller: _exampleJaController,
+          controller: _exampleTranslationController,
           minLines: 2,
           maxLines: null,
-          trailing: _autoExampleJa ? const AutoFillBadge() : null,
+          trailing: _autoExampleTranslation ? const AutoFillBadge() : null,
         ),
         if (state.errorMessage != null) ...[
           const SizedBox(height: 16),

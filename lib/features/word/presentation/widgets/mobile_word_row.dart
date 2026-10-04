@@ -90,7 +90,7 @@ class MobileWordRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    word.japanese,
+                    word.meaning,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

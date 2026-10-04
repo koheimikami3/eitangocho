@@ -63,9 +63,9 @@ void main() {
     final result = await notifier.save(
       word: '',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     expect(result, isFalse);
@@ -83,9 +83,9 @@ void main() {
     final result = await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: '',
+      meaning: '',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     expect(result, isFalse);
@@ -102,16 +102,16 @@ void main() {
     final result = await notifier.save(
       word: ' apple ',
       ipa: '/ˈæpəl/',
-      japanese: ' りんご ',
+      meaning: ' りんご ',
       exampleEn: 'An apple a day.',
-      exampleJa: '1日1個のリンゴ。',
+      exampleTranslation: '1日1個のリンゴ。',
     );
 
     expect(result, isTrue);
     final words = await db.wordDao.watchAll().first;
     expect(words, hasLength(1));
     expect(words.single.word, 'apple');
-    expect(words.single.japanese, 'りんご');
+    expect(words.single.meaning, 'りんご');
     expect(words.single.exampleEn, 'An apple a day.');
   });
 
@@ -122,9 +122,9 @@ void main() {
     await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -139,9 +139,9 @@ void main() {
     await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -159,9 +159,9 @@ void main() {
     await notifier.save(
       word: 'light',
       ipa: '',
-      japanese: '光',
+      meaning: '光',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -192,9 +192,9 @@ void main() {
       word: 'serendipity',
       ipa: '/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/',
       partsOfSpeech: [PartOfSpeech.noun],
-      japanese: '思わぬ発見',
+      meaning: '思わぬ発見',
       exampleEn: 'A lucky find.',
-      exampleJa: '幸運な発見。',
+      exampleTranslation: '幸運な発見。',
       audioUrl: 'https://example.com/a.mp3',
     );
 
@@ -259,7 +259,7 @@ void main() {
     test('英例文ありなのに和訳が空なら translationFailed(DeepL キーは無関係)', () async {
       container = buildContainer(
         wordInfoProvider: _FakeWordInfoProvider(
-          (_) async => fetchedInfo.copyWith(exampleJa: ''),
+          (_) async => fetchedInfo.copyWith(exampleTranslation: ''),
         ),
       );
 
@@ -276,7 +276,8 @@ void main() {
     test('英例文が無ければ translationFailed は立たない', () async {
       container = buildContainer(
         wordInfoProvider: _FakeWordInfoProvider(
-          (_) async => fetchedInfo.copyWith(exampleEn: '', exampleJa: ''),
+          (_) async =>
+              fetchedInfo.copyWith(exampleEn: '', exampleTranslation: ''),
         ),
       );
 
@@ -300,9 +301,9 @@ void main() {
       await notifier.save(
         word: 'serendipity',
         ipa: fetchedInfo.ipa,
-        japanese: fetchedInfo.japanese,
+        meaning: fetchedInfo.meaning,
         exampleEn: fetchedInfo.exampleEn,
-        exampleJa: fetchedInfo.exampleJa,
+        exampleTranslation: fetchedInfo.exampleTranslation,
       );
 
       final words = await db.wordDao.watchAll().first;
@@ -315,9 +316,9 @@ void main() {
         word: 'run',
         ipa: '/ɹʌn/',
         partsOfSpeech: [PartOfSpeech.verb, PartOfSpeech.noun],
-        japanese: '走る',
+        meaning: '走る',
         exampleEn: '',
-        exampleJa: '',
+        exampleTranslation: '',
         audioUrl: '',
       );
       container = buildContainer(
@@ -335,9 +336,9 @@ void main() {
       await notifier.save(
         word: 'run',
         ipa: verbFirst.ipa,
-        japanese: verbFirst.japanese,
+        meaning: verbFirst.meaning,
         exampleEn: '',
-        exampleJa: '',
+        exampleTranslation: '',
       );
 
       final words = await db.wordDao.watchAll().first;
@@ -379,7 +380,7 @@ void main() {
   // 同じ単語が 2 件並ぶのは事故なので、登録させずに止める。
   group('重複登録', () {
     Future<void> insertApple() => db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     test('登録済みなら autoFill は辞書を引かず input に留まる', () async {
@@ -425,9 +426,9 @@ void main() {
           .save(
             word: 'Apple',
             ipa: '',
-            japanese: 'りんご',
+            meaning: 'りんご',
             exampleEn: '',
-            exampleJa: '',
+            exampleTranslation: '',
           );
 
       expect(result, isFalse);
@@ -466,9 +467,9 @@ void main() {
           .save(
             word: 'give   up',
             ipa: '',
-            japanese: 'あきらめる',
+            meaning: 'あきらめる',
             exampleEn: '',
-            exampleJa: '',
+            exampleTranslation: '',
           );
 
       expect((await db.wordDao.getAll()).single.word, 'give up');

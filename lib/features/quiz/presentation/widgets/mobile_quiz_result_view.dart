@@ -145,7 +145,7 @@ class _ForgotList extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      words[i].japanese,
+                      words[i].meaning,
                       style: TextStyle(
                         fontSize: 13,
                         color: palette.textAlpha(60),

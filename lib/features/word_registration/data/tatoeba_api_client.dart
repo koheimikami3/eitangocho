@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 /// Tatoeba(対訳付き例文コーパス)のクライアント。
 ///
 /// 英文とその和訳が対でぶら下がっているため、1 リクエストで exampleEn と
-/// exampleJa の両方が埋まる。辞書側(kaikki)の例文は語義説明用の断片や
+/// exampleTranslation の両方が埋まる。辞書側(kaikki)の例文は語義説明用の断片や
 /// 文献引用が混ざるので、単語帳の例文としてはこちらを優先する。
 ///
 /// 例文は補助情報なので、失敗しても throw せず null を返す(登録を妨げない。
@@ -101,7 +101,7 @@ class TatoebaApiClient {
           .map((t) => t.text!.trim())
           .firstOrNull;
       if (ja == null) continue;
-      candidates.add(ExampleSentence(en: en, ja: ja));
+      candidates.add(ExampleSentence(en: en, translation: ja));
     }
     if (candidates.isEmpty) return null;
     final qualified = candidates

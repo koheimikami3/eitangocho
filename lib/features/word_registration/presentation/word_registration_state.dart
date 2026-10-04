@@ -19,7 +19,7 @@ abstract class WordRegistrationState with _$WordRegistrationState {
     /// 自動入力したが辞書(FD・EJDict とも)未収録だった
     @Default(false) bool notFound,
 
-    /// 例文の DeepL 翻訳に失敗した(exampleJa 空のまま続行し警告を出す)
+    /// 例文の DeepL 翻訳に失敗した(exampleTranslation 空のまま続行し警告を出す)
     @Default(false) bool translationFailed,
     @Default(<PartOfSpeech>{}) Set<PartOfSpeech> selectedPartsOfSpeech,
     String? errorMessage,
@@ -35,7 +35,7 @@ abstract class WordRegistrationState with _$WordRegistrationState {
     if (fetched == null) return null;
     // 訳は必須項目なので、空なら他に何が埋まっていてもまずこれを伝える。
     // EJDict は句動詞を 1 件も収録していないため、句動詞ではこれが常態になる。
-    if (fetched.japanese.isEmpty) {
+    if (fetched.meaning.isEmpty) {
       return '日本語訳は辞書に見つかりませんでした(手動で入力してください)';
     }
     // audioUrl は画面に出さないので、文言どおり IPA と例文だけで判定する。

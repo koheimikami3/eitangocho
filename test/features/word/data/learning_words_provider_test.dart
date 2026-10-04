@@ -6,14 +6,14 @@ import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Word _word(String word, String japanese, {bool isLearned = false}) => Word(
+Word _word(String word, String meaning, {bool isLearned = false}) => Word(
   id: word.hashCode,
   word: word,
-  japanese: japanese,
+  meaning: meaning,
   ipa: '',
   partsOfSpeech: const <PartOfSpeech>[],
   exampleEn: '',
-  exampleJa: '',
+  exampleTranslation: '',
   audioUrl: '',
   isLearned: isLearned,
   correctCount: 0,

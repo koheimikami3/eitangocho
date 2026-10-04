@@ -10,9 +10,9 @@ abstract class WordInfo with _$WordInfo {
     required String word,
     @Default('') String ipa,
     @Default(<PartOfSpeech>[]) List<PartOfSpeech> partsOfSpeech,
-    @Default('') String japanese,
+    @Default('') String meaning,
     @Default('') String exampleEn,
-    @Default('') String exampleJa,
+    @Default('') String exampleTranslation,
 
     /// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
     /// (docs/design.md)。words の同名カラムを埋める経路だけ残している。

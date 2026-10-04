@@ -70,11 +70,11 @@ class WordExportService {
 
   WordExportEntry _toEntry(Word word) => WordExportEntry(
     word: word.word,
-    japanese: word.japanese,
+    meaning: word.meaning,
     ipa: word.ipa,
     partsOfSpeech: word.partsOfSpeech.map((p) => p.name).toList(),
     exampleEn: word.exampleEn,
-    exampleJa: word.exampleJa,
+    exampleTranslation: word.exampleTranslation,
     audioUrl: word.audioUrl,
     isLearned: word.isLearned,
     lastReviewedAt: word.lastReviewedAt,
@@ -89,7 +89,7 @@ class WordExportService {
   /// - 一致あり: ファイル側 updatedAt が新しいときだけ上書き(word 表記・
   ///   createdAt は DB 側を維持)。それ以外は変更なし扱い
   /// - lastReviewedAt だけは単語の勝敗と切り離し、ファイルと DB の新しい方を採る
-  /// - word/japanese の欠落・型不正・空文字はスキップして続行する
+  /// - word/meaning の欠落・型不正・空文字はスキップして続行する
   /// - ファイル内に同一単語が複数あれば、updatedAt が新しい方だけを採用する
   /// - 削除ログ(v2 の deletions)は、同じキーの単語がローカルにあり
   ///   deletedAt がその updatedAt より新しければ削除する。ローカルに無くても
@@ -167,8 +167,8 @@ class WordExportService {
       }
 
       final word = entry.word.trim();
-      final japanese = entry.japanese.trim();
-      if (word.isEmpty || japanese.isEmpty) {
+      final meaning = entry.meaning.trim();
+      if (word.isEmpty || meaning.isEmpty) {
         skipped++;
         continue;
       }
@@ -191,7 +191,7 @@ class WordExportService {
 
       plannedByKey[key] = _PlannedEntry(
         word: word,
-        japanese: japanese,
+        meaning: meaning,
         entry: entry,
         updatedAt: updatedAt,
         createdAt: createdAt,
@@ -335,11 +335,11 @@ class WordExportService {
   WordsCompanion _toInsertCompanion(_PlannedEntry plan) {
     return WordsCompanion(
       word: Value(plan.word),
-      japanese: Value(plan.japanese),
+      meaning: Value(plan.meaning),
       ipa: Value(plan.entry.ipa),
       partsOfSpeech: Value(_partsOfSpeechOf(plan)),
       exampleEn: Value(plan.entry.exampleEn),
-      exampleJa: Value(plan.entry.exampleJa),
+      exampleTranslation: Value(plan.entry.exampleTranslation),
       audioUrl: Value(plan.entry.audioUrl),
       isLearned: Value(plan.entry.isLearned),
       lastReviewedAt: Value(plan.entry.lastReviewedAt),
@@ -357,11 +357,11 @@ class WordExportService {
     required DateTime? lastReviewedAt,
   }) {
     return WordsCompanion(
-      japanese: Value(plan.japanese),
+      meaning: Value(plan.meaning),
       ipa: Value(plan.entry.ipa),
       partsOfSpeech: Value(_partsOfSpeechOf(plan)),
       exampleEn: Value(plan.entry.exampleEn),
-      exampleJa: Value(plan.entry.exampleJa),
+      exampleTranslation: Value(plan.entry.exampleTranslation),
       audioUrl: Value(plan.entry.audioUrl),
       isLearned: Value(plan.entry.isLearned),
       lastReviewedAt: Value(lastReviewedAt),
@@ -374,14 +374,14 @@ class WordExportService {
 class _PlannedEntry {
   const _PlannedEntry({
     required this.word,
-    required this.japanese,
+    required this.meaning,
     required this.entry,
     required this.updatedAt,
     required this.createdAt,
   });
 
   final String word;
-  final String japanese;
+  final String meaning;
   final WordExportEntry entry;
   final DateTime updatedAt;
   final DateTime createdAt;

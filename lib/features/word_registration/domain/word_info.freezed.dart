@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WordInfo {
 
- String get word; String get ipa; List<PartOfSpeech> get partsOfSpeech; String get japanese; String get exampleEn; String get exampleJa;/// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
+ String get word; String get ipa; List<PartOfSpeech> get partsOfSpeech; String get meaning; String get exampleEn; String get exampleTranslation;/// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
 /// (docs/design.md)。words の同名カラムを埋める経路だけ残している。
  String get audioUrl;
 /// Create a copy of WordInfo
@@ -27,16 +27,16 @@ $WordInfoCopyWith<WordInfo> get copyWith => _$WordInfoCopyWithImpl<WordInfo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordInfo&&(identical(other.word, word) || other.word == word)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other.partsOfSpeech, partsOfSpeech)&&(identical(other.japanese, japanese) || other.japanese == japanese)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleJa, exampleJa) || other.exampleJa == exampleJa)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordInfo&&(identical(other.word, word) || other.word == word)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other.partsOfSpeech, partsOfSpeech)&&(identical(other.meaning, meaning) || other.meaning == meaning)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleTranslation, exampleTranslation) || other.exampleTranslation == exampleTranslation)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,word,ipa,const DeepCollectionEquality().hash(partsOfSpeech),japanese,exampleEn,exampleJa,audioUrl);
+int get hashCode => Object.hash(runtimeType,word,ipa,const DeepCollectionEquality().hash(partsOfSpeech),meaning,exampleEn,exampleTranslation,audioUrl);
 
 @override
 String toString() {
-  return 'WordInfo(word: $word, ipa: $ipa, partsOfSpeech: $partsOfSpeech, japanese: $japanese, exampleEn: $exampleEn, exampleJa: $exampleJa, audioUrl: $audioUrl)';
+  return 'WordInfo(word: $word, ipa: $ipa, partsOfSpeech: $partsOfSpeech, meaning: $meaning, exampleEn: $exampleEn, exampleTranslation: $exampleTranslation, audioUrl: $audioUrl)';
 }
 
 
@@ -47,7 +47,7 @@ abstract mixin class $WordInfoCopyWith<$Res>  {
   factory $WordInfoCopyWith(WordInfo value, $Res Function(WordInfo) _then) = _$WordInfoCopyWithImpl;
 @useResult
 $Res call({
- String word, String ipa, List<PartOfSpeech> partsOfSpeech, String japanese, String exampleEn, String exampleJa, String audioUrl
+ String word, String ipa, List<PartOfSpeech> partsOfSpeech, String meaning, String exampleEn, String exampleTranslation, String audioUrl
 });
 
 
@@ -64,14 +64,14 @@ class _$WordInfoCopyWithImpl<$Res>
 
 /// Create a copy of WordInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? word = null,Object? ipa = null,Object? partsOfSpeech = null,Object? japanese = null,Object? exampleEn = null,Object? exampleJa = null,Object? audioUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? word = null,Object? ipa = null,Object? partsOfSpeech = null,Object? meaning = null,Object? exampleEn = null,Object? exampleTranslation = null,Object? audioUrl = null,}) {
   return _then(_self.copyWith(
 word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String,ipa: null == ipa ? _self.ipa : ipa // ignore: cast_nullable_to_non_nullable
 as String,partsOfSpeech: null == partsOfSpeech ? _self.partsOfSpeech : partsOfSpeech // ignore: cast_nullable_to_non_nullable
-as List<PartOfSpeech>,japanese: null == japanese ? _self.japanese : japanese // ignore: cast_nullable_to_non_nullable
+as List<PartOfSpeech>,meaning: null == meaning ? _self.meaning : meaning // ignore: cast_nullable_to_non_nullable
 as String,exampleEn: null == exampleEn ? _self.exampleEn : exampleEn // ignore: cast_nullable_to_non_nullable
-as String,exampleJa: null == exampleJa ? _self.exampleJa : exampleJa // ignore: cast_nullable_to_non_nullable
+as String,exampleTranslation: null == exampleTranslation ? _self.exampleTranslation : exampleTranslation // ignore: cast_nullable_to_non_nullable
 as String,audioUrl: null == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -158,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String japanese,  String exampleEn,  String exampleJa,  String audioUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String meaning,  String exampleEn,  String exampleTranslation,  String audioUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WordInfo() when $default != null:
-return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.exampleEn,_that.exampleJa,_that.audioUrl);case _:
+return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.meaning,_that.exampleEn,_that.exampleTranslation,_that.audioUrl);case _:
   return orElse();
 
 }
@@ -179,10 +179,10 @@ return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.ex
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String japanese,  String exampleEn,  String exampleJa,  String audioUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String meaning,  String exampleEn,  String exampleTranslation,  String audioUrl)  $default,) {final _that = this;
 switch (_that) {
 case _WordInfo():
-return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.exampleEn,_that.exampleJa,_that.audioUrl);case _:
+return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.meaning,_that.exampleEn,_that.exampleTranslation,_that.audioUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +199,10 @@ return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.ex
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String japanese,  String exampleEn,  String exampleJa,  String audioUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String word,  String ipa,  List<PartOfSpeech> partsOfSpeech,  String meaning,  String exampleEn,  String exampleTranslation,  String audioUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _WordInfo() when $default != null:
-return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.exampleEn,_that.exampleJa,_that.audioUrl);case _:
+return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.meaning,_that.exampleEn,_that.exampleTranslation,_that.audioUrl);case _:
   return null;
 
 }
@@ -214,7 +214,7 @@ return $default(_that.word,_that.ipa,_that.partsOfSpeech,_that.japanese,_that.ex
 
 
 class _WordInfo implements WordInfo {
-  const _WordInfo({required this.word, this.ipa = '', final  List<PartOfSpeech> partsOfSpeech = const <PartOfSpeech>[], this.japanese = '', this.exampleEn = '', this.exampleJa = '', this.audioUrl = ''}): _partsOfSpeech = partsOfSpeech;
+  const _WordInfo({required this.word, this.ipa = '', final  List<PartOfSpeech> partsOfSpeech = const <PartOfSpeech>[], this.meaning = '', this.exampleEn = '', this.exampleTranslation = '', this.audioUrl = ''}): _partsOfSpeech = partsOfSpeech;
   
 
 @override final  String word;
@@ -226,9 +226,9 @@ class _WordInfo implements WordInfo {
   return EqualUnmodifiableListView(_partsOfSpeech);
 }
 
-@override@JsonKey() final  String japanese;
+@override@JsonKey() final  String meaning;
 @override@JsonKey() final  String exampleEn;
-@override@JsonKey() final  String exampleJa;
+@override@JsonKey() final  String exampleTranslation;
 /// 発音 mp3 の URL。kaikki に切り替えてから取得しておらず常に空
 /// (docs/design.md)。words の同名カラムを埋める経路だけ残している。
 @override@JsonKey() final  String audioUrl;
@@ -243,16 +243,16 @@ _$WordInfoCopyWith<_WordInfo> get copyWith => __$WordInfoCopyWithImpl<_WordInfo>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordInfo&&(identical(other.word, word) || other.word == word)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other._partsOfSpeech, _partsOfSpeech)&&(identical(other.japanese, japanese) || other.japanese == japanese)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleJa, exampleJa) || other.exampleJa == exampleJa)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordInfo&&(identical(other.word, word) || other.word == word)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other._partsOfSpeech, _partsOfSpeech)&&(identical(other.meaning, meaning) || other.meaning == meaning)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleTranslation, exampleTranslation) || other.exampleTranslation == exampleTranslation)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,word,ipa,const DeepCollectionEquality().hash(_partsOfSpeech),japanese,exampleEn,exampleJa,audioUrl);
+int get hashCode => Object.hash(runtimeType,word,ipa,const DeepCollectionEquality().hash(_partsOfSpeech),meaning,exampleEn,exampleTranslation,audioUrl);
 
 @override
 String toString() {
-  return 'WordInfo(word: $word, ipa: $ipa, partsOfSpeech: $partsOfSpeech, japanese: $japanese, exampleEn: $exampleEn, exampleJa: $exampleJa, audioUrl: $audioUrl)';
+  return 'WordInfo(word: $word, ipa: $ipa, partsOfSpeech: $partsOfSpeech, meaning: $meaning, exampleEn: $exampleEn, exampleTranslation: $exampleTranslation, audioUrl: $audioUrl)';
 }
 
 
@@ -263,7 +263,7 @@ abstract mixin class _$WordInfoCopyWith<$Res> implements $WordInfoCopyWith<$Res>
   factory _$WordInfoCopyWith(_WordInfo value, $Res Function(_WordInfo) _then) = __$WordInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String word, String ipa, List<PartOfSpeech> partsOfSpeech, String japanese, String exampleEn, String exampleJa, String audioUrl
+ String word, String ipa, List<PartOfSpeech> partsOfSpeech, String meaning, String exampleEn, String exampleTranslation, String audioUrl
 });
 
 
@@ -280,14 +280,14 @@ class __$WordInfoCopyWithImpl<$Res>
 
 /// Create a copy of WordInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? word = null,Object? ipa = null,Object? partsOfSpeech = null,Object? japanese = null,Object? exampleEn = null,Object? exampleJa = null,Object? audioUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? word = null,Object? ipa = null,Object? partsOfSpeech = null,Object? meaning = null,Object? exampleEn = null,Object? exampleTranslation = null,Object? audioUrl = null,}) {
   return _then(_WordInfo(
 word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String,ipa: null == ipa ? _self.ipa : ipa // ignore: cast_nullable_to_non_nullable
 as String,partsOfSpeech: null == partsOfSpeech ? _self._partsOfSpeech : partsOfSpeech // ignore: cast_nullable_to_non_nullable
-as List<PartOfSpeech>,japanese: null == japanese ? _self.japanese : japanese // ignore: cast_nullable_to_non_nullable
+as List<PartOfSpeech>,meaning: null == meaning ? _self.meaning : meaning // ignore: cast_nullable_to_non_nullable
 as String,exampleEn: null == exampleEn ? _self.exampleEn : exampleEn // ignore: cast_nullable_to_non_nullable
-as String,exampleJa: null == exampleJa ? _self.exampleJa : exampleJa // ignore: cast_nullable_to_non_nullable
+as String,exampleTranslation: null == exampleTranslation ? _self.exampleTranslation : exampleTranslation // ignore: cast_nullable_to_non_nullable
 as String,audioUrl: null == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));

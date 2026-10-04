@@ -57,7 +57,8 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         fetched: info,
         notFound: false,
         selectedPartsOfSpeech: info.partsOfSpeech.toSet(),
-        translationFailed: info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
+        translationFailed:
+            info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty,
       );
     } on WordInfoException {
       if (!ref.mounted) return;
@@ -104,12 +105,12 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
   Future<bool> save({
     required String word,
     required String ipa,
-    required String japanese,
+    required String meaning,
     required String exampleEn,
-    required String exampleJa,
+    required String exampleTranslation,
   }) async {
     final headword = normalizeHeadword(word);
-    if (headword.isEmpty || japanese.trim().isEmpty) {
+    if (headword.isEmpty || meaning.trim().isEmpty) {
       state = state.copyWith(errorMessage: '英単語と日本語訳は必須です。');
       return false;
     }
@@ -132,10 +133,10 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
           WordsCompanion(
             word: Value(headword),
             ipa: Value(ipa.trim()),
-            japanese: Value(japanese.trim()),
+            meaning: Value(meaning.trim()),
             partsOfSpeech: Value(partsOfSpeech),
             exampleEn: Value(exampleEn.trim()),
-            exampleJa: Value(exampleJa.trim()),
+            exampleTranslation: Value(exampleTranslation.trim()),
             // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
             // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
             audioUrl: Value(state.fetched?.audioUrl ?? ''),

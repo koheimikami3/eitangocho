@@ -45,7 +45,7 @@ final filteredWordListProvider = Provider<List<Word>>((ref) {
             .where(
               (w) =>
                   w.word.toLowerCase().contains(lower) ||
-                  w.japanese.contains(query),
+                  w.meaning.contains(query),
             )
             .toList();
   return filtered..sort((a, b) => _compareWords(a, b, order));

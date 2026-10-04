@@ -27,7 +27,7 @@ void main() {
   ) async {
     try {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       final word = (await db.wordDao.getAll()).single;
 
@@ -63,7 +63,7 @@ void main() {
       await tester.tap(find.text('保存'));
       await tester.pumpAndSettle();
 
-      expect((await db.wordDao.getAll()).single.japanese, 'リンゴ');
+      expect((await db.wordDao.getAll()).single.meaning, 'リンゴ');
       // 保存するとダイアログが閉じる。
       expect(find.text('単語を編集'), findsNothing);
     });
@@ -72,7 +72,7 @@ void main() {
   testWidgets('既存の単語名に変更するとエラーになり、更新もされない', (tester) async {
     await runDialog(tester, (word) async {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+        const WordsCompanion(word: Value('banana'), meaning: Value('バナナ')),
       );
 
       // 大文字違いでも同じ単語とみなす。

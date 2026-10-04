@@ -7,13 +7,20 @@ class Words extends Table {
   TextColumn get word => text()();
   TextColumn get ipa => text().withDefault(const Constant(''))();
 
-  /// 日本語訳(必須)
-  TextColumn get japanese => text()();
+  /// 訳語(必須)。言語は利用者の訳の言語で、多くは日本語。
+  ///
+  /// **SQL の列名は `japanese` のまま**。iCloud 同期の JSON・既存端末の DB と
+  /// 名前をそろえ続けるため、多言語化では列を言語ごとに増やさず使い回している
+  /// (docs/design.md「多言語化」)。Dart 側の名前だけを中立にしている。
+  TextColumn get meaning => text().named('japanese')();
   TextColumn get partsOfSpeech => text()
       .map(const PartOfSpeechListConverter())
       .withDefault(const Constant(''))();
   TextColumn get exampleEn => text().withDefault(const Constant(''))();
-  TextColumn get exampleJa => text().withDefault(const Constant(''))();
+
+  /// 英例文の訳。[meaning] と同じ理由で SQL の列名は `example_ja` のまま。
+  TextColumn get exampleTranslation =>
+      text().named('example_ja').withDefault(const Constant(''))();
 
   /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
   /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、

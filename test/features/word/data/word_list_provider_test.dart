@@ -18,11 +18,11 @@ Word _word(
 }) => Word(
   id: id,
   word: word,
-  japanese: '$word の訳',
+  meaning: '$word の訳',
   ipa: '',
   partsOfSpeech: const <PartOfSpeech>[],
   exampleEn: '',
-  exampleJa: '',
+  exampleTranslation: '',
   audioUrl: '',
   isLearned: isLearned,
   correctCount: correctCount,

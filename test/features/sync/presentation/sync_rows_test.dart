@@ -32,9 +32,7 @@ void main() {
   Future<void> pump(WidgetTester tester, SyncState state, Widget rows) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          syncProvider.overrideWith(() => _FixedSyncNotifier(state)),
-        ],
+        overrides: [syncProvider.overrideWith(() => _FixedSyncNotifier(state))],
         child: MaterialApp(
           home: Scaffold(body: SettingsCard(children: [rows])),
         ),

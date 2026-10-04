@@ -86,10 +86,10 @@ void main() {
   const fetched = WordInfo(
     word: 'serendipity',
     ipa: '/ˌserənˈdɪpəti/',
-    japanese: '偶然の幸運',
+    meaning: '偶然の幸運',
     partsOfSpeech: [PartOfSpeech.noun],
     exampleEn: 'Meeting her was pure serendipity.',
-    exampleJa: '彼女に出会えたのは偶然の幸運だった。',
+    exampleTranslation: '彼女に出会えたのは偶然の幸運だった。',
     audioUrl: '',
   );
 
@@ -161,7 +161,7 @@ void main() {
       expect(find.text('単語を登録'), findsNothing);
       final saved = (await db.wordDao.getAll()).single;
       expect(saved.word, 'serendipity');
-      expect(saved.japanese, '偶然の幸運');
+      expect(saved.meaning, '偶然の幸運');
     });
   });
 }

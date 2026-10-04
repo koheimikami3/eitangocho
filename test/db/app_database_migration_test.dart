@@ -109,7 +109,7 @@ void main() {
     addTearDown(db.close);
 
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.deleteWord(id);
 

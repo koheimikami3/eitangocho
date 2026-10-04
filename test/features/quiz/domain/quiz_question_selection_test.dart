@@ -10,10 +10,10 @@ void main() {
     id: id,
     word: 'word$id',
     ipa: '',
-    japanese: '訳$id',
+    meaning: '訳$id',
     partsOfSpeech: const [],
     exampleEn: '',
-    exampleJa: '',
+    exampleTranslation: '',
     audioUrl: '',
     isLearned: true,
     lastReviewedAt: answeredDaysAgo == null

@@ -126,7 +126,7 @@ class _WordTableRowState extends State<WordTableRow> {
               Expanded(
                 flex: 2,
                 child: Text(
-                  word.japanese,
+                  word.meaning,
                   style: const TextStyle(
                     fontSize: 13,
                     color: Color(0xBF000000),
@@ -138,7 +138,7 @@ class _WordTableRowState extends State<WordTableRow> {
                 flex: 3,
                 child: hasExample
                     ? Text(
-                        '${word.exampleEn}\n${word.exampleJa}',
+                        '${word.exampleEn}\n${word.exampleTranslation}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,

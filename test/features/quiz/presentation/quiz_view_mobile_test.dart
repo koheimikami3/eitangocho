@@ -33,13 +33,13 @@ void main() {
   /// 購読させないことで、破棄時の購読解除タイマー衝突(drift #3323)を避ける
   /// (quiz_page_notifier_test.dart と同じ手法)。
   Future<ProviderContainer> setupLearned(List<(String, String)> words) async {
-    for (final (word, japanese) in words) {
+    for (final (word, meaning) in words) {
       final id = await db.wordDao.insertWord(
         WordsCompanion(
           word: Value(word),
-          japanese: Value(japanese),
+          meaning: Value(meaning),
           exampleEn: const Value('An example sentence.'),
-          exampleJa: const Value('例文です。'),
+          exampleTranslation: const Value('例文です。'),
         ),
       );
       await db.wordDao.setLearned(id, isLearned: true);

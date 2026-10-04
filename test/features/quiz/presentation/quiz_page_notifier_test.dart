@@ -34,7 +34,7 @@ void main() {
   Future<ProviderContainer> setupLearned(int n) async {
     for (var i = 0; i < n; i++) {
       final id = await db.wordDao.insertWord(
-        WordsCompanion(word: Value('word$i'), japanese: Value('訳$i')),
+        WordsCompanion(word: Value('word$i'), meaning: Value('訳$i')),
       );
       await db.wordDao.setLearned(id, isLearned: true);
     }

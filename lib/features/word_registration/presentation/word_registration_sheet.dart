@@ -37,17 +37,17 @@ class _WordRegistrationSheetState
     extends ConsumerState<_WordRegistrationSheet> {
   final _wordController = TextEditingController();
   final _ipaController = TextEditingController();
-  final _japaneseController = TextEditingController();
+  final _meaningController = TextEditingController();
   final _exampleEnController = TextEditingController();
-  final _exampleJaController = TextEditingController();
+  final _exampleTranslationController = TextEditingController();
 
   // 「自動入力」バッジの表示フラグ。プレフィル時に立て、ユーザーが
   // その項目を空にしたら消す(macOS 版と同じ方針)。
   var _autoIpa = false;
-  var _autoJapanese = false;
+  var _autoMeaning = false;
   var _autoPos = false;
   var _autoExampleEn = false;
-  var _autoExampleJa = false;
+  var _autoExampleTranslation = false;
 
   @override
   void initState() {
@@ -64,11 +64,11 @@ class _WordRegistrationSheetState
         (v) => _autoIpa = v,
       ),
     );
-    _japaneseController.addListener(
+    _meaningController.addListener(
       () => _clearBadgeIfEmpty(
-        _japaneseController,
-        () => _autoJapanese,
-        (v) => _autoJapanese = v,
+        _meaningController,
+        () => _autoMeaning,
+        (v) => _autoMeaning = v,
       ),
     );
     _exampleEnController.addListener(
@@ -78,11 +78,11 @@ class _WordRegistrationSheetState
         (v) => _autoExampleEn = v,
       ),
     );
-    _exampleJaController.addListener(
+    _exampleTranslationController.addListener(
       () => _clearBadgeIfEmpty(
-        _exampleJaController,
-        () => _autoExampleJa,
-        (v) => _autoExampleJa = v,
+        _exampleTranslationController,
+        () => _autoExampleTranslation,
+        (v) => _autoExampleTranslation = v,
       ),
     );
   }
@@ -101,9 +101,9 @@ class _WordRegistrationSheetState
   void dispose() {
     _wordController.dispose();
     _ipaController.dispose();
-    _japaneseController.dispose();
+    _meaningController.dispose();
     _exampleEnController.dispose();
-    _exampleJaController.dispose();
+    _exampleTranslationController.dispose();
     super.dispose();
   }
 
@@ -113,14 +113,14 @@ class _WordRegistrationSheetState
     setState(() {
       _wordController.text = info.word;
       _ipaController.text = info.ipa;
-      _japaneseController.text = info.japanese;
+      _meaningController.text = info.meaning;
       _exampleEnController.text = info.exampleEn;
-      _exampleJaController.text = info.exampleJa;
+      _exampleTranslationController.text = info.exampleTranslation;
       _autoIpa = info.ipa.isNotEmpty;
-      _autoJapanese = info.japanese.isNotEmpty;
+      _autoMeaning = info.meaning.isNotEmpty;
       _autoPos = info.partsOfSpeech.isNotEmpty;
       _autoExampleEn = info.exampleEn.isNotEmpty;
-      _autoExampleJa = info.exampleJa.isNotEmpty;
+      _autoExampleTranslation = info.exampleTranslation.isNotEmpty;
     });
   }
 
@@ -128,14 +128,14 @@ class _WordRegistrationSheetState
   void _resetFormFields() {
     setState(() {
       _ipaController.clear();
-      _japaneseController.clear();
+      _meaningController.clear();
       _exampleEnController.clear();
-      _exampleJaController.clear();
+      _exampleTranslationController.clear();
       _autoIpa = false;
-      _autoJapanese = false;
+      _autoMeaning = false;
       _autoPos = false;
       _autoExampleEn = false;
-      _autoExampleJa = false;
+      _autoExampleTranslation = false;
     });
   }
 
@@ -145,9 +145,9 @@ class _WordRegistrationSheetState
         .save(
           word: _wordController.text,
           ipa: _ipaController.text,
-          japanese: _japaneseController.text,
+          meaning: _meaningController.text,
           exampleEn: _exampleEnController.text,
-          exampleJa: _exampleJaController.text,
+          exampleTranslation: _exampleTranslationController.text,
         );
     // macOS 版はビューを切り替えるが、iOS はシートを閉じるだけでよい
     // (背後の学習中リストは Stream で自動更新される)。
@@ -196,14 +196,14 @@ class _WordRegistrationSheetState
           errorMessage: state.errorMessage,
           wordController: _wordController,
           ipaController: _ipaController,
-          japaneseController: _japaneseController,
+          meaningController: _meaningController,
           exampleEnController: _exampleEnController,
-          exampleJaController: _exampleJaController,
+          exampleTranslationController: _exampleTranslationController,
           autoIpa: _autoIpa,
-          autoJapanese: _autoJapanese,
+          autoMeaning: _autoMeaning,
           autoPos: _autoPos,
           autoExampleEn: _autoExampleEn,
-          autoExampleJa: _autoExampleJa,
+          autoExampleTranslation: _autoExampleTranslation,
           selectedPartsOfSpeech: state.selectedPartsOfSpeech,
           onTogglePartOfSpeech: notifier.togglePartOfSpeech,
         ),
@@ -318,14 +318,14 @@ class _FormStep extends StatelessWidget {
     required this.errorMessage,
     required this.wordController,
     required this.ipaController,
-    required this.japaneseController,
+    required this.meaningController,
     required this.exampleEnController,
-    required this.exampleJaController,
+    required this.exampleTranslationController,
     required this.autoIpa,
-    required this.autoJapanese,
+    required this.autoMeaning,
     required this.autoPos,
     required this.autoExampleEn,
-    required this.autoExampleJa,
+    required this.autoExampleTranslation,
     required this.selectedPartsOfSpeech,
     required this.onTogglePartOfSpeech,
   });
@@ -335,14 +335,14 @@ class _FormStep extends StatelessWidget {
   final String? errorMessage;
   final TextEditingController wordController;
   final TextEditingController ipaController;
-  final TextEditingController japaneseController;
+  final TextEditingController meaningController;
   final TextEditingController exampleEnController;
-  final TextEditingController exampleJaController;
+  final TextEditingController exampleTranslationController;
   final bool autoIpa;
-  final bool autoJapanese;
+  final bool autoMeaning;
   final bool autoPos;
   final bool autoExampleEn;
-  final bool autoExampleJa;
+  final bool autoExampleTranslation;
   final Set<PartOfSpeech> selectedPartsOfSpeech;
   final ValueChanged<PartOfSpeech> onTogglePartOfSpeech;
 
@@ -376,9 +376,9 @@ class _FormStep extends StatelessWidget {
             ),
             MobileLabeledField(
               label: '日本語訳 *',
-              controller: japaneseController,
+              controller: meaningController,
               maxLines: null,
-              autoFilled: autoJapanese,
+              autoFilled: autoMeaning,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -400,10 +400,10 @@ class _FormStep extends StatelessWidget {
             ),
             MobileLabeledField(
               label: '日本語例文',
-              controller: exampleJaController,
+              controller: exampleTranslationController,
               minLines: 2,
               maxLines: null,
-              autoFilled: autoExampleJa,
+              autoFilled: autoExampleTranslation,
             ),
           ],
         ),

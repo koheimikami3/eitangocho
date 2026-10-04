@@ -50,10 +50,10 @@ void main() {
 
   testWidgets('登録済みの単語が行として表示される', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
 
     await runWithView(tester, () async {
@@ -64,10 +64,10 @@ void main() {
 
   testWidgets('検索クエリで行が絞り込まれる', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
 
     await runWithView(tester, () async {
@@ -81,7 +81,7 @@ void main() {
 
   testWidgets('学習済みチェックで isLearned が反転する', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {

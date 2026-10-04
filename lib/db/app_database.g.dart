@@ -40,11 +40,11 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _japaneseMeta = const VerificationMeta(
-    'japanese',
+  static const VerificationMeta _meaningMeta = const VerificationMeta(
+    'meaning',
   );
   @override
-  late final GeneratedColumn<String> japanese = GeneratedColumn<String>(
+  late final GeneratedColumn<String> meaning = GeneratedColumn<String>(
     'japanese',
     aliasedName,
     false,
@@ -73,18 +73,18 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _exampleJaMeta = const VerificationMeta(
-    'exampleJa',
-  );
+  static const VerificationMeta _exampleTranslationMeta =
+      const VerificationMeta('exampleTranslation');
   @override
-  late final GeneratedColumn<String> exampleJa = GeneratedColumn<String>(
-    'example_ja',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
+  late final GeneratedColumn<String> exampleTranslation =
+      GeneratedColumn<String>(
+        'example_ja',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
   static const VerificationMeta _audioUrlMeta = const VerificationMeta(
     'audioUrl',
   );
@@ -163,10 +163,10 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     id,
     word,
     ipa,
-    japanese,
+    meaning,
     partsOfSpeech,
     exampleEn,
-    exampleJa,
+    exampleTranslation,
     audioUrl,
     isLearned,
     lastReviewedAt,
@@ -205,11 +205,11 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     }
     if (data.containsKey('japanese')) {
       context.handle(
-        _japaneseMeta,
-        japanese.isAcceptableOrUnknown(data['japanese']!, _japaneseMeta),
+        _meaningMeta,
+        meaning.isAcceptableOrUnknown(data['japanese']!, _meaningMeta),
       );
     } else if (isInserting) {
-      context.missing(_japaneseMeta);
+      context.missing(_meaningMeta);
     }
     if (data.containsKey('example_en')) {
       context.handle(
@@ -219,8 +219,11 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     }
     if (data.containsKey('example_ja')) {
       context.handle(
-        _exampleJaMeta,
-        exampleJa.isAcceptableOrUnknown(data['example_ja']!, _exampleJaMeta),
+        _exampleTranslationMeta,
+        exampleTranslation.isAcceptableOrUnknown(
+          data['example_ja']!,
+          _exampleTranslationMeta,
+        ),
       );
     }
     if (data.containsKey('audio_url')) {
@@ -290,7 +293,7 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         DriftSqlType.string,
         data['${effectivePrefix}ipa'],
       )!,
-      japanese: attachedDatabase.typeMapping.read(
+      meaning: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}japanese'],
       )!,
@@ -304,7 +307,7 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         DriftSqlType.string,
         data['${effectivePrefix}example_en'],
       )!,
-      exampleJa: attachedDatabase.typeMapping.read(
+      exampleTranslation: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}example_ja'],
       )!,
@@ -349,11 +352,17 @@ class Word extends DataClass implements Insertable<Word> {
   final String word;
   final String ipa;
 
-  /// 日本語訳(必須)
-  final String japanese;
+  /// 訳語(必須)。言語は利用者の訳の言語で、多くは日本語。
+  ///
+  /// **SQL の列名は `japanese` のまま**。iCloud 同期の JSON・既存端末の DB と
+  /// 名前をそろえ続けるため、多言語化では列を言語ごとに増やさず使い回している
+  /// (docs/design.md「多言語化」)。Dart 側の名前だけを中立にしている。
+  final String meaning;
   final List<PartOfSpeech> partsOfSpeech;
   final String exampleEn;
-  final String exampleJa;
+
+  /// 英例文の訳。[meaning] と同じ理由で SQL の列名は `example_ja` のまま。
+  final String exampleTranslation;
 
   /// 辞書 API の発音 mp3 URL。配信元が落ちていて再生に使えず、辞書ソースを
   /// kaikki に替えた際に取得もやめた(docs/design.md)。以後は常に空だが、
@@ -371,10 +380,10 @@ class Word extends DataClass implements Insertable<Word> {
     required this.id,
     required this.word,
     required this.ipa,
-    required this.japanese,
+    required this.meaning,
     required this.partsOfSpeech,
     required this.exampleEn,
-    required this.exampleJa,
+    required this.exampleTranslation,
     required this.audioUrl,
     required this.isLearned,
     this.lastReviewedAt,
@@ -388,14 +397,14 @@ class Word extends DataClass implements Insertable<Word> {
     map['id'] = Variable<int>(id);
     map['word'] = Variable<String>(word);
     map['ipa'] = Variable<String>(ipa);
-    map['japanese'] = Variable<String>(japanese);
+    map['japanese'] = Variable<String>(meaning);
     {
       map['parts_of_speech'] = Variable<String>(
         $WordsTable.$converterpartsOfSpeech.toSql(partsOfSpeech),
       );
     }
     map['example_en'] = Variable<String>(exampleEn);
-    map['example_ja'] = Variable<String>(exampleJa);
+    map['example_ja'] = Variable<String>(exampleTranslation);
     map['audio_url'] = Variable<String>(audioUrl);
     map['is_learned'] = Variable<bool>(isLearned);
     if (!nullToAbsent || lastReviewedAt != null) {
@@ -412,10 +421,10 @@ class Word extends DataClass implements Insertable<Word> {
       id: Value(id),
       word: Value(word),
       ipa: Value(ipa),
-      japanese: Value(japanese),
+      meaning: Value(meaning),
       partsOfSpeech: Value(partsOfSpeech),
       exampleEn: Value(exampleEn),
-      exampleJa: Value(exampleJa),
+      exampleTranslation: Value(exampleTranslation),
       audioUrl: Value(audioUrl),
       isLearned: Value(isLearned),
       lastReviewedAt: lastReviewedAt == null && nullToAbsent
@@ -436,12 +445,14 @@ class Word extends DataClass implements Insertable<Word> {
       id: serializer.fromJson<int>(json['id']),
       word: serializer.fromJson<String>(json['word']),
       ipa: serializer.fromJson<String>(json['ipa']),
-      japanese: serializer.fromJson<String>(json['japanese']),
+      meaning: serializer.fromJson<String>(json['meaning']),
       partsOfSpeech: serializer.fromJson<List<PartOfSpeech>>(
         json['partsOfSpeech'],
       ),
       exampleEn: serializer.fromJson<String>(json['exampleEn']),
-      exampleJa: serializer.fromJson<String>(json['exampleJa']),
+      exampleTranslation: serializer.fromJson<String>(
+        json['exampleTranslation'],
+      ),
       audioUrl: serializer.fromJson<String>(json['audioUrl']),
       isLearned: serializer.fromJson<bool>(json['isLearned']),
       lastReviewedAt: serializer.fromJson<DateTime?>(json['lastReviewedAt']),
@@ -457,10 +468,10 @@ class Word extends DataClass implements Insertable<Word> {
       'id': serializer.toJson<int>(id),
       'word': serializer.toJson<String>(word),
       'ipa': serializer.toJson<String>(ipa),
-      'japanese': serializer.toJson<String>(japanese),
+      'meaning': serializer.toJson<String>(meaning),
       'partsOfSpeech': serializer.toJson<List<PartOfSpeech>>(partsOfSpeech),
       'exampleEn': serializer.toJson<String>(exampleEn),
-      'exampleJa': serializer.toJson<String>(exampleJa),
+      'exampleTranslation': serializer.toJson<String>(exampleTranslation),
       'audioUrl': serializer.toJson<String>(audioUrl),
       'isLearned': serializer.toJson<bool>(isLearned),
       'lastReviewedAt': serializer.toJson<DateTime?>(lastReviewedAt),
@@ -474,10 +485,10 @@ class Word extends DataClass implements Insertable<Word> {
     int? id,
     String? word,
     String? ipa,
-    String? japanese,
+    String? meaning,
     List<PartOfSpeech>? partsOfSpeech,
     String? exampleEn,
-    String? exampleJa,
+    String? exampleTranslation,
     String? audioUrl,
     bool? isLearned,
     Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -488,10 +499,10 @@ class Word extends DataClass implements Insertable<Word> {
     id: id ?? this.id,
     word: word ?? this.word,
     ipa: ipa ?? this.ipa,
-    japanese: japanese ?? this.japanese,
+    meaning: meaning ?? this.meaning,
     partsOfSpeech: partsOfSpeech ?? this.partsOfSpeech,
     exampleEn: exampleEn ?? this.exampleEn,
-    exampleJa: exampleJa ?? this.exampleJa,
+    exampleTranslation: exampleTranslation ?? this.exampleTranslation,
     audioUrl: audioUrl ?? this.audioUrl,
     isLearned: isLearned ?? this.isLearned,
     lastReviewedAt: lastReviewedAt.present
@@ -506,12 +517,14 @@ class Word extends DataClass implements Insertable<Word> {
       id: data.id.present ? data.id.value : this.id,
       word: data.word.present ? data.word.value : this.word,
       ipa: data.ipa.present ? data.ipa.value : this.ipa,
-      japanese: data.japanese.present ? data.japanese.value : this.japanese,
+      meaning: data.meaning.present ? data.meaning.value : this.meaning,
       partsOfSpeech: data.partsOfSpeech.present
           ? data.partsOfSpeech.value
           : this.partsOfSpeech,
       exampleEn: data.exampleEn.present ? data.exampleEn.value : this.exampleEn,
-      exampleJa: data.exampleJa.present ? data.exampleJa.value : this.exampleJa,
+      exampleTranslation: data.exampleTranslation.present
+          ? data.exampleTranslation.value
+          : this.exampleTranslation,
       audioUrl: data.audioUrl.present ? data.audioUrl.value : this.audioUrl,
       isLearned: data.isLearned.present ? data.isLearned.value : this.isLearned,
       lastReviewedAt: data.lastReviewedAt.present
@@ -531,10 +544,10 @@ class Word extends DataClass implements Insertable<Word> {
           ..write('id: $id, ')
           ..write('word: $word, ')
           ..write('ipa: $ipa, ')
-          ..write('japanese: $japanese, ')
+          ..write('meaning: $meaning, ')
           ..write('partsOfSpeech: $partsOfSpeech, ')
           ..write('exampleEn: $exampleEn, ')
-          ..write('exampleJa: $exampleJa, ')
+          ..write('exampleTranslation: $exampleTranslation, ')
           ..write('audioUrl: $audioUrl, ')
           ..write('isLearned: $isLearned, ')
           ..write('lastReviewedAt: $lastReviewedAt, ')
@@ -550,10 +563,10 @@ class Word extends DataClass implements Insertable<Word> {
     id,
     word,
     ipa,
-    japanese,
+    meaning,
     partsOfSpeech,
     exampleEn,
-    exampleJa,
+    exampleTranslation,
     audioUrl,
     isLearned,
     lastReviewedAt,
@@ -568,10 +581,10 @@ class Word extends DataClass implements Insertable<Word> {
           other.id == this.id &&
           other.word == this.word &&
           other.ipa == this.ipa &&
-          other.japanese == this.japanese &&
+          other.meaning == this.meaning &&
           other.partsOfSpeech == this.partsOfSpeech &&
           other.exampleEn == this.exampleEn &&
-          other.exampleJa == this.exampleJa &&
+          other.exampleTranslation == this.exampleTranslation &&
           other.audioUrl == this.audioUrl &&
           other.isLearned == this.isLearned &&
           other.lastReviewedAt == this.lastReviewedAt &&
@@ -584,10 +597,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
   final Value<int> id;
   final Value<String> word;
   final Value<String> ipa;
-  final Value<String> japanese;
+  final Value<String> meaning;
   final Value<List<PartOfSpeech>> partsOfSpeech;
   final Value<String> exampleEn;
-  final Value<String> exampleJa;
+  final Value<String> exampleTranslation;
   final Value<String> audioUrl;
   final Value<bool> isLearned;
   final Value<DateTime?> lastReviewedAt;
@@ -598,10 +611,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
     this.id = const Value.absent(),
     this.word = const Value.absent(),
     this.ipa = const Value.absent(),
-    this.japanese = const Value.absent(),
+    this.meaning = const Value.absent(),
     this.partsOfSpeech = const Value.absent(),
     this.exampleEn = const Value.absent(),
-    this.exampleJa = const Value.absent(),
+    this.exampleTranslation = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.isLearned = const Value.absent(),
     this.lastReviewedAt = const Value.absent(),
@@ -613,10 +626,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
     this.id = const Value.absent(),
     required String word,
     this.ipa = const Value.absent(),
-    required String japanese,
+    required String meaning,
     this.partsOfSpeech = const Value.absent(),
     this.exampleEn = const Value.absent(),
-    this.exampleJa = const Value.absent(),
+    this.exampleTranslation = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.isLearned = const Value.absent(),
     this.lastReviewedAt = const Value.absent(),
@@ -624,17 +637,17 @@ class WordsCompanion extends UpdateCompanion<Word> {
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : word = Value(word),
-       japanese = Value(japanese),
+       meaning = Value(meaning),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<Word> custom({
     Expression<int>? id,
     Expression<String>? word,
     Expression<String>? ipa,
-    Expression<String>? japanese,
+    Expression<String>? meaning,
     Expression<String>? partsOfSpeech,
     Expression<String>? exampleEn,
-    Expression<String>? exampleJa,
+    Expression<String>? exampleTranslation,
     Expression<String>? audioUrl,
     Expression<bool>? isLearned,
     Expression<DateTime>? lastReviewedAt,
@@ -646,10 +659,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
       if (id != null) 'id': id,
       if (word != null) 'word': word,
       if (ipa != null) 'ipa': ipa,
-      if (japanese != null) 'japanese': japanese,
+      if (meaning != null) 'japanese': meaning,
       if (partsOfSpeech != null) 'parts_of_speech': partsOfSpeech,
       if (exampleEn != null) 'example_en': exampleEn,
-      if (exampleJa != null) 'example_ja': exampleJa,
+      if (exampleTranslation != null) 'example_ja': exampleTranslation,
       if (audioUrl != null) 'audio_url': audioUrl,
       if (isLearned != null) 'is_learned': isLearned,
       if (lastReviewedAt != null) 'last_reviewed_at': lastReviewedAt,
@@ -663,10 +676,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
     Value<int>? id,
     Value<String>? word,
     Value<String>? ipa,
-    Value<String>? japanese,
+    Value<String>? meaning,
     Value<List<PartOfSpeech>>? partsOfSpeech,
     Value<String>? exampleEn,
-    Value<String>? exampleJa,
+    Value<String>? exampleTranslation,
     Value<String>? audioUrl,
     Value<bool>? isLearned,
     Value<DateTime?>? lastReviewedAt,
@@ -678,10 +691,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
       id: id ?? this.id,
       word: word ?? this.word,
       ipa: ipa ?? this.ipa,
-      japanese: japanese ?? this.japanese,
+      meaning: meaning ?? this.meaning,
       partsOfSpeech: partsOfSpeech ?? this.partsOfSpeech,
       exampleEn: exampleEn ?? this.exampleEn,
-      exampleJa: exampleJa ?? this.exampleJa,
+      exampleTranslation: exampleTranslation ?? this.exampleTranslation,
       audioUrl: audioUrl ?? this.audioUrl,
       isLearned: isLearned ?? this.isLearned,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
@@ -703,8 +716,8 @@ class WordsCompanion extends UpdateCompanion<Word> {
     if (ipa.present) {
       map['ipa'] = Variable<String>(ipa.value);
     }
-    if (japanese.present) {
-      map['japanese'] = Variable<String>(japanese.value);
+    if (meaning.present) {
+      map['japanese'] = Variable<String>(meaning.value);
     }
     if (partsOfSpeech.present) {
       map['parts_of_speech'] = Variable<String>(
@@ -714,8 +727,8 @@ class WordsCompanion extends UpdateCompanion<Word> {
     if (exampleEn.present) {
       map['example_en'] = Variable<String>(exampleEn.value);
     }
-    if (exampleJa.present) {
-      map['example_ja'] = Variable<String>(exampleJa.value);
+    if (exampleTranslation.present) {
+      map['example_ja'] = Variable<String>(exampleTranslation.value);
     }
     if (audioUrl.present) {
       map['audio_url'] = Variable<String>(audioUrl.value);
@@ -744,10 +757,10 @@ class WordsCompanion extends UpdateCompanion<Word> {
           ..write('id: $id, ')
           ..write('word: $word, ')
           ..write('ipa: $ipa, ')
-          ..write('japanese: $japanese, ')
+          ..write('meaning: $meaning, ')
           ..write('partsOfSpeech: $partsOfSpeech, ')
           ..write('exampleEn: $exampleEn, ')
-          ..write('exampleJa: $exampleJa, ')
+          ..write('exampleTranslation: $exampleTranslation, ')
           ..write('audioUrl: $audioUrl, ')
           ..write('isLearned: $isLearned, ')
           ..write('lastReviewedAt: $lastReviewedAt, ')
@@ -1492,10 +1505,10 @@ typedef $$WordsTableCreateCompanionBuilder =
       Value<int> id,
       required String word,
       Value<String> ipa,
-      required String japanese,
+      required String meaning,
       Value<List<PartOfSpeech>> partsOfSpeech,
       Value<String> exampleEn,
-      Value<String> exampleJa,
+      Value<String> exampleTranslation,
       Value<String> audioUrl,
       Value<bool> isLearned,
       Value<DateTime?> lastReviewedAt,
@@ -1508,10 +1521,10 @@ typedef $$WordsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> word,
       Value<String> ipa,
-      Value<String> japanese,
+      Value<String> meaning,
       Value<List<PartOfSpeech>> partsOfSpeech,
       Value<String> exampleEn,
-      Value<String> exampleJa,
+      Value<String> exampleTranslation,
       Value<String> audioUrl,
       Value<bool> isLearned,
       Value<DateTime?> lastReviewedAt,
@@ -1543,8 +1556,8 @@ class $$WordsTableFilterComposer extends Composer<_$AppDatabase, $WordsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get japanese => $composableBuilder(
-    column: $table.japanese,
+  ColumnFilters<String> get meaning => $composableBuilder(
+    column: $table.meaning,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1559,8 +1572,8 @@ class $$WordsTableFilterComposer extends Composer<_$AppDatabase, $WordsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get exampleJa => $composableBuilder(
-    column: $table.exampleJa,
+  ColumnFilters<String> get exampleTranslation => $composableBuilder(
+    column: $table.exampleTranslation,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1619,8 +1632,8 @@ class $$WordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get japanese => $composableBuilder(
-    column: $table.japanese,
+  ColumnOrderings<String> get meaning => $composableBuilder(
+    column: $table.meaning,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1634,8 +1647,8 @@ class $$WordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get exampleJa => $composableBuilder(
-    column: $table.exampleJa,
+  ColumnOrderings<String> get exampleTranslation => $composableBuilder(
+    column: $table.exampleTranslation,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1688,8 +1701,8 @@ class $$WordsTableAnnotationComposer
   GeneratedColumn<String> get ipa =>
       $composableBuilder(column: $table.ipa, builder: (column) => column);
 
-  GeneratedColumn<String> get japanese =>
-      $composableBuilder(column: $table.japanese, builder: (column) => column);
+  GeneratedColumn<String> get meaning =>
+      $composableBuilder(column: $table.meaning, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<List<PartOfSpeech>, String>
   get partsOfSpeech => $composableBuilder(
@@ -1700,8 +1713,10 @@ class $$WordsTableAnnotationComposer
   GeneratedColumn<String> get exampleEn =>
       $composableBuilder(column: $table.exampleEn, builder: (column) => column);
 
-  GeneratedColumn<String> get exampleJa =>
-      $composableBuilder(column: $table.exampleJa, builder: (column) => column);
+  GeneratedColumn<String> get exampleTranslation => $composableBuilder(
+    column: $table.exampleTranslation,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get audioUrl =>
       $composableBuilder(column: $table.audioUrl, builder: (column) => column);
@@ -1757,10 +1772,10 @@ class $$WordsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> word = const Value.absent(),
                 Value<String> ipa = const Value.absent(),
-                Value<String> japanese = const Value.absent(),
+                Value<String> meaning = const Value.absent(),
                 Value<List<PartOfSpeech>> partsOfSpeech = const Value.absent(),
                 Value<String> exampleEn = const Value.absent(),
-                Value<String> exampleJa = const Value.absent(),
+                Value<String> exampleTranslation = const Value.absent(),
                 Value<String> audioUrl = const Value.absent(),
                 Value<bool> isLearned = const Value.absent(),
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -1771,10 +1786,10 @@ class $$WordsTableTableManager
                 id: id,
                 word: word,
                 ipa: ipa,
-                japanese: japanese,
+                meaning: meaning,
                 partsOfSpeech: partsOfSpeech,
                 exampleEn: exampleEn,
-                exampleJa: exampleJa,
+                exampleTranslation: exampleTranslation,
                 audioUrl: audioUrl,
                 isLearned: isLearned,
                 lastReviewedAt: lastReviewedAt,
@@ -1787,10 +1802,10 @@ class $$WordsTableTableManager
                 Value<int> id = const Value.absent(),
                 required String word,
                 Value<String> ipa = const Value.absent(),
-                required String japanese,
+                required String meaning,
                 Value<List<PartOfSpeech>> partsOfSpeech = const Value.absent(),
                 Value<String> exampleEn = const Value.absent(),
-                Value<String> exampleJa = const Value.absent(),
+                Value<String> exampleTranslation = const Value.absent(),
                 Value<String> audioUrl = const Value.absent(),
                 Value<bool> isLearned = const Value.absent(),
                 Value<DateTime?> lastReviewedAt = const Value.absent(),
@@ -1801,10 +1816,10 @@ class $$WordsTableTableManager
                 id: id,
                 word: word,
                 ipa: ipa,
-                japanese: japanese,
+                meaning: meaning,
                 partsOfSpeech: partsOfSpeech,
                 exampleEn: exampleEn,
-                exampleJa: exampleJa,
+                exampleTranslation: exampleTranslation,
                 audioUrl: audioUrl,
                 isLearned: isLearned,
                 lastReviewedAt: lastReviewedAt,

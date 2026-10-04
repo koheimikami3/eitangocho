@@ -69,7 +69,7 @@ class _MobileWordCardState extends State<MobileWordCard> {
           ),
           const SizedBox(height: 8),
           _RevealToggle(
-            japanese: word.japanese,
+            meaning: word.meaning,
             revealed: _revealed,
             onTap: () => setState(() => _revealed = !_revealed),
           ),
@@ -93,11 +93,13 @@ class _MobileWordCardState extends State<MobileWordCard> {
                   )
                 : null,
           ),
-          if (hasExample && _revealed && word.exampleJa.trim().isNotEmpty)
+          if (hasExample &&
+              _revealed &&
+              word.exampleTranslation.trim().isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                word.exampleJa,
+                word.exampleTranslation,
                 style: TextStyle(
                   fontSize: 11,
                   height: 1.45,
@@ -243,25 +245,25 @@ class _CardHeader extends StatelessWidget {
 /// 訳の表示 / 非表示トグル。未表示は破線枠、表示中は塗りつぶし枠。
 class _RevealToggle extends StatelessWidget {
   const _RevealToggle({
-    required this.japanese,
+    required this.meaning,
     required this.revealed,
     required this.onTap,
   });
 
-  final String japanese;
+  final String meaning;
   final bool revealed;
   final VoidCallback onTap;
 
   static const _padding = 9.0;
   static const _lineHeight = 1.4;
-  static const _japaneseFontSize = 13.0;
+  static const _meaningFontSize = 13.0;
   static const _hintFontSize = 12.0;
 
   static const _radius = 9.0;
 
   /// 訳を 1 行表示したときの外形高さ(パディング + 1 行)。
   /// 表示中の枠は内側の影で描くため、枠線の分の高さは無い。
-  static const _boxHeight = _padding * 2 + _japaneseFontSize * _lineHeight;
+  static const _boxHeight = _padding * 2 + _meaningFontSize * _lineHeight;
 
   /// 破線側のパディング。文字が小さいぶんをここで埋め、タップしても
   /// 高さが変わらないようにする(破線は CustomPaint で描くので高さを取らない)。
@@ -285,11 +287,11 @@ class _RevealToggle extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: Text(
-                  japanese,
+                  meaning,
                   // 訳が 2 行に折り返したときに 2 行目だけ中央に寄って見えるため、
                   // 左揃えにする(「訳を表示」の方は 1 行固定なので中央のまま)。
                   style: TextStyle(
-                    fontSize: _japaneseFontSize,
+                    fontSize: _meaningFontSize,
                     height: _lineHeight,
                     color: palette.text,
                   ),

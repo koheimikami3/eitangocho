@@ -111,7 +111,7 @@ void main() {
 
   test('有効にすると 1 回同期し、最終同期日時が入る', () async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final container = makeContainer();
 
@@ -189,7 +189,7 @@ void main() {
       expect(store.writeCount, 1, reason: 'オプトイン時の 1 回');
 
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await pumpEventQueue();
 
@@ -201,7 +201,7 @@ void main() {
       await container.read(syncProvider.notifier).initialized;
 
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await pumpEventQueue();
 
@@ -215,7 +215,7 @@ void main() {
       await container.read(syncProvider.notifier).setEnabled(enabled: true);
 
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await db.wordDao.setLearned(id, isLearned: true);
       await db.wordDao.deleteWord(id);

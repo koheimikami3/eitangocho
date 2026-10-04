@@ -8,9 +8,9 @@ void main() {
     word: 'serendipity',
     ipa: '/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/',
     partsOfSpeech: [PartOfSpeech.noun],
-    japanese: '思わぬ発見',
+    meaning: '思わぬ発見',
     exampleEn: 'A lucky find.',
-    exampleJa: '幸運な発見。',
+    exampleTranslation: '幸運な発見。',
     audioUrl: '',
   );
 
@@ -28,7 +28,7 @@ void main() {
 
     // EJDict は句動詞を 1 件も収録していないため、句動詞ではこれが常態になる。
     test('訳が空なら、他が埋まっていても訳の不足を先に伝える', () {
-      final state = WordRegistrationState(fetched: full.copyWith(japanese: ''));
+      final state = WordRegistrationState(fetched: full.copyWith(meaning: ''));
 
       expect(state.warningMessage, '日本語訳は辞書に見つかりませんでした(手動で入力してください)');
     });

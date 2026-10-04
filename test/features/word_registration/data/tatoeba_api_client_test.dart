@@ -53,7 +53,7 @@ void main() {
 
     expect(example, isNotNull);
     expect(example!.en, 'Tom obtained a gun.');
-    expect(example.ja, 'トムは銃を手に入れた。');
+    expect(example.translation, 'トムは銃を手に入れた。');
   });
 
   test('必要なクエリを組み立てる(sort が無いと 400 になる)', () async {

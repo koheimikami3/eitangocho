@@ -150,9 +150,7 @@ class SettingsViewMobile extends ConsumerWidget {
         // (macOS から踏んでもインストールできない)。
         MobileSettingsSection(
           title: '作者の他のアプリ',
-          rows: [
-            for (final app in AuthorApp.all) MobileAuthorAppRow(app: app),
-          ],
+          rows: [for (final app in AuthorApp.all) MobileAuthorAppRow(app: app)],
         ),
         const SizedBox(height: 22),
         MobileSettingsSection(

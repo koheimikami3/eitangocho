@@ -51,10 +51,10 @@ void main() {
 
   testWidgets('未学習の単語だけがカード表示される(学習済みは出ない)', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final learnedId = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
     await db.wordDao.setLearned(learnedId, isLearned: true);
 
@@ -95,7 +95,7 @@ void main() {
 
   testWidgets('「日本語訳を表示」をタップすると訳が現れる', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {
@@ -111,7 +111,7 @@ void main() {
 
   testWidgets('学習済みチェックで isLearned が true になりカードから消える', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {

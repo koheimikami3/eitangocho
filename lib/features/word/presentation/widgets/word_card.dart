@@ -126,7 +126,7 @@ class _WordCardState extends State<WordCard> {
               ),
               const SizedBox(height: 10),
               _RevealArea(
-                japanese: word.japanese,
+                meaning: word.meaning,
                 revealed: _revealed,
                 onToggle: () => setState(() => _revealed = !_revealed),
               ),
@@ -152,7 +152,7 @@ class _WordCardState extends State<WordCard> {
               if (hasExample && _revealed) ...[
                 const SizedBox(height: 4),
                 Text(
-                  word.exampleJa,
+                  word.exampleTranslation,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0x80000000),
@@ -207,12 +207,12 @@ class _WordCardState extends State<WordCard> {
 /// 日本語訳の隠し/表示エリア。未表示は破線ボタン、表示は訳テキスト。
 class _RevealArea extends StatefulWidget {
   const _RevealArea({
-    required this.japanese,
+    required this.meaning,
     required this.revealed,
     required this.onToggle,
   });
 
-  final String japanese;
+  final String meaning;
   final bool revealed;
   final VoidCallback onToggle;
 
@@ -248,7 +248,7 @@ class _RevealAreaState extends State<_RevealArea> {
                     border: Border.all(color: AppColors.inputBorder),
                   ),
                   child: Text(
-                    widget.japanese,
+                    widget.meaning,
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textPrimary,

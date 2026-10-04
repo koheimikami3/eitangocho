@@ -17,7 +17,7 @@ mixin _$WordRegistrationState {
  RegistrationStep get step;/// 自動入力の取得結果。手動入力(スキップ・未収録)のときは null。
 /// audioUrl はフォームに出さず、保存時にここから words へ書き込む。
  WordInfo? get fetched;/// 自動入力したが辞書(FD・EJDict とも)未収録だった
- bool get notFound;/// 例文の DeepL 翻訳に失敗した(exampleJa 空のまま続行し警告を出す)
+ bool get notFound;/// 例文の DeepL 翻訳に失敗した(exampleTranslation 空のまま続行し警告を出す)
  bool get translationFailed; Set<PartOfSpeech> get selectedPartsOfSpeech; String? get errorMessage;
 /// Create a copy of WordRegistrationState
 /// with the given fields replaced by the non-null parameter values.
@@ -236,7 +236,7 @@ class _WordRegistrationState extends WordRegistrationState {
 @override final  WordInfo? fetched;
 /// 自動入力したが辞書(FD・EJDict とも)未収録だった
 @override@JsonKey() final  bool notFound;
-/// 例文の DeepL 翻訳に失敗した(exampleJa 空のまま続行し警告を出す)
+/// 例文の DeepL 翻訳に失敗した(exampleTranslation 空のまま続行し警告を出す)
 @override@JsonKey() final  bool translationFailed;
  final  Set<PartOfSpeech> _selectedPartsOfSpeech;
 @override@JsonKey() Set<PartOfSpeech> get selectedPartsOfSpeech {
