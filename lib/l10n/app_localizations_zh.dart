@@ -372,7 +372,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sectionTranslation => '翻譯語言';
 
   @override
-  String get translationLanguageCaption => '新增單字時會以這個語言取得翻譯，已新增的單字翻譯不會改變。';
+  String get translationLanguageCaption => '新增單字時會以這個語言取得翻譯。\n已新增的單字翻譯不會改變。';
 
   @override
   String get sectionData => '資料';
@@ -929,7 +929,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get sectionTranslation => '翻譯語言';
 
   @override
-  String get translationLanguageCaption => '新增單字時會以這個語言取得翻譯，已新增的單字翻譯不會改變。';
+  String get translationLanguageCaption => '新增單字時會以這個語言取得翻譯。\n已新增的單字翻譯不會改變。';
 
   @override
   String get sectionData => '資料';

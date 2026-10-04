@@ -268,7 +268,7 @@
   "showIpa": "発音記号(IPA)を表示",
   "sectionQuiz": "クイズ",
   "sectionTranslation": "訳の言語",
-  "translationLanguageCaption": "新しく登録する単語の訳を、この言語で取得します。登録済みの単語の訳は変わりません。",
+  "translationLanguageCaption": "新しく登録する単語の訳を、この言語で取得します。\n登録済みの単語の訳は変わりません。",
   "sectionData": "データ",
   "sectionSupport": "サポート",
   "writeReview": "App Store でレビューを書く",

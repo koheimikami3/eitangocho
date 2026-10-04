@@ -105,7 +105,7 @@
   "showIpa": "顯示音標（IPA）",
   "sectionQuiz": "測驗",
   "sectionTranslation": "翻譯語言",
-  "translationLanguageCaption": "新增單字時會以這個語言取得翻譯，已新增的單字翻譯不會改變。",
+  "translationLanguageCaption": "新增單字時會以這個語言取得翻譯。\n已新增的單字翻譯不會改變。",
   "sectionData": "資料",
   "sectionSupport": "支援",
   "writeReview": "在 App Store 撰寫評論",

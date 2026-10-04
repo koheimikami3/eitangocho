@@ -374,7 +374,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get translationLanguageCaption =>
-      '新しく登録する単語の訳を、この言語で取得します。登録済みの単語の訳は変わりません。';
+      '新しく登録する単語の訳を、この言語で取得します。\n登録済みの単語の訳は変わりません。';
 
   @override
   String get sectionData => 'データ';

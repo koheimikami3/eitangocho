@@ -734,7 +734,7 @@ abstract class AppLocalizations {
   /// No description provided for @translationLanguageCaption.
   ///
   /// In ja, this message translates to:
-  /// **'新しく登録する単語の訳を、この言語で取得します。登録済みの単語の訳は変わりません。'**
+  /// **'新しく登録する単語の訳を、この言語で取得します。\n登録済みの単語の訳は変わりません。'**
   String get translationLanguageCaption;
 
   /// No description provided for @sectionData.
