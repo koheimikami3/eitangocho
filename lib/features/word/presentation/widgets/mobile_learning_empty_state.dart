@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の学習中 0 件の空状態。
@@ -26,7 +27,7 @@ class MobileLearningEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '学習中の単語はありません。\n単語を登録しましょう。',
+              context.l10n.learningEmpty,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -36,7 +37,7 @@ class MobileLearningEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             MobileFilledButton(
-              label: '＋ 単語を登録',
+              label: context.l10n.addWord,
               onPressed: () => showWordRegistrationSheet(context),
               fontSize: 14,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

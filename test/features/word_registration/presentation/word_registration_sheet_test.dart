@@ -5,6 +5,7 @@ import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,9 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            locale: const Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: Builder(
                 builder: (context) => TextButton(
@@ -86,10 +90,10 @@ void main() {
   const fetched = WordInfo(
     word: 'serendipity',
     ipa: '/ˌserənˈdɪpəti/',
-    japanese: '偶然の幸運',
+    meaning: '偶然の幸運',
     partsOfSpeech: [PartOfSpeech.noun],
     exampleEn: 'Meeting her was pure serendipity.',
-    exampleJa: '彼女に出会えたのは偶然の幸運だった。',
+    exampleTranslation: '彼女に出会えたのは偶然の幸運だった。',
     audioUrl: '',
   );
 
@@ -161,7 +165,7 @@ void main() {
       expect(find.text('単語を登録'), findsNothing);
       final saved = (await db.wordDao.getAll()).single;
       expect(saved.word, 'serendipity');
-      expect(saved.japanese, '偶然の幸運');
+      expect(saved.meaning, '偶然の幸運');
     });
   });
 }

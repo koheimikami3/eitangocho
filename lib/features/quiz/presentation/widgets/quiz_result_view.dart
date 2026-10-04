@@ -6,6 +6,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,8 +27,8 @@ class QuizResultView extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          '復習完了',
+        Text(
+          context.l10n.quizDone,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 22,
@@ -37,7 +38,7 @@ class QuizResultView extends ConsumerWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '覚えている $okCount語 / 忘れていた ${forgotWords.length}語',
+          context.l10n.quizSummary(okCount, forgotWords.length),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
         ),
@@ -50,7 +51,7 @@ class QuizResultView extends ConsumerWidget {
           children: [
             Expanded(
               child: AppFilledButton(
-                label: '続ける',
+                label: context.l10n.quizContinue,
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: () =>
@@ -61,7 +62,7 @@ class QuizResultView extends ConsumerWidget {
             Expanded(
               // iOS と同じく 2 つとも主ボタン(どちらも次の行動として同格)。
               child: AppFilledButton(
-                label: '学習中リストへ',
+                label: context.l10n.toLearningList,
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: () => ref
@@ -102,8 +103,8 @@ class _ForgotList extends StatelessWidget {
               color: palette.dangerSoft,
               border: Border(bottom: BorderSide(color: palette.rowLine)),
             ),
-            child: const Text(
-              '忘れていた単語(学習中リストに戻りました)',
+            child: Text(
+              context.l10n.quizForgotWordsHeader,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -141,7 +142,7 @@ class _ForgotList extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      words[i].japanese,
+                      words[i].meaning,
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,

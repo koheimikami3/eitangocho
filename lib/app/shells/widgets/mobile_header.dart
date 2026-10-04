@@ -8,6 +8,7 @@ import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_sort_button.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_sheet.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -57,7 +58,7 @@ class MobileHeader extends ConsumerWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              _titleOf(view),
+                              _titleOf(context, view),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 20,
@@ -69,7 +70,7 @@ class MobileHeader extends ConsumerWidget {
                           if (showSearchAndAdd) ...[
                             const SizedBox(width: 8),
                             Text(
-                              _countOf(ref, view),
+                              _countOf(context, ref, view),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: palette.textAlpha(40),
@@ -106,20 +107,25 @@ class MobileHeader extends ConsumerWidget {
     );
   }
 
-  String _titleOf(MainView view) => switch (view) {
-    MainView.learning => '学習中',
-    MainView.allWords => '全単語',
-    MainView.quiz => 'フラッシュクイズ',
-    MainView.registration => '単語を登録',
-    MainView.settings => '設定',
+  String _titleOf(BuildContext context, MainView view) => switch (view) {
+    MainView.learning => context.l10n.navLearning,
+    MainView.allWords => context.l10n.navAllWords,
+    MainView.quiz => context.l10n.navQuiz,
+    MainView.registration => context.l10n.navRegistration,
+    MainView.settings => context.l10n.navSettings,
   };
 
   /// 件数はタイトルの脇に小さく出す(学習中 / 全単語のみ)。
-  String _countOf(WidgetRef ref, MainView view) => switch (view) {
-    MainView.learning => '${ref.watch(learningWordsProvider).length}語',
-    MainView.allWords => '${ref.watch(wordListProvider).value?.length ?? 0}語',
-    _ => '',
-  };
+  String _countOf(BuildContext context, WidgetRef ref, MainView view) =>
+      switch (view) {
+        MainView.learning => context.l10n.wordCount(
+          ref.watch(learningWordsProvider).length,
+        ),
+        MainView.allWords => context.l10n.wordCount(
+          ref.watch(wordListProvider).value?.length ?? 0,
+        ),
+        _ => '',
+      };
 }
 
 class _AddWordButton extends StatelessWidget {
@@ -128,7 +134,7 @@ class _AddWordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MobileFilledButton(
-      label: '＋ 登録',
+      label: context.l10n.addShort,
       // 登録はタブではなくシートで開く(デザインどおり)。
       onPressed: () => showWordRegistrationSheet(context),
       // 文字の大きさは 1.x と同じ 14px・太字(デザインの 13px・w600 は
@@ -153,7 +159,9 @@ class _SortRow extends ConsumerWidget {
         Expanded(
           child: Text(
             // 検索で絞り込んだ後の件数(タイトル脇の件数は全件)。
-            '${ref.watch(filteredWordListProvider).length}語を表示中',
+            context.l10n.showingWordCount(
+              ref.watch(filteredWordListProvider).length,
+            ),
             style: TextStyle(fontSize: 12, color: palette.textAlpha(45)),
           ),
         ),

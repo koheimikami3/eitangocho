@@ -34,7 +34,7 @@ final filteredLearningWordsProvider = Provider<List<Word>>((ref) {
             !w.isLearned &&
             (query.isEmpty ||
                 w.word.toLowerCase().contains(lower) ||
-                w.japanese.contains(query)),
+                w.meaning.contains(query)),
       )
       .toList();
 });

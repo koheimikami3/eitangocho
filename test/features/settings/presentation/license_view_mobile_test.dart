@@ -2,6 +2,7 @@ import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/domain/license_item.dart';
 import 'package:eitangocho/features/settings/presentation/license_detail_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,7 +24,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [licenseListProvider.overrideWith((ref) async => licenses)],
-        child: const MaterialApp(home: LicenseViewMobile()),
+        child: const MaterialApp(
+          locale: Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: LicenseViewMobile(),
+        ),
       ),
     );
     await tester.pumpAndSettle();

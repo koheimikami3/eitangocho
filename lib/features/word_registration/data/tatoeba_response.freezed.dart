@@ -556,7 +556,7 @@ as List<TatoebaTranslation>,
 /// @nodoc
 mixin _$TatoebaTranslation {
 
- String? get lang; String? get text;
+ String? get lang; String? get script; String? get text;
 /// Create a copy of TatoebaTranslation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -569,16 +569,16 @@ $TatoebaTranslationCopyWith<TatoebaTranslation> get copyWith => _$TatoebaTransla
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TatoebaTranslation&&(identical(other.lang, lang) || other.lang == lang)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TatoebaTranslation&&(identical(other.lang, lang) || other.lang == lang)&&(identical(other.script, script) || other.script == script)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,lang,text);
+int get hashCode => Object.hash(runtimeType,lang,script,text);
 
 @override
 String toString() {
-  return 'TatoebaTranslation(lang: $lang, text: $text)';
+  return 'TatoebaTranslation(lang: $lang, script: $script, text: $text)';
 }
 
 
@@ -589,7 +589,7 @@ abstract mixin class $TatoebaTranslationCopyWith<$Res>  {
   factory $TatoebaTranslationCopyWith(TatoebaTranslation value, $Res Function(TatoebaTranslation) _then) = _$TatoebaTranslationCopyWithImpl;
 @useResult
 $Res call({
- String? lang, String? text
+ String? lang, String? script, String? text
 });
 
 
@@ -606,9 +606,10 @@ class _$TatoebaTranslationCopyWithImpl<$Res>
 
 /// Create a copy of TatoebaTranslation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? lang = freezed,Object? text = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? lang = freezed,Object? script = freezed,Object? text = freezed,}) {
   return _then(_self.copyWith(
 lang: freezed == lang ? _self.lang : lang // ignore: cast_nullable_to_non_nullable
+as String?,script: freezed == script ? _self.script : script // ignore: cast_nullable_to_non_nullable
 as String?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -695,10 +696,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? lang,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? lang,  String? script,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TatoebaTranslation() when $default != null:
-return $default(_that.lang,_that.text);case _:
+return $default(_that.lang,_that.script,_that.text);case _:
   return orElse();
 
 }
@@ -716,10 +717,10 @@ return $default(_that.lang,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? lang,  String? text)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? lang,  String? script,  String? text)  $default,) {final _that = this;
 switch (_that) {
 case _TatoebaTranslation():
-return $default(_that.lang,_that.text);case _:
+return $default(_that.lang,_that.script,_that.text);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -736,10 +737,10 @@ return $default(_that.lang,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? lang,  String? text)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? lang,  String? script,  String? text)?  $default,) {final _that = this;
 switch (_that) {
 case _TatoebaTranslation() when $default != null:
-return $default(_that.lang,_that.text);case _:
+return $default(_that.lang,_that.script,_that.text);case _:
   return null;
 
 }
@@ -751,10 +752,11 @@ return $default(_that.lang,_that.text);case _:
 @JsonSerializable()
 
 class _TatoebaTranslation implements TatoebaTranslation {
-  const _TatoebaTranslation({this.lang, this.text});
+  const _TatoebaTranslation({this.lang, this.script, this.text});
   factory _TatoebaTranslation.fromJson(Map<String, dynamic> json) => _$TatoebaTranslationFromJson(json);
 
 @override final  String? lang;
+@override final  String? script;
 @override final  String? text;
 
 /// Create a copy of TatoebaTranslation
@@ -770,16 +772,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TatoebaTranslation&&(identical(other.lang, lang) || other.lang == lang)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TatoebaTranslation&&(identical(other.lang, lang) || other.lang == lang)&&(identical(other.script, script) || other.script == script)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,lang,text);
+int get hashCode => Object.hash(runtimeType,lang,script,text);
 
 @override
 String toString() {
-  return 'TatoebaTranslation(lang: $lang, text: $text)';
+  return 'TatoebaTranslation(lang: $lang, script: $script, text: $text)';
 }
 
 
@@ -790,7 +792,7 @@ abstract mixin class _$TatoebaTranslationCopyWith<$Res> implements $TatoebaTrans
   factory _$TatoebaTranslationCopyWith(_TatoebaTranslation value, $Res Function(_TatoebaTranslation) _then) = __$TatoebaTranslationCopyWithImpl;
 @override @useResult
 $Res call({
- String? lang, String? text
+ String? lang, String? script, String? text
 });
 
 
@@ -807,9 +809,10 @@ class __$TatoebaTranslationCopyWithImpl<$Res>
 
 /// Create a copy of TatoebaTranslation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? lang = freezed,Object? text = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? lang = freezed,Object? script = freezed,Object? text = freezed,}) {
   return _then(_TatoebaTranslation(
 lang: freezed == lang ? _self.lang : lang // ignore: cast_nullable_to_non_nullable
+as String?,script: freezed == script ? _self.script : script // ignore: cast_nullable_to_non_nullable
 as String?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

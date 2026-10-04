@@ -2,6 +2,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -30,5 +31,8 @@ abstract class SettingsState with _$SettingsState {
 
     /// 全単語一覧の並び順。
     @Default(WordSortOrder.newest) WordSortOrder wordSortOrder,
+
+    /// 訳の言語。未保存のときは端末の言語から決める(SettingsNotifier.build)。
+    @Default(TranslationLanguage.ja) TranslationLanguage translationLanguage,
   }) = _SettingsState;
 }

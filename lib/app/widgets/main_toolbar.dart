@@ -6,6 +6,7 @@ import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_sort_button.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,11 +18,11 @@ class MainToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final title = switch (view) {
-      MainView.learning => '学習中の単語',
-      MainView.allWords => '全単語',
-      MainView.quiz => 'フラッシュクイズ',
-      MainView.registration => '単語を登録',
-      MainView.settings => '設定',
+      MainView.learning => context.l10n.navLearningWords,
+      MainView.allWords => context.l10n.navAllWords,
+      MainView.quiz => context.l10n.navQuiz,
+      MainView.registration => context.l10n.navRegistration,
+      MainView.settings => context.l10n.navSettings,
     };
     // 検索は学習中・全単語ビューのみ表示(プロトタイプの showSearch 準拠)。
     final showSearch = view == MainView.learning || view == MainView.allWords;
@@ -77,7 +78,7 @@ class MainToolbar extends ConsumerWidget {
                 const SizedBox(width: 10),
               ],
               AppFilledButton(
-                label: '＋ 単語を登録',
+                label: context.l10n.addWord,
                 verticalPadding: 6,
                 fontSize: 13,
                 borderRadius: 7,

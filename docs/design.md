@@ -19,8 +19,10 @@
 |---|---|
 | IPA(米音優先)・品詞・英例文 | kaikki.org(Wiktionary を構造化した静的 JSONL) |
 | 英例文 + 対訳 | Tatoeba(`api.tatoeba.org/unstable/sentences`) |
-| 単語の日本語訳 | EJDict-hand(同梱、初回起動時に DB へ取込)。未収録なら kaikki の `translations`(ja のみ) |
-| 例文の日本語訳(予備) | DeepL API Free(設定 UI は隠してある。コードとチェーンは残す) |
+| 単語の訳(日本語) | EJDict-hand(同梱、初回起動時に DB へ取込)。未収録なら kaikki の `translations`(ja) |
+| 単語の訳(繁体字中国語) | kaikki の `translations`(cmn。`實現 /实现` の繁体字側だけ採る) |
+| 例文の訳 | Tatoeba の対訳(繁体字は `script == Hant` の訳だけ。字形変換はしない) |
+| 例文の訳(予備) | DeepL API Free(設定 UI は隠してある。コードとチェーンは残す) |
 | 発音 | Google 翻訳の URL を生成して開く(音声は再生しない) |
 
 - **取得の失敗で登録を止めない**。何も得られなかったときだけ例外にする
@@ -35,6 +37,29 @@
 - 句動詞も単語と同じ経路で引ける(kaikki は空白を含む見出しをそのまま配信する)。
   見出し語は保存・照合の前に `normalizeHeadword` で正規化する
 - **非商用限定のソース(Wordnik、Merriam-Webster)は使わない**。広告・課金と両立しない
+
+## 多言語化
+
+- **画面の表示言語と訳の言語は別に持つ。** 表示言語は端末の優先言語から
+  `AppLocale.resolve` で決める(ja / zh-Hant / en。簡体字・対応外は en)。訳の言語は
+  設定(`TranslationLanguage`)で、既定は繁体字の画面だけ zh-Hant、他は ja。
+  英語の画面を使う日本語話者(海外在住など)がいるため
+- **訳は DB の `japanese` / `example_ja` 列と同期 JSON の `japanese` / `exampleJa` を
+  言語によらず使い回す**(Dart 側の名前だけ `meaning` / `exampleTranslation`)。
+  言語ごとに列を足すと、古い版の端末が同期ファイルを書き戻すときに未知のキーを
+  落として訳が消えるうえ、言語を足すたびに訳を扱う全箇所に分岐が要る。
+  何語の訳かは `words.translation_language`(既定 ja)に残す
+- **同期・書き出しのファイル形式のバージョンは上げない。** 上げると古い版の端末が
+  同期ファイルを読めなくなる。`translationLanguage` は省略可の項目として足し、
+  無ければ ja として読む。古い版の端末が編集した単語は ja に戻りうる(訳自体は残る)
+- **言語の選定は「同梱辞書なしで kaikki の訳語が日本語並みに取れるか」で決める。**
+  日本語以外には EJDict に当たる同梱辞書が無い。韓国語は取得率不足で見送った
+- **Notifier・データ層は文言を組み立てない。** エラーや状態は種類(enum など)で持ち、
+  ウィジェットが `AppLocalizations` で文言にする(BuildContext が無いため)
+- 言語を足すときは、`TranslationLanguage` に値を足して各取得元のコードを埋め、
+  ARB(`lib/l10n/`)・`AppLocale`・両 OS の `CFBundleLocalizations` と
+  `InfoPlist.strings`・ストアの掲載情報を揃える。ストアのリリースノートも
+  言語ごとに要る
 
 ## データ・同期
 
@@ -190,4 +215,4 @@
 
 - iPad 専用レイアウト / 同期のバックグラウンド実行
 - LLM による例文生成(`WordInfoProvider` の追加実装として。Ollama を優先)
-- 多言語化(kaikki の `translations` と Tatoeba の `trans:lang` の差し替えで成り立つ)
+

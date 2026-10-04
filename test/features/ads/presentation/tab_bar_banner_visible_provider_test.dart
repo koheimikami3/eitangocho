@@ -25,7 +25,7 @@ void main() {
   /// 購読させない。
   Future<ProviderContainer> setup() async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.setLearned(id, isLearned: true);
     final learned = (await db.wordDao.watchAll().first)

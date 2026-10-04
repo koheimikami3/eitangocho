@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/tatoeba_response.dart';
 import 'package:eitangocho/features/word_registration/domain/example_sentence.dart';
 import 'package:eitangocho/features/word_registration/domain/word_form_matcher.dart';
@@ -7,8 +8,8 @@ import 'package:http/http.dart' as http;
 
 /// Tatoeba(対訳付き例文コーパス)のクライアント。
 ///
-/// 英文とその和訳が対でぶら下がっているため、1 リクエストで exampleEn と
-/// exampleJa の両方が埋まる。辞書側(kaikki)の例文は語義説明用の断片や
+/// 英文とその訳が対でぶら下がっているため、1 リクエストで exampleEn と
+/// exampleTranslation の両方が埋まる。辞書側(kaikki)の例文は語義説明用の断片や
 /// 文献引用が混ざるので、単語帳の例文としてはこちらを優先する。
 ///
 /// 例文は補助情報なので、失敗しても throw せず null を返す(登録を妨げない。
@@ -48,15 +49,18 @@ class TatoebaApiClient {
   /// 上げると例文が丸ごと消える(Tatoeba が空振りしたときしか使われない)。
   static const _preferredMinWords = 6;
 
-  /// [word] を含む英文と和訳の組を 1 つ返す。見つからなければ null。
-  Future<ExampleSentence?> findExample(String word) async {
+  /// [word] を含む英文と、[language] の訳の組を 1 つ返す。見つからなければ null。
+  Future<ExampleSentence?> findExample(
+    String word,
+    TranslationLanguage language,
+  ) async {
     final normalized = word.trim();
     if (normalized.isEmpty) return null;
 
     final uri = Uri.https('api.tatoeba.org', '/unstable/sentences', {
       'lang': 'eng',
       'q': normalized,
-      'trans:lang': 'jpn',
+      'trans:lang': language.tatoebaLang,
       // sort は必須。省略すると 400 が返る。
       'sort': 'relevance',
       'limit': '$_limit',
@@ -73,10 +77,10 @@ class TatoebaApiClient {
       // 通信失敗・レスポンス形式の変化はどちらも「例文なし」として扱う
       return null;
     }
-    return _select(parsed.data, normalized);
+    return _select(parsed.data, normalized, language);
   }
 
-  /// 和訳があり、見出し語を実際に含む文のうち最短のものを選ぶ。
+  /// 訳があり、見出し語を実際に含む文のうち最短のものを選ぶ。
   ///
   /// Tatoeba の検索はステミングするため、`negligible` で検索しても
   /// `negligence` の文しか返らないことがある。語形フィルタを通さないと
@@ -90,18 +94,22 @@ class TatoebaApiClient {
   /// 長短の比較は文字数ではなく**語数**で行う。下限を語数で見ているのに
   /// 比較が文字数だと、降格したときに「語数は少ないが文字数は長い文」が
   /// 選ばれて基準が噛み合わない。
-  ExampleSentence? _select(List<TatoebaSentence> sentences, String word) {
+  ExampleSentence? _select(
+    List<TatoebaSentence> sentences,
+    String word,
+    TranslationLanguage language,
+  ) {
     final candidates = <ExampleSentence>[];
     for (final sentence in sentences) {
       final en = (sentence.text ?? '').trim();
       if (en.isEmpty) continue;
       if (!containsWordForm(en, word)) continue;
-      final ja = sentence.translations
-          .where((t) => t.lang == 'jpn' && (t.text ?? '').trim().isNotEmpty)
+      final translation = sentence.translations
+          .where((t) => _matches(t, language))
           .map((t) => t.text!.trim())
           .firstOrNull;
-      if (ja == null) continue;
-      candidates.add(ExampleSentence(en: en, ja: ja));
+      if (translation == null) continue;
+      candidates.add(ExampleSentence(en: en, translation: translation));
     }
     if (candidates.isEmpty) return null;
     final qualified = candidates
@@ -116,6 +124,16 @@ class TatoebaApiClient {
     candidates.sort((a, b) => _wordCount(b.en).compareTo(_wordCount(a.en)));
     return candidates.first;
   }
+
+  /// [language] の訳として使えるか。
+  ///
+  /// 中国語(cmn)は繁体字と簡体字の訳が混ざって返るので、文字体系
+  /// (`script`)でも絞る。字形を変換せずに済むよう、繁体字の訳がある文だけを
+  /// 候補にする(実測では 40 語中 37 語で繁体字の訳が見つかる)。
+  static bool _matches(TatoebaTranslation t, TranslationLanguage language) =>
+      t.lang == language.tatoebaLang &&
+      (language.tatoebaScript == null || t.script == language.tatoebaScript) &&
+      (t.text ?? '').trim().isNotEmpty;
 
   static int _wordCount(String sentence) =>
       sentence.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).length;

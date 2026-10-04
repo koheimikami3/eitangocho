@@ -49,7 +49,7 @@ Map<String, dynamic> _$WordDeletionEntryToJson(_WordDeletionEntry instance) =>
 _WordExportEntry _$WordExportEntryFromJson(Map<String, dynamic> json) =>
     _WordExportEntry(
       word: json['word'] as String,
-      japanese: json['japanese'] as String,
+      meaning: json['japanese'] as String,
       ipa: json['ipa'] as String? ?? '',
       partsOfSpeech:
           (json['partsOfSpeech'] as List<dynamic>?)
@@ -57,7 +57,8 @@ _WordExportEntry _$WordExportEntryFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const <String>[],
       exampleEn: json['exampleEn'] as String? ?? '',
-      exampleJa: json['exampleJa'] as String? ?? '',
+      exampleTranslation: json['exampleJa'] as String? ?? '',
+      translationLanguage: json['translationLanguage'] as String? ?? 'ja',
       audioUrl: json['audioUrl'] as String? ?? '',
       isLearned: json['isLearned'] as bool? ?? false,
       lastReviewedAt: const NullableUtcDateTimeConverter().fromJson(
@@ -76,11 +77,12 @@ Map<String, dynamic> _$WordExportEntryToJson(
   _WordExportEntry instance,
 ) => <String, dynamic>{
   'word': instance.word,
-  'japanese': instance.japanese,
+  'japanese': instance.meaning,
   'ipa': instance.ipa,
   'partsOfSpeech': instance.partsOfSpeech,
   'exampleEn': instance.exampleEn,
-  'exampleJa': instance.exampleJa,
+  'exampleJa': instance.exampleTranslation,
+  'translationLanguage': instance.translationLanguage,
   'audioUrl': instance.audioUrl,
   'isLearned': instance.isLearned,
   'lastReviewedAt': const NullableUtcDateTimeConverter().toJson(

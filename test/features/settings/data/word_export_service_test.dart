@@ -24,11 +24,11 @@ void main() {
     await db.wordDao.insertWord(
       const WordsCompanion(
         word: Value('serendipity'),
-        japanese: Value('偶然の幸運'),
+        meaning: Value('偶然の幸運'),
         ipa: Value('/ˌserənˈdɪpəti/'),
         partsOfSpeech: Value([PartOfSpeech.noun]),
         exampleEn: Value('Meeting her was pure serendipity.'),
-        exampleJa: Value('彼女に出会えたのはまったくの偶然の幸運だった。'),
+        exampleTranslation: Value('彼女に出会えたのはまったくの偶然の幸運だった。'),
       ),
     );
 
@@ -51,7 +51,7 @@ void main() {
 
     final imported = (await db.wordDao.getAll()).single;
     expect(imported.word, 'serendipity');
-    expect(imported.japanese, '偶然の幸運');
+    expect(imported.meaning, '偶然の幸運');
     expect(imported.ipa, '/ˌserənˈdɪpəti/');
     expect(imported.partsOfSpeech, [PartOfSpeech.noun]);
     expect(imported.exampleEn, 'Meeting her was pure serendipity.');
@@ -59,13 +59,13 @@ void main() {
 
   test('ファイル側 updatedAt が新しければ上書きされる', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final existing = (await db.wordDao.getAll()).single;
     final newerUpdatedAt = existing.updatedAt.add(const Duration(days: 1));
 
     final json = _buildExportJson([
-      _entryJson(word: 'apple', japanese: 'リンゴ', updatedAt: newerUpdatedAt),
+      _entryJson(word: 'apple', meaning: 'リンゴ', updatedAt: newerUpdatedAt),
     ]);
 
     final result = await service.importJson(json);
@@ -76,20 +76,20 @@ void main() {
     final after = await db.wordDao.getAll();
     expect(after, hasLength(1));
     expect(after.single.id, id);
-    expect(after.single.japanese, 'リンゴ');
+    expect(after.single.meaning, 'リンゴ');
     // word 表記と createdAt は DB 側を維持する。
     expect(after.single.word, 'apple');
   });
 
   test('ファイル側 updatedAt が古い・同時刻なら上書きされない(変更なし)', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final existing = (await db.wordDao.getAll()).single;
     final olderUpdatedAt = existing.updatedAt.subtract(const Duration(days: 1));
 
     final json = _buildExportJson([
-      _entryJson(word: 'apple', japanese: 'リンゴ', updatedAt: olderUpdatedAt),
+      _entryJson(word: 'apple', meaning: 'リンゴ', updatedAt: olderUpdatedAt),
     ]);
 
     final result = await service.importJson(json);
@@ -98,18 +98,18 @@ void main() {
 
     final after = await db.wordDao.getAll();
     expect(after.single.id, id);
-    expect(after.single.japanese, 'りんご');
+    expect(after.single.meaning, 'りんご');
   });
 
   test('単語の照合は trim + 小文字化で行い、DB 側の表記を維持する', () async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final existing = (await db.wordDao.getAll()).single;
     final newerUpdatedAt = existing.updatedAt.add(const Duration(days: 1));
 
     final json = _buildExportJson([
-      _entryJson(word: ' Apple ', japanese: 'リンゴ', updatedAt: newerUpdatedAt),
+      _entryJson(word: ' Apple ', meaning: 'リンゴ', updatedAt: newerUpdatedAt),
     ]);
 
     final result = await service.importJson(json);
@@ -118,16 +118,16 @@ void main() {
     final after = await db.wordDao.getAll();
     expect(after, hasLength(1));
     expect(after.single.word, 'apple');
-    expect(after.single.japanese, 'リンゴ');
+    expect(after.single.meaning, 'リンゴ');
   });
 
-  test('word・japanese の欠落や型不正・空文字はスキップして続行する', () async {
+  test('word・meaning の欠落や型不正・空文字はスキップして続行する', () async {
     final json = jsonEncode({
       'version': 1,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'words': [
         {'japanese': '訳のみ'}, // word 欠落
-        {'word': 'no-japanese'}, // japanese 欠落
+        {'word': 'no-japanese'}, // meaning 欠落
         {'word': 123, 'japanese': '型不正'}, // word が数値
         {'word': '  ', 'japanese': '空白のみ'}, // trim 後空文字
         {'word': 'valid', 'japanese': '有効'},
@@ -162,6 +162,33 @@ void main() {
     );
   });
 
+  // 多言語化。v2.5.0 より前の版が書いたファイルには translationLanguage が無い。
+  test('translationLanguage の無い行は日本語として取り込み、ある行はそのまま持ち回す', () async {
+    final json = jsonEncode({
+      'version': 1,
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
+      'words': [
+        {'word': 'apple', 'japanese': 'りんご'},
+        {'word': 'achieve', 'japanese': '實現', 'translationLanguage': 'zh-Hant'},
+      ],
+    });
+
+    await service.importJson(json);
+
+    final byWord = {
+      for (final w in await db.wordDao.getAll()) w.word: w.translationLanguage,
+    };
+    expect(byWord, {'apple': 'ja', 'achieve': 'zh-Hant'});
+
+    // 書き出しにも載り、JSON のキーは訳の言語によらず japanese のまま。
+    final exported = jsonDecode(await service.exportJson()) as Map;
+    final achieve = (exported['words'] as List).cast<Map>().firstWhere(
+      (w) => w['word'] == 'achieve',
+    );
+    expect(achieve['japanese'], '實現');
+    expect(achieve['translationLanguage'], 'zh-Hant');
+  });
+
   test('未知の partsOfSpeech 名は捨てて既知の値だけ復元する', () async {
     final json = jsonEncode({
       'version': 1,
@@ -186,8 +213,8 @@ void main() {
     final older = DateTime.utc(2020, 1, 1);
     final newer = DateTime.utc(2021, 1, 1);
     final json = _buildExportJson([
-      _entryJson(word: 'apple', japanese: '古い訳', updatedAt: older),
-      _entryJson(word: 'apple', japanese: '新しい訳', updatedAt: newer),
+      _entryJson(word: 'apple', meaning: '古い訳', updatedAt: older),
+      _entryJson(word: 'apple', meaning: '新しい訳', updatedAt: newer),
     ]);
 
     final result = await service.importJson(json);
@@ -196,7 +223,7 @@ void main() {
 
     final words = await db.wordDao.getAll();
     expect(words, hasLength(1));
-    expect(words.single.japanese, '新しい訳');
+    expect(words.single.meaning, '新しい訳');
   });
 
   // 削除ログ(version 2)。既存の他テストは version 1 のファイルを使っており、
@@ -209,7 +236,7 @@ void main() {
     /// apple を登録し、lastReviewedAt を [reviewedAt] にした既存行を返す。
     Future<Word> seedApple(DateTime? reviewedAt) async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await (db.update(db.words)..where((t) => t.id.equals(id))).write(
         WordsCompanion(lastReviewedAt: Value(reviewedAt)),
@@ -224,7 +251,7 @@ void main() {
         _buildExportJson([
           _entryJson(
             word: 'apple',
-            japanese: 'リンゴ',
+            meaning: 'リンゴ',
             updatedAt: existing.updatedAt.subtract(const Duration(days: 1)),
             lastReviewedAt: newer,
           ),
@@ -236,7 +263,7 @@ void main() {
       expect(result.unchanged, 1);
       final after = (await db.wordDao.getAll()).single;
       expect(after.lastReviewedAt, newer);
-      expect(after.japanese, 'りんご');
+      expect(after.meaning, 'りんご');
       expect(after.updatedAt, existing.updatedAt);
     });
 
@@ -247,7 +274,7 @@ void main() {
         _buildExportJson([
           _entryJson(
             word: 'apple',
-            japanese: 'りんご',
+            meaning: 'りんご',
             updatedAt: existing.updatedAt,
             lastReviewedAt: older,
           ),
@@ -264,7 +291,7 @@ void main() {
         _buildExportJson([
           _entryJson(
             word: 'apple',
-            japanese: 'りんご',
+            meaning: 'りんご',
             updatedAt: existing.updatedAt.subtract(const Duration(days: 1)),
             lastReviewedAt: older,
           ),
@@ -281,7 +308,7 @@ void main() {
         _buildExportJson([
           _entryJson(
             word: 'apple',
-            japanese: 'リンゴ',
+            meaning: 'リンゴ',
             updatedAt: existing.updatedAt.add(const Duration(days: 1)),
             lastReviewedAt: older,
           ),
@@ -290,7 +317,7 @@ void main() {
 
       expect(result.updated, 1);
       final after = (await db.wordDao.getAll()).single;
-      expect(after.japanese, 'リンゴ');
+      expect(after.meaning, 'リンゴ');
       expect(after.lastReviewedAt, newer);
     });
   });
@@ -298,7 +325,7 @@ void main() {
   group('削除ログ', () {
     Future<int> insertWord(String word, {required DateTime updatedAt}) async {
       final id = await db.wordDao.insertWord(
-        WordsCompanion(word: Value(word), japanese: const Value('訳')),
+        WordsCompanion(word: Value(word), meaning: const Value('訳')),
       );
       // insertWord は updatedAt を now で上書きするため、狙った時刻に直す。
       await (db.update(db.words)..where((t) => t.id.equals(id))).write(
@@ -353,7 +380,7 @@ void main() {
           words: [
             _entryJson(
               word: 'apple',
-              japanese: 'りんご',
+              meaning: 'りんご',
               updatedAt: DateTime.utc(2026, 3, 1),
             ),
           ],
@@ -375,7 +402,7 @@ void main() {
           words: [
             _entryJson(
               word: 'apple',
-              japanese: '新しい訳',
+              meaning: '新しい訳',
               updatedAt: DateTime.utc(2026, 4, 1),
             ),
           ],
@@ -385,7 +412,7 @@ void main() {
 
       expect(result.updated, 1);
       expect(result.deleted, 0);
-      expect((await db.wordDao.getAll()).single.japanese, '新しい訳');
+      expect((await db.wordDao.getAll()).single.meaning, '新しい訳');
     });
 
     test('削除ログは大文字小文字・前後空白を無視して突き合わせる', () async {
@@ -408,7 +435,7 @@ void main() {
           words: [
             _entryJson(
               word: 'apple',
-              japanese: 'りんご',
+              meaning: 'りんご',
               updatedAt: DateTime.utc(2026),
             ),
           ],
@@ -463,13 +490,13 @@ Map<String, dynamic> _deletionJson(String word, DateTime deletedAt) {
 
 Map<String, dynamic> _entryJson({
   required String word,
-  required String japanese,
+  required String meaning,
   required DateTime updatedAt,
   DateTime? lastReviewedAt,
 }) {
   return {
     'word': word,
-    'japanese': japanese,
+    'japanese': meaning,
     'updatedAt': updatedAt.toUtc().toIso8601String(),
     'createdAt': updatedAt.toUtc().toIso8601String(),
     if (lastReviewedAt != null)

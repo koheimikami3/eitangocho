@@ -92,8 +92,8 @@ void main() {
 
   tearDown(() async => db.close());
 
-  Future<int> addWord(String word, String japanese) => db.wordDao.insertWord(
-    WordsCompanion(word: Value(word), japanese: Value(japanese)),
+  Future<int> addWord(String word, String meaning) => db.wordDao.insertWord(
+    WordsCompanion(word: Value(word), meaning: Value(meaning)),
   );
 
   /// クラウド上の JSON に含まれる単語を取り出す。
@@ -174,7 +174,7 @@ void main() {
     expect(outcome.updated, 1);
     final after = (await db.wordDao.getAll()).single;
     expect(after.id, id);
-    expect(after.japanese, 'クラウドの訳');
+    expect(after.meaning, 'クラウドの訳');
   });
 
   test('クラウドの削除ログでローカルの単語が消え、復活しない', () async {
@@ -296,7 +296,7 @@ void main() {
 
   test('最新のデータを取得できずに読み取りを見送ったら、書き戻さない', () async {
     await addWord('apple', 'りんご');
-    store.readError = const CloudNotReadyException('同期を見送りました。');
+    store.readError = const CloudNotReadyException();
 
     await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
 
@@ -306,14 +306,14 @@ void main() {
 
   group('競合版', () {
     /// 単語 1 つだけを持つ同期ファイルの JSON。
-    String snapshotWith(String word, String japanese, {DateTime? updatedAt}) =>
+    String snapshotWith(String word, String meaning, {DateTime? updatedAt}) =>
         jsonEncode({
           'version': 2,
           'exportedAt': DateTime.now().toUtc().toIso8601String(),
           'words': [
             {
               'word': word,
-              'japanese': japanese,
+              'japanese': meaning,
               if (updatedAt != null)
                 'updatedAt': updatedAt.toUtc().toIso8601String(),
             },
@@ -350,7 +350,7 @@ void main() {
       expect(outcome.added, 1);
       expect(outcome.updated, 1);
       final words = {
-        for (final w in await db.wordDao.getAll()) w.word: w.japanese,
+        for (final w in await db.wordDao.getAll()) w.word: w.meaning,
       };
       expect(words, {'apple': '競合版の訳', 'banana': 'バナナ'});
       // 取り込んだ内容は書き戻したスナップショットにも載る。
@@ -373,7 +373,7 @@ void main() {
 
       await service.sync();
 
-      expect((await db.wordDao.getAll()).single.japanese, 'ローカルの訳');
+      expect((await db.wordDao.getAll()).single.meaning, 'ローカルの訳');
     });
 
     test('書き戻し後に、読み取った競合版だけが片付けられる', () async {
@@ -394,7 +394,7 @@ void main() {
 
     test('書き戻しに失敗したら競合版は片付けない', () async {
       store.conflicts = [conflict('a', snapshotWith('banana', 'バナナ'))];
-      store.writeError = const CloudNotReadyException('同期を見送りました。');
+      store.writeError = const CloudNotReadyException();
 
       await expectLater(service.sync(), throwsA(isA<CloudNotReadyException>()));
 

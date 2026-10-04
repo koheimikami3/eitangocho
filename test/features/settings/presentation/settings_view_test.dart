@@ -5,6 +5,7 @@ import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/license_list_provider.dart';
 import 'package:eitangocho/features/settings/presentation/settings_view.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,12 @@ void main() {
             if (reviewClient != null)
               reviewClientProvider.overrideWithValue(reviewClient),
           ],
-          child: const MaterialApp(home: Scaffold(body: SettingsView())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: SettingsView()),
+          ),
         ),
       );
       await tester.pump();

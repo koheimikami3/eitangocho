@@ -43,11 +43,18 @@ abstract class WordDeletionEntry with _$WordDeletionEntry {
 abstract class WordExportEntry with _$WordExportEntry {
   const factory WordExportEntry({
     required String word,
-    required String japanese,
+    // JSON のキーは訳の言語によらず `japanese` / `exampleJa` のまま
+    // (古い版の端末と同期ファイルを読み書きし合うため。docs/design.md「多言語化」)。
+    @JsonKey(name: 'japanese') required String meaning,
     @Default('') String ipa,
     @Default(<String>[]) List<String> partsOfSpeech,
     @Default('') String exampleEn,
-    @Default('') String exampleJa,
+    @JsonKey(name: 'exampleJa') @Default('') String exampleTranslation,
+
+    /// 訳の言語(words.translation_language と同じ値)。v2.5.0 より前の版が
+    /// 書いたファイルには無いので、無ければ日本語として読む。未知の値も
+    /// そのまま持ち回す(新しい版が足した言語を古い版で消さないため)。
+    @Default('ja') String translationLanguage,
     @Default('') String audioUrl,
     @Default(false) bool isLearned,
     @NullableUtcDateTimeConverter() DateTime? lastReviewedAt,

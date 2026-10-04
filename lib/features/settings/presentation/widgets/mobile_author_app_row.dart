@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -96,9 +97,9 @@ class MobileAuthorAppRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(99),
                 boxShadow: palette.buttonShadow,
               ),
-              child: const Text(
-                '入手',
-                style: TextStyle(
+              child: Text(
+                context.l10n.getApp,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,

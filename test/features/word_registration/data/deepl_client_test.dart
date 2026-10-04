@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -18,9 +19,10 @@ void main() {
       }),
     );
 
-    final result = await client.translateToJapanese(
+    final result = await client.translate(
       'He reads a book.',
       'test-key',
+      TranslationLanguage.ja,
     );
 
     expect(result, '彼は本を読む。');
@@ -36,7 +38,10 @@ void main() {
       MockClient((_) async => http.Response('forbidden', 403)),
     );
 
-    expect(await client.translateToJapanese('text', 'bad-key'), isNull);
+    expect(
+      await client.translate('text', 'bad-key', TranslationLanguage.ja),
+      isNull,
+    );
   });
 
   test('ネットワーク例外でも null を返す(throw しない)', () async {
@@ -44,6 +49,31 @@ void main() {
       MockClient((_) async => throw http.ClientException('offline')),
     );
 
-    expect(await client.translateToJapanese('text', 'key'), isNull);
+    expect(
+      await client.translate('text', 'key', TranslationLanguage.ja),
+      isNull,
+    );
+  });
+
+  test('訳先は訳の言語に合わせる(繁体字は ZH-HANT)', () async {
+    late http.Request captured;
+    final client = DeeplClient(
+      MockClient((request) async {
+        captured = request;
+        return http.Response.bytes(
+          utf8.encode('{"translations":[{"text":"他在讀書。"}]}'),
+          200,
+        );
+      }),
+    );
+
+    await client.translate(
+      'He reads a book.',
+      'key',
+      TranslationLanguage.zhHant,
+    );
+
+    final body = jsonDecode(captured.body) as Map<String, dynamic>;
+    expect(body['target_lang'], 'ZH-HANT');
   });
 }

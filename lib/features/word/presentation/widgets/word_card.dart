@@ -3,9 +3,12 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 学習中リストの単語カード 1 枚(プロトタイプの学習中カード準拠)。
 /// 「日本語訳を表示」トグルはカードのローカル state で保持する
@@ -126,7 +129,7 @@ class _WordCardState extends State<WordCard> {
               ),
               const SizedBox(height: 10),
               _RevealArea(
-                japanese: word.japanese,
+                meaning: word.meaning,
                 revealed: _revealed,
                 onToggle: () => setState(() => _revealed = !_revealed),
               ),
@@ -137,7 +140,7 @@ class _WordCardState extends State<WordCard> {
                 height: _exampleAreaHeight,
                 width: double.infinity,
                 child: Text(
-                  hasExample ? word.exampleEn : '例文なし',
+                  hasExample ? word.exampleEn : context.l10n.noExample,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -152,7 +155,7 @@ class _WordCardState extends State<WordCard> {
               if (hasExample && _revealed) ...[
                 const SizedBox(height: 4),
                 Text(
-                  word.exampleJa,
+                  word.exampleTranslation,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0x80000000),
@@ -178,9 +181,9 @@ class _WordCardState extends State<WordCard> {
                             value: word.isLearned,
                             onChanged: widget.onToggleLearned,
                           ),
-                          const Text(
-                            '学習済みにする',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.markLearned,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -204,23 +207,23 @@ class _WordCardState extends State<WordCard> {
   }
 }
 
-/// 日本語訳の隠し/表示エリア。未表示は破線ボタン、表示は訳テキスト。
-class _RevealArea extends StatefulWidget {
+/// 訳の隠し/表示エリア。未表示は破線ボタン、表示は訳テキスト。
+class _RevealArea extends ConsumerStatefulWidget {
   const _RevealArea({
-    required this.japanese,
+    required this.meaning,
     required this.revealed,
     required this.onToggle,
   });
 
-  final String japanese;
+  final String meaning;
   final bool revealed;
   final VoidCallback onToggle;
 
   @override
-  State<_RevealArea> createState() => _RevealAreaState();
+  ConsumerState<_RevealArea> createState() => _RevealAreaState();
 }
 
-class _RevealAreaState extends State<_RevealArea> {
+class _RevealAreaState extends ConsumerState<_RevealArea> {
   bool _isHovered = false;
 
   @override
@@ -248,7 +251,7 @@ class _RevealAreaState extends State<_RevealArea> {
                     border: Border.all(color: AppColors.inputBorder),
                   ),
                   child: Text(
-                    widget.japanese,
+                    widget.meaning,
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textPrimary,
@@ -257,9 +260,16 @@ class _RevealAreaState extends State<_RevealArea> {
                 )
               : DottedBorderBox(
                   backgroundColor: _isHovered ? const Color(0x08000000) : null,
-                  child: const Text(
-                    '日本語訳を表示',
-                    style: TextStyle(fontSize: 12, color: Color(0x66000000)),
+                  child: Text(
+                    context.l10n.showMeaningWithLanguage(
+                      ref
+                          .watch(translationLanguageProvider)
+                          .shortLabel(context.l10n),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0x66000000),
+                    ),
                   ),
                 ),
         ),
@@ -268,7 +278,7 @@ class _RevealAreaState extends State<_RevealArea> {
   }
 }
 
-/// 破線 border のボックス(「日本語訳を表示」ボタン用)。
+/// 破線 border のボックス(「訳を表示」ボタン用)。
 /// Flutter 標準に破線 border がないため CustomPaint で描く。
 class DottedBorderBox extends StatelessWidget {
   const DottedBorderBox({required this.child, super.key, this.backgroundColor});

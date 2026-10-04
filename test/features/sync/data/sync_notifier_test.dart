@@ -4,6 +4,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/sync/data/sync_service.dart';
 import 'package:eitangocho/features/sync/domain/cloud_file_store.dart';
+import 'package:eitangocho/features/sync/domain/sync_state.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -111,7 +112,7 @@ void main() {
 
   test('有効にすると 1 回同期し、最終同期日時が入る', () async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final container = makeContainer();
 
@@ -121,32 +122,40 @@ void main() {
     expect(state.enabled, isTrue);
     expect(state.syncing, isFalse);
     expect(state.lastSyncedAt, isNotNull);
-    expect(state.errorMessage, isNull);
+    expect(state.failure, isNull);
     expect(store.writeCount, 1);
   });
 
-  test('iCloud が使えないときはエラーメッセージを保持し、落ちない', () async {
-    store.failWith = const CloudUnavailableException('iCloud が利用できません。');
+  test('iCloud が使えないときは失敗の理由を保持し、落ちない', () async {
+    store.failWith = const CloudUnavailableException(
+      CloudFailureReason.noICloud,
+    );
     final container = makeContainer();
 
     await container.read(syncProvider.notifier).setEnabled(enabled: true);
 
     final state = container.read(syncProvider);
     expect(state.syncing, isFalse);
-    expect(state.errorMessage, 'iCloud が利用できません。');
+    expect(
+      state.failure,
+      const SyncFailure(reason: CloudFailureReason.noICloud),
+    );
     expect(state.lastSyncedAt, isNull);
   });
 
   group('最新のデータを取得できずに見送ったとき', () {
-    const notReady = CloudNotReadyException('同期を見送りました。');
+    const notReady = CloudNotReadyException();
     const retryDelay = Duration(milliseconds: 50);
 
-    test('エラーメッセージを持ち、1 回だけ再試行する', () async {
+    test('失敗の理由を持ち、1 回だけ再試行する', () async {
       store.failWith = notReady;
       final container = makeContainer(notReadyRetryDelay: retryDelay);
 
       await container.read(syncProvider.notifier).setEnabled(enabled: true);
-      expect(container.read(syncProvider).errorMessage, '同期を見送りました。');
+      expect(
+        container.read(syncProvider).failure?.reason,
+        CloudFailureReason.notCurrent,
+      );
       expect(store.readCount, 1);
 
       // 再試行も見送りになるが、それ以上は予約しない。
@@ -164,7 +173,7 @@ void main() {
       await Future<void>.delayed(retryDelay * 3);
 
       final state = container.read(syncProvider);
-      expect(state.errorMessage, isNull);
+      expect(state.failure, isNull);
       expect(state.lastSyncedAt, isNotNull);
       expect(store.writeCount, 1);
     });
@@ -189,7 +198,7 @@ void main() {
       expect(store.writeCount, 1, reason: 'オプトイン時の 1 回');
 
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await pumpEventQueue();
 
@@ -201,7 +210,7 @@ void main() {
       await container.read(syncProvider.notifier).initialized;
 
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await pumpEventQueue();
 
@@ -215,7 +224,7 @@ void main() {
       await container.read(syncProvider.notifier).setEnabled(enabled: true);
 
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await db.wordDao.setLearned(id, isLearned: true);
       await db.wordDao.deleteWord(id);

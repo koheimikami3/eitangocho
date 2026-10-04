@@ -9,9 +9,11 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:eitangocho/utils/headword.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,14 +42,14 @@ class _WordEditSheet extends StatefulWidget {
 class _WordEditSheetState extends State<_WordEditSheet> {
   late final _wordController = TextEditingController(text: widget.word.word);
   late final _ipaController = TextEditingController(text: widget.word.ipa);
-  late final _japaneseController = TextEditingController(
-    text: widget.word.japanese,
+  late final _meaningController = TextEditingController(
+    text: widget.word.meaning,
   );
   late final _exampleEnController = TextEditingController(
     text: widget.word.exampleEn,
   );
-  late final _exampleJaController = TextEditingController(
-    text: widget.word.exampleJa,
+  late final _exampleTranslationController = TextEditingController(
+    text: widget.word.exampleTranslation,
   );
   late Set<PartOfSpeech> _selectedPartsOfSpeech = widget.word.partsOfSpeech
       .toSet();
@@ -57,17 +59,28 @@ class _WordEditSheetState extends State<_WordEditSheet> {
   void dispose() {
     _wordController.dispose();
     _ipaController.dispose();
-    _japaneseController.dispose();
+    _meaningController.dispose();
     _exampleEnController.dispose();
-    _exampleJaController.dispose();
+    _exampleTranslationController.dispose();
     super.dispose();
   }
 
+  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
+  ///
+  /// シートは呼び出し元の ref を借りているため watch せず read で引く
+  /// (開いている間に訳の言語が変わることはない)。
+  String _languageLabel(BuildContext context) =>
+      widget.ref.read(translationLanguageProvider).shortLabel(context.l10n);
+
   Future<void> _save() async {
     final word = normalizeHeadword(_wordController.text);
-    final japanese = _japaneseController.text.trim();
-    if (word.isEmpty || japanese.isEmpty) {
-      setState(() => _errorMessage = '英単語と日本語訳は必須です。');
+    final meaning = _meaningController.text.trim();
+    if (word.isEmpty || meaning.isEmpty) {
+      setState(
+        () => _errorMessage = context.l10n.errorRequiredFields(
+          _languageLabel(context),
+        ),
+      );
       return;
     }
     // 単語名を既存の単語に書き換えられると重複ができるため、登録時と同じく止める
@@ -78,7 +91,9 @@ class _WordEditSheetState extends State<_WordEditSheet> {
         .findByWord(word, excludeId: widget.word.id);
     if (duplicate != null) {
       if (mounted) {
-        setState(() => _errorMessage = '「${duplicate.word}」は既に登録されています。');
+        setState(
+          () => _errorMessage = context.l10n.errorDuplicate(duplicate.word),
+        );
       }
       return;
     }
@@ -91,7 +106,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           WordsCompanion(
             word: Value(word),
             ipa: Value(_ipaController.text.trim()),
-            japanese: Value(japanese),
+            meaning: Value(meaning),
             // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
             // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
             partsOfSpeech: Value(
@@ -100,7 +115,9 @@ class _WordEditSheetState extends State<_WordEditSheet> {
               ),
             ),
             exampleEn: Value(_exampleEnController.text.trim()),
-            exampleJa: Value(_exampleJaController.text.trim()),
+            exampleTranslation: Value(
+              _exampleTranslationController.text.trim(),
+            ),
           ),
         );
     if (mounted) Navigator.of(context).pop();
@@ -126,15 +143,17 @@ class _WordEditSheetState extends State<_WordEditSheet> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = context.l10n;
+    final languageLabel = _languageLabel(context);
 
     return MobileSheet(
-      title: '単語を編集',
+      title: l10n.editWordTitle,
       // デザインにあるのは登録シートだけだが、作りが同じでユーザー判断により
       // こちらにも出す(開く頻度はこちらの方が高い)。
       footer: const MobileSheetBannerAd(),
-      leftLabel: 'キャンセル',
+      leftLabel: l10n.cancel,
       onLeft: () => Navigator.of(context).pop(),
-      rightLabel: '保存',
+      rightLabel: l10n.save,
       onRight: _save,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -142,24 +161,24 @@ class _WordEditSheetState extends State<_WordEditSheet> {
           MobileFormRows(
             children: [
               MobileLabeledField(
-                label: '英単語 *',
+                label: l10n.fieldWord,
                 controller: _wordController,
                 asciiOnly: true,
               ),
               // IPA は非 ASCII なので asciiOnly を付けない。
               MobileLabeledField(
-                label: '発音記号 (IPA)',
+                label: l10n.fieldIpa,
                 controller: _ipaController,
               ),
               MobileLabeledField(
-                label: '日本語訳 *',
-                controller: _japaneseController,
+                label: l10n.fieldMeaning(languageLabel),
+                controller: _meaningController,
                 maxLines: null,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const MobileFieldLabel(label: '品詞(複数選択可)'),
+                  MobileFieldLabel(label: l10n.fieldPartsOfSpeech),
                   const SizedBox(height: 7),
                   MobilePosChipSelector(
                     selected: _selectedPartsOfSpeech,
@@ -168,14 +187,14 @@ class _WordEditSheetState extends State<_WordEditSheet> {
                 ],
               ),
               MobileLabeledField(
-                label: '英例文',
+                label: l10n.fieldExampleEn,
                 controller: _exampleEnController,
                 minLines: 2,
                 maxLines: null,
               ),
               MobileLabeledField(
-                label: '日本語例文',
-                controller: _exampleJaController,
+                label: l10n.fieldExampleTranslation(languageLabel),
+                controller: _exampleTranslationController,
                 minLines: 2,
                 maxLines: null,
               ),
@@ -199,7 +218,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
                 border: Border.all(color: palette.dangerLine),
               ),
               child: Text(
-                'この単語を削除',
+                l10n.deleteThisWord,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,

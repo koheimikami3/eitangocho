@@ -1,6 +1,8 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/widgets/toolbar_search_field.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +42,7 @@ class AppMenuBar extends ConsumerWidget {
 
     return PlatformMenuBar(
       menus: buildMenus(
+        l10n: context.l10n,
         onRegister: () => ref
             .read(mainPageProvider.notifier)
             .selectView(MainView.registration),
@@ -61,6 +64,7 @@ class AppMenuBar extends ConsumerWidget {
   /// 有効、という仕様)。
   @visibleForTesting
   static List<PlatformMenuItem> buildMenus({
+    required AppLocalizations l10n,
     required VoidCallback onRegister,
     required VoidCallback? onSearch,
   }) {
@@ -97,10 +101,10 @@ class AppMenuBar extends ConsumerWidget {
         ],
       ),
       PlatformMenu(
-        label: '単語',
+        label: l10n.menuWords,
         menus: [
           PlatformMenuItem(
-            label: '単語を登録',
+            label: l10n.navRegistration,
             shortcut: const SingleActivator(
               LogicalKeyboardKey.keyN,
               meta: true,
@@ -110,10 +114,10 @@ class AppMenuBar extends ConsumerWidget {
         ],
       ),
       PlatformMenu(
-        label: '編集',
+        label: l10n.menuEdit,
         menus: [
           PlatformMenuItem(
-            label: '検索',
+            label: l10n.search,
             shortcut: const SingleActivator(
               LogicalKeyboardKey.keyF,
               meta: true,
@@ -122,8 +126,8 @@ class AppMenuBar extends ConsumerWidget {
           ),
         ],
       ),
-      const PlatformMenu(
-        label: 'ウィンドウ',
+      PlatformMenu(
+        label: l10n.menuWindow,
         menus: [
           PlatformProvidedMenuItem(
             type: PlatformProvidedMenuItemType.minimizeWindow,

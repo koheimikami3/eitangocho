@@ -4,6 +4,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/all_words_view.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,7 +33,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: AllWordsView())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: AllWordsView()),
+          ),
         ),
       );
       // drift の watch() の初回発火は実イベントループの Future を経由するため、
@@ -50,10 +56,10 @@ void main() {
 
   testWidgets('登録済みの単語が行として表示される', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
 
     await runWithView(tester, () async {
@@ -64,10 +70,10 @@ void main() {
 
   testWidgets('検索クエリで行が絞り込まれる', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
 
     await runWithView(tester, () async {
@@ -81,7 +87,7 @@ void main() {
 
   testWidgets('学習済みチェックで isLearned が反転する', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {

@@ -4,6 +4,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view_mobile.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,13 +34,13 @@ void main() {
   /// 購読させないことで、破棄時の購読解除タイマー衝突(drift #3323)を避ける
   /// (quiz_page_notifier_test.dart と同じ手法)。
   Future<ProviderContainer> setupLearned(List<(String, String)> words) async {
-    for (final (word, japanese) in words) {
+    for (final (word, meaning) in words) {
       final id = await db.wordDao.insertWord(
         WordsCompanion(
           word: Value(word),
-          japanese: Value(japanese),
+          meaning: Value(meaning),
           exampleEn: const Value('An example sentence.'),
-          exampleJa: const Value('例文です。'),
+          exampleTranslation: const Value('例文です。'),
         ),
       );
       await db.wordDao.setLearned(id, isLearned: true);
@@ -70,7 +71,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: QuizViewMobile())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: QuizViewMobile()),
+          ),
         ),
       );
       await tester.pump();

@@ -7,9 +7,11 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:eitangocho/utils/headword.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,14 +40,14 @@ class _EditWordDialog extends StatefulWidget {
 class _EditWordDialogState extends State<_EditWordDialog> {
   late final _wordController = TextEditingController(text: widget.word.word);
   late final _ipaController = TextEditingController(text: widget.word.ipa);
-  late final _japaneseController = TextEditingController(
-    text: widget.word.japanese,
+  late final _meaningController = TextEditingController(
+    text: widget.word.meaning,
   );
   late final _exampleEnController = TextEditingController(
     text: widget.word.exampleEn,
   );
-  late final _exampleJaController = TextEditingController(
-    text: widget.word.exampleJa,
+  late final _exampleTranslationController = TextEditingController(
+    text: widget.word.exampleTranslation,
   );
   late Set<PartOfSpeech> _selectedPartsOfSpeech = widget.word.partsOfSpeech
       .toSet();
@@ -55,17 +57,28 @@ class _EditWordDialogState extends State<_EditWordDialog> {
   void dispose() {
     _wordController.dispose();
     _ipaController.dispose();
-    _japaneseController.dispose();
+    _meaningController.dispose();
     _exampleEnController.dispose();
-    _exampleJaController.dispose();
+    _exampleTranslationController.dispose();
     super.dispose();
   }
 
+  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
+  ///
+  /// ダイアログは呼び出し元の ref を借りているため watch せず read で引く
+  /// (開いている間に訳の言語が変わることはない)。
+  String _languageLabel(BuildContext context) =>
+      widget.ref.read(translationLanguageProvider).shortLabel(context.l10n);
+
   Future<void> _save() async {
     final word = normalizeHeadword(_wordController.text);
-    final japanese = _japaneseController.text.trim();
-    if (word.isEmpty || japanese.isEmpty) {
-      setState(() => _errorMessage = '英単語と日本語訳は必須です。');
+    final meaning = _meaningController.text.trim();
+    if (word.isEmpty || meaning.isEmpty) {
+      setState(
+        () => _errorMessage = context.l10n.errorRequiredFields(
+          _languageLabel(context),
+        ),
+      );
       return;
     }
     // 単語名を既存の単語に書き換えられると重複ができるため、登録時と同じく止める
@@ -76,7 +89,9 @@ class _EditWordDialogState extends State<_EditWordDialog> {
         .findByWord(word, excludeId: widget.word.id);
     if (duplicate != null) {
       if (mounted) {
-        setState(() => _errorMessage = '「${duplicate.word}」は既に登録されています。');
+        setState(
+          () => _errorMessage = context.l10n.errorDuplicate(duplicate.word),
+        );
       }
       return;
     }
@@ -89,7 +104,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
           WordsCompanion(
             word: Value(word),
             ipa: Value(_ipaController.text.trim()),
-            japanese: Value(japanese),
+            meaning: Value(meaning),
             // 編集前の並びを保ち、足した品詞だけ規定順で後ろに置く
             // (タップ順で保存すると、付け外しだけでバッジ色が変わる)。
             partsOfSpeech: Value(
@@ -98,7 +113,9 @@ class _EditWordDialogState extends State<_EditWordDialog> {
               ),
             ),
             exampleEn: Value(_exampleEnController.text.trim()),
-            exampleJa: Value(_exampleJaController.text.trim()),
+            exampleTranslation: Value(
+              _exampleTranslationController.text.trim(),
+            ),
           ),
         );
     if (mounted) Navigator.of(context).pop();
@@ -117,6 +134,8 @@ class _EditWordDialogState extends State<_EditWordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final languageLabel = _languageLabel(context);
     // 高さは固定の上限を持たず、ウィンドウに収まる範囲まで広げる(Dialog が
     // 画面の縁に余白を残して制約する)。それでも入り切らないときは入力欄だけを
     // スクロールさせ、保存・キャンセル・削除は常に下端に見えるようにする
@@ -140,9 +159,9 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      '単語を編集',
-                      style: TextStyle(
+                    Text(
+                      l10n.editWordTitle,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -154,14 +173,14 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                       children: [
                         Expanded(
                           child: LabeledTextField(
-                            label: '英単語 *',
+                            label: l10n.fieldWord,
                             controller: _wordController,
                           ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
                           child: LabeledTextField(
-                            label: '発音記号 (IPA)',
+                            label: l10n.fieldIpa,
                             controller: _ipaController,
                           ),
                         ),
@@ -169,17 +188,17 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                     const SizedBox(height: 16),
                     LabeledTextField(
-                      label: '日本語訳 *',
-                      controller: _japaneseController,
+                      label: l10n.fieldMeaning(languageLabel),
+                      controller: _meaningController,
                       maxLines: null,
                     ),
                     const SizedBox(height: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '品詞(複数選択可)',
-                          style: TextStyle(
+                        Text(
+                          l10n.fieldPartsOfSpeech,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -203,15 +222,15 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                     const SizedBox(height: 16),
                     LabeledTextField(
-                      label: '英例文',
+                      label: l10n.fieldExampleEn,
                       controller: _exampleEnController,
                       minLines: 2,
                       maxLines: null,
                     ),
                     const SizedBox(height: 16),
                     LabeledTextField(
-                      label: '日本語例文',
-                      controller: _exampleJaController,
+                      label: l10n.fieldExampleTranslation(languageLabel),
+                      controller: _exampleTranslationController,
                       minLines: 2,
                       maxLines: null,
                     ),
@@ -238,15 +257,15 @@ class _EditWordDialogState extends State<_EditWordDialog> {
               ),
               child: Row(
                 children: [
-                  AppFilledButton(label: '保存', onPressed: _save),
+                  AppFilledButton(label: l10n.save, onPressed: _save),
                   const SizedBox(width: 10),
                   AppOutlinedButton(
-                    label: 'キャンセル',
+                    label: l10n.cancel,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const Spacer(),
                   AppOutlinedButton(
-                    label: '削除...',
+                    label: l10n.deleteEllipsis,
                     textColor: AppColors.danger,
                     hoverBackground: AppColors.dangerHoverBackground,
                     onPressed: _delete,

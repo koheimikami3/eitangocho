@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/tatoeba_api_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -49,17 +50,20 @@ void main() {
       ),
     );
 
-    final example = await mock.client.findExample('obtain');
+    final example = await mock.client.findExample(
+      'obtain',
+      TranslationLanguage.ja,
+    );
 
     expect(example, isNotNull);
     expect(example!.en, 'Tom obtained a gun.');
-    expect(example.ja, 'トムは銃を手に入れた。');
+    expect(example.translation, 'トムは銃を手に入れた。');
   });
 
   test('必要なクエリを組み立てる(sort が無いと 400 になる)', () async {
     final mock = buildClient(() => utf8Response(responseOf([]), 200));
 
-    await mock.client.findExample('obtain');
+    await mock.client.findExample('obtain', TranslationLanguage.ja);
 
     final uri = mock.requests.single;
     expect(uri.host, 'api.tatoeba.org');
@@ -86,7 +90,10 @@ void main() {
       ),
     );
 
-    final example = await mock.client.findExample('monster');
+    final example = await mock.client.findExample(
+      'monster',
+      TranslationLanguage.ja,
+    );
 
     expect(example!.en, "There's a monster in my closet.");
   });
@@ -100,7 +107,10 @@ void main() {
       ),
     );
 
-    final example = await mock.client.findExample('ghost');
+    final example = await mock.client.findExample(
+      'ghost',
+      TranslationLanguage.ja,
+    );
 
     expect(example!.en, 'Ghosts exist.');
   });
@@ -120,7 +130,7 @@ void main() {
     );
 
     expect(
-      (await mock.client.findExample('obtain'))!.en,
+      (await mock.client.findExample('obtain', TranslationLanguage.ja))!.en,
       'How much money have you obtained?',
     );
   });
@@ -142,7 +152,7 @@ void main() {
 
     // どちらも下限に届かないので降格し、語数の多い方を採る。
     expect(
-      (await mock.client.findExample('apple'))!.en,
+      (await mock.client.findExample('apple', TranslationLanguage.ja))!.en,
       'I want an apple now.',
     );
   });
@@ -159,7 +169,10 @@ void main() {
       ),
     );
 
-    expect(await mock.client.findExample('negligible'), isNull);
+    expect(
+      await mock.client.findExample('negligible', TranslationLanguage.ja),
+      isNull,
+    );
   });
 
   // 句動詞は語形フィルタが複合語を扱えないと候補が全滅する。
@@ -174,7 +187,10 @@ void main() {
       ),
     );
 
-    final example = await mock.client.findExample('put off');
+    final example = await mock.client.findExample(
+      'put off',
+      TranslationLanguage.ja,
+    );
 
     expect(example!.en, 'The wedding was put off.');
   });
@@ -191,7 +207,7 @@ void main() {
     );
 
     expect(
-      (await mock.client.findExample('obtain'))!.en,
+      (await mock.client.findExample('obtain', TranslationLanguage.ja))!.en,
       'Tom obtained a firearm.',
     );
   });
@@ -199,27 +215,89 @@ void main() {
   test('ヒットしなければ null', () async {
     final mock = buildClient(() => utf8Response(responseOf([]), 200));
 
-    expect(await mock.client.findExample('zzzzz'), isNull);
+    expect(
+      await mock.client.findExample('zzzzz', TranslationLanguage.ja),
+      isNull,
+    );
   });
 
   // 例文は補助情報なので、失敗しても登録フローを止めない。
   test('通信失敗・非 200・壊れたレスポンスはすべて null', () async {
     final serverError = buildClient(() => http.Response('error', 500));
-    expect(await serverError.client.findExample('obtain'), isNull);
+    expect(
+      await serverError.client.findExample('obtain', TranslationLanguage.ja),
+      isNull,
+    );
 
     final broken = buildClient(() => utf8Response('not json', 200));
-    expect(await broken.client.findExample('obtain'), isNull);
+    expect(
+      await broken.client.findExample('obtain', TranslationLanguage.ja),
+      isNull,
+    );
 
     final throwing = TatoebaApiClient(
       MockClient((_) async => throw http.ClientException('boom')),
     );
-    expect(await throwing.findExample('obtain'), isNull);
+    expect(
+      await throwing.findExample('obtain', TranslationLanguage.ja),
+      isNull,
+    );
   });
 
   test('空文字は問い合わせない', () async {
     final mock = buildClient(() => utf8Response(responseOf([]), 200));
 
-    expect(await mock.client.findExample('  '), isNull);
+    expect(await mock.client.findExample('  ', TranslationLanguage.ja), isNull);
     expect(mock.requests, isEmpty);
+  });
+
+  group('繁体字中国語', () {
+    // cmn には繁体字と簡体字の訳が混ざって返る(script で区別される)。
+    String chineseResponse() => jsonEncode({
+      'data': [
+        {
+          'text': 'They achieved their goal.',
+          'lang': 'eng',
+          'translations': [
+            {'lang': 'cmn', 'script': 'Hans', 'text': '他们达到了目标。'},
+          ],
+        },
+        {
+          'text': 'How did you achieve that so quickly?',
+          'lang': 'eng',
+          'translations': [
+            {'lang': 'cmn', 'script': 'Hans', 'text': '你怎么这么快就完成了？'},
+            {'lang': 'cmn', 'script': 'Hant', 'text': '你怎麼這麼快就完成了？'},
+          ],
+        },
+      ],
+    });
+
+    test('cmn の訳を求め、繁体字の訳がある文だけを採る', () async {
+      final mock = buildClient(() => utf8Response(chineseResponse(), 200));
+
+      final example = await mock.client.findExample(
+        'achieve',
+        TranslationLanguage.zhHant,
+      );
+
+      expect(mock.requests.single.queryParameters['trans:lang'], 'cmn');
+      expect(example!.en, 'How did you achieve that so quickly?');
+      expect(example.translation, '你怎麼這麼快就完成了？');
+    });
+
+    test('日本語の訳しか無い文は採らない', () async {
+      final mock = buildClient(
+        () => utf8Response(
+          responseOf([('Tom obtained a gun.', 'トムは銃を手に入れた。')]),
+          200,
+        ),
+      );
+
+      expect(
+        await mock.client.findExample('obtain', TranslationLanguage.zhHant),
+        isNull,
+      );
+    });
   });
 }

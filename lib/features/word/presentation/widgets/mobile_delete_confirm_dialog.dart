@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,7 +49,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '「${word.word}」を削除しますか?',
+                    context.l10n.deleteConfirmTitle(word.word),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -58,7 +59,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'この操作は取り消せません。',
+                    context.l10n.deleteConfirmBody,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
@@ -77,7 +78,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _AlertAction(
-                        label: 'やめる',
+                        label: context.l10n.deleteConfirmCancel,
                         color: palette.accent,
                         onTap: () => Navigator.of(context).pop(false),
                       ),
@@ -89,7 +90,7 @@ class _MobileDeleteConfirmDialog extends StatelessWidget {
                     ),
                     Expanded(
                       child: _AlertAction(
-                        label: '削除する',
+                        label: context.l10n.deleteConfirmOk,
                         color: palette.danger,
                         bold: true,
                         onTap: () => Navigator.of(context).pop(true),

@@ -2,6 +2,9 @@ import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:eitangocho/utils/pronunciation_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,10 +34,10 @@ enum PronunciationButtonVariant {
   };
 
   /// ラベル。アイコンのみの形は null。
-  String? get label => switch (this) {
-    cardPill => '発音',
+  String? label(AppLocalizations l10n) => switch (this) {
+    cardPill => l10n.pronunciationShort,
     tableIcon => null,
-    quizPill => '発音を聞く',
+    quizPill => l10n.listenPronunciation,
   };
 
   double get fontSize => switch (this) {
@@ -92,7 +95,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
   @override
   Widget build(BuildContext context) {
     final variant = widget.variant;
-    final label = variant.label;
+    final label = variant.label(context.l10n);
 
     final button = MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -103,6 +106,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
         // 押したときだけ読むので build では watch しない。
         onTap: () => openPronunciationWindow(
           widget.word,
+          ref.read(translationLanguageProvider),
           zoom:
               ref.read(settingsProvider).value?.uiScale ??
               AppDimensions.defaultUiScale,
@@ -150,7 +154,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
 
     // ラベルが無い形は用途が読めないため、説明を出す。
     return label == null
-        ? Tooltip(message: 'Google 翻訳で発音を確認', child: button)
+        ? Tooltip(message: context.l10n.pronunciationTooltip, child: button)
         : button;
   }
 }

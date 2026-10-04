@@ -21,7 +21,8 @@ mixin _$SettingsState {
  double get uiScale;/// 配色(ライト / ダーク)。iOS 専用で、macOS は常にライト。
  AppAppearance get appearance;/// 学習中カードの並び(1 列 / 2 列)。iOS 専用。
  LearningCardLayout get cardLayout;/// 全単語一覧の並び順。
- WordSortOrder get wordSortOrder;
+ WordSortOrder get wordSortOrder;/// 訳の言語。未保存のときは端末の言語から決める(SettingsNotifier.build)。
+ TranslationLanguage get translationLanguage;
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -32,16 +33,16 @@ $SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale)&&(identical(other.appearance, appearance) || other.appearance == appearance)&&(identical(other.cardLayout, cardLayout) || other.cardLayout == cardLayout)&&(identical(other.wordSortOrder, wordSortOrder) || other.wordSortOrder == wordSortOrder));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale)&&(identical(other.appearance, appearance) || other.appearance == appearance)&&(identical(other.cardLayout, cardLayout) || other.cardLayout == cardLayout)&&(identical(other.wordSortOrder, wordSortOrder) || other.wordSortOrder == wordSortOrder)&&(identical(other.translationLanguage, translationLanguage) || other.translationLanguage == translationLanguage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale,appearance,cardLayout,wordSortOrder);
+int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale,appearance,cardLayout,wordSortOrder,translationLanguage);
 
 @override
 String toString() {
-  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale, appearance: $appearance, cardLayout: $cardLayout, wordSortOrder: $wordSortOrder)';
+  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale, appearance: $appearance, cardLayout: $cardLayout, wordSortOrder: $wordSortOrder, translationLanguage: $translationLanguage)';
 }
 
 
@@ -52,7 +53,7 @@ abstract mixin class $SettingsStateCopyWith<$Res>  {
   factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
 @useResult
 $Res call({
- QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale, AppAppearance appearance, LearningCardLayout cardLayout, WordSortOrder wordSortOrder
+ QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale, AppAppearance appearance, LearningCardLayout cardLayout, WordSortOrder wordSortOrder, TranslationLanguage translationLanguage
 });
 
 
@@ -69,7 +70,7 @@ class _$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,Object? appearance = null,Object? cardLayout = null,Object? wordSortOrder = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,Object? appearance = null,Object? cardLayout = null,Object? wordSortOrder = null,Object? translationLanguage = null,}) {
   return _then(_self.copyWith(
 quizDirection: null == quizDirection ? _self.quizDirection : quizDirection // ignore: cast_nullable_to_non_nullable
 as QuizDirection,showIpa: null == showIpa ? _self.showIpa : showIpa // ignore: cast_nullable_to_non_nullable
@@ -78,7 +79,8 @@ as String,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nul
 as double,appearance: null == appearance ? _self.appearance : appearance // ignore: cast_nullable_to_non_nullable
 as AppAppearance,cardLayout: null == cardLayout ? _self.cardLayout : cardLayout // ignore: cast_nullable_to_non_nullable
 as LearningCardLayout,wordSortOrder: null == wordSortOrder ? _self.wordSortOrder : wordSortOrder // ignore: cast_nullable_to_non_nullable
-as WordSortOrder,
+as WordSortOrder,translationLanguage: null == translationLanguage ? _self.translationLanguage : translationLanguage // ignore: cast_nullable_to_non_nullable
+as TranslationLanguage,
   ));
 }
 
@@ -163,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder,  TranslationLanguage translationLanguage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder,_that.translationLanguage);case _:
   return orElse();
 
 }
@@ -184,10 +186,10 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScal
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder,  TranslationLanguage translationLanguage)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder,_that.translationLanguage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +206,10 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScal
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( QuizDirection quizDirection,  bool showIpa,  String deeplApiKey,  double uiScale,  AppAppearance appearance,  LearningCardLayout cardLayout,  WordSortOrder wordSortOrder,  TranslationLanguage translationLanguage)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder);case _:
+return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScale,_that.appearance,_that.cardLayout,_that.wordSortOrder,_that.translationLanguage);case _:
   return null;
 
 }
@@ -219,7 +221,7 @@ return $default(_that.quizDirection,_that.showIpa,_that.deeplApiKey,_that.uiScal
 
 
 class _SettingsState implements SettingsState {
-  const _SettingsState({this.quizDirection = QuizDirection.enToJa, this.showIpa = true, this.deeplApiKey = '', this.uiScale = AppDimensions.defaultUiScale, this.appearance = AppAppearance.light, this.cardLayout = LearningCardLayout.twoColumns, this.wordSortOrder = WordSortOrder.newest});
+  const _SettingsState({this.quizDirection = QuizDirection.enToJa, this.showIpa = true, this.deeplApiKey = '', this.uiScale = AppDimensions.defaultUiScale, this.appearance = AppAppearance.light, this.cardLayout = LearningCardLayout.twoColumns, this.wordSortOrder = WordSortOrder.newest, this.translationLanguage = TranslationLanguage.ja});
   
 
 @override@JsonKey() final  QuizDirection quizDirection;
@@ -236,6 +238,8 @@ class _SettingsState implements SettingsState {
 @override@JsonKey() final  LearningCardLayout cardLayout;
 /// 全単語一覧の並び順。
 @override@JsonKey() final  WordSortOrder wordSortOrder;
+/// 訳の言語。未保存のときは端末の言語から決める(SettingsNotifier.build)。
+@override@JsonKey() final  TranslationLanguage translationLanguage;
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +251,16 @@ _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale)&&(identical(other.appearance, appearance) || other.appearance == appearance)&&(identical(other.cardLayout, cardLayout) || other.cardLayout == cardLayout)&&(identical(other.wordSortOrder, wordSortOrder) || other.wordSortOrder == wordSortOrder));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.quizDirection, quizDirection) || other.quizDirection == quizDirection)&&(identical(other.showIpa, showIpa) || other.showIpa == showIpa)&&(identical(other.deeplApiKey, deeplApiKey) || other.deeplApiKey == deeplApiKey)&&(identical(other.uiScale, uiScale) || other.uiScale == uiScale)&&(identical(other.appearance, appearance) || other.appearance == appearance)&&(identical(other.cardLayout, cardLayout) || other.cardLayout == cardLayout)&&(identical(other.wordSortOrder, wordSortOrder) || other.wordSortOrder == wordSortOrder)&&(identical(other.translationLanguage, translationLanguage) || other.translationLanguage == translationLanguage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale,appearance,cardLayout,wordSortOrder);
+int get hashCode => Object.hash(runtimeType,quizDirection,showIpa,deeplApiKey,uiScale,appearance,cardLayout,wordSortOrder,translationLanguage);
 
 @override
 String toString() {
-  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale, appearance: $appearance, cardLayout: $cardLayout, wordSortOrder: $wordSortOrder)';
+  return 'SettingsState(quizDirection: $quizDirection, showIpa: $showIpa, deeplApiKey: $deeplApiKey, uiScale: $uiScale, appearance: $appearance, cardLayout: $cardLayout, wordSortOrder: $wordSortOrder, translationLanguage: $translationLanguage)';
 }
 
 
@@ -267,7 +271,7 @@ abstract mixin class _$SettingsStateCopyWith<$Res> implements $SettingsStateCopy
   factory _$SettingsStateCopyWith(_SettingsState value, $Res Function(_SettingsState) _then) = __$SettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale, AppAppearance appearance, LearningCardLayout cardLayout, WordSortOrder wordSortOrder
+ QuizDirection quizDirection, bool showIpa, String deeplApiKey, double uiScale, AppAppearance appearance, LearningCardLayout cardLayout, WordSortOrder wordSortOrder, TranslationLanguage translationLanguage
 });
 
 
@@ -284,7 +288,7 @@ class __$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,Object? appearance = null,Object? cardLayout = null,Object? wordSortOrder = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? quizDirection = null,Object? showIpa = null,Object? deeplApiKey = null,Object? uiScale = null,Object? appearance = null,Object? cardLayout = null,Object? wordSortOrder = null,Object? translationLanguage = null,}) {
   return _then(_SettingsState(
 quizDirection: null == quizDirection ? _self.quizDirection : quizDirection // ignore: cast_nullable_to_non_nullable
 as QuizDirection,showIpa: null == showIpa ? _self.showIpa : showIpa // ignore: cast_nullable_to_non_nullable
@@ -293,7 +297,8 @@ as String,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nul
 as double,appearance: null == appearance ? _self.appearance : appearance // ignore: cast_nullable_to_non_nullable
 as AppAppearance,cardLayout: null == cardLayout ? _self.cardLayout : cardLayout // ignore: cast_nullable_to_non_nullable
 as LearningCardLayout,wordSortOrder: null == wordSortOrder ? _self.wordSortOrder : wordSortOrder // ignore: cast_nullable_to_non_nullable
-as WordSortOrder,
+as WordSortOrder,translationLanguage: null == translationLanguage ? _self.translationLanguage : translationLanguage // ignore: cast_nullable_to_non_nullable
+as TranslationLanguage,
   ));
 }
 

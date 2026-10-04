@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -151,6 +152,9 @@ void main() {
     Future<void> pump(Brightness brightness) async {
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(brightness: brightness),
           home: Builder(
             builder: (context) {

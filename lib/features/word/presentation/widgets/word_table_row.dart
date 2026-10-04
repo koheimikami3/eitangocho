@@ -3,6 +3,7 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// 全単語テーブルの 1 行。
@@ -90,7 +91,7 @@ class _WordTableRowState extends State<WordTableRow> {
                     if (widget.showCorrectCount) ...[
                       const SizedBox(height: 2),
                       Text(
-                        '覚えた ${word.correctCount}回',
+                        context.l10n.correctCount(word.correctCount),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -126,7 +127,7 @@ class _WordTableRowState extends State<WordTableRow> {
               Expanded(
                 flex: 2,
                 child: Text(
-                  word.japanese,
+                  word.meaning,
                   style: const TextStyle(
                     fontSize: 13,
                     color: Color(0xBF000000),
@@ -138,16 +139,16 @@ class _WordTableRowState extends State<WordTableRow> {
                 flex: 3,
                 child: hasExample
                     ? Text(
-                        '${word.exampleEn}\n${word.exampleJa}',
+                        '${word.exampleEn}\n${word.exampleTranslation}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
                           height: 1.5,
                         ),
                       )
-                    : const Text(
-                        '例文なし',
-                        style: TextStyle(
+                    : Text(
+                        context.l10n.noExample,
+                        style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textDisabled,
                         ),

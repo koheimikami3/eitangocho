@@ -4,7 +4,10 @@ import 'package:drift/drift.dart' show Value;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
+import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_state.dart';
@@ -19,14 +22,14 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
   @override
   WordRegistrationState build() => const WordRegistrationState();
 
-  /// 既に登録済みの単語なら、エラー文言を state に立てて true を返す。
+  /// 既に登録済みの単語なら、エラーを state に立てて true を返す。
   /// 単語帳として同じ単語が 2 件並ぶのは事故なので、登録させずに止める。
   Future<bool> _rejectIfDuplicate(String word) async {
     final existing = await ref.read(databaseProvider).wordDao.findByWord(word);
     // 破棄後は state に触らない(呼び出し側も続行させない)。
     if (!ref.mounted) return true;
     if (existing == null) return false;
-    state = state.copyWith(errorMessage: '「${existing.word}」は既に登録されています。');
+    state = state.copyWith(error: RegistrationError.duplicate(existing.word));
     return true;
   }
 
@@ -34,12 +37,12 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
   Future<void> autoFill(String rawWord) async {
     final word = normalizeHeadword(rawWord);
     if (word.isEmpty) {
-      state = state.copyWith(errorMessage: '英単語を入力してください。');
+      state = state.copyWith(error: const RegistrationError.emptyWord());
       return;
     }
     // 辞書を引く前に重複を弾く(登録できない単語のために通信しない)。
     if (await _rejectIfDuplicate(word)) return;
-    state = state.copyWith(step: RegistrationStep.loading, errorMessage: null);
+    state = state.copyWith(step: RegistrationStep.loading, error: null);
     try {
       final info = await ref.read(wordInfoProviderProvider).fetch(word);
       // fetch 中に画面を離れると自動破棄されるため、破棄後は state に触らない
@@ -57,13 +60,14 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         fetched: info,
         notFound: false,
         selectedPartsOfSpeech: info.partsOfSpeech.toSet(),
-        translationFailed: info.exampleEn.isNotEmpty && info.exampleJa.isEmpty,
+        translationFailed:
+            info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty,
       );
     } on WordInfoException {
       if (!ref.mounted) return;
       state = state.copyWith(
         step: RegistrationStep.input,
-        errorMessage: '辞書データの取得に失敗しました。通信環境を確認してください。',
+        error: const RegistrationError.fetchFailed(),
       );
     }
   }
@@ -75,7 +79,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
       fetched: null,
       notFound: false,
       translationFailed: false,
-      errorMessage: null,
+      error: null,
     );
   }
 
@@ -86,7 +90,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
       fetched: null,
       notFound: false,
       translationFailed: false,
-      errorMessage: null,
+      error: null,
       selectedPartsOfSpeech: const {},
     );
   }
@@ -97,20 +101,20 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
       selectedPartsOfSpeech: current.contains(pos)
           ? (Set<PartOfSpeech>.from(current)..remove(pos))
           : (Set<PartOfSpeech>.from(current)..add(pos)),
-      errorMessage: null,
+      error: null,
     );
   }
 
   Future<bool> save({
     required String word,
     required String ipa,
-    required String japanese,
+    required String meaning,
     required String exampleEn,
-    required String exampleJa,
+    required String exampleTranslation,
   }) async {
     final headword = normalizeHeadword(word);
-    if (headword.isEmpty || japanese.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '英単語と日本語訳は必須です。');
+    if (headword.isEmpty || meaning.trim().isEmpty) {
+      state = state.copyWith(error: const RegistrationError.requiredFields());
       return false;
     }
     // フォームでも英単語を書き換えられるため、保存時にも重複を見る
@@ -119,6 +123,10 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
 
     // 自動取得できた並び(辞書の主用法が先頭)を保ち、手動で足した品詞は
     // 規定順で後ろに置く。チップのタップ順には依存させない。
+    // 自動入力した言語。手動入力なら今の訳の言語で書いたとみなす。
+    final TranslationLanguage language =
+        state.fetched?.translationLanguage ??
+        ref.read(translationLanguageProvider);
     final partsOfSpeech = state.selectedPartsOfSpeech.isEmpty
         ? const [PartOfSpeech.other]
         : state.selectedPartsOfSpeech.ordered(
@@ -132,13 +140,14 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
           WordsCompanion(
             word: Value(headword),
             ipa: Value(ipa.trim()),
-            japanese: Value(japanese.trim()),
+            meaning: Value(meaning.trim()),
             partsOfSpeech: Value(partsOfSpeech),
             exampleEn: Value(exampleEn.trim()),
-            exampleJa: Value(exampleJa.trim()),
+            exampleTranslation: Value(exampleTranslation.trim()),
             // audioUrl はフォームに出さない。現在の辞書ソースは音声 URL を
             // 返さないため常に空になるが、経路だけ残している(docs/design.md)。
             audioUrl: Value(state.fetched?.audioUrl ?? ''),
+            translationLanguage: Value(language.storageCode),
           ),
         );
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。

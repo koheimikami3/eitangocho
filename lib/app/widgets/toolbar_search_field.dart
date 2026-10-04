@@ -1,5 +1,6 @@
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,7 +31,7 @@ class ToolbarSearchField extends ConsumerWidget {
         style: const TextStyle(fontSize: 13),
         decoration: InputDecoration(
           isDense: true,
-          hintText: '検索',
+          hintText: context.l10n.search,
           // 他の入力欄(LabeledTextField)と同じく白地 + 枠線にする。
           // 以前は枠なしの塗り潰しだったが、ツールバーの地と色が近く
           // 欄の範囲が分からなかった。

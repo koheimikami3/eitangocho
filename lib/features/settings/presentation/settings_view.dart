@@ -1,8 +1,11 @@
+import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
@@ -17,6 +20,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_value
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
 import 'package:eitangocho/utils/app_platform.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,6 +33,8 @@ class SettingsView extends ConsumerWidget {
     // ロード前は既定値でフォールバックする。
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
+    final l10n = context.l10n;
+    final translationLanguage = ref.watch(translationLanguageProvider);
 
     return Align(
       alignment: Alignment.topLeft,
@@ -40,11 +46,11 @@ class SettingsView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SettingsSection(
-                title: '表示',
+                title: l10n.sectionDisplay,
                 child: SettingsCard(
                   children: [
                     SettingsToggleRow(
-                      label: '発音記号(IPA)を表示',
+                      label: l10n.showIpa,
                       value: settings.showIpa,
                       onChanged: notifier.setShowIpa,
                     ),
@@ -57,15 +63,45 @@ class SettingsView extends ConsumerWidget {
               ),
               const SizedBox(height: 22),
               SettingsSection(
-                title: 'クイズ',
+                title: l10n.sectionQuiz,
                 child: SettingsCard(
                   children: [
                     for (final direction in QuizDirection.values)
                       SettingsRadioRow(
-                        label: direction.label,
+                        label: direction.label(l10n, translationLanguage),
                         selected: settings.quizDirection == direction,
                         onTap: () => notifier.setQuizDirection(direction),
                       ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              SettingsSection(
+                title: l10n.sectionTranslation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SettingsCard(
+                      children: [
+                        for (final language in TranslationLanguage.values)
+                          SettingsRadioRow(
+                            label: language.label(l10n),
+                            selected: translationLanguage == language,
+                            onTap: () =>
+                                notifier.setTranslationLanguage(language),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // 説明文の意匠は DeepL の欄(DeeplApiKeyField)に合わせる。
+                    Text(
+                      l10n.translationLanguageCaption,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        height: 1.6,
+                        color: AppColors.textQuaternary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -86,21 +122,21 @@ class SettingsView extends ConsumerWidget {
               const SizedBox(height: 22),
               // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの
               // 持ち出しを扱うため 1 枚のカードにまとめる(デザイン準拠)。
-              const SettingsSection(
-                title: 'データ',
-                child: SettingsCard(
+              SettingsSection(
+                title: l10n.sectionData,
+                child: const SettingsCard(
                   children: [DesktopSyncRows(), DataBackupRows()],
                 ),
               ),
               const SizedBox(height: 22),
               SettingsSection(
-                title: 'サポート',
+                title: l10n.sectionSupport,
                 child: SettingsCard(
                   children: [
                     // 自分から書きたい人の受け皿。OS のレビュー依頼はクォータ
                     // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
                     SettingsLinkRow(
-                      label: 'App Store でレビューを書く',
+                      label: l10n.writeReview,
                       onTap: () =>
                           ref.read(reviewPrompterProvider).openStoreListing(),
                     ),
@@ -109,16 +145,16 @@ class SettingsView extends ConsumerWidget {
               ),
               const SizedBox(height: 22),
               SettingsSection(
-                title: '情報',
+                title: l10n.sectionInfo,
                 child: SettingsCard(
                   children: [
                     SettingsValueRow(
-                      label: 'バージョン',
+                      label: l10n.version,
                       // 取得前は空欄にする(一瞬のプレースホルダの方が目に付く)。
                       value: ref.watch(appVersionProvider).value ?? '',
                     ),
                     SettingsLinkRow(
-                      label: 'ライセンス',
+                      label: l10n.licenses,
                       onTap: () => showLicenseDialog(context),
                     ),
                   ],

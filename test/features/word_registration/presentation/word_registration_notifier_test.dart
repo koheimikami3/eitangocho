@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
+import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info_exception.dart';
@@ -63,15 +64,15 @@ void main() {
     final result = await notifier.save(
       word: '',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     expect(result, isFalse);
     expect(
-      container.read(wordRegistrationProvider).errorMessage,
-      '英単語と日本語訳は必須です。',
+      container.read(wordRegistrationProvider).error,
+      const RegistrationError.requiredFields(),
     );
     expect(await db.wordDao.watchAll().first, isEmpty);
   });
@@ -83,15 +84,15 @@ void main() {
     final result = await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: '',
+      meaning: '',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     expect(result, isFalse);
     expect(
-      container.read(wordRegistrationProvider).errorMessage,
-      '英単語と日本語訳は必須です。',
+      container.read(wordRegistrationProvider).error,
+      const RegistrationError.requiredFields(),
     );
   });
 
@@ -102,16 +103,16 @@ void main() {
     final result = await notifier.save(
       word: ' apple ',
       ipa: '/ˈæpəl/',
-      japanese: ' りんご ',
+      meaning: ' りんご ',
       exampleEn: 'An apple a day.',
-      exampleJa: '1日1個のリンゴ。',
+      exampleTranslation: '1日1個のリンゴ。',
     );
 
     expect(result, isTrue);
     final words = await db.wordDao.watchAll().first;
     expect(words, hasLength(1));
     expect(words.single.word, 'apple');
-    expect(words.single.japanese, 'りんご');
+    expect(words.single.meaning, 'りんご');
     expect(words.single.exampleEn, 'An apple a day.');
   });
 
@@ -122,9 +123,9 @@ void main() {
     await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -139,9 +140,9 @@ void main() {
     await notifier.save(
       word: 'apple',
       ipa: '',
-      japanese: 'りんご',
+      meaning: 'りんご',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -159,9 +160,9 @@ void main() {
     await notifier.save(
       word: 'light',
       ipa: '',
-      japanese: '光',
+      meaning: '光',
       exampleEn: '',
-      exampleJa: '',
+      exampleTranslation: '',
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -192,9 +193,9 @@ void main() {
       word: 'serendipity',
       ipa: '/ˌsɛ.ɹən.ˈdɪ.pɪ.ti/',
       partsOfSpeech: [PartOfSpeech.noun],
-      japanese: '思わぬ発見',
+      meaning: '思わぬ発見',
       exampleEn: 'A lucky find.',
-      exampleJa: '幸運な発見。',
+      exampleTranslation: '幸運な発見。',
       audioUrl: 'https://example.com/a.mp3',
     );
 
@@ -207,7 +208,7 @@ void main() {
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '英単語を入力してください。');
+      expect(state.error, const RegistrationError.emptyWord());
     });
 
     test('成功すると form へ遷移し fetched と品詞が反映される', () async {
@@ -251,7 +252,7 @@ void main() {
 
       final state = container.read(wordRegistrationProvider);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '辞書データの取得に失敗しました。通信環境を確認してください。');
+      expect(state.error, const RegistrationError.fetchFailed());
     });
 
     // DeepL のキーは条件に含めない。設定 UI を隠したいま、キーを条件にすると
@@ -259,7 +260,7 @@ void main() {
     test('英例文ありなのに和訳が空なら translationFailed(DeepL キーは無関係)', () async {
       container = buildContainer(
         wordInfoProvider: _FakeWordInfoProvider(
-          (_) async => fetchedInfo.copyWith(exampleJa: ''),
+          (_) async => fetchedInfo.copyWith(exampleTranslation: ''),
         ),
       );
 
@@ -276,7 +277,8 @@ void main() {
     test('英例文が無ければ translationFailed は立たない', () async {
       container = buildContainer(
         wordInfoProvider: _FakeWordInfoProvider(
-          (_) async => fetchedInfo.copyWith(exampleEn: '', exampleJa: ''),
+          (_) async =>
+              fetchedInfo.copyWith(exampleEn: '', exampleTranslation: ''),
         ),
       );
 
@@ -300,9 +302,9 @@ void main() {
       await notifier.save(
         word: 'serendipity',
         ipa: fetchedInfo.ipa,
-        japanese: fetchedInfo.japanese,
+        meaning: fetchedInfo.meaning,
         exampleEn: fetchedInfo.exampleEn,
-        exampleJa: fetchedInfo.exampleJa,
+        exampleTranslation: fetchedInfo.exampleTranslation,
       );
 
       final words = await db.wordDao.watchAll().first;
@@ -315,9 +317,9 @@ void main() {
         word: 'run',
         ipa: '/ɹʌn/',
         partsOfSpeech: [PartOfSpeech.verb, PartOfSpeech.noun],
-        japanese: '走る',
+        meaning: '走る',
         exampleEn: '',
-        exampleJa: '',
+        exampleTranslation: '',
         audioUrl: '',
       );
       container = buildContainer(
@@ -335,9 +337,9 @@ void main() {
       await notifier.save(
         word: 'run',
         ipa: verbFirst.ipa,
-        japanese: verbFirst.japanese,
+        meaning: verbFirst.meaning,
         exampleEn: '',
-        exampleJa: '',
+        exampleTranslation: '',
       );
 
       final words = await db.wordDao.watchAll().first;
@@ -379,7 +381,7 @@ void main() {
   // 同じ単語が 2 件並ぶのは事故なので、登録させずに止める。
   group('重複登録', () {
     Future<void> insertApple() => db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     test('登録済みなら autoFill は辞書を引かず input に留まる', () async {
@@ -397,7 +399,7 @@ void main() {
       final state = container.read(wordRegistrationProvider);
       expect(fetchCalled, isFalse);
       expect(state.step, RegistrationStep.input);
-      expect(state.errorMessage, '「apple」は既に登録されています。');
+      expect(state.error, const RegistrationError.duplicate('apple'));
     });
 
     test('大文字違い・前後空白でも autoFill は弾く', () async {
@@ -411,8 +413,8 @@ void main() {
           .autoFill('  Apple ');
 
       expect(
-        container.read(wordRegistrationProvider).errorMessage,
-        '「apple」は既に登録されています。',
+        container.read(wordRegistrationProvider).error,
+        const RegistrationError.duplicate('apple'),
       );
     });
 
@@ -425,15 +427,15 @@ void main() {
           .save(
             word: 'Apple',
             ipa: '',
-            japanese: 'りんご',
+            meaning: 'りんご',
             exampleEn: '',
-            exampleJa: '',
+            exampleTranslation: '',
           );
 
       expect(result, isFalse);
       expect(
-        container.read(wordRegistrationProvider).errorMessage,
-        '「apple」は既に登録されています。',
+        container.read(wordRegistrationProvider).error,
+        const RegistrationError.duplicate('apple'),
       );
       expect(await db.wordDao.watchAll().first, hasLength(1));
     });
@@ -466,9 +468,9 @@ void main() {
           .save(
             word: 'give   up',
             ipa: '',
-            japanese: 'あきらめる',
+            meaning: 'あきらめる',
             exampleEn: '',
-            exampleJa: '',
+            exampleTranslation: '',
           );
 
       expect((await db.wordDao.getAll()).single.word, 'give up');

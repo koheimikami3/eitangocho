@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/app_route_observer.dart';
 import 'package:eitangocho/features/ads/presentation/banner_ad_height_notifier.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_banner_ad.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,6 +31,9 @@ void main() {
             bannerAdHeightProvider.overrideWith(_LoadedBannerAdHeight.new),
         ],
         child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           navigatorObservers: [appRouteObserver],
           home: Scaffold(
             body: Builder(

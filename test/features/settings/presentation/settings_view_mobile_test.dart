@@ -10,6 +10,7 @@ import 'package:eitangocho/features/settings/presentation/license_view_mobile.da
 import 'package:eitangocho/features/settings/presentation/settings_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_deepl_api_key_field.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,7 +59,12 @@ void main() {
           if (reviewClient != null)
             reviewClientProvider.overrideWithValue(reviewClient),
         ],
-        child: const MaterialApp(home: Scaffold(body: SettingsViewMobile())),
+        child: const MaterialApp(
+          locale: Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: SettingsViewMobile()),
+        ),
       ),
     );
     await tester.pump();

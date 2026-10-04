@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     try {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       final word = (await db.wordDao.getAll()).single;
 
@@ -44,6 +45,9 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            locale: const Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Consumer(
               builder: (context, ref, _) => Scaffold(
                 body: Builder(
@@ -96,7 +100,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final updated = (await db.wordDao.getAll()).single;
-      expect(updated.japanese, 'リンゴ');
+      expect(updated.meaning, 'リンゴ');
       // 保存するとシートが閉じる。
       expect(find.text('単語を編集'), findsNothing);
     });
@@ -105,7 +109,7 @@ void main() {
   testWidgets('既存の単語名に変更するとエラーになり、更新もされない', (tester) async {
     await runSheet(tester, (word) async {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+        const WordsCompanion(word: Value('banana'), meaning: Value('バナナ')),
       );
 
       // 大文字違いでも同じ単語とみなす。

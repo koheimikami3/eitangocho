@@ -4,6 +4,8 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:eitangocho/utils/app_locale.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +37,12 @@ class EitangochoApp extends ConsumerWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(palette),
+      // 表示言語は端末の優先言語から AppLocale.resolve で決める(対応外は英語)。
+      // 生成された AppLocalizations.supportedLocales には gen-l10n の都合で
+      // 置いた素の zh も入るため、対応言語は AppLocale.supported を渡す。
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocale.supported,
+      localeListResolutionCallback: (locales, _) => AppLocale.resolve(locales),
       // 「上に別の画面が積まれたか」をバナー広告が知るために要る。
       navigatorObservers: [appRouteObserver],
       // UI 全体をブラウザズーム相当で拡大する(設定 uiScale)。

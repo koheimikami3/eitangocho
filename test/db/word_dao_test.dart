@@ -17,7 +17,7 @@ void main() {
 
   test('insertWord は createdAt/updatedAt を付与し watchAll に反映される', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -30,10 +30,10 @@ void main() {
 
   test('watchAll は登録日時の新しい順(同時刻は id の新しい順)で返す', () async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('first'), japanese: Value('一つ目')),
+      const WordsCompanion(word: Value('first'), meaning: Value('一つ目')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('second'), japanese: Value('二つ目')),
+      const WordsCompanion(word: Value('second'), meaning: Value('二つ目')),
     );
 
     final words = await db.wordDao.watchAll().first;
@@ -44,10 +44,10 @@ void main() {
     expect(await db.wordDao.countWords(), 0);
 
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('banana'), japanese: Value('バナナ')),
+      const WordsCompanion(word: Value('banana'), meaning: Value('バナナ')),
     );
     expect(await db.wordDao.countWords(), 2);
 
@@ -57,7 +57,7 @@ void main() {
 
   test('updateWord はフィールドと updatedAt を更新する', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final before = await db.wordDao.watchAll().first;
     final updatedAtBefore = before.single.updatedAt;
@@ -66,20 +66,20 @@ void main() {
     await db.wordDao.updateWord(
       id,
       const WordsCompanion(
-        japanese: Value('リンゴ'),
+        meaning: Value('リンゴ'),
         partsOfSpeech: Value([PartOfSpeech.noun]),
       ),
     );
 
     final after = await db.wordDao.watchAll().first;
-    expect(after.single.japanese, 'リンゴ');
+    expect(after.single.meaning, 'リンゴ');
     expect(after.single.partsOfSpeech, [PartOfSpeech.noun]);
     expect(after.single.updatedAt.isAfter(updatedAtBefore), isTrue);
   });
 
   test('deleteWord で行が消える', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await db.wordDao.deleteWord(id);
@@ -92,7 +92,7 @@ void main() {
   group('findByWord', () {
     test('大文字小文字・前後空白を無視して既存の単語を返す', () async {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
 
       expect((await db.wordDao.findByWord('apple'))?.word, 'apple');
@@ -102,7 +102,7 @@ void main() {
 
     test('未登録の単語では null を返す', () async {
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
 
       expect(await db.wordDao.findByWord('banana'), isNull);
@@ -110,7 +110,7 @@ void main() {
 
     test('excludeId で指定した 1 件は対象外になる(編集で自分自身に当たらない)', () async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
 
       expect(await db.wordDao.findByWord('apple', excludeId: id), isNull);
@@ -125,7 +125,7 @@ void main() {
   group('削除ログ', () {
     test('deleteWord は削除ログを残す(キーは小文字化する)', () async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('Apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('Apple'), meaning: Value('りんご')),
       );
 
       await db.wordDao.deleteWord(id);
@@ -143,13 +143,13 @@ void main() {
 
     test('削除した単語を再登録すると削除ログは取り消される', () async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       await db.wordDao.deleteWord(id);
       expect(await db.wordDao.getDeletions(), hasLength(1));
 
       await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
 
       expect(await db.wordDao.getDeletions(), isEmpty);
@@ -157,7 +157,7 @@ void main() {
 
     test('pruneDeletions は指定日時より古いログだけ消す', () async {
       final oldId = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('old'), japanese: Value('古い')),
+        const WordsCompanion(word: Value('old'), meaning: Value('古い')),
       );
       await db.wordDao.deleteWord(oldId);
       // deleteWord は deletedAt に now を入れるため、古い日時へ直す。
@@ -165,7 +165,7 @@ void main() {
           .write(DeletedWordsCompanion(deletedAt: Value(DateTime.utc(2020))));
 
       final recentId = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('recent'), japanese: Value('新しい')),
+        const WordsCompanion(word: Value('recent'), meaning: Value('新しい')),
       );
       await db.wordDao.deleteWord(recentId);
 
@@ -178,7 +178,7 @@ void main() {
 
   test('setLearned で isLearned をトグルできる', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await db.wordDao.setLearned(id, isLearned: true);
@@ -194,7 +194,7 @@ void main() {
     'recordQuizResult(knew:true) は correctCount+1・lastReviewedAt 付与し updatedAt は変えない',
     () async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
       final before = (await db.wordDao.watchAll().first).single;
 
@@ -214,7 +214,7 @@ void main() {
     'recordQuizResult(knew:false) は correctCount 据え置きで lastReviewedAt を更新する',
     () async {
       final id = await db.wordDao.insertWord(
-        const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+        const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
       );
 
       await db.wordDao.recordQuizResult(id, knew: false);
@@ -227,10 +227,10 @@ void main() {
 
   test('getAll は watchAll と同じ並び順で全件返す', () async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('first'), japanese: Value('一つ目')),
+      const WordsCompanion(word: Value('first'), meaning: Value('一つ目')),
     );
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('second'), japanese: Value('二つ目')),
+      const WordsCompanion(word: Value('second'), meaning: Value('二つ目')),
     );
 
     final words = await db.wordDao.getAll();
@@ -245,7 +245,7 @@ void main() {
       inserts: [
         WordsCompanion(
           word: const Value('serendipity'),
-          japanese: const Value('偶然の幸運'),
+          meaning: const Value('偶然の幸運'),
           createdAt: Value(createdAt),
           updatedAt: Value(updatedAt),
         ),
@@ -262,7 +262,7 @@ void main() {
 
   test('importWords は insert と update を両方適用する', () async {
     final id = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final newUpdatedAt = DateTime.utc(2025, 1, 1);
 
@@ -270,7 +270,7 @@ void main() {
       inserts: [
         WordsCompanion(
           word: const Value('banana'),
-          japanese: const Value('バナナ'),
+          meaning: const Value('バナナ'),
           createdAt: Value(DateTime.utc(2020, 1, 1)),
           updatedAt: Value(DateTime.utc(2020, 1, 1)),
         ),
@@ -279,7 +279,7 @@ void main() {
         (
           id,
           WordsCompanion(
-            japanese: const Value('リンゴ'),
+            meaning: const Value('リンゴ'),
             updatedAt: Value(newUpdatedAt),
           ),
         ),
@@ -289,7 +289,7 @@ void main() {
     final words = await db.wordDao.getAll();
     expect(words, hasLength(2));
     final apple = words.firstWhere((w) => w.word == 'apple');
-    expect(apple.japanese, 'リンゴ');
+    expect(apple.meaning, 'リンゴ');
     expect(apple.updatedAt.isAtSameMomentAs(newUpdatedAt), isTrue);
     expect(words.any((w) => w.word == 'banana'), isTrue);
   });

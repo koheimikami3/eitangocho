@@ -1,5 +1,7 @@
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,7 +48,7 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             isDense: true,
-            hintText: 'DeepL API キーを入力',
+            hintText: context.l10n.deeplKeyHint,
             // LabeledTextField と同様、ヒント色は明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
             // LabeledTextField と同様、地のグレーが透けないよう白で塗る。
@@ -75,10 +77,11 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'DeepL API Free のキーを設定すると、自動入力時に英例文の日本語訳を'
-          '取得します。未設定の場合、例文の和訳はスキップされます。',
-          style: TextStyle(
+        Text(
+          context.l10n.deeplDescription(
+            ref.watch(translationLanguageProvider).shortLabel(context.l10n),
+          ),
+          style: const TextStyle(
             fontSize: 11,
             height: 1.6,
             color: AppColors.textQuaternary,

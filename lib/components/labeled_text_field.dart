@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// ラベル付き入力欄。textarea 相当は [maxLines] を 2 以上にして使う。
@@ -12,7 +13,7 @@ class LabeledTextField extends StatelessWidget {
     this.trailing,
     this.minLines,
     this.maxLines = 1,
-    this.hintText = '手動で入力してください',
+    this.hintText,
     this.onSubmitted,
   });
 
@@ -21,7 +22,9 @@ class LabeledTextField extends StatelessWidget {
   final Widget? trailing;
   final int? minLines;
   final int? maxLines;
-  final String hintText;
+
+  /// 空欄のときのヒント。省略時は「手動で入力してください」(manualInputHint)。
+  final String? hintText;
 
   /// Enter キー確定時のコールバック(ステップ 1 の自動入力発火等)
   final ValueChanged<String>? onSubmitted;
@@ -57,7 +60,7 @@ class LabeledTextField extends StatelessWidget {
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             isDense: true,
-            hintText: hintText,
+            hintText: hintText ?? context.l10n.manualInputHint,
             // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
             hintStyle: const TextStyle(color: AppColors.textDisabled),
             // 塗りなしだと画面の地のグレーが透けるため、白で塗る。

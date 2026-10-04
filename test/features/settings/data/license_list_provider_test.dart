@@ -81,16 +81,16 @@ void main() {
 
       expect(items, hasLength(1));
       expect(items.single.texts, hasLength(2));
-      // 種別が割れるので件数表記に落ちる
-      expect(items.single.summary, '2 件のライセンス');
+      // 種別が割れるので null(表示側が件数表記にする)
+      expect(items.single.summary, isNull);
     });
 
-    test('種別が判別できない単一ライセンスは「ライセンス」と表示する', () {
+    test('種別が判別できない単一ライセンスは summary が null になる', () {
       final items = groupLicenses([
         const LicenseEntryWithLineBreaks(['x'], '独自ライセンス'),
       ]);
 
-      expect(items.single.summary, 'ライセンス');
+      expect(items.single.summary, isNull);
     });
 
     test('本文が空のエントリは無視する', () {

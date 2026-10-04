@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
@@ -25,6 +26,12 @@ const kaikkiFixture = '''
 /// 「諦める」は語義違いで 2 件来る(畳んで 1 つにする)。
 const giveUpJsonl = '''
 {"word":"give up","pos":"verb","senses":[],"translations":[{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"surrender","alt":"こうふくする","roman":"kōfuku suru","word":"降服する"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"stop, quit, desist","roman":"akirameru","word":"諦める"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"abandon","alt":"あきらめる","roman":"akirameru","word":"諦める"},{"lang":"Japanese","code":"ja","lang_code":"ja","sense":"abandon","roman":"yameru","word":"やめる"}]}
+''';
+
+/// `achieve` の訳語(日本語と北京語)。北京語は「繁体字 /簡体字」の形で、
+/// 両者が同じ字なら 1 つだけ来る。閩南語(nan-hbl)など他の中国語は使わない。
+const achieveJsonl = '''
+{"word":"achieve","pos":"verb","senses":[],"translations":[{"lang":"Japanese","code":"ja","lang_code":"ja","word":"達成する"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"實現 /实现"},{"lang":"Chinese","code":"nan-hbl","lang_code":"nan-hbl","word":"達成"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"達到 /达到"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"完成"}]}
 ''';
 
 void main() {
@@ -68,6 +75,7 @@ void main() {
     http.Response Function()? tatoebaResponseFn,
     http.Response Function()? deeplResponse,
     String deeplApiKey = '',
+    TranslationLanguage translationLanguage = TranslationLanguage.ja,
   }) {
     return DictionaryWordInfoProvider(
       kaikkiClient: KaikkiApiClient(
@@ -98,6 +106,7 @@ void main() {
       ejdictDao: db.ejdictDao,
       ensureEjdictImported: () async {},
       getDeeplApiKey: () async => deeplApiKey,
+      getTranslationLanguage: () async => translationLanguage,
     );
   }
 
@@ -121,10 +130,10 @@ void main() {
 
     expect(info, isNotNull);
     expect(info!.word, 'serendipity');
-    expect(info.japanese, '思わぬ発見');
+    expect(info.meaning, '思わぬ発見');
     // name は other に落ちる
     expect(info.partsOfSpeech, [PartOfSpeech.noun, PartOfSpeech.other]);
-    expect(info.exampleJa, '二人を巡り合わせたのは偶然だった。');
+    expect(info.exampleTranslation, '二人を巡り合わせたのは偶然だった。');
   });
 
   test('IPA は米音(US / General-American)を優先し、音素表記だけを使う', () async {
@@ -182,7 +191,7 @@ void main() {
     final info = await provider.fetch('serendipity');
 
     expect(info!.exampleEn, 'What a serendipity!');
-    expect(info.exampleJa, 'なんという偶然！');
+    expect(info.exampleTranslation, 'なんという偶然！');
   });
 
   test('Tatoeba が空振りなら kaikki の例文を使い、和訳は空のまま', () async {
@@ -194,7 +203,7 @@ void main() {
 
     expect(tatoebaCallCount, 1);
     expect(info!.exampleEn, 'It was serendipity that brought them together.');
-    expect(info.exampleJa, isEmpty);
+    expect(info.exampleTranslation, isEmpty);
   });
 
   test('Tatoeba で和訳が取れたら DeepL は呼ばない', () async {
@@ -223,14 +232,14 @@ void main() {
     expect(info.ipa, isEmpty);
   });
 
-  test('kaikki 未収録・EJDict のみヒット: japanese のみの WordInfo を返す', () async {
+  test('kaikki 未収録・EJDict のみヒット: meaning のみの WordInfo を返す', () async {
     await seedEjdict({'milksop': '意気地なし'});
     final provider = buildProvider();
 
     final info = await provider.fetch('milksop');
 
     expect(info, isNotNull);
-    expect(info!.japanese, '意気地なし');
+    expect(info!.meaning, '意気地なし');
     expect(info.ipa, isEmpty);
     expect(info.exampleEn, isEmpty);
     expect(info.partsOfSpeech, isEmpty);
@@ -245,7 +254,7 @@ void main() {
     final info = await provider.fetch('give up');
 
     // 語義ごとに重複する「諦める」は 1 つに畳み、EJDict と同じ区切りで繋ぐ。
-    expect(info!.japanese, '降服する / 諦める / やめる');
+    expect(info!.meaning, '降服する / 諦める / やめる');
   });
 
   test('EJDict がヒットすれば kaikki の訳語は使わない', () async {
@@ -256,7 +265,7 @@ void main() {
 
     final info = await provider.fetch('give up');
 
-    expect(info!.japanese, 'あきらめる(EJDict 側)');
+    expect(info!.meaning, 'あきらめる(EJDict 側)');
   });
 
   test('訳語が多い語は打ち切る(必須項目の欄が長大にならないように)', () async {
@@ -272,7 +281,7 @@ void main() {
 
     final info = await provider.fetch('x');
 
-    expect(info!.japanese.split(' / '), hasLength(5));
+    expect(info!.meaning.split(' / '), hasLength(5));
   });
 
   test('日本語以外の訳語はキャッシュにも日本語訳にも残さない', () async {
@@ -287,7 +296,7 @@ void main() {
 
     final info = await provider.fetch('x');
 
-    expect(info!.japanese, '諦める');
+    expect(info!.meaning, '諦める');
     expect(
       await db.dictionaryCacheDao.find('x'),
       isNot(contains('abandonner')),
@@ -315,9 +324,9 @@ void main() {
 
     expect(info, isNotNull);
     expect(info!.exampleEn, "We've run out of soap.");
-    expect(info.exampleJa, '石鹸がないです。');
+    expect(info.exampleTranslation, '石鹸がないです。');
     // 埋まるのは例文だけ。訳が空なので登録フォームは警告バナーを出す。
-    expect(info.japanese, isEmpty);
+    expect(info.meaning, isEmpty);
     expect(info.partsOfSpeech, isEmpty);
   });
 
@@ -336,7 +345,7 @@ void main() {
     final info = await provider.fetch('  Apple ');
 
     expect(info?.word, 'apple');
-    expect(info?.japanese, 'リンゴ');
+    expect(info?.meaning, 'リンゴ');
   });
 
   test('成功レスポンスはキャッシュされ、2 回目は取得しない', () async {
@@ -365,7 +374,7 @@ void main() {
     final second = await provider.fetch('give up');
 
     expect(kaikkiCallCount, 1);
-    expect(second!.japanese, '降服する / 諦める / やめる');
+    expect(second!.meaning, '降服する / 諦める / やめる');
   });
 
   test('未収録(404)はキャッシュしない', () async {
@@ -387,7 +396,7 @@ void main() {
     final info = await provider.fetch('phrase');
 
     expect(info, isNotNull);
-    expect(info!.japanese, '句、成句');
+    expect(info!.meaning, '句、成句');
     expect(info.ipa, isEmpty);
   });
 
@@ -399,7 +408,7 @@ void main() {
     expect(() => provider.fetch('zzzzz'), throwsA(isA<WordInfoException>()));
   });
 
-  test('DeepL キー未設定なら翻訳を呼ばず exampleJa は空', () async {
+  test('DeepL キー未設定なら翻訳を呼ばず exampleTranslation は空', () async {
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
     );
@@ -407,10 +416,10 @@ void main() {
     final info = await provider.fetch('serendipity');
 
     expect(deeplCallCount, 0);
-    expect(info!.exampleJa, isEmpty);
+    expect(info!.exampleTranslation, isEmpty);
   });
 
-  test('DeepL 失敗(キー不正)でも throw せず exampleJa 空で続行する', () async {
+  test('DeepL 失敗(キー不正)でも throw せず exampleTranslation 空で続行する', () async {
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(kaikkiFixture, 200),
       deeplApiKey: 'bad-key',
@@ -419,7 +428,58 @@ void main() {
     final info = await provider.fetch('serendipity');
 
     expect(deeplCallCount, 1);
-    expect(info!.exampleJa, isEmpty);
+    expect(info!.exampleTranslation, isEmpty);
     expect(info.exampleEn, 'It was serendipity that brought them together.');
+  });
+
+  group('訳の言語が繁体字中国語', () {
+    test('EJDict は引かず、kaikki の北京語の訳語を繁体字で採る', () async {
+      await seedEjdict({'achieve': '成し遂げる'});
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveJsonl, 200),
+        translationLanguage: TranslationLanguage.zhHant,
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.meaning, '實現 / 達到 / 完成');
+      expect(info.translationLanguage, TranslationLanguage.zhHant);
+    });
+
+    test('日本語なら同じキャッシュから日本語の訳語を採る(EJDict 未収録時)', () async {
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveJsonl, 200),
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.meaning, '達成する');
+      expect(info.translationLanguage, TranslationLanguage.ja);
+    });
+
+    test('Tatoeba の繁体字の訳を例文の訳にする', () async {
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveJsonl, 200),
+        tatoebaResponseFn: () => utf8Response(
+          jsonEncode({
+            'data': [
+              {
+                'text': 'How did you achieve that so quickly?',
+                'translations': [
+                  {'lang': 'cmn', 'script': 'Hant', 'text': '你怎麼這麼快就完成了？'},
+                ],
+              },
+            ],
+          }),
+          200,
+        ),
+        translationLanguage: TranslationLanguage.zhHant,
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.exampleEn, 'How did you achieve that so quickly?');
+      expect(info.exampleTranslation, '你怎麼這麼快就完成了？');
+    });
   });
 }

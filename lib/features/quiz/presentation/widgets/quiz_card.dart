@@ -2,6 +2,7 @@ import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// クイズの出題カード(幅 480 中央)。進捗・表面・IPA・答え表示ボタン、
@@ -16,7 +17,7 @@ class QuizCard extends StatelessWidget {
     required this.revealed,
     required this.back,
     required this.exampleEn,
-    required this.exampleJa,
+    required this.exampleTranslation,
     required this.onReveal,
     required this.englishWord,
     required this.pronunciationOnFront,
@@ -31,7 +32,7 @@ class QuizCard extends StatelessWidget {
   final bool revealed;
   final String back;
   final String exampleEn;
-  final String exampleJa;
+  final String exampleTranslation;
   final VoidCallback onReveal;
 
   /// 発音の対象(表裏に関わらず常に英単語)
@@ -124,7 +125,7 @@ class QuizCard extends StatelessWidget {
                 if (hasExample) ...[
                   const SizedBox(height: 10),
                   Text(
-                    '$exampleEn\n$exampleJa',
+                    '$exampleEn\n$exampleTranslation',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 13,
@@ -140,7 +141,7 @@ class QuizCard extends StatelessWidget {
         if (!revealed) ...[
           const SizedBox(height: 16),
           AppFilledButton(
-            label: '答えを表示',
+            label: context.l10n.showAnswer,
             verticalPadding: 11,
             borderRadius: 9,
             onPressed: onReveal,

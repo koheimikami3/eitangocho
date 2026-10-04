@@ -34,7 +34,7 @@ void main() {
   Future<void> seedWords(int count) async {
     for (var i = 0; i < count; i++) {
       await db.wordDao.insertWord(
-        WordsCompanion(word: Value('word$i'), japanese: Value('訳$i')),
+        WordsCompanion(word: Value('word$i'), meaning: Value('訳$i')),
       );
     }
   }
@@ -167,7 +167,7 @@ void main() {
     /// 1 語登録して onWordRegistered を呼ぶ(単語登録の保存と同じ順序)。
     Future<void> register(ReviewPrompter prompter, String word) async {
       await db.wordDao.insertWord(
-        WordsCompanion(word: Value(word), japanese: const Value('訳')),
+        WordsCompanion(word: Value(word), meaning: const Value('訳')),
       );
       await prompter.onWordRegistered();
     }

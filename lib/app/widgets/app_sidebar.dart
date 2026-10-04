@@ -7,6 +7,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,13 +33,13 @@ class AppSidebar extends ConsumerWidget {
           // 信号機ボタンの並ぶ上端はタイトルバーとして振る舞わせる
           // (ドラッグで移動、ダブルクリックで拡大 / 元に戻す)。
           const WindowDragArea(child: SizedBox(height: 52)),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(18, 6, 0, 2),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 6, 0, 2),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '単語帳',
-                style: TextStyle(
+                context.l10n.sidebarTitle,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textTertiary,
@@ -47,7 +48,7 @@ class AppSidebar extends ConsumerWidget {
             ),
           ),
           SidebarItem(
-            label: '学習中',
+            label: context.l10n.navLearning,
             count: '$learningCount',
             selected: view == MainView.learning,
             onTap: () => ref
@@ -55,7 +56,7 @@ class AppSidebar extends ConsumerWidget {
                 .selectView(MainView.learning),
           ),
           SidebarItem(
-            label: '全単語',
+            label: context.l10n.navAllWords,
             count: '$wordCount',
             selected: view == MainView.allWords,
             onTap: () => ref
@@ -63,7 +64,7 @@ class AppSidebar extends ConsumerWidget {
                 .selectView(MainView.allWords),
           ),
           SidebarItem(
-            label: 'フラッシュクイズ',
+            label: context.l10n.navQuiz,
             count: '$learnedCount',
             selected: view == MainView.quiz,
             // クリックで常に新セッションを開始してからビューへ切り替える。
@@ -73,7 +74,7 @@ class AppSidebar extends ConsumerWidget {
             },
           ),
           SidebarItem(
-            label: '単語を登録',
+            label: context.l10n.navRegistration,
             selected: view == MainView.registration,
             onTap: () => ref
                 .read(mainPageProvider.notifier)
@@ -81,25 +82,28 @@ class AppSidebar extends ConsumerWidget {
           ),
           const Spacer(),
           SidebarItem(
-            label: '設定',
+            label: context.l10n.navSettings,
             selected: view == MainView.settings,
             onTap: () => ref
                 .read(mainPageProvider.notifier)
                 .selectView(MainView.settings),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
             child: DecoratedBox(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(top: BorderSide(color: Color(0x0F000000))),
               ),
               child: Padding(
-                padding: EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: 12),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'ローカル DB に保存済み',
-                    style: TextStyle(fontSize: 11, color: Color(0x59000000)),
+                    context.l10n.sidebarSavedLocally,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0x59000000),
+                    ),
                   ),
                 ),
               ),

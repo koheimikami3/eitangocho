@@ -2,6 +2,7 @@ import 'package:eitangocho/db/daos/dictionary_cache_dao.dart';
 import 'package:eitangocho/db/daos/ejdict_dao.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/deepl_client.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
 import 'package:eitangocho/features/word_registration/data/kaikki_api_client.dart';
@@ -17,7 +18,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dictionary_word_info_provider.g.dart';
 
-/// WordInfoProvider の辞書ベース実装(kaikki + EJDict + DeepL)。
+/// WordInfoProvider の辞書ベース実装(kaikki + Tatoeba + EJDict + DeepL)。
+///
+/// 訳は訳の言語(TranslationLanguage)で取得する。日本語は同梱の EJDict を
+/// 優先し、それ以外の言語は kaikki の訳語だけを使う(同梱できる辞書が無い)。
 /// 依存はすべてコンストラクタ注入し、テストでフェイクに差し替えられるようにする。
 class DictionaryWordInfoProvider implements WordInfoProvider {
   const DictionaryWordInfoProvider({
@@ -28,6 +32,7 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     required this._ejdictDao,
     required this._ensureEjdictImported,
     required this._getDeeplApiKey,
+    required this._getTranslationLanguage,
   });
 
   final KaikkiApiClient _kaikkiClient;
@@ -40,16 +45,20 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
   final Future<void> Function() _ensureEjdictImported;
   final Future<String> Function() _getDeeplApiKey;
 
+  /// 訳の言語(設定)。fetch のたびに引き、設定の変更をすぐ反映する。
+  final Future<TranslationLanguage> Function() _getTranslationLanguage;
+
   /// 例文として短すぎるものを弾く語数。`obtain permission` のような
   /// コロケーションの断片は単語帳の例文にならない。
   static const _minExampleWords = 4;
 
-  /// kaikki の訳語から日本語訳に採る最大件数(EJDict が未収録のときの予備)。
-  static const _maxJapaneseWords = 5;
+  /// kaikki の訳語から訳に採る最大件数。
+  static const _maxMeaningWords = 5;
 
   @override
   Future<WordInfo?> fetch(String word) async {
     final normalized = word.trim().toLowerCase();
+    final language = await _getTranslationLanguage();
 
     // 1. kaikki: キャッシュ優先、miss なら取得し成功時のみ保存。
     //    取得に失敗しても例外にせず、EJDict の訳だけで登録を続けられるようにする
@@ -72,22 +81,25 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       kaikkiFailure = e;
     }
 
-    // 2. EJDict の訳(取込完了を待ってから引く)
-    await _ensureEjdictImported();
-    final japanese = await _ejdictDao.lookup(normalized);
+    // 2. EJDict の訳(取込完了を待ってから引く)。英和辞書なので日本語のときだけ。
+    String? meaning;
+    if (language == TranslationLanguage.ja) {
+      await _ensureEjdictImported();
+      meaning = await _ejdictDao.lookup(normalized);
+    }
 
     // 3. 辞書が両方空振りで、しかも通信に失敗していたならエラーにする。
     //    「取得できない」を「辞書に未収録」と誤解させないため。オフラインなら
     //    続く Tatoeba も失敗するので、ここで打ち切ってよい。
-    if (entries == null && japanese == null && kaikkiFailure != null) {
+    if (entries == null && meaning == null && kaikkiFailure != null) {
       throw kaikkiFailure;
     }
 
     // EJDict の語義を優先し、未収録のときだけ kaikki の訳語に落とす。
     // EJDict は英和辞典の語義で情報量が多く、kaikki 側は訳語の列挙なので
     // 出番は EJDict が持たない見出し(句動詞がほぼこれに当たる)だけになる。
-    var info = _mapEntries(normalized, entries ?? const []);
-    if (japanese != null) info = info.copyWith(japanese: japanese);
+    var info = _mapEntries(normalized, entries ?? const [], language);
+    if (meaning != null) info = info.copyWith(meaning: meaning);
 
     // 4. Tatoeba の例文を優先する。和訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
@@ -97,30 +109,38 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     //    (`run out of` は Wiktionary の見出しが `run out` なので 404)では、
     //    ここが唯一の自動入力になる。単語 1 語では kaikki がほぼ埋めるため、
     //    この経路に来るのは実質そういう句と綴り間違いだけ。
-    final example = await _tatoebaClient.findExample(normalized);
+    final example = await _tatoebaClient.findExample(normalized, language);
     if (example != null) {
-      info = info.copyWith(exampleEn: example.en, exampleJa: example.ja);
+      info = info.copyWith(
+        exampleEn: example.en,
+        exampleTranslation: example.translation,
+      );
     }
 
     // 5. 辞書にも例文にも何も無ければ未収録として扱う(手動入力へ倒す)。
-    if (entries == null && japanese == null && example == null) return null;
+    if (entries == null && meaning == null && example == null) return null;
 
     // 6. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
-    if (info.exampleEn.isNotEmpty && info.exampleJa.isEmpty) {
+    if (info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {
-        final translated = await _deeplClient.translateToJapanese(
+        final translated = await _deeplClient.translate(
           info.exampleEn,
           apiKey,
+          language,
         );
-        info = info.copyWith(exampleJa: translated ?? '');
+        info = info.copyWith(exampleTranslation: translated ?? '');
       }
     }
     return info;
   }
 
   /// kaikki のエントリ(1 件 = 1 品詞)を WordInfo に畳み込む。
-  WordInfo _mapEntries(String word, List<KaikkiEntry> entries) {
+  WordInfo _mapEntries(
+    String word,
+    List<KaikkiEntry> entries,
+    TranslationLanguage language,
+  ) {
     final partsOfSpeech = <PartOfSpeech>[];
     for (final entry in entries) {
       final pos = _toPartOfSpeech(entry.pos);
@@ -130,29 +150,48 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       word: word,
       ipa: _selectIpa(entries),
       partsOfSpeech: partsOfSpeech,
-      japanese: _selectJapanese(entries),
+      meaning: _selectMeaning(entries, language),
       exampleEn: _selectExample(entries, word),
+      translationLanguage: language,
     );
   }
 
-  /// kaikki の訳語を日本語訳の文字列にまとめる。
+  /// kaikki の訳語のうち [language] のものを訳の文字列にまとめる。
   ///
   /// 同じ訳語が語義ごとに重複して来る(`give up` の「諦める」は 2 件)ので
   /// 畳み、EJDict の語義と同じ ` / ` 区切りで連結する。並びは kaikki が
   /// 返した順のままで、語義の主従は反映されない(`give up` は「降服する」が
-  /// 先頭に来る)。**必須項目の欄が長大にならないよう [_maxJapaneseWords] で
+  /// 先頭に来る)。**必須項目の欄が長大にならないよう [_maxMeaningWords] で
   /// 打ち切る**。多義語では 10 件以上返ることがあるため。
-  String _selectJapanese(List<KaikkiEntry> entries) {
+  String _selectMeaning(
+    List<KaikkiEntry> entries,
+    TranslationLanguage language,
+  ) {
     final words = <String>{};
     for (final entry in entries) {
       for (final translation in entry.translations) {
-        final word = (translation.word ?? '').trim();
+        if (translation.langCode != language.kaikkiLangCode) continue;
+        final word = _traditionalForm(
+          (translation.word ?? '').trim(),
+          language,
+        );
         if (word.isEmpty) continue;
         words.add(word);
-        if (words.length == _maxJapaneseWords) return words.join(' / ');
+        if (words.length == _maxMeaningWords) return words.join(' / ');
       }
     }
     return words.join(' / ');
+  }
+
+  /// 中国語の訳語から繁体字の表記だけを取り出す。
+  ///
+  /// kaikki の北京語の訳語は `實現 /实现`(繁体字 + ` /` + 簡体字)の形で来る。
+  /// 両者が同じ字のとき(`完成`)は 1 つだけ。区切りを残すと訳の連結に使う
+  /// ` / ` と紛れるため、先頭(繁体字)だけを採る。
+  static String _traditionalForm(String word, TranslationLanguage language) {
+    if (language != TranslationLanguage.zhHant) return word;
+    final separator = word.indexOf(' /');
+    return separator < 0 ? word : word.substring(0, separator).trim();
   }
 
   /// 米音を優先して IPA を 1 つ選ぶ。
@@ -239,5 +278,8 @@ WordInfoProvider wordInfoProvider(Ref ref) {
       final settings = await ref.read(settingsProvider.future);
       return settings.deeplApiKey;
     },
+    // 未保存なら SettingsNotifier.build が端末の言語から既定を決めている。
+    getTranslationLanguage: () async =>
+        (await ref.read(settingsProvider.future)).translationLanguage,
   );
 }

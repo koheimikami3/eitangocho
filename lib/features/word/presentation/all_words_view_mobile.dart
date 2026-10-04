@@ -7,6 +7,7 @@ import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_row.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,7 +40,7 @@ class AllWordsViewMobile extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(32),
             child: Text(
-              '単語がまだありません。',
+              context.l10n.noWordsYet,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: palette.textAlpha(45)),
             ),

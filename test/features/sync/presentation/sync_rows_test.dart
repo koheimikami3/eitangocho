@@ -1,9 +1,11 @@
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_card.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
+import 'package:eitangocho/features/sync/domain/cloud_file_store.dart';
 import 'package:eitangocho/features/sync/domain/sync_state.dart';
 import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
 import 'package:eitangocho/features/sync/presentation/mobile_sync_rows.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,10 +34,11 @@ void main() {
   Future<void> pump(WidgetTester tester, SyncState state, Widget rows) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          syncProvider.overrideWith(() => _FixedSyncNotifier(state)),
-        ],
+        overrides: [syncProvider.overrideWith(() => _FixedSyncNotifier(state))],
         child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(body: SettingsCard(children: [rows])),
         ),
       ),
@@ -83,7 +86,10 @@ void main() {
       const message = 'iCloud が利用できません。設定で iCloud Drive にサインインしてください。';
       await pump(
         tester,
-        const SyncState(enabled: true, errorMessage: message),
+        const SyncState(
+          enabled: true,
+          failure: SyncFailure(reason: CloudFailureReason.noICloud),
+        ),
         rows,
       );
 

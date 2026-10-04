@@ -71,6 +71,11 @@ dependencies:
   # 本プロジェクトは CocoaPods を使っていないため、SPM に対応した版を使う。
   firebase_core: ^4.15.0
   firebase_analytics: ^12.6.0
+  # 画面の多言語化(ja / en / zh-Hant)。ARB は lib/l10n/、設定は l10n.yaml。
+  # intl の版は flutter_localizations が固定するので any にする。
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -97,6 +102,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # lib/l10n/ の ARB から AppLocalizations を生成する(flutter pub get / run で走る)。
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

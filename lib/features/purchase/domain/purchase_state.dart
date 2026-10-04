@@ -23,10 +23,13 @@ abstract class PurchaseState with _$PurchaseState {
     /// 復元処理の実行中か。
     @Default(false) bool restoring,
 
-    /// 購入行に一時表示するメッセージ(失敗時のみ)。
-    String? purchaseMessage,
+    /// 購入に失敗した(購入行に一時表示する)。
+    @Default(false) bool purchaseFailed,
 
-    /// 復元行の右端に一時表示するメッセージ。
-    String? restoreMessage,
+    /// 復元行の右端に一時表示する状況。文言は表示側が言語に合わせて出す。
+    RestoreStatus? restoreStatus,
   }) = _PurchaseState;
 }
+
+/// 復元の状況(復元行の右端に一時表示する)。
+enum RestoreStatus { checking, restored, notFound, failed }

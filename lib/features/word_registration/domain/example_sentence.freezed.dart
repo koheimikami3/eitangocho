@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExampleSentence {
 
- String get en; String get ja;
+ String get en; String get translation;
 /// Create a copy of ExampleSentence
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ExampleSentenceCopyWith<ExampleSentence> get copyWith => _$ExampleSentenceCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExampleSentence&&(identical(other.en, en) || other.en == en)&&(identical(other.ja, ja) || other.ja == ja));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExampleSentence&&(identical(other.en, en) || other.en == en)&&(identical(other.translation, translation) || other.translation == translation));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,en,ja);
+int get hashCode => Object.hash(runtimeType,en,translation);
 
 @override
 String toString() {
-  return 'ExampleSentence(en: $en, ja: $ja)';
+  return 'ExampleSentence(en: $en, translation: $translation)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ExampleSentenceCopyWith<$Res>  {
   factory $ExampleSentenceCopyWith(ExampleSentence value, $Res Function(ExampleSentence) _then) = _$ExampleSentenceCopyWithImpl;
 @useResult
 $Res call({
- String en, String ja
+ String en, String translation
 });
 
 
@@ -62,10 +62,10 @@ class _$ExampleSentenceCopyWithImpl<$Res>
 
 /// Create a copy of ExampleSentence
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? en = null,Object? ja = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? en = null,Object? translation = null,}) {
   return _then(_self.copyWith(
 en: null == en ? _self.en : en // ignore: cast_nullable_to_non_nullable
-as String,ja: null == ja ? _self.ja : ja // ignore: cast_nullable_to_non_nullable
+as String,translation: null == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -151,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String en,  String ja)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String en,  String translation)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExampleSentence() when $default != null:
-return $default(_that.en,_that.ja);case _:
+return $default(_that.en,_that.translation);case _:
   return orElse();
 
 }
@@ -172,10 +172,10 @@ return $default(_that.en,_that.ja);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String en,  String ja)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String en,  String translation)  $default,) {final _that = this;
 switch (_that) {
 case _ExampleSentence():
-return $default(_that.en,_that.ja);case _:
+return $default(_that.en,_that.translation);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +192,10 @@ return $default(_that.en,_that.ja);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String en,  String ja)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String en,  String translation)?  $default,) {final _that = this;
 switch (_that) {
 case _ExampleSentence() when $default != null:
-return $default(_that.en,_that.ja);case _:
+return $default(_that.en,_that.translation);case _:
   return null;
 
 }
@@ -207,11 +207,11 @@ return $default(_that.en,_that.ja);case _:
 
 
 class _ExampleSentence implements ExampleSentence {
-  const _ExampleSentence({required this.en, this.ja = ''});
+  const _ExampleSentence({required this.en, this.translation = ''});
   
 
 @override final  String en;
-@override@JsonKey() final  String ja;
+@override@JsonKey() final  String translation;
 
 /// Create a copy of ExampleSentence
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +223,16 @@ _$ExampleSentenceCopyWith<_ExampleSentence> get copyWith => __$ExampleSentenceCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExampleSentence&&(identical(other.en, en) || other.en == en)&&(identical(other.ja, ja) || other.ja == ja));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExampleSentence&&(identical(other.en, en) || other.en == en)&&(identical(other.translation, translation) || other.translation == translation));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,en,ja);
+int get hashCode => Object.hash(runtimeType,en,translation);
 
 @override
 String toString() {
-  return 'ExampleSentence(en: $en, ja: $ja)';
+  return 'ExampleSentence(en: $en, translation: $translation)';
 }
 
 
@@ -243,7 +243,7 @@ abstract mixin class _$ExampleSentenceCopyWith<$Res> implements $ExampleSentence
   factory _$ExampleSentenceCopyWith(_ExampleSentence value, $Res Function(_ExampleSentence) _then) = __$ExampleSentenceCopyWithImpl;
 @override @useResult
 $Res call({
- String en, String ja
+ String en, String translation
 });
 
 
@@ -260,10 +260,10 @@ class __$ExampleSentenceCopyWithImpl<$Res>
 
 /// Create a copy of ExampleSentence
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? en = null,Object? ja = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? en = null,Object? translation = null,}) {
   return _then(_ExampleSentence(
 en: null == en ? _self.en : en // ignore: cast_nullable_to_non_nullable
-as String,ja: null == ja ? _self.ja : ja // ignore: cast_nullable_to_non_nullable
+as String,translation: null == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

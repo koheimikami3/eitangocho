@@ -10,13 +10,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// エクスポート/インポート対象の JSON フォーマットが不正なときの例外
 /// (未知の version・トップレベルの型不正・JSON 自体のパース失敗)。
 class WordExportFormatException implements Exception {
-  const WordExportFormatException(this.message);
+  const WordExportFormatException(this.error);
 
-  final String message;
+  /// 何が不正だったか。文言は表示側(showImportErrorDialog)が言語に合わせて出す。
+  final WordExportFormatError error;
 
   @override
-  String toString() => message;
+  String toString() => 'WordExportFormatException: ${error.name}';
 }
+
+/// [WordExportFormatException] の種類。
+enum WordExportFormatError { invalidJson, invalidFormat, unsupportedVersion }
 
 /// インポート結果の件数。
 class ImportResult {
@@ -70,11 +74,12 @@ class WordExportService {
 
   WordExportEntry _toEntry(Word word) => WordExportEntry(
     word: word.word,
-    japanese: word.japanese,
+    meaning: word.meaning,
     ipa: word.ipa,
     partsOfSpeech: word.partsOfSpeech.map((p) => p.name).toList(),
     exampleEn: word.exampleEn,
-    exampleJa: word.exampleJa,
+    exampleTranslation: word.exampleTranslation,
+    translationLanguage: word.translationLanguage,
     audioUrl: word.audioUrl,
     isLearned: word.isLearned,
     lastReviewedAt: word.lastReviewedAt,
@@ -89,7 +94,7 @@ class WordExportService {
   /// - 一致あり: ファイル側 updatedAt が新しいときだけ上書き(word 表記・
   ///   createdAt は DB 側を維持)。それ以外は変更なし扱い
   /// - lastReviewedAt だけは単語の勝敗と切り離し、ファイルと DB の新しい方を採る
-  /// - word/japanese の欠落・型不正・空文字はスキップして続行する
+  /// - word/meaning の欠落・型不正・空文字はスキップして続行する
   /// - ファイル内に同一単語が複数あれば、updatedAt が新しい方だけを採用する
   /// - 削除ログ(v2 の deletions)は、同じキーの単語がローカルにあり
   ///   deletedAt がその updatedAt より新しければ削除する。ローカルに無くても
@@ -111,18 +116,24 @@ class WordExportService {
     try {
       decoded = jsonDecode(source);
     } on FormatException {
-      throw const WordExportFormatException('JSON として読み込めませんでした。');
+      throw const WordExportFormatException(WordExportFormatError.invalidJson);
     }
 
     if (decoded is! Map<String, dynamic>) {
-      throw const WordExportFormatException('JSON の形式が不正です。');
+      throw const WordExportFormatException(
+        WordExportFormatError.invalidFormat,
+      );
     }
     if (!_supportedVersions.contains(decoded['version'])) {
-      throw const WordExportFormatException('対応していないバージョンのファイルです。');
+      throw const WordExportFormatException(
+        WordExportFormatError.unsupportedVersion,
+      );
     }
     final rawWords = decoded['words'];
     if (rawWords is! List) {
-      throw const WordExportFormatException('JSON の形式が不正です。');
+      throw const WordExportFormatException(
+        WordExportFormatError.invalidFormat,
+      );
     }
     // v1 には deletions が無い。型が違う場合も欠落と同じく空として扱い、
     // 単語本体の取り込みまで巻き添えで失敗させない。
@@ -167,8 +178,8 @@ class WordExportService {
       }
 
       final word = entry.word.trim();
-      final japanese = entry.japanese.trim();
-      if (word.isEmpty || japanese.isEmpty) {
+      final meaning = entry.meaning.trim();
+      if (word.isEmpty || meaning.isEmpty) {
         skipped++;
         continue;
       }
@@ -191,7 +202,7 @@ class WordExportService {
 
       plannedByKey[key] = _PlannedEntry(
         word: word,
-        japanese: japanese,
+        meaning: meaning,
         entry: entry,
         updatedAt: updatedAt,
         createdAt: createdAt,
@@ -335,11 +346,12 @@ class WordExportService {
   WordsCompanion _toInsertCompanion(_PlannedEntry plan) {
     return WordsCompanion(
       word: Value(plan.word),
-      japanese: Value(plan.japanese),
+      meaning: Value(plan.meaning),
       ipa: Value(plan.entry.ipa),
       partsOfSpeech: Value(_partsOfSpeechOf(plan)),
       exampleEn: Value(plan.entry.exampleEn),
-      exampleJa: Value(plan.entry.exampleJa),
+      exampleTranslation: Value(plan.entry.exampleTranslation),
+      translationLanguage: Value(plan.entry.translationLanguage),
       audioUrl: Value(plan.entry.audioUrl),
       isLearned: Value(plan.entry.isLearned),
       lastReviewedAt: Value(plan.entry.lastReviewedAt),
@@ -357,11 +369,12 @@ class WordExportService {
     required DateTime? lastReviewedAt,
   }) {
     return WordsCompanion(
-      japanese: Value(plan.japanese),
+      meaning: Value(plan.meaning),
       ipa: Value(plan.entry.ipa),
       partsOfSpeech: Value(_partsOfSpeechOf(plan)),
       exampleEn: Value(plan.entry.exampleEn),
-      exampleJa: Value(plan.entry.exampleJa),
+      exampleTranslation: Value(plan.entry.exampleTranslation),
+      translationLanguage: Value(plan.entry.translationLanguage),
       audioUrl: Value(plan.entry.audioUrl),
       isLearned: Value(plan.entry.isLearned),
       lastReviewedAt: Value(lastReviewedAt),
@@ -374,14 +387,14 @@ class WordExportService {
 class _PlannedEntry {
   const _PlannedEntry({
     required this.word,
-    required this.japanese,
+    required this.meaning,
     required this.entry,
     required this.updatedAt,
     required this.createdAt,
   });
 
   final String word;
-  final String japanese;
+  final String meaning;
   final WordExportEntry entry;
   final DateTime updatedAt;
   final DateTime createdAt;

@@ -4,6 +4,7 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_pos_badge.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版の全単語リストの 1 行。
@@ -90,7 +91,7 @@ class MobileWordRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    word.japanese,
+                    word.meaning,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -103,7 +104,7 @@ class MobileWordRow extends StatelessWidget {
                   if (showCorrectCount) ...[
                     const SizedBox(height: 3),
                     Text(
-                      '覚えた ${word.correctCount}回',
+                      context.l10n.correctCount(word.correctCount),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/domain/license_item.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_push_header.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
 /// iOS 版のライセンス全文(ライセンス一覧からプッシュ遷移)。
@@ -70,7 +71,10 @@ class LicenseDetailViewMobile extends StatelessWidget {
                   ],
                 ),
               ),
-              const MobilePushHeader(title: 'ライセンス', backLabel: 'ライセンス'),
+              MobilePushHeader(
+                title: context.l10n.licenses,
+                backLabel: context.l10n.licenses,
+              ),
             ],
           ),
         ),

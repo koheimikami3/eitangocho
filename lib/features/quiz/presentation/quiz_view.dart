@@ -102,12 +102,12 @@ class _ActiveQuiz extends StatelessWidget {
           children: [
             QuizCard(
               progress: '${state.index + 1} / ${state.questions.length}',
-              front: isJaToEn ? word.japanese : word.word,
+              front: isJaToEn ? word.meaning : word.word,
               ipa: isJaToEn ? '' : word.ipa,
               revealed: state.revealed,
-              back: isJaToEn ? word.word : word.japanese,
+              back: isJaToEn ? word.word : word.meaning,
               exampleEn: word.exampleEn,
-              exampleJa: word.exampleJa,
+              exampleTranslation: word.exampleTranslation,
               onReveal: notifier.reveal,
               englishWord: word.word,
               pronunciationOnFront: !isJaToEn,

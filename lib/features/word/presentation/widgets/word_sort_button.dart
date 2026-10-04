@@ -3,6 +3,7 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/word/presentation/widgets/hover_menu_item.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,7 +38,7 @@ class WordSortButton extends ConsumerWidget {
             children: [
               Flexible(
                 child: Text(
-                  '並び順: ${order.label}',
+                  context.l10n.sortOrderLabel(order.label(context.l10n)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -101,7 +102,7 @@ class WordSortButton extends ConsumerWidget {
             padding: EdgeInsets.zero,
             height: 0,
             child: HoverMenuItem(
-              label: orders[i].label,
+              label: orders[i].label(context.l10n),
               checked: orders[i] == current,
             ),
           ),

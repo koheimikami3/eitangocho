@@ -42,11 +42,12 @@ abstract class KaikkiSound with _$KaikkiSound {
 /// 訳語(Wiktionary の translations 節)。
 ///
 /// 生のレスポンスは全言語ぶんを持ち、`give up` では 1 品詞に 243 件来る。
-/// キャッシュへ詰め直す時点で日本語(`lang_code == 'ja'`)だけに絞るので、
-/// パース後にこのリストへ残るのは日本語の訳語だけになる。
+/// キャッシュへ詰め直す時点で訳の言語の分(日本語 `ja`・北京語 `cmn`)だけに
+/// 絞るので、パース後にこのリストへ残るのはそれらの訳語だけになる。
 ///
-/// [word] は漢字表記(`諦める`)で、かなは `alt` に入るが読みは使わないので
-/// 読み飛ばす。同じ訳語が語義ごとに重複して来るため、使う側で畳む。
+/// [word] は日本語なら漢字表記(`諦める`)で、かなは `alt` に入るが読みは
+/// 使わないので読み飛ばす。中国語は `實現 /实现` のように繁体字と簡体字が
+/// 並んで来る。同じ訳語が語義ごとに重複して来るため、使う側で畳む。
 @freezed
 abstract class KaikkiTranslation with _$KaikkiTranslation {
   const factory KaikkiTranslation({

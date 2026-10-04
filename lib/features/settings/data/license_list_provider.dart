@@ -56,13 +56,12 @@ List<LicenseItem> groupLicenses(List<LicenseEntry> entries) {
   return items;
 }
 
-/// 判別できた種別が 1 つに定まればその名前、そうでなければ件数表記。
-String _summaryOf(List<String> texts) {
+/// 判別できた種別が 1 つに定まればその名前、そうでなければ null
+/// (表示側が件数表記にする)。
+String? _summaryOf(List<String> texts) {
   // 判別できなかった本文が 1 つでも混ざれば null が要素に残り、名前は使わない。
   final names = texts.map(detectLicenseName).toSet();
-  final single = names.length == 1 ? names.first : null;
-  if (single != null) return single;
-  return texts.length == 1 ? 'ライセンス' : '${texts.length} 件のライセンス';
+  return names.length == 1 ? names.first : null;
 }
 
 /// ライセンス一覧。[LicenseRegistry.licenses] は Stream なので読み切ってから返す。

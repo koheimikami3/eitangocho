@@ -3,6 +3,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/delete_confirm_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.dart';
 import 'package:eitangocho/features/word/presentation/widgets/hover_menu_item.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,19 +31,19 @@ Future<void> showWordContextMenu(
     ),
     constraints: const BoxConstraints(minWidth: 140),
     menuPadding: const EdgeInsets.all(4),
-    items: const [
+    items: [
       PopupMenuItem(
         value: _ContextMenuAction.edit,
         padding: EdgeInsets.zero,
         height: 0,
-        child: HoverMenuItem(label: '編集...'),
+        child: HoverMenuItem(label: context.l10n.editEllipsis),
       ),
       PopupMenuItem(
         value: _ContextMenuAction.delete,
         padding: EdgeInsets.zero,
         height: 0,
         child: HoverMenuItem(
-          label: '削除...',
+          label: context.l10n.deleteEllipsis,
           color: AppColors.danger,
           hoverColor: AppColors.danger,
         ),

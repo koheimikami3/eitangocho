@@ -6,14 +6,18 @@ import 'package:eitangocho/components/labeled_text_field.dart';
 import 'package:eitangocho/components/pos_chip_selector.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
+import 'package:eitangocho/features/word_registration/presentation/registration_messages.dart';
 import 'package:eitangocho/features/word_registration/presentation/widgets/auto_fill_badge.dart';
 import 'package:eitangocho/features/word_registration/presentation/widgets/dictionary_warning_banner.dart';
 import 'package:eitangocho/features/word_registration/presentation/widgets/registration_input_step.dart';
 import 'package:eitangocho/features/word_registration/presentation/widgets/registration_loading_step.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_notifier.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_state.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,17 +33,17 @@ class WordRegistrationView extends ConsumerStatefulWidget {
 class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   final _wordController = TextEditingController();
   final _ipaController = TextEditingController();
-  final _japaneseController = TextEditingController();
+  final _meaningController = TextEditingController();
   final _exampleEnController = TextEditingController();
-  final _exampleJaController = TextEditingController();
+  final _exampleTranslationController = TextEditingController();
 
   // 「自動入力」バッジの表示フラグ。プレフィル時に立て、ユーザーが
   // その項目を空にしたら消す(プロトタイプ準拠)。View の揮発状態でよい。
   var _autoIpa = false;
-  var _autoJapanese = false;
+  var _autoMeaning = false;
   var _autoPos = false;
   var _autoExampleEn = false;
-  var _autoExampleJa = false;
+  var _autoExampleTranslation = false;
 
   @override
   void initState() {
@@ -51,11 +55,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         (v) => _autoIpa = v,
       ),
     );
-    _japaneseController.addListener(
+    _meaningController.addListener(
       () => _clearBadgeIfEmpty(
-        _japaneseController,
-        () => _autoJapanese,
-        (v) => _autoJapanese = v,
+        _meaningController,
+        () => _autoMeaning,
+        (v) => _autoMeaning = v,
       ),
     );
     _exampleEnController.addListener(
@@ -65,11 +69,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         (v) => _autoExampleEn = v,
       ),
     );
-    _exampleJaController.addListener(
+    _exampleTranslationController.addListener(
       () => _clearBadgeIfEmpty(
-        _exampleJaController,
-        () => _autoExampleJa,
-        (v) => _autoExampleJa = v,
+        _exampleTranslationController,
+        () => _autoExampleTranslation,
+        (v) => _autoExampleTranslation = v,
       ),
     );
   }
@@ -88,9 +92,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   void dispose() {
     _wordController.dispose();
     _ipaController.dispose();
-    _japaneseController.dispose();
+    _meaningController.dispose();
     _exampleEnController.dispose();
-    _exampleJaController.dispose();
+    _exampleTranslationController.dispose();
     super.dispose();
   }
 
@@ -100,14 +104,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
     setState(() {
       _wordController.text = info.word;
       _ipaController.text = info.ipa;
-      _japaneseController.text = info.japanese;
+      _meaningController.text = info.meaning;
       _exampleEnController.text = info.exampleEn;
-      _exampleJaController.text = info.exampleJa;
+      _exampleTranslationController.text = info.exampleTranslation;
       _autoIpa = info.ipa.isNotEmpty;
-      _autoJapanese = info.japanese.isNotEmpty;
+      _autoMeaning = info.meaning.isNotEmpty;
       _autoPos = info.partsOfSpeech.isNotEmpty;
       _autoExampleEn = info.exampleEn.isNotEmpty;
-      _autoExampleJa = info.exampleJa.isNotEmpty;
+      _autoExampleTranslation = info.exampleTranslation.isNotEmpty;
     });
   }
 
@@ -115,14 +119,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   void _resetFormFields() {
     setState(() {
       _ipaController.clear();
-      _japaneseController.clear();
+      _meaningController.clear();
       _exampleEnController.clear();
-      _exampleJaController.clear();
+      _exampleTranslationController.clear();
       _autoIpa = false;
-      _autoJapanese = false;
+      _autoMeaning = false;
       _autoPos = false;
       _autoExampleEn = false;
-      _autoExampleJa = false;
+      _autoExampleTranslation = false;
     });
   }
 
@@ -132,9 +136,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         .save(
           word: _wordController.text,
           ipa: _ipaController.text,
-          japanese: _japaneseController.text,
+          meaning: _meaningController.text,
           exampleEn: _exampleEnController.text,
-          exampleJa: _exampleJaController.text,
+          exampleTranslation: _exampleTranslationController.text,
         );
     if (saved && mounted) {
       ref.read(mainPageProvider.notifier).selectView(MainView.learning);
@@ -161,6 +165,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
       }
     });
     final state = ref.watch(wordRegistrationProvider);
+    final language = ref.watch(translationLanguageProvider);
+    final error = state.error;
+    final errorMessage = error == null
+        ? null
+        : registrationErrorText(context.l10n, error, language);
 
     return Align(
       alignment: Alignment.topLeft,
@@ -171,7 +180,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           child: switch (state.step) {
             RegistrationStep.input => RegistrationInputStep(
               wordController: _wordController,
-              errorMessage: state.errorMessage,
+              errorMessage: errorMessage,
               onAutoFill: () => ref
                   .read(wordRegistrationProvider.notifier)
                   .autoFill(_wordController.text),
@@ -179,26 +188,34 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
                   ref.read(wordRegistrationProvider.notifier).skipToManual(),
             ),
             RegistrationStep.loading => const RegistrationLoadingStep(),
-            RegistrationStep.form => _buildForm(state),
+            RegistrationStep.form => _buildForm(state, language, errorMessage),
           },
         ),
       ),
     );
   }
 
-  Widget _buildForm(WordRegistrationState state) {
-    final banner = state.warningMessage;
+  Widget _buildForm(
+    WordRegistrationState state,
+    TranslationLanguage language,
+    String? errorMessage,
+  ) {
+    final l10n = context.l10n;
+    final notice = state.notice;
+    final languageLabel = language.shortLabel(l10n);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (banner != null) ...[
-          DictionaryWarningBanner(message: banner),
+        if (notice != null) ...[
+          DictionaryWarningBanner(
+            message: registrationNoticeText(l10n, notice, language),
+          ),
           const SizedBox(height: 16),
         ],
         if (state.translationFailed) ...[
-          const Text(
-            '例文の翻訳に失敗しました(手動で入力できます)',
-            style: TextStyle(
+          Text(
+            l10n.exampleTranslationFailedShort,
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.warningBannerForeground,
             ),
@@ -210,14 +227,14 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           children: [
             Expanded(
               child: LabeledTextField(
-                label: '英単語 *',
+                label: l10n.fieldWord,
                 controller: _wordController,
               ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: LabeledTextField(
-                label: '発音記号 (IPA)',
+                label: l10n.fieldIpa,
                 controller: _ipaController,
                 trailing: _autoIpa ? const AutoFillBadge() : null,
               ),
@@ -226,10 +243,10 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         ),
         const SizedBox(height: 16),
         LabeledTextField(
-          label: '日本語訳 *',
-          controller: _japaneseController,
+          label: l10n.fieldMeaning(languageLabel),
+          controller: _meaningController,
           maxLines: null,
-          trailing: _autoJapanese ? const AutoFillBadge() : null,
+          trailing: _autoMeaning ? const AutoFillBadge() : null,
         ),
         const SizedBox(height: 16),
         Column(
@@ -237,9 +254,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           children: [
             Row(
               children: [
-                const Text(
-                  '品詞(複数選択可)',
-                  style: TextStyle(
+                Text(
+                  l10n.fieldPartsOfSpeech,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
@@ -263,7 +280,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         ),
         const SizedBox(height: 16),
         LabeledTextField(
-          label: '英例文',
+          label: l10n.fieldExampleEn,
           controller: _exampleEnController,
           minLines: 2,
           maxLines: null,
@@ -271,31 +288,31 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         ),
         const SizedBox(height: 16),
         LabeledTextField(
-          label: '日本語例文',
-          controller: _exampleJaController,
+          label: l10n.fieldExampleTranslation(languageLabel),
+          controller: _exampleTranslationController,
           minLines: 2,
           maxLines: null,
-          trailing: _autoExampleJa ? const AutoFillBadge() : null,
+          trailing: _autoExampleTranslation ? const AutoFillBadge() : null,
         ),
-        if (state.errorMessage != null) ...[
+        if (errorMessage != null) ...[
           const SizedBox(height: 16),
           Text(
-            state.errorMessage!,
+            errorMessage,
             style: const TextStyle(fontSize: 12, color: AppColors.danger),
           ),
         ],
         const SizedBox(height: 16),
         Row(
           children: [
-            AppFilledButton(label: '登録する', onPressed: _save),
+            AppFilledButton(label: l10n.registerButton, onPressed: _save),
             const SizedBox(width: 10),
             AppOutlinedButton(
-              label: '戻る',
+              label: l10n.back,
               onPressed: () =>
                   ref.read(wordRegistrationProvider.notifier).backToInput(),
             ),
             const SizedBox(width: 12),
-            _TextActionButton(label: 'キャンセル', onTap: _cancel),
+            _TextActionButton(label: l10n.cancel, onTap: _cancel),
           ],
         ),
       ],

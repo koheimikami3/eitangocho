@@ -565,7 +565,10 @@ as DateTime,
 /// @nodoc
 mixin _$WordExportEntry {
 
- String get word; String get japanese; String get ipa; List<String> get partsOfSpeech; String get exampleEn; String get exampleJa; String get audioUrl; bool get isLearned;@NullableUtcDateTimeConverter() DateTime? get lastReviewedAt; int get correctCount;@NullableUtcDateTimeConverter() DateTime? get createdAt;@NullableUtcDateTimeConverter() DateTime? get updatedAt;
+ String get word;@JsonKey(name: 'japanese') String get meaning; String get ipa; List<String> get partsOfSpeech; String get exampleEn;@JsonKey(name: 'exampleJa') String get exampleTranslation;/// 訳の言語(words.translation_language と同じ値)。v2.5.0 より前の版が
+/// 書いたファイルには無いので、無ければ日本語として読む。未知の値も
+/// そのまま持ち回す(新しい版が足した言語を古い版で消さないため)。
+ String get translationLanguage; String get audioUrl; bool get isLearned;@NullableUtcDateTimeConverter() DateTime? get lastReviewedAt; int get correctCount;@NullableUtcDateTimeConverter() DateTime? get createdAt;@NullableUtcDateTimeConverter() DateTime? get updatedAt;
 /// Create a copy of WordExportEntry
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -578,16 +581,16 @@ $WordExportEntryCopyWith<WordExportEntry> get copyWith => _$WordExportEntryCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordExportEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.japanese, japanese) || other.japanese == japanese)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other.partsOfSpeech, partsOfSpeech)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleJa, exampleJa) || other.exampleJa == exampleJa)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.isLearned, isLearned) || other.isLearned == isLearned)&&(identical(other.lastReviewedAt, lastReviewedAt) || other.lastReviewedAt == lastReviewedAt)&&(identical(other.correctCount, correctCount) || other.correctCount == correctCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordExportEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.meaning, meaning) || other.meaning == meaning)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other.partsOfSpeech, partsOfSpeech)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleTranslation, exampleTranslation) || other.exampleTranslation == exampleTranslation)&&(identical(other.translationLanguage, translationLanguage) || other.translationLanguage == translationLanguage)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.isLearned, isLearned) || other.isLearned == isLearned)&&(identical(other.lastReviewedAt, lastReviewedAt) || other.lastReviewedAt == lastReviewedAt)&&(identical(other.correctCount, correctCount) || other.correctCount == correctCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,japanese,ipa,const DeepCollectionEquality().hash(partsOfSpeech),exampleEn,exampleJa,audioUrl,isLearned,lastReviewedAt,correctCount,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,word,meaning,ipa,const DeepCollectionEquality().hash(partsOfSpeech),exampleEn,exampleTranslation,translationLanguage,audioUrl,isLearned,lastReviewedAt,correctCount,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'WordExportEntry(word: $word, japanese: $japanese, ipa: $ipa, partsOfSpeech: $partsOfSpeech, exampleEn: $exampleEn, exampleJa: $exampleJa, audioUrl: $audioUrl, isLearned: $isLearned, lastReviewedAt: $lastReviewedAt, correctCount: $correctCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'WordExportEntry(word: $word, meaning: $meaning, ipa: $ipa, partsOfSpeech: $partsOfSpeech, exampleEn: $exampleEn, exampleTranslation: $exampleTranslation, translationLanguage: $translationLanguage, audioUrl: $audioUrl, isLearned: $isLearned, lastReviewedAt: $lastReviewedAt, correctCount: $correctCount, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -598,7 +601,7 @@ abstract mixin class $WordExportEntryCopyWith<$Res>  {
   factory $WordExportEntryCopyWith(WordExportEntry value, $Res Function(WordExportEntry) _then) = _$WordExportEntryCopyWithImpl;
 @useResult
 $Res call({
- String word, String japanese, String ipa, List<String> partsOfSpeech, String exampleEn, String exampleJa, String audioUrl, bool isLearned,@NullableUtcDateTimeConverter() DateTime? lastReviewedAt, int correctCount,@NullableUtcDateTimeConverter() DateTime? createdAt,@NullableUtcDateTimeConverter() DateTime? updatedAt
+ String word,@JsonKey(name: 'japanese') String meaning, String ipa, List<String> partsOfSpeech, String exampleEn,@JsonKey(name: 'exampleJa') String exampleTranslation, String translationLanguage, String audioUrl, bool isLearned,@NullableUtcDateTimeConverter() DateTime? lastReviewedAt, int correctCount,@NullableUtcDateTimeConverter() DateTime? createdAt,@NullableUtcDateTimeConverter() DateTime? updatedAt
 });
 
 
@@ -615,14 +618,15 @@ class _$WordExportEntryCopyWithImpl<$Res>
 
 /// Create a copy of WordExportEntry
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? word = null,Object? japanese = null,Object? ipa = null,Object? partsOfSpeech = null,Object? exampleEn = null,Object? exampleJa = null,Object? audioUrl = null,Object? isLearned = null,Object? lastReviewedAt = freezed,Object? correctCount = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? word = null,Object? meaning = null,Object? ipa = null,Object? partsOfSpeech = null,Object? exampleEn = null,Object? exampleTranslation = null,Object? translationLanguage = null,Object? audioUrl = null,Object? isLearned = null,Object? lastReviewedAt = freezed,Object? correctCount = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
-as String,japanese: null == japanese ? _self.japanese : japanese // ignore: cast_nullable_to_non_nullable
+as String,meaning: null == meaning ? _self.meaning : meaning // ignore: cast_nullable_to_non_nullable
 as String,ipa: null == ipa ? _self.ipa : ipa // ignore: cast_nullable_to_non_nullable
 as String,partsOfSpeech: null == partsOfSpeech ? _self.partsOfSpeech : partsOfSpeech // ignore: cast_nullable_to_non_nullable
 as List<String>,exampleEn: null == exampleEn ? _self.exampleEn : exampleEn // ignore: cast_nullable_to_non_nullable
-as String,exampleJa: null == exampleJa ? _self.exampleJa : exampleJa // ignore: cast_nullable_to_non_nullable
+as String,exampleTranslation: null == exampleTranslation ? _self.exampleTranslation : exampleTranslation // ignore: cast_nullable_to_non_nullable
+as String,translationLanguage: null == translationLanguage ? _self.translationLanguage : translationLanguage // ignore: cast_nullable_to_non_nullable
 as String,audioUrl: null == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
 as String,isLearned: null == isLearned ? _self.isLearned : isLearned // ignore: cast_nullable_to_non_nullable
 as bool,lastReviewedAt: freezed == lastReviewedAt ? _self.lastReviewedAt : lastReviewedAt // ignore: cast_nullable_to_non_nullable
@@ -714,10 +718,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String word,  String japanese,  String ipa,  List<String> partsOfSpeech,  String exampleEn,  String exampleJa,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String word, @JsonKey(name: 'japanese')  String meaning,  String ipa,  List<String> partsOfSpeech,  String exampleEn, @JsonKey(name: 'exampleJa')  String exampleTranslation,  String translationLanguage,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WordExportEntry() when $default != null:
-return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleJa,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.word,_that.meaning,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleTranslation,_that.translationLanguage,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -735,10 +739,10 @@ return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.ex
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String word,  String japanese,  String ipa,  List<String> partsOfSpeech,  String exampleEn,  String exampleJa,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String word, @JsonKey(name: 'japanese')  String meaning,  String ipa,  List<String> partsOfSpeech,  String exampleEn, @JsonKey(name: 'exampleJa')  String exampleTranslation,  String translationLanguage,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _WordExportEntry():
-return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleJa,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.word,_that.meaning,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleTranslation,_that.translationLanguage,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -755,10 +759,10 @@ return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.ex
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String word,  String japanese,  String ipa,  List<String> partsOfSpeech,  String exampleEn,  String exampleJa,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String word, @JsonKey(name: 'japanese')  String meaning,  String ipa,  List<String> partsOfSpeech,  String exampleEn, @JsonKey(name: 'exampleJa')  String exampleTranslation,  String translationLanguage,  String audioUrl,  bool isLearned, @NullableUtcDateTimeConverter()  DateTime? lastReviewedAt,  int correctCount, @NullableUtcDateTimeConverter()  DateTime? createdAt, @NullableUtcDateTimeConverter()  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _WordExportEntry() when $default != null:
-return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleJa,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.word,_that.meaning,_that.ipa,_that.partsOfSpeech,_that.exampleEn,_that.exampleTranslation,_that.translationLanguage,_that.audioUrl,_that.isLearned,_that.lastReviewedAt,_that.correctCount,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -770,11 +774,11 @@ return $default(_that.word,_that.japanese,_that.ipa,_that.partsOfSpeech,_that.ex
 @JsonSerializable()
 
 class _WordExportEntry implements WordExportEntry {
-  const _WordExportEntry({required this.word, required this.japanese, this.ipa = '', final  List<String> partsOfSpeech = const <String>[], this.exampleEn = '', this.exampleJa = '', this.audioUrl = '', this.isLearned = false, @NullableUtcDateTimeConverter() this.lastReviewedAt, this.correctCount = 0, @NullableUtcDateTimeConverter() this.createdAt, @NullableUtcDateTimeConverter() this.updatedAt}): _partsOfSpeech = partsOfSpeech;
+  const _WordExportEntry({required this.word, @JsonKey(name: 'japanese') required this.meaning, this.ipa = '', final  List<String> partsOfSpeech = const <String>[], this.exampleEn = '', @JsonKey(name: 'exampleJa') this.exampleTranslation = '', this.translationLanguage = 'ja', this.audioUrl = '', this.isLearned = false, @NullableUtcDateTimeConverter() this.lastReviewedAt, this.correctCount = 0, @NullableUtcDateTimeConverter() this.createdAt, @NullableUtcDateTimeConverter() this.updatedAt}): _partsOfSpeech = partsOfSpeech;
   factory _WordExportEntry.fromJson(Map<String, dynamic> json) => _$WordExportEntryFromJson(json);
 
 @override final  String word;
-@override final  String japanese;
+@override@JsonKey(name: 'japanese') final  String meaning;
 @override@JsonKey() final  String ipa;
  final  List<String> _partsOfSpeech;
 @override@JsonKey() List<String> get partsOfSpeech {
@@ -784,7 +788,11 @@ class _WordExportEntry implements WordExportEntry {
 }
 
 @override@JsonKey() final  String exampleEn;
-@override@JsonKey() final  String exampleJa;
+@override@JsonKey(name: 'exampleJa') final  String exampleTranslation;
+/// 訳の言語(words.translation_language と同じ値)。v2.5.0 より前の版が
+/// 書いたファイルには無いので、無ければ日本語として読む。未知の値も
+/// そのまま持ち回す(新しい版が足した言語を古い版で消さないため)。
+@override@JsonKey() final  String translationLanguage;
 @override@JsonKey() final  String audioUrl;
 @override@JsonKey() final  bool isLearned;
 @override@NullableUtcDateTimeConverter() final  DateTime? lastReviewedAt;
@@ -805,16 +813,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordExportEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.japanese, japanese) || other.japanese == japanese)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other._partsOfSpeech, _partsOfSpeech)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleJa, exampleJa) || other.exampleJa == exampleJa)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.isLearned, isLearned) || other.isLearned == isLearned)&&(identical(other.lastReviewedAt, lastReviewedAt) || other.lastReviewedAt == lastReviewedAt)&&(identical(other.correctCount, correctCount) || other.correctCount == correctCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordExportEntry&&(identical(other.word, word) || other.word == word)&&(identical(other.meaning, meaning) || other.meaning == meaning)&&(identical(other.ipa, ipa) || other.ipa == ipa)&&const DeepCollectionEquality().equals(other._partsOfSpeech, _partsOfSpeech)&&(identical(other.exampleEn, exampleEn) || other.exampleEn == exampleEn)&&(identical(other.exampleTranslation, exampleTranslation) || other.exampleTranslation == exampleTranslation)&&(identical(other.translationLanguage, translationLanguage) || other.translationLanguage == translationLanguage)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.isLearned, isLearned) || other.isLearned == isLearned)&&(identical(other.lastReviewedAt, lastReviewedAt) || other.lastReviewedAt == lastReviewedAt)&&(identical(other.correctCount, correctCount) || other.correctCount == correctCount)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,japanese,ipa,const DeepCollectionEquality().hash(_partsOfSpeech),exampleEn,exampleJa,audioUrl,isLearned,lastReviewedAt,correctCount,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,word,meaning,ipa,const DeepCollectionEquality().hash(_partsOfSpeech),exampleEn,exampleTranslation,translationLanguage,audioUrl,isLearned,lastReviewedAt,correctCount,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'WordExportEntry(word: $word, japanese: $japanese, ipa: $ipa, partsOfSpeech: $partsOfSpeech, exampleEn: $exampleEn, exampleJa: $exampleJa, audioUrl: $audioUrl, isLearned: $isLearned, lastReviewedAt: $lastReviewedAt, correctCount: $correctCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'WordExportEntry(word: $word, meaning: $meaning, ipa: $ipa, partsOfSpeech: $partsOfSpeech, exampleEn: $exampleEn, exampleTranslation: $exampleTranslation, translationLanguage: $translationLanguage, audioUrl: $audioUrl, isLearned: $isLearned, lastReviewedAt: $lastReviewedAt, correctCount: $correctCount, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -825,7 +833,7 @@ abstract mixin class _$WordExportEntryCopyWith<$Res> implements $WordExportEntry
   factory _$WordExportEntryCopyWith(_WordExportEntry value, $Res Function(_WordExportEntry) _then) = __$WordExportEntryCopyWithImpl;
 @override @useResult
 $Res call({
- String word, String japanese, String ipa, List<String> partsOfSpeech, String exampleEn, String exampleJa, String audioUrl, bool isLearned,@NullableUtcDateTimeConverter() DateTime? lastReviewedAt, int correctCount,@NullableUtcDateTimeConverter() DateTime? createdAt,@NullableUtcDateTimeConverter() DateTime? updatedAt
+ String word,@JsonKey(name: 'japanese') String meaning, String ipa, List<String> partsOfSpeech, String exampleEn,@JsonKey(name: 'exampleJa') String exampleTranslation, String translationLanguage, String audioUrl, bool isLearned,@NullableUtcDateTimeConverter() DateTime? lastReviewedAt, int correctCount,@NullableUtcDateTimeConverter() DateTime? createdAt,@NullableUtcDateTimeConverter() DateTime? updatedAt
 });
 
 
@@ -842,14 +850,15 @@ class __$WordExportEntryCopyWithImpl<$Res>
 
 /// Create a copy of WordExportEntry
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? word = null,Object? japanese = null,Object? ipa = null,Object? partsOfSpeech = null,Object? exampleEn = null,Object? exampleJa = null,Object? audioUrl = null,Object? isLearned = null,Object? lastReviewedAt = freezed,Object? correctCount = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? word = null,Object? meaning = null,Object? ipa = null,Object? partsOfSpeech = null,Object? exampleEn = null,Object? exampleTranslation = null,Object? translationLanguage = null,Object? audioUrl = null,Object? isLearned = null,Object? lastReviewedAt = freezed,Object? correctCount = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_WordExportEntry(
 word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
-as String,japanese: null == japanese ? _self.japanese : japanese // ignore: cast_nullable_to_non_nullable
+as String,meaning: null == meaning ? _self.meaning : meaning // ignore: cast_nullable_to_non_nullable
 as String,ipa: null == ipa ? _self.ipa : ipa // ignore: cast_nullable_to_non_nullable
 as String,partsOfSpeech: null == partsOfSpeech ? _self._partsOfSpeech : partsOfSpeech // ignore: cast_nullable_to_non_nullable
 as List<String>,exampleEn: null == exampleEn ? _self.exampleEn : exampleEn // ignore: cast_nullable_to_non_nullable
-as String,exampleJa: null == exampleJa ? _self.exampleJa : exampleJa // ignore: cast_nullable_to_non_nullable
+as String,exampleTranslation: null == exampleTranslation ? _self.exampleTranslation : exampleTranslation // ignore: cast_nullable_to_non_nullable
+as String,translationLanguage: null == translationLanguage ? _self.translationLanguage : translationLanguage // ignore: cast_nullable_to_non_nullable
 as String,audioUrl: null == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
 as String,isLearned: null == isLearned ? _self.isLearned : isLearned // ignore: cast_nullable_to_non_nullable
 as bool,lastReviewedAt: freezed == lastReviewedAt ? _self.lastReviewedAt : lastReviewedAt // ignore: cast_nullable_to_non_nullable

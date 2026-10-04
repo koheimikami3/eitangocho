@@ -1,5 +1,7 @@
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
+import 'package:eitangocho/features/purchase/domain/purchase_state.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,7 +31,7 @@ class MobileProRestoreRow extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
-                '購入を復元',
+                context.l10n.restorePurchases,
                 style: TextStyle(
                   fontSize: 13,
                   // デザインはここに --accText を当てている。その対応色が
@@ -41,11 +43,13 @@ class MobileProRestoreRow extends ConsumerWidget {
                 ),
               ),
             ),
-            if (state.restoreMessage != null)
-              Text(
-                state.restoreMessage!,
-                style: TextStyle(fontSize: 11, color: palette.textAlpha(45)),
-              ),
+            if (state.restoreStatus case final status?)
+              Text(switch (status) {
+                RestoreStatus.checking => context.l10n.restoreChecking,
+                RestoreStatus.restored => context.l10n.restoreDone,
+                RestoreStatus.notFound => context.l10n.restoreNotFound,
+                RestoreStatus.failed => context.l10n.restoreFailed,
+              }, style: TextStyle(fontSize: 11, color: palette.textAlpha(45))),
           ],
         ),
       ),

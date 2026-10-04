@@ -1,0 +1,2 @@
+/* アプリ名は英語の端末でも Info.plist の「英単語帳」のまま(英語の掲載は出さない方針)。 */
+"NSUserTrackingUsageDescription" = "Used to show ads in the app that better match your interests.";

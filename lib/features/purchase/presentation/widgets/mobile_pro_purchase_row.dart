@@ -1,6 +1,8 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
+import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,15 +25,20 @@ class MobileProPurchaseRow extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '広告を非表示にする',
+                  context.l10n.removeAds,
                   style: TextStyle(fontSize: 14, color: palette.text),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  _note(state.purchaseMessage, state.priceText, done: done),
+                  _note(
+                    context.l10n,
+                    failed: state.purchaseFailed,
+                    priceText: state.priceText,
+                    done: done,
+                  ),
                   style: TextStyle(
                     fontSize: 11,
-                    color: state.purchaseMessage != null
+                    color: state.purchaseFailed
                         ? palette.danger
                         : palette.textAlpha(45),
                   ),
@@ -54,11 +61,16 @@ class MobileProPurchaseRow extends ConsumerWidget {
   }
 
   /// ボタンの下の補足。失敗メッセージは一時的に価格を置き換える。
-  String _note(String? message, String? priceText, {required bool done}) {
-    if (message != null) return message;
-    if (done) return 'Pro を購入済みです';
-    if (priceText == null) return '価格を取得できませんでした';
-    return '買い切り $priceText';
+  String _note(
+    AppLocalizations l10n, {
+    required bool failed,
+    required String? priceText,
+    required bool done,
+  }) {
+    if (failed) return l10n.purchaseFailed;
+    if (done) return l10n.proPurchasedCaption;
+    if (priceText == null) return l10n.priceUnavailable;
+    return l10n.oneTimePrice(priceText);
   }
 }
 
@@ -104,7 +116,7 @@ class _PurchaseButton extends StatelessWidget {
                 ),
               )
             : Text(
-                done ? '購入済み' : '購入',
+                done ? context.l10n.purchased : context.l10n.purchase,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

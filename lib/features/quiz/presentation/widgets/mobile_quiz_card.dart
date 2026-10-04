@@ -13,7 +13,7 @@ class MobileQuizCard extends StatelessWidget {
     required this.revealed,
     required this.back,
     required this.exampleEn,
-    required this.exampleJa,
+    required this.exampleTranslation,
     required this.englishWord,
     required this.pronunciationOnFront,
     super.key,
@@ -24,7 +24,7 @@ class MobileQuizCard extends StatelessWidget {
   final bool revealed;
   final String back;
   final String exampleEn;
-  final String exampleJa;
+  final String exampleTranslation;
 
   /// 発音の対象(表裏に関わらず常に英単語)
   final String englishWord;
@@ -101,7 +101,9 @@ class MobileQuizCard extends StatelessWidget {
             if (exampleEn.trim().isNotEmpty) ...[
               const SizedBox(height: 14),
               Text(
-                exampleJa.trim().isEmpty ? exampleEn : '$exampleEn\n$exampleJa',
+                exampleTranslation.trim().isEmpty
+                    ? exampleEn
+                    : '$exampleEn\n$exampleTranslation',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,

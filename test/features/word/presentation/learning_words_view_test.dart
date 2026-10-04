@@ -4,6 +4,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/learning_words_view.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
+import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: LearningWordsView())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: LearningWordsView()),
+          ),
         ),
       );
       // drift の watch() の初回発火は実イベントループの Future を経由するため、
@@ -51,10 +57,10 @@ void main() {
 
   testWidgets('未学習の単語だけがカード表示される(学習済みは出ない)', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
     final learnedId = await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('orange'), japanese: Value('オレンジ')),
+      const WordsCompanion(word: Value('orange'), meaning: Value('オレンジ')),
     );
     await db.wordDao.setLearned(learnedId, isLearned: true);
 
@@ -69,7 +75,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: Scaffold(body: LearningWordsView())),
+          child: const MaterialApp(
+            locale: Locale('ja'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: LearningWordsView()),
+          ),
         ),
       );
       // drift の watch() が初回発火する前(runWithView の待ちを挟まない)。
@@ -95,7 +106,7 @@ void main() {
 
   testWidgets('「日本語訳を表示」をタップすると訳が現れる', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {
@@ -111,7 +122,7 @@ void main() {
 
   testWidgets('学習済みチェックで isLearned が true になりカードから消える', (tester) async {
     await db.wordDao.insertWord(
-      const WordsCompanion(word: Value('apple'), japanese: Value('りんご')),
+      const WordsCompanion(word: Value('apple'), meaning: Value('りんご')),
     );
 
     await runWithView(tester, () async {
