@@ -84,49 +84,33 @@ class _WordCardState extends State<WordCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  // 単語 + IPA は左側で自然幅を取り、バッジを右端へ押し出す。
-                  // 幅が足りないときは折り返さず省略表示にする。
-                  Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            word.word,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        if (showIpa) ...[
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              word.ipa,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Menlo',
-                                color: AppColors.textTertiary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  PosBadge(partsOfSpeech: word.partsOfSpeech),
-                ],
+              // 単語・IPA・品詞はそれぞれ別の行に積む(iOS の 2 列カードと同じ)。
+              // 1 行に並べていた頃は単語が長いと省略され、肝心の単語が
+              // 読めないカードが多かった。単語は省略せず折り返す。
+              // IPA は補助情報なので 1 行に留め、溢れる分は末尾を省略する。
+              Text(
+                word.word,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
+              if (showIpa) ...[
+                const SizedBox(height: 3),
+                Text(
+                  word.ipa,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Menlo',
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 4),
+              PosBadge(partsOfSpeech: word.partsOfSpeech),
               const SizedBox(height: 10),
               _RevealArea(
                 meaning: word.meaning,

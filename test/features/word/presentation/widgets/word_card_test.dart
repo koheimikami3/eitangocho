@@ -62,6 +62,45 @@ void main() {
     }
   }
 
+  // 1 行に並べると長い単語が省略されて読めないため、1 項目 1 行に積む。
+  testWidgets('単語・IPA・品詞をそれぞれ別の行に積み、長い単語も省略しない', (tester) async {
+    const longWord = 'be well versed in something';
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                // 学習中グリッドのカード最小幅相当。
+                width: 260,
+                child: WordCard(
+                  word: word.copyWith(word: longWord),
+                  showIpa: true,
+                  onToggleLearned: (_) {},
+                  onTap: () {},
+                  onContextMenu: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final wordRect = tester.getRect(find.text(longWord));
+    final ipaRect = tester.getRect(find.text('/ˈæp.əl/'));
+    final badgeRect = tester.getRect(find.text('その他'));
+
+    // 1 行に収まらない長さなので、省略されず 2 行以上に折り返している。
+    expect(wordRect.height, greaterThan(17 * 1.5));
+    expect(ipaRect.top, greaterThan(wordRect.bottom - 1));
+    expect(badgeRect.top, greaterThan(ipaRect.bottom - 1));
+    expect(ipaRect.left, closeTo(wordRect.left, 1));
+  });
+
   // 削除導線は iOS では編集シート内の「この単語を削除...」に一本化した
   // (デザイン準拠)。長押しメニューはどちらのプラットフォームでも持たない。
   for (final platform in [TargetPlatform.macOS, TargetPlatform.iOS]) {
