@@ -120,9 +120,23 @@ final class PronunciationWindowPlugin: NSObject, NSWindowDelegate {
   }
 }
 
-/// Esc で閉じられる発音ウィンドウ(iOS のシートを閉じる感覚に合わせる)。
+/// Esc と ⌘W で閉じられる発音ウィンドウ(Esc は iOS のシートを閉じる感覚に合わせる)。
 private final class PronunciationWindow: NSWindow {
   override func cancelOperation(_ sender: Any?) {
     close()
+  }
+
+  // メニューバーは Dart の PlatformMenuBar(app_menu_bar.dart)で置き換えており、
+  // 標準の「閉じる」(⌘W)項目が無い。メニューに足すと本体ウィンドウでも ⌘W が
+  // 効いてしまうため、このウィンドウだけで受ける。キーウィンドウには
+  // メニューより先に key equivalent が回ってくる。
+  override func performKeyEquivalent(with event: NSEvent) -> Bool {
+    if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+      event.charactersIgnoringModifiers?.lowercased() == "w"
+    {
+      performClose(nil)
+      return true
+    }
+    return super.performKeyEquivalent(with: event)
   }
 }
