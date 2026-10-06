@@ -129,6 +129,35 @@ void main() {
     expect(raw.userVersion, 4);
   });
 
+  // v4 で列を足した後に v3 のアプリで開くと、列はそのまま user_version だけ
+  // 3 に戻る(drift はダウングレードで何もせず版だけ書き戻す)。
+  test('列が既にある v3 の DB も開け、辞書キャッシュが空になる', () async {
+    final raw = sqlite3.openInMemory();
+    createV2Schema(raw);
+    raw
+      ..execute(
+        'ALTER TABLE words ADD COLUMN translation_language '
+        "TEXT NOT NULL DEFAULT 'ja'",
+      )
+      ..execute('PRAGMA user_version = 3')
+      ..execute(
+        'INSERT INTO words (word, japanese, created_at, updated_at) '
+        "VALUES ('apple', 'りんご', 0, 0)",
+      )
+      ..execute(
+        'INSERT INTO dictionary_cache_entries (word, response_json, fetched_at) '
+        """VALUES ('apple', '[{"word":"apple"}]', 0)""",
+      );
+
+    final db = AppDatabase.forTesting(NativeDatabase.opened(raw));
+    addTearDown(db.close);
+
+    final word = (await db.wordDao.getAll()).single;
+    expect(word.translationLanguage, 'ja');
+    expect(await db.dictionaryCacheDao.find('apple'), isNull);
+    expect(raw.userVersion, 4);
+  });
+
   test('新規 DB は最新スキーマで作られ、deleted_words が使える', () async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);

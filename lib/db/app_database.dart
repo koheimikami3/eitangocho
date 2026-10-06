@@ -42,8 +42,21 @@ class AppDatabase extends _$AppDatabase {
       // v3 → v4 は列の追加と、辞書キャッシュの削除。キャッシュは訳語を
       // 日本語だけに絞って保存していたため、中国語の訳語を引けない。
       // 次の自動入力で kaikki から入れ直される(KaikkiApiClient._parseJsonl)。
+      //
+      // 列が既にあれば足さない。v4 で列を足した DB を v3 のアプリが開くと、
+      // drift は列を残したまま user_version だけ 3 に書き戻すため、v4 で
+      // 開き直すと ADD COLUMN が重複で失敗し、DB ごと開けなくなる(ストアでは
+      // 戻せないが、開発機でリリース構成のビルドと旧ストア版が同居すると起きる)。
       if (from < 4) {
-        await m.addColumn(words, words.translationLanguage);
+        final columns = await m.database
+            .customSelect("SELECT name FROM pragma_table_info('words')")
+            .get();
+        final hasColumn = columns.any(
+          (row) => row.read<String>('name') == words.translationLanguage.name,
+        );
+        if (!hasColumn) {
+          await m.addColumn(words, words.translationLanguage);
+        }
         await m.database.customStatement(
           'DELETE FROM dictionary_cache_entries',
         );
