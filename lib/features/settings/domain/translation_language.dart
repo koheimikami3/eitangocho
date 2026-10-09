@@ -23,6 +23,20 @@ enum TranslationLanguage {
     tatoebaScript: 'Hant',
     deeplTargetLang: 'ZH-HANT',
     googleTranslateCode: 'zh-TW',
+  ),
+  es(
+    storageCode: 'es',
+    kaikkiLangCode: 'es',
+    tatoebaLang: 'spa',
+    deeplTargetLang: 'ES',
+    googleTranslateCode: 'es',
+  ),
+  fr(
+    storageCode: 'fr',
+    kaikkiLangCode: 'fr',
+    tatoebaLang: 'fra',
+    deeplTargetLang: 'FR',
+    googleTranslateCode: 'fr',
   );
 
   const TranslationLanguage({

@@ -300,4 +300,35 @@ void main() {
       );
     });
   });
+
+  test('スペイン語は spa の訳を求め、文字体系では絞らない', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        jsonEncode({
+          'data': [
+            {
+              'text': 'How did you achieve that so quickly?',
+              'lang': 'eng',
+              'translations': [
+                {
+                  'lang': 'spa',
+                  'script': null,
+                  'text': '¿Cómo lo lograste tan rápido?',
+                },
+              ],
+            },
+          ],
+        }),
+        200,
+      ),
+    );
+
+    final example = await mock.client.findExample(
+      'achieve',
+      TranslationLanguage.es,
+    );
+
+    expect(mock.requests.single.queryParameters['trans:lang'], 'spa');
+    expect(example!.translation, '¿Cómo lo lograste tan rápido?');
+  });
 }

@@ -27,6 +27,13 @@ void main() {
       expect(AppLocale.resolve(const [Locale('zh', 'HK')]), AppLocale.zhHant);
     });
 
+    test('スペイン語・フランス語は地域によらず 1 つにまとめる', () {
+      expect(AppLocale.resolve(const [Locale('es', 'MX')]), AppLocale.es);
+      expect(AppLocale.resolve(const [Locale('es', 'ES')]), AppLocale.es);
+      expect(AppLocale.resolve(const [Locale('fr', 'CA')]), AppLocale.fr);
+      expect(AppLocale.resolve(const [Locale('fr', 'FR')]), AppLocale.fr);
+    });
+
     test('簡体字は対応言語として扱わず、次の候補へ進む', () {
       const hans = Locale.fromSubtags(
         languageCode: 'zh',
@@ -47,10 +54,18 @@ void main() {
     });
   });
 
-  test('訳の言語の既定は、繁体字の画面だけ繁体字、それ以外は日本語', () {
+  test('訳の言語の既定は、画面と同じ言語があればそれ、無ければ日本語', () {
     expect(
       AppLocale.defaultTranslationLanguage(AppLocale.zhHant),
       TranslationLanguage.zhHant,
+    );
+    expect(
+      AppLocale.defaultTranslationLanguage(AppLocale.es),
+      TranslationLanguage.es,
+    );
+    expect(
+      AppLocale.defaultTranslationLanguage(AppLocale.fr),
+      TranslationLanguage.fr,
     );
     expect(
       AppLocale.defaultTranslationLanguage(AppLocale.ja),
