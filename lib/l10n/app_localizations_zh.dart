@@ -13,6 +13,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '繁體中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -23,6 +25,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -570,6 +574,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '繁體中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -580,6 +586,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';

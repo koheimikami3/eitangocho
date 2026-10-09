@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
-  "translationLanguageName": "{language, select, ja{Japanese} zhHant{Chinese (Traditional)} other{}}",
-  "translationLanguageShortName": "{language, select, ja{Japanese} zhHant{Chinese} other{}}",
+  "translationLanguageName": "{language, select, ja{Japanese} zhHant{Chinese (Traditional)} es{Spanish} fr{French} other{}}",
+  "translationLanguageShortName": "{language, select, ja{Japanese} zhHant{Chinese} es{Spanish} fr{French} other{}}",
   "navLearning": "Learning",
   "navLearningWords": "Words in progress",
   "navAllWords": "All words",

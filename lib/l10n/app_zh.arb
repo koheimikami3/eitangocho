@@ -1,7 +1,7 @@
 {
   "@@locale": "zh",
-  "translationLanguageName": "{language, select, ja{日文} zhHant{繁體中文} other{}}",
-  "translationLanguageShortName": "{language, select, ja{日文} zhHant{中文} other{}}",
+  "translationLanguageName": "{language, select, ja{日文} zhHant{繁體中文} es{西班牙文} fr{法文} other{}}",
+  "translationLanguageShortName": "{language, select, ja{日文} zhHant{中文} es{西班牙文} fr{法文} other{}}",
   "navLearning": "學習中",
   "navLearningWords": "學習中的單字",
   "navAllWords": "全部單字",
