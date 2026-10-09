@@ -105,6 +105,10 @@
     }
   },
   "autoFill": "自動入力",
+  "autoFillBadge": "自動入力",
+  "@autoFillBadge": {
+    "description": "自動取得できた項目のラベル横のバッジ。ボタンの autoFill と同じ語で済む言語でも、バッジに収まる短さを優先して別に持つ"
+  },
   "skipToManual": "スキップして手動で入力する",
   "fetchingDictionary": "辞書データを取得中...",
   "exampleTranslationFailed": "例文の{language}訳を取得できませんでした。手動で入力できます。",

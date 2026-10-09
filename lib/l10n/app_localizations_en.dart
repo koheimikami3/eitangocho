@@ -151,6 +151,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoFill => 'Auto-fill';
 
   @override
+  String get autoFillBadge => 'Auto-fill';
+
+  @override
   String get skipToManual => 'Skip and enter manually';
 
   @override

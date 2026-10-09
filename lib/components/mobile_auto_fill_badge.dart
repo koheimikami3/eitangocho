@@ -16,7 +16,7 @@ class MobileAutoFillBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
-        context.l10n.autoFill,
+        context.l10n.autoFillBadge,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,

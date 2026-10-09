@@ -309,6 +309,12 @@ abstract class AppLocalizations {
   /// **'自動入力'**
   String get autoFill;
 
+  /// 自動取得できた項目のラベル横のバッジ。ボタンの autoFill と同じ語で済む言語でも、バッジに収まる短さを優先して別に持つ
+  ///
+  /// In ja, this message translates to:
+  /// **'自動入力'**
+  String get autoFillBadge;
+
   /// No description provided for @skipToManual.
   ///
   /// In ja, this message translates to:

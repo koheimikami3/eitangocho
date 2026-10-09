@@ -139,6 +139,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoFill => '自動填入';
 
   @override
+  String get autoFillBadge => '自動填入';
+
+  @override
   String get skipToManual => '略過，改為手動輸入';
 
   @override
@@ -698,6 +701,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get autoFill => '自動填入';
+
+  @override
+  String get autoFillBadge => '自動填入';
 
   @override
   String get skipToManual => '略過，改為手動輸入';

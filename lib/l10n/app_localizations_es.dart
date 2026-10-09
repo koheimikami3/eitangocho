@@ -152,6 +152,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get autoFill => 'Autocompletar';
 
   @override
+  String get autoFillBadge => 'Autocompletado';
+
+  @override
   String get skipToManual => 'Omitir y escribir manualmente';
 
   @override

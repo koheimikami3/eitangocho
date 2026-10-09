@@ -34,6 +34,7 @@
   "manualInputHint": "Escribe manualmente",
   "registrationIntro": "Escribe una palabra en inglés y se completarán desde el diccionario su pronunciación, su traducción al {language}, ejemplos y más.",
   "autoFill": "Autocompletar",
+  "autoFillBadge": "Autocompletado",
   "skipToManual": "Omitir y escribir manualmente",
   "fetchingDictionary": "Buscando en el diccionario...",
   "exampleTranslationFailed": "No se pudo obtener la traducción del ejemplo al {language}. Puedes escribirla manualmente.",

@@ -151,6 +151,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoFill => 'Remplir automatiquement';
 
   @override
+  String get autoFillBadge => 'Automatique';
+
+  @override
   String get skipToManual => 'Passer et saisir manuellement';
 
   @override
