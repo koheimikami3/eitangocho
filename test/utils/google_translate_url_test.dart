@@ -23,5 +23,13 @@ void main() {
       googleTranslateUrl('apple', TranslationLanguage.zhHant).toString(),
       'https://translate.google.com/?sl=en&tl=zh-TW&text=apple&op=translate',
     );
+    expect(
+      googleTranslateUrl('apple', TranslationLanguage.es).toString(),
+      'https://translate.google.com/?sl=en&tl=es&text=apple&op=translate',
+    );
+    expect(
+      googleTranslateUrl('apple', TranslationLanguage.fr).toString(),
+      'https://translate.google.com/?sl=en&tl=fr&text=apple&op=translate',
+    );
   });
 }

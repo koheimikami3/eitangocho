@@ -1,0 +1,6 @@
+/* スペイン語の端末ではアプリ名を現地名にする。固定の文字列で上書きするため、
+   Debug ビルドの「dev」表記はこの言語では付かない(許容している)。
+   ホーム画面で省略されないよう短い名前にしている。 */
+"CFBundleDisplayName" = "Vocab Inglés";
+"CFBundleName" = "Vocab Inglés";
+"NSUserTrackingUsageDescription" = "Se usa para que los anuncios de la app se ajusten mejor a tus intereses.";

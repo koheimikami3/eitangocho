@@ -34,6 +34,12 @@ const achieveJsonl = '''
 {"word":"achieve","pos":"verb","senses":[],"translations":[{"lang":"Japanese","code":"ja","lang_code":"ja","word":"達成する"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"實現 /实现"},{"lang":"Chinese","code":"nan-hbl","lang_code":"nan-hbl","word":"達成"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"達到 /达到"},{"lang":"Chinese Mandarin","code":"cmn","lang_code":"cmn","word":"完成"}]}
 ''';
 
+/// `achieve` の訳語(スペイン語とフランス語)。実レスポンスでは
+/// スペイン語の同じ訳語が語義ごとに重複して来る。字形の違いは無く、素の語で来る。
+const achieveEsFrJsonl = '''
+{"word":"achieve","pos":"verb","senses":[],"translations":[{"lang":"French","code":"fr","lang_code":"fr","word":"accomplir"},{"lang":"French","code":"fr","lang_code":"fr","word":"réaliser"},{"lang":"Spanish","code":"es","lang_code":"es","word":"conseguir"},{"lang":"Spanish","code":"es","lang_code":"es","word":"lograr"},{"lang":"Spanish","code":"es","lang_code":"es","word":"conseguir"},{"lang":"Spanish","code":"es","lang_code":"es","word":"lograr"}]}
+''';
+
 void main() {
   late AppDatabase db;
   var kaikkiCallCount = 0;
@@ -284,11 +290,11 @@ void main() {
     expect(info!.meaning.split(' / '), hasLength(5));
   });
 
-  test('日本語以外の訳語はキャッシュにも日本語訳にも残さない', () async {
+  test('対応外の言語の訳語はキャッシュにも訳にも残さない', () async {
     final provider = buildProvider(
       kaikkiResponse: () => utf8Response(
         '{"word":"x","pos":"verb","senses":[],"translations":['
-        '{"lang_code":"fr","word":"abandonner"},'
+        '{"lang_code":"de","word":"aufgeben"},'
         '{"lang_code":"ja","word":"諦める"}]}',
         200,
       ),
@@ -297,10 +303,7 @@ void main() {
     final info = await provider.fetch('x');
 
     expect(info!.meaning, '諦める');
-    expect(
-      await db.dictionaryCacheDao.find('x'),
-      isNot(contains('abandonner')),
-    );
+    expect(await db.dictionaryCacheDao.find('x'), isNot(contains('aufgeben')));
   });
 
   test('kaikki・EJDict 両 miss で例文も無ければ null(未収録)', () async {
@@ -480,6 +483,59 @@ void main() {
 
       expect(info!.exampleEn, 'How did you achieve that so quickly?');
       expect(info.exampleTranslation, '你怎麼這麼快就完成了？');
+    });
+  });
+
+  group('訳の言語がスペイン語・フランス語', () {
+    test('EJDict は引かず、kaikki の訳語をそのまま重複を畳んで採る', () async {
+      await seedEjdict({'achieve': '成し遂げる'});
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveEsFrJsonl, 200),
+        translationLanguage: TranslationLanguage.es,
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.meaning, 'conseguir / lograr');
+      expect(info.translationLanguage, TranslationLanguage.es);
+    });
+
+    test('フランス語は同じキャッシュからフランス語の訳語を採る', () async {
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveEsFrJsonl, 200),
+        translationLanguage: TranslationLanguage.fr,
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.meaning, 'accomplir / réaliser');
+      expect(info.translationLanguage, TranslationLanguage.fr);
+    });
+
+    test('Tatoeba のスペイン語の訳を例文の訳にする', () async {
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(achieveEsFrJsonl, 200),
+        tatoebaResponseFn: () => utf8Response(
+          jsonEncode({
+            'data': [
+              {
+                'text': 'How did you achieve that so quickly?',
+                'translations': [
+                  {'lang': 'jpn', 'text': 'どうやってそんなに早く達成したの?'},
+                  {'lang': 'spa', 'text': '¿Cómo lo lograste tan rápido?'},
+                ],
+              },
+            ],
+          }),
+          200,
+        ),
+        translationLanguage: TranslationLanguage.es,
+      );
+
+      final info = await provider.fetch('achieve');
+
+      expect(info!.exampleEn, 'How did you achieve that so quickly?');
+      expect(info.exampleTranslation, '¿Cómo lo lograste tan rápido?');
     });
   });
 }

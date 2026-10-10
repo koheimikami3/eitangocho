@@ -20,7 +20,7 @@
 | IPA(米音優先)・品詞・英例文 | kaikki.org(Wiktionary を構造化した静的 JSONL) |
 | 英例文 + 対訳 | Tatoeba(`api.tatoeba.org/unstable/sentences`) |
 | 単語の訳(日本語) | EJDict-hand(同梱、初回起動時に DB へ取込)。未収録なら kaikki の `translations`(ja) |
-| 単語の訳(繁体字中国語) | kaikki の `translations`(cmn。`實現 /实现` の繁体字側だけ採る) |
+| 単語の訳(日本語以外) | kaikki の `translations`(繁体字は cmn の `實現 /实现` の繁体字側だけ採る) |
 | 例文の訳 | Tatoeba の対訳(繁体字は `script == Hant` の訳だけ。字形変換はしない) |
 | 例文の訳(予備) | DeepL API Free(設定 UI は隠してある。コードとチェーンは残す) |
 | 発音 | Google 翻訳の URL を生成して開く(音声は再生しない) |
@@ -41,9 +41,9 @@
 ## 多言語化
 
 - **画面の表示言語と訳の言語は別に持つ。** 表示言語は端末の優先言語から
-  `AppLocale.resolve` で決める(ja / zh-Hant / en。簡体字・対応外は en)。訳の言語は
-  設定(`TranslationLanguage`)で、既定は繁体字の画面だけ zh-Hant、他は ja。
-  英語の画面を使う日本語話者(海外在住など)がいるため
+  `AppLocale.resolve` で決める(ja / zh-Hant / es / fr / en。es / fr は地域を区別しない。
+  簡体字・対応外は en)。訳の言語は設定(`TranslationLanguage`)で、既定は画面と同じ
+  言語があればそれ、無ければ ja。英語の画面を使う日本語話者(海外在住など)がいるため
 - **訳は DB の `japanese` / `example_ja` 列と同期 JSON の `japanese` / `exampleJa` を
   言語によらず使い回す**(Dart 側の名前だけ `meaning` / `exampleTranslation`)。
   言語ごとに列を足すと、古い版の端末が同期ファイルを書き戻すときに未知のキーを
@@ -59,7 +59,8 @@
 - 言語を足すときは、`TranslationLanguage` に値を足して各取得元のコードを埋め、
   ARB(`lib/l10n/`)・`AppLocale`・両 OS の `CFBundleLocalizations` と
   `InfoPlist.strings`・ストアの掲載情報を揃える。ストアのリリースノートも
-  言語ごとに要る
+  言語ごとに要る。辞書キャッシュは対応言語の訳語だけを残して保存しているので、
+  `schemaVersion` を上げて捨て直す(残すと登録済みの語で新しい言語の訳が空になる)
 
 ## データ・同期
 

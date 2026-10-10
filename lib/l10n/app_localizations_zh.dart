@@ -13,6 +13,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '繁體中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -23,6 +25,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -133,6 +137,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get autoFill => '自動填入';
+
+  @override
+  String get autoFillBadge => '自動填入';
 
   @override
   String get skipToManual => '略過，改為手動輸入';
@@ -570,6 +577,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '繁體中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -580,6 +589,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日文',
       'zhHant': '中文',
+      'es': '西班牙文',
+      'fr': '法文',
       'other': '',
     });
     return '$_temp0';
@@ -690,6 +701,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get autoFill => '自動填入';
+
+  @override
+  String get autoFillBadge => '自動填入';
 
   @override
   String get skipToManual => '略過，改為手動輸入';

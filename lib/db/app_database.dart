@@ -23,8 +23,9 @@ class AppDatabase extends _$AppDatabase {
   /// v2: deleted_words を追加(iCloud 同期で削除を伝播させるため)
   /// v3: dictionary_cache_entries の中身を捨てる(辞書ソースの入れ替え)
   /// v4: words.translation_language を追加し、辞書キャッシュを捨てる(多言語化)
+  /// v5: 辞書キャッシュを捨てる(訳の言語にスペイン語・フランス語を追加)
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -57,6 +58,15 @@ class AppDatabase extends _$AppDatabase {
         if (!hasColumn) {
           await m.addColumn(words, words.translationLanguage);
         }
+        await m.database.customStatement(
+          'DELETE FROM dictionary_cache_entries',
+        );
+      }
+      // v4 → v5 は辞書キャッシュの削除のみ。キャッシュは訳語を ja / cmn に
+      // 絞って保存していたため、スペイン語・フランス語の訳語を引けない。
+      // 訳の言語を足すたびに、ここで捨て直す必要がある。v3 からの更新では
+      // 上で既に捨てているが、二度消しても害は無い。
+      if (from < 5) {
         await m.database.customStatement(
           'DELETE FROM dictionary_cache_entries',
         );

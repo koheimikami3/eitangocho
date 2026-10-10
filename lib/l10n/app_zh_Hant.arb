@@ -1,7 +1,7 @@
 {
   "@@locale": "zh_Hant",
-  "translationLanguageName": "{language, select, ja{日文} zhHant{繁體中文} other{}}",
-  "translationLanguageShortName": "{language, select, ja{日文} zhHant{中文} other{}}",
+  "translationLanguageName": "{language, select, ja{日文} zhHant{繁體中文} es{西班牙文} fr{法文} other{}}",
+  "translationLanguageShortName": "{language, select, ja{日文} zhHant{中文} es{西班牙文} fr{法文} other{}}",
   "navLearning": "學習中",
   "navLearningWords": "學習中的單字",
   "navAllWords": "全部單字",
@@ -34,6 +34,7 @@
   "manualInputHint": "請手動輸入",
   "registrationIntro": "輸入英文單字，就會從字典自動取得音標、{language}翻譯、例句等資訊。",
   "autoFill": "自動填入",
+  "autoFillBadge": "自動填入",
   "skipToManual": "略過，改為手動輸入",
   "fetchingDictionary": "正在查詢字典⋯",
   "exampleTranslationFailed": "無法取得例句的{language}翻譯，可以手動輸入。",

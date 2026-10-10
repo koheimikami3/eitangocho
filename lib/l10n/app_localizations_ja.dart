@@ -13,6 +13,8 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日本語',
       'zhHant': '中国語(繁体字)',
+      'es': 'スペイン語',
+      'fr': 'フランス語',
       'other': '',
     });
     return '$_temp0';
@@ -23,6 +25,8 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(language, {
       'ja': '日本語',
       'zhHant': '中国語',
+      'es': 'スペイン語',
+      'fr': 'フランス語',
       'other': '',
     });
     return '$_temp0';
@@ -133,6 +137,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get autoFill => '自動入力';
+
+  @override
+  String get autoFillBadge => '自動入力';
 
   @override
   String get skipToManual => 'スキップして手動で入力する';

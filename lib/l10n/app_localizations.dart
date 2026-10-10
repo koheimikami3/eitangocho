@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
 import 'app_localizations_ja.dart';
 import 'app_localizations_zh.dart';
 
@@ -96,6 +98,8 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
     Locale('ja'),
     Locale('zh'),
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
@@ -104,13 +108,13 @@ abstract class AppLocalizations {
   /// 訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name
   ///
   /// In ja, this message translates to:
-  /// **'{language, select, ja{日本語} zhHant{中国語(繁体字)} other{}}'**
+  /// **'{language, select, ja{日本語} zhHant{中国語(繁体字)} es{スペイン語} fr{フランス語} other{}}'**
   String translationLanguageName(String language);
 
-  /// 訳の言語の短い名前(項目名・出題方向に差し込む)
+  /// 訳の言語の短い名前(項目名・出題方向に差し込む)。es / fr は文中に差し込むので小文字で書く
   ///
   /// In ja, this message translates to:
-  /// **'{language, select, ja{日本語} zhHant{中国語} other{}}'**
+  /// **'{language, select, ja{日本語} zhHant{中国語} es{スペイン語} fr{フランス語} other{}}'**
   String translationLanguageShortName(String language);
 
   /// No description provided for @navLearning.
@@ -304,6 +308,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'自動入力'**
   String get autoFill;
+
+  /// 自動取得できた項目のラベル横のバッジ。ボタンの autoFill と同じ語で済む言語でも、バッジに収まる短さを優先して別に持つ
+  ///
+  /// In ja, this message translates to:
+  /// **'自動入力'**
+  String get autoFillBadge;
 
   /// No description provided for @skipToManual.
   ///
@@ -1073,7 +1083,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'ja', 'zh'].contains(locale.languageCode);
+      <String>['en', 'es', 'fr', 'ja', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1096,6 +1106,10 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
     case 'ja':
       return AppLocalizationsJa();
     case 'zh':
