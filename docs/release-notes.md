@@ -22,6 +22,37 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.7.0 (build 18)
+
+iOS・macOS 共通。今回からスペイン語・フランス語のローカリゼーションがあり、新機能の欄は 4 言語ぶん入れる
+(スペイン語はメキシコ・スペイン、フランス語はフランス・カナダの掲載にそれぞれ同じ文面)。
+
+日本語:
+
+```
+スペイン語とフランス語に対応しました。
+```
+
+繁體中文:
+
+```
+新增西班牙文與法文介面與翻譯。
+```
+
+Español:
+
+```
+Añadimos el español y el francés para la interfaz y las traducciones.
+```
+
+Français:
+
+```
+Ajout de l'espagnol et du français pour l'interface et les traductions.
+```
+
+---
+
 ## 2.6.0 (build 17)
 
 macOS のみ(iOS は出していない)。2.5.0 と同じく新機能の欄は日本語と繁體中文の 2 言語ぶん入れる。
