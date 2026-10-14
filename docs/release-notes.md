@@ -22,6 +22,66 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.8.0 (build 19)
+
+両プラットフォームに出したが、利用者から見える変化は iOS の入力まわり(キーボードとタブバー、英字キーボード、
+「完了」キー、欄の外のタップで閉じる)だけなので文面を分ける。新機能の欄は 2.7.0 と同じく 4 言語ぶん入れる。
+計測の追加と、検索を英単語だけに一致させた変更は掲載していない。
+
+### iOS
+
+日本語:
+
+```
+入力欄の使い勝手を改善しました。
+```
+
+繁體中文:
+
+```
+改善了輸入欄位的使用體驗。
+```
+
+Español:
+
+```
+Mejoramos la facilidad de uso de los campos de texto.
+```
+
+Français:
+
+```
+Amélioration de l'ergonomie des champs de saisie.
+```
+
+### macOS
+
+日本語:
+
+```
+今後の機能改善に向けて、アプリ内部の仕組みを整えました。
+```
+
+繁體中文:
+
+```
+為了日後改善功能，調整了 App 的內部架構。
+```
+
+Español:
+
+```
+Mejoramos el funcionamiento interno de la app para futuras mejoras.
+```
+
+Français:
+
+```
+Amélioration du fonctionnement interne de l'app en vue de futures évolutions.
+```
+
+---
+
 ## 2.7.0 (build 18)
 
 iOS・macOS 共通。今回からスペイン語・フランス語のローカリゼーションがあり、新機能の欄は 4 言語ぶん入れる
