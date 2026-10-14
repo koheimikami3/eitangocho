@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/sync/data/sync_service.dart';
 import 'package:eitangocho/features/sync/domain/cloud_file_store.dart';
 import 'package:eitangocho/features/sync/domain/sync_state.dart';
@@ -202,18 +203,23 @@ class SyncNotifier extends Notifier<SyncState> {
       state = state.copyWith(syncing: false, lastSyncedAt: now);
     } on CloudNotReadyException catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(syncing: false, failure: _failureOf(e));
+      _fail(_failureOf(e));
       _scheduleRetry();
     } on CloudUnavailableException catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(syncing: false, failure: _failureOf(e));
+      _fail(_failureOf(e));
     } on Object catch (e) {
       if (!ref.mounted) return;
-      state = state.copyWith(
-        syncing: false,
-        failure: SyncFailure(reason: CloudFailureReason.failed, detail: '$e'),
-      );
+      _fail(SyncFailure(reason: CloudFailureReason.failed, detail: '$e'));
     }
+  }
+
+  /// 失敗を画面に出し、計測にも送る(送るのは理由だけで detail は送らない)。
+  /// 準備待ち(notCurrent)は再試行のたびに送るので、件数ではなく
+  /// ユーザー数で見ること。
+  void _fail(SyncFailure failure) {
+    state = state.copyWith(syncing: false, failure: failure);
+    ref.read(analyticsLoggerProvider).logSyncFailed(failure.reason);
   }
 
   static SyncFailure _failureOf(CloudUnavailableException e) =>

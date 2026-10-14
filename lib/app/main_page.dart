@@ -1,5 +1,6 @@
 import 'package:eitangocho/app/shells/sidebar_shell.dart';
 import 'package:eitangocho/app/shells/tab_bar_shell.dart';
+import 'package:eitangocho/features/analytics/data/analytics_reporter.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/word_registration/data/ejdict_importer.dart';
@@ -29,6 +30,8 @@ class MainPage extends ConsumerWidget {
     // また出る、答えた単語の日時が古いまま同じ単語が選ばれる)。常に購読しておく。
     // watch ではなく listen にするのは、単語の更新のたびにシェルを作り直さないため。
     ref.listen(learnedWordsProvider, (_, _) {});
+    // 計測のユーザープロパティと主画面の screen_view。起動から終了まで購読する。
+    ref.listen(analyticsReporterProvider, (_, _) {});
 
     return AppPlatform.isMacOS ? const SidebarShell() : const TabBarShell();
   }

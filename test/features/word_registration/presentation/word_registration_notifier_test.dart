@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/analytics/data/analytics_client.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../analytics/fake_analytics_client.dart';
 import '../../review/review_test_overrides.dart';
 
 /// autoFill のテスト用フェイク(実 API を呼ばない)。
@@ -31,11 +33,16 @@ void main() {
   late AppDatabase db;
   late ProviderContainer container;
 
-  ProviderContainer buildContainer({WordInfoProvider? wordInfoProvider}) {
+  ProviderContainer buildContainer({
+    WordInfoProvider? wordInfoProvider,
+    FakeAnalyticsClient? analytics,
+  }) {
     final c = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
         reviewDisabled,
+        if (analytics != null)
+          analyticsClientProvider.overrideWithValue(analytics),
         if (wordInfoProvider != null)
           wordInfoProviderProvider.overrideWithValue(wordInfoProvider),
       ],
@@ -474,6 +481,81 @@ void main() {
           );
 
       expect((await db.wordDao.getAll()).single.word, 'give up');
+    });
+  });
+
+  group('計測', () {
+    const fetchedInfo = WordInfo(
+      word: 'give up',
+      ipa: '/ɡɪv ʌp/',
+      meaning: 'あきらめる',
+      exampleEn: 'Never give up.',
+    );
+
+    test('自動入力の結果を送る(取得・未収録・失敗)', () async {
+      final analytics = FakeAnalyticsClient();
+      final results = <Future<WordInfo?> Function()>[
+        () async => fetchedInfo,
+        () async => null,
+        () async => throw const WordInfoException('offline'),
+      ];
+      container = buildContainer(
+        analytics: analytics,
+        wordInfoProvider: _FakeWordInfoProvider((_) => results.removeAt(0)()),
+      );
+      final notifier = container.read(wordRegistrationProvider.notifier);
+
+      await notifier.autoFill('give up');
+      await notifier.autoFill('zzzzz');
+      await notifier.autoFill('apple');
+
+      expect(analytics.eventsNamed('autofill_result'), [
+        {'result': 'success', 'notice': 'none', 'is_phrase': 'true'},
+        {'result': 'not_found', 'is_phrase': 'false'},
+        {'result': 'fetch_failed', 'is_phrase': 'false'},
+      ]);
+    });
+
+    test('自動入力の値から書き換えた項目を送る(前後の空白は書き換えとみなさない)', () async {
+      final analytics = FakeAnalyticsClient();
+      container = buildContainer(
+        analytics: analytics,
+        wordInfoProvider: _FakeWordInfoProvider((_) async => fetchedInfo),
+      );
+      final notifier = container.read(wordRegistrationProvider.notifier);
+      await notifier.autoFill('give up');
+
+      await notifier.save(
+        word: 'give up',
+        ipa: ' /ɡɪv ʌp/ ',
+        meaning: '諦める',
+        exampleEn: 'Never give up.',
+        exampleTranslation: '',
+      );
+
+      expect(analytics.eventsNamed('word_registered').single, {
+        'method': 'autofill',
+        'edited_meaning': 'true',
+        'edited_example': 'false',
+        'edited_ipa': 'false',
+      });
+    });
+
+    test('保存できなかったときは登録を送らない', () async {
+      final analytics = FakeAnalyticsClient();
+      container = buildContainer(analytics: analytics);
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .save(
+            word: 'apple',
+            ipa: '',
+            meaning: '',
+            exampleEn: '',
+            exampleTranslation: '',
+          );
+
+      expect(analytics.eventsNamed('word_registered'), isEmpty);
     });
   });
 }

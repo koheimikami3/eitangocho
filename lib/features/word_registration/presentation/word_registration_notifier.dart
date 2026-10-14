@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:drift/drift.dart' show Value;
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/settings/domain/translation_language.dart';
@@ -43,12 +45,19 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
     // 辞書を引く前に重複を弾く(登録できない単語のために通信しない)。
     if (await _rejectIfDuplicate(word)) return;
     state = state.copyWith(step: RegistrationStep.loading, error: null);
+    // 句(空白を含む見出し語)は辞書の収録が薄いので、取得率を分けて見る。
+    final isPhrase = word.contains(' ');
     try {
       final info = await ref.read(wordInfoProviderProvider).fetch(word);
       // fetch 中に画面を離れると自動破棄されるため、破棄後は state に触らない
       if (!ref.mounted) return;
+      final analytics = ref.read(analyticsLoggerProvider);
       if (info == null) {
         state = state.copyWith(step: RegistrationStep.form, notFound: true);
+        analytics.logAutofillResult(
+          result: AutofillResult.notFound,
+          isPhrase: isPhrase,
+        );
         return;
       }
       // WordInfoProvider 抽象は翻訳失敗を返せないため、「英例文はあるのに
@@ -63,12 +72,23 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         translationFailed:
             info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty,
       );
+      analytics.logAutofillResult(
+        result: AutofillResult.success,
+        isPhrase: isPhrase,
+        notice: state.notice,
+      );
     } on WordInfoException {
       if (!ref.mounted) return;
       state = state.copyWith(
         step: RegistrationStep.input,
         error: const RegistrationError.fetchFailed(),
       );
+      ref
+          .read(analyticsLoggerProvider)
+          .logAutofillResult(
+            result: AutofillResult.fetchFailed,
+            isPhrase: isPhrase,
+          );
     }
   }
 
@@ -149,6 +169,19 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
             audioUrl: Value(state.fetched?.audioUrl ?? ''),
             translationLanguage: Value(language.storageCode),
           ),
+        );
+    // 自動入力の値をどの項目で書き換えたか(自動入力の品質の指標)。
+    // フォームには取得値がそのまま入るので、保存値(trim 後)と比べる。
+    final fetched = state.fetched;
+    ref
+        .read(analyticsLoggerProvider)
+        .logWordRegistered(
+          autoFilled: fetched != null,
+          editedMeaning:
+              fetched != null && fetched.meaning.trim() != meaning.trim(),
+          editedExample:
+              fetched != null && fetched.exampleEn.trim() != exampleEn.trim(),
+          editedIpa: fetched != null && fetched.ipa.trim() != ipa.trim(),
         );
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。
     // macOS / iOS で共有するこの Notifier を呼び出し口にする。true を返すと

@@ -159,10 +159,20 @@
 
 ## 計測
 
-- Firebase Analytics(プロジェクト `eitangocho-8d6dd`)で、自動収集イベントだけを取る。
-  **Firebase に登録するのは本番の Bundle ID だけ**で、debug は初期化しない。
-  dev 用の Firebase プロジェクトは持たない(本番の計測に開発中の起動を混ぜないため)
-- iOS と macOS は Bundle ID が同じなので、Firebase 上は 1 つの Apple アプリを共有する
+- Firebase Analytics(プロジェクト `eitangocho-8d6dd`)。自動収集に加え、独自イベントと
+  ユーザープロパティを `AnalyticsLogger` / `analyticsReporterProvider` から送る。
+  **Firebase に登録するのは本番の Bundle ID だけ**で、debug は初期化しない(送る内容は
+  `[analytics]` ログに出る)。dev 用の Firebase プロジェクトは持たない(本番の計測に
+  開発中の起動を混ぜないため)
+- **イベント・パラメータは「値によってどの判断が変わるか」を言えるものだけ足す。**
+  GA4 の画面で見られるパラメータはカスタムディメンション・指標として登録した分だけで、
+  枠は iOS / macOS / Android の合計で決まる。名前と値は変えると過去のデータとつながらない
+- **ユーザーが入力した中身(単語・訳・例文・検索語)と OS のエラー文言は送らない。**
+  送るのは区分と件数だけ(App Privacy の申告を「製品の操作」に留めるため)
+- iOS と macOS は Bundle ID が同じなので、Firebase 上は 1 つの Apple アプリを共有する。
+  プラットフォームはユーザープロパティ `app_platform` で分ける
+- 自動の screen_view は Info.plist で止めている(Flutter は画面が 1 つで意味のある名前が
+  出ない)。画面遷移はアプリから送る
 - `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする
 - `flutterfire configure` は pbxproj を丸ごと書き直して並び順を崩す。再実行したら、
   plist の追加分だけを残して他の差分は戻す

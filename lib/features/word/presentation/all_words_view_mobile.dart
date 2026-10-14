@@ -6,7 +6,7 @@ import 'package:eitangocho/features/settings/domain/word_sort_order.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_row.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
-import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/features/word/presentation/word_learned_toggle.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,10 +59,8 @@ class AllWordsViewMobile extends ConsumerWidget {
           word: word,
           showIpa: showIpa,
           showCorrectCount: sortGroup == WordSortGroup.correctCount,
-          onToggleLearned: (isLearned) => ref
-              .read(databaseProvider)
-              .wordDao
-              .setLearned(word.id, isLearned: isLearned),
+          onToggleLearned: (isLearned) =>
+              toggleWordLearned(ref, word, isLearned: isLearned),
           onTap: () => showWordEditSheet(context, ref, word),
         );
       },

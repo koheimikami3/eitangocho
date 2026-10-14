@@ -45,5 +45,10 @@
 	     ios/Runner/Info.plist と同じ理由で同じ値を持つ。 -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Firebase Analytics の自動の screen_view を止める。Flutter は画面が
+	     1 つ(FlutterViewController)なので自動では意味のある画面名が出ず、
+	     アプリが送る screen_view(AnalyticsLogger)を汚すため。 -->
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
 </dict>
 </plist>

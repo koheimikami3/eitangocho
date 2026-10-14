@@ -8,6 +8,7 @@ import 'package:eitangocho/components/mobile_sheet.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
@@ -55,6 +56,9 @@ class _WordRegistrationSheetState
   @override
   void initState() {
     super.initState();
+    // iOS の登録はシートなので、主画面の切り替え(analyticsReporterProvider)
+    // には現れない。開いたことをここで送る(macOS の登録ビューと同じ名前)。
+    ref.read(analyticsLoggerProvider).logScreenView('registration');
     // 開くたびに前回の状態が残らないようステップを初期化する
     // (Notifier は keepAlive ではないが、同一セッション中の再オープンに備える)。
     WidgetsBinding.instance.addPostFrameCallback((_) {

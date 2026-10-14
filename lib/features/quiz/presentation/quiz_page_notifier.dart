@@ -1,11 +1,16 @@
 import 'dart:async';
 
+import 'package:eitangocho/app/main_page_notifier.dart';
+import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/domain/quiz_question_selection.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/providers/database_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'quiz_page_notifier.g.dart';
@@ -20,17 +25,45 @@ part 'quiz_page_notifier.g.dart';
 @Riverpod(keepAlive: true)
 class QuizPageNotifier extends _$QuizPageNotifier {
   @override
-  QuizPageState build() => const QuizPageState();
+  QuizPageState build() {
+    // 回の途中でクイズ以外の画面へ移ったら、離脱として計測する。クイズへの
+    // 入口は必ず startQuiz を呼ぶので、戻ってきたときは新しい回になる。
+    ref.listen(mainPageProvider.select((s) => s.view), (previous, next) {
+      if (previous == MainView.quiz && next != MainView.quiz) {
+        _abandonIfActive();
+      }
+    });
+    return const QuizPageState();
+  }
 
   /// 学習済み単語から 1 セッション分を選んで新セッションを開始する
-  /// (選び方は [selectQuizQuestions])。結果画面の「続ける」もここを呼ぶ。
+  /// (選び方は [selectQuizQuestions])。結果画面の「続ける」もここを呼ぶ
+  /// ([trigger] は計測用。どこから始めたか)。
   /// 直前に答えた単語は日時が新しくなって後ろに回るため、次の単語が出る。
-  void startQuiz() {
+  void startQuiz({required QuizTrigger trigger}) {
+    // 回の途中でクイズタブを押し直した場合も、前の回は離脱として数える。
+    _abandonIfActive();
     final questions = selectQuizQuestions(ref.read(learnedWordsProvider));
     state = QuizPageState(
       phase: questions.isEmpty ? QuizPhase.empty : QuizPhase.active,
       questions: questions,
     );
+    final analytics = ref.read(analyticsLoggerProvider);
+    if (questions.isEmpty) {
+      analytics.logQuizEmptyShown();
+    } else {
+      analytics.logQuizStarted(trigger: trigger, questions: questions);
+    }
+  }
+
+  /// 回の途中なら離脱を送り、状態を初期化する(同じ回を二重に数えない)。
+  /// アプリをバックグラウンドのまま終了された回は検知できない。
+  void _abandonIfActive() {
+    if (state.phase != QuizPhase.active) return;
+    ref
+        .read(analyticsLoggerProvider)
+        .logQuizAbandoned(answeredCount: state.index);
+    state = const QuizPageState();
   }
 
   void reveal() => state = state.copyWith(revealed: true);
@@ -70,6 +103,12 @@ class QuizPageNotifier extends _$QuizPageNotifier {
     // 共有しているため、呼び出し口はここ 1 箇所で足りる。
     // 依頼の成否はクイズの進行に関係しないので待たない。
     if (done) {
+      ref
+          .read(analyticsLoggerProvider)
+          .logQuizCompleted(
+            okCount: state.okCount,
+            forgotCount: state.forgotWords.length,
+          );
       unawaited(
         ref
             .read(reviewPrompterProvider)

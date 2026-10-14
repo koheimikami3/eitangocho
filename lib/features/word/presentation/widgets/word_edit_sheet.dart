@@ -9,6 +9,7 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -23,6 +24,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// 「この単語を削除...」からのみ到達する(iOS には右クリックが無く、
 /// デザイン上も長押しメニューを持たないため、ここが唯一の削除導線)。
 Future<void> showWordEditSheet(BuildContext context, WidgetRef ref, Word word) {
+  ref.read(analyticsLoggerProvider).logScreenView('word_edit');
   return showMobileSheet<void>(
     context: context,
     builder: (context) => _WordEditSheet(word: word, ref: ref),

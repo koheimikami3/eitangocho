@@ -8,9 +8,10 @@ part 'tracking_client.g.dart';
 /// SDK の型が [TrackingAuthorizer] より上に漏れないようにする
 /// (`ReviewClient` と同じ方針)。テストではフェイクに差し替える。
 ///
-/// 応答の中身(許可 / 拒否)は呼び出し側では使わないため、どちらのメソッドも
-/// 「確定したか」= `notDetermined` 以外になったか、だけを返す。拒否されても
-/// 非パーソナライズ広告は出せるので、広告を出すかどうかの判断には効かない。
+/// 応答の中身(許可 / 拒否)は広告の判断には使わないため、[isSettled] /
+/// [request] は「確定したか」= `notDetermined` 以外になったか、だけを返す。
+/// 拒否されても非パーソナライズ広告は出せるので、広告を出すかどうかの判断には
+/// 効かない。中身は計測(att_status)のためだけに [statusName] で読む。
 abstract interface class TrackingClient {
   /// 許可の状態が確定しているか。true ならダイアログを出す必要はない。
   ///
@@ -24,6 +25,10 @@ abstract interface class TrackingClient {
   /// アクティブでない間に呼ぶと、iOS 15 以降はダイアログを出さずに
   /// `notDetermined` のまま返る。
   Future<bool> request();
+
+  /// 今の許可の状態の名前(`authorized` / `denied` / `restricted` /
+  /// `not_determined` / `not_supported`)。ダイアログは出さない。
+  Future<String> statusName();
 }
 
 /// app_tracking_transparency による実装。
@@ -39,6 +44,16 @@ class AppTrackingTransparencyClient implements TrackingClient {
   Future<bool> request() async =>
       await AppTrackingTransparency.requestTrackingAuthorization() !=
       TrackingStatus.notDetermined;
+
+  @override
+  Future<String> statusName() async =>
+      switch (await AppTrackingTransparency.trackingAuthorizationStatus) {
+        TrackingStatus.authorized => 'authorized',
+        TrackingStatus.denied => 'denied',
+        TrackingStatus.restricted => 'restricted',
+        TrackingStatus.notDetermined => 'not_determined',
+        TrackingStatus.notSupported => 'not_supported',
+      };
 }
 
 /// ATT の実装。テストではフェイクに差し替える。

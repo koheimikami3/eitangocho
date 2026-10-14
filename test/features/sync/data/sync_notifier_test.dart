@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/data/analytics_client.dart';
 import 'package:eitangocho/features/sync/data/sync_notifier.dart';
 import 'package:eitangocho/features/sync/data/sync_service.dart';
 import 'package:eitangocho/features/sync/domain/cloud_file_store.dart';
@@ -12,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+import '../../analytics/fake_analytics_client.dart';
 
 /// 呼ばれた回数を数えるだけの保管先。失敗も再現できる。
 class _CountingStore implements CloudFileStore {
@@ -66,10 +69,13 @@ void main() {
     Duration debounce = const Duration(seconds: 5),
     Duration resumeMinInterval = const Duration(seconds: 60),
     Duration notReadyRetryDelay = const Duration(seconds: 30),
+    FakeAnalyticsClient? analytics,
   }) {
     final container = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
+        if (analytics != null)
+          analyticsClientProvider.overrideWithValue(analytics),
         cloudFileStoreProvider.overrideWithValue(store),
         syncProvider.overrideWith(
           () => SyncNotifier(
@@ -141,6 +147,21 @@ void main() {
       const SyncFailure(reason: CloudFailureReason.noICloud),
     );
     expect(state.lastSyncedAt, isNull);
+  });
+
+  test('失敗したら理由だけを計測に送る(OS の説明は送らない)', () async {
+    store.failWith = const CloudUnavailableException(
+      CloudFailureReason.noICloud,
+      'ユーザーのパスを含みうる説明',
+    );
+    final analytics = FakeAnalyticsClient();
+    final container = makeContainer(analytics: analytics);
+
+    await container.read(syncProvider.notifier).setEnabled(enabled: true);
+
+    expect(analytics.eventsNamed('sync_failed'), [
+      {'reason': 'no_icloud'},
+    ]);
   });
 
   group('最新のデータを取得できずに見送ったとき', () {

@@ -5,6 +5,7 @@ import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_quiz_rectangle_ad.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -57,8 +58,9 @@ class MobileQuizResultView extends ConsumerWidget {
             Expanded(
               child: MobileFilledButton(
                 label: context.l10n.quizContinue,
-                onPressed: () =>
-                    ref.read(quizPageProvider.notifier).startQuiz(),
+                onPressed: () => ref
+                    .read(quizPageProvider.notifier)
+                    .startQuiz(trigger: QuizTrigger.continued),
               ),
             ),
             const SizedBox(width: 10),

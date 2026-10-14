@@ -7,6 +7,7 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/word/presentation/widgets/delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
@@ -21,6 +22,7 @@ Future<void> showEditWordDialog(
   WidgetRef ref,
   Word word,
 ) {
+  ref.read(analyticsLoggerProvider).logScreenView('word_edit');
   return showDialog<void>(
     context: context,
     builder: (context) => _EditWordDialog(word: word, ref: ref),

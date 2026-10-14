@@ -7,7 +7,7 @@ import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.d
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_table_header.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_table_row.dart';
-import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/features/word/presentation/word_learned_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,10 +45,8 @@ class AllWordsView extends ConsumerWidget {
                       final word = words[index];
                       return WordTableRow(
                         word: word,
-                        onToggleLearned: (isLearned) => ref
-                            .read(databaseProvider)
-                            .wordDao
-                            .setLearned(word.id, isLearned: isLearned),
+                        onToggleLearned: (isLearned) =>
+                            toggleWordLearned(ref, word, isLearned: isLearned),
                         onTap: () => showEditWordDialog(context, ref, word),
                         showCorrectCount:
                             sortGroup == WordSortGroup.correctCount,

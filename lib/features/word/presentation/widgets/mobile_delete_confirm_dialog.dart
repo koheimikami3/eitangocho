@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ Future<bool> showMobileDeleteConfirmDialog(
   );
 
   if (confirmed ?? false) {
+    ref.read(analyticsLoggerProvider).logWordDeleted(word);
     await ref.read(databaseProvider).wordDao.deleteWord(word.id);
     return true;
   }
