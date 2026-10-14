@@ -17,9 +17,12 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 /// 高さは読み込みが終わるまで分からないため、確定したら
 /// [bannerAdHeightProvider] に流してコンテンツの下余白に反映させる。
 ///
-/// 隠す条件が 2 つある。どちらも [MobileAdSlot] ごとツリーから外して表現する。
+/// 隠す条件が 3 つある。どれも [MobileAdSlot] ごとツリーから外して表現する。
 /// - シートや全画面遷移に覆われている間([RouteAware])
 /// - クイズ結果でレクタングル広告が出ている間([tabBarBannerVisibleProvider])
+/// - キーボードが出ている間。タブバーごとキーボードの下に隠れるため
+///   (TabBarShell 参照)、見えない広告のインプレッションを避ける
+///   (`MobileSheetBannerAd` と同じ判定)
 class MobileBannerAd extends ConsumerStatefulWidget {
   const MobileBannerAd({super.key});
 
@@ -75,7 +78,9 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
   @override
   Widget build(BuildContext context) {
     final visible = ref.watch(tabBarBannerVisibleProvider);
-    if (_covered || !visible) {
+    // viewInsets はキーボードの高さ。0 より大きければ出ている。
+    final keyboardShown = MediaQuery.viewInsetsOf(context).bottom > 0;
+    if (_covered || !visible || keyboardShown) {
       // 消えている間は下余白も返す。build 中に Provider は変更できないため、
       // フレームの後に回す。
       WidgetsBinding.instance.addPostFrameCallback((_) {

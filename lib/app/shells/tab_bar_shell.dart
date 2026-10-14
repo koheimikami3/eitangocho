@@ -26,6 +26,10 @@ class TabBarShell extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: palette.background,
+      // キーボードの分は _ShellBody がコンテンツだけを縮めて受け持つ。
+      // Scaffold に縮めさせると、下端に重ねたタブバーとバナーまで
+      // キーボードの上に持ち上がる(シートの背後にいる間も同じ)。
+      resizeToAvoidBottomInset: false,
       body: Center(
         // iPad でも iPhone 相当の幅に収める(iPad 専用レイアウトを作るまでの措置)。
         child: ConstrainedBox(
@@ -47,6 +51,8 @@ class _ShellBody extends ConsumerWidget {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     // 広告が読み込まれていない間は 0。
     final bannerHeight = ref.watch(bannerAdHeightProvider);
+    // キーボードの高さ(出ていなければ 0)。
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     // タブバーは半透明でコンテンツの上に重なる(デザインの position:absolute +
     // backdrop-filter)。そのため Column ではなく Stack で重ね、コンテンツ側は
@@ -56,31 +62,40 @@ class _ShellBody extends ConsumerWidget {
         // ヘッダの影をコンテンツの上に落とすため、ヘッダを後に描かせる。
         // Column は children の順に描くので、並びを下から上(up)にして
         // ヘッダを最後に置く(見た目の上下は従来どおり)。
-        Column(
-          verticalDirection: VerticalDirection.up,
-          children: [
-            Expanded(
-              // 上のセーフエリアはヘッダが消費済み。下端はタブバーとバナー広告が
-              // 重なるので、その分をビュー側のスクロール余白として渡す。
-              child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  padding: EdgeInsets.only(
-                    bottom: MobileTabBar.heightOf(context) + bannerHeight,
+        // キーボードが出ている間は、その分だけコンテンツを縮めて一覧の末尾まで
+        // スクロールできるようにする。タブバーは縮めずキーボードの下に隠す
+        // (TabBarShell の resizeToAvoidBottomInset 参照)。
+        Padding(
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: Column(
+            verticalDirection: VerticalDirection.up,
+            children: [
+              Expanded(
+                // 上のセーフエリアはヘッダが消費済み。下端はタブバーとバナー広告が
+                // 重なるので、その分をビュー側のスクロール余白として渡す。
+                // キーボードが出ている間はタブバーが隠れているので余白は要らない。
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    padding: EdgeInsets.only(
+                      bottom: keyboardInset > 0
+                          ? 0
+                          : MobileTabBar.heightOf(context) + bannerHeight,
+                    ),
                   ),
+                  child: switch (view) {
+                    MainView.learning => const LearningWordsViewMobile(),
+                    MainView.allWords => const AllWordsViewMobile(),
+                    MainView.quiz => const QuizViewMobile(),
+                    MainView.settings => const SettingsViewMobile(),
+                    // 登録はシートで開くためタブの中身にはならない。
+                    // 万一この状態になっても破綻しないよう学習中を出す。
+                    MainView.registration => const LearningWordsViewMobile(),
+                  },
                 ),
-                child: switch (view) {
-                  MainView.learning => const LearningWordsViewMobile(),
-                  MainView.allWords => const AllWordsViewMobile(),
-                  MainView.quiz => const QuizViewMobile(),
-                  MainView.settings => const SettingsViewMobile(),
-                  // 登録はシートで開くためタブの中身にはならない。
-                  // 万一この状態になっても破綻しないよう学習中を出す。
-                  MainView.registration => const LearningWordsViewMobile(),
-                },
               ),
-            ),
-            const MobileHeader(),
-          ],
+              const MobileHeader(),
+            ],
+          ),
         ),
         const Positioned(
           left: 0,
