@@ -71,6 +71,11 @@
 	     この宣言があるとアップロードごとの輸出コンプライアンス回答が不要になる。 -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Firebase Analytics の自動の screen_view を止める。Flutter は画面が
+	     1 つ(FlutterViewController)なので自動では意味のある画面名が出ず、
+	     アプリが送る screen_view(AnalyticsLogger)を汚すため。 -->
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
 	<!-- AdMob のアプリ ID。Debug は Google 公式のテスト用アプリ ID、Release は
 	     本番の ID を xcconfig 側で与える(ios/Flutter/{Debug,Release}.xcconfig)。 -->
 	<key>GADApplicationIdentifier</key>
