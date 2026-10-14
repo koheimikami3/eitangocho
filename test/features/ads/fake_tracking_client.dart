@@ -15,6 +15,9 @@ class FakeTrackingClient implements TrackingClient {
   /// 出ないまま返った」を模す。
   bool dialogShows;
 
+  /// [statusName] が返す状態。
+  String status = 'not_determined';
+
   /// 投げさせたい例外。
   Object? requestError;
 
@@ -34,4 +37,7 @@ class FakeTrackingClient implements TrackingClient {
     if (dialogShows) settled = true;
     return settled;
   }
+
+  @override
+  Future<String> statusName() async => status;
 }
