@@ -61,7 +61,7 @@ void main() {
     ]);
   });
 
-  test('検索は英単語が大文字小文字を無視した部分一致、日本語訳は部分一致', () async {
+  test('検索は英単語が大文字小文字を無視した部分一致で、訳には一致しない', () async {
     final container = makeContainer();
     await warmUp(container);
 
@@ -71,9 +71,7 @@ void main() {
     ]);
 
     container.read(mainPageProvider.notifier).updateSearchQuery('りんご');
-    expect(container.read(filteredLearningWordsProvider).map((w) => w.word), [
-      'apple',
-    ]);
+    expect(container.read(filteredLearningWordsProvider), isEmpty);
   });
 
   test('検索語が学習済みの単語に一致しても出さない', () async {

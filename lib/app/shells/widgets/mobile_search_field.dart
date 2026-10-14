@@ -2,6 +2,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/ascii_keyboard.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,11 @@ class MobileSearchField extends ConsumerWidget {
       borderRadius: BorderRadius.circular(10),
       child: TextField(
         onChanged: ref.read(mainPageProvider.notifier).updateSearchQuery,
+        // 検索は英単語だけが対象(filteredWordListProvider)なので英字に固定し、
+        // 部分一致で打った途中の綴りを補正させない(登録の英単語欄と同じ)。
+        keyboardType: asciiKeyboardType,
+        autocorrect: false,
+        enableSuggestions: false,
         cursorWidth: AppDimensions.mobileCursorWidth,
         cursorColor: palette.accent,
         style: TextStyle(fontSize: 15, color: palette.text),

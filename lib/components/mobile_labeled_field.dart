@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_field_label.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/utils/ascii_keyboard.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +21,8 @@ class MobileLabeledField extends StatelessWidget {
     this.minLines,
     this.maxLines = 1,
     this.autoFilled = false,
-    this.asciiOnly = false,
+    this.asciiKeyboard = false,
+    this.correction = true,
     this.onSubmitted,
   });
 
@@ -33,8 +35,13 @@ class MobileLabeledField extends StatelessWidget {
   final int? maxLines;
   final bool autoFilled;
 
-  /// 半角英字キーボードに固定するか(英単語の入力欄で使う)。
-  final bool asciiOnly;
+  /// 半角英字キーボードに固定するか(英単語・英例文の入力欄で使う)。
+  final bool asciiKeyboard;
+
+  /// 自動修正・変換候補を出すか。キーボードとは別に指定する。
+  /// 見出し語は入力どおりに保存されるため切るが、英例文のような文章は
+  /// 英字キーボードでも補正があった方が打ちやすいため残す。
+  final bool correction;
   final ValueChanged<String>? onSubmitted;
 
   @override
@@ -56,16 +63,14 @@ class MobileLabeledField extends StatelessWidget {
             minLines: minLines,
             maxLines: maxLines,
             onSubmitted: onSubmitted,
-            // 英単語欄で日本語 IME に切り替えられないようにする。
-            // **visiblePassword でなければならない**: Flutter の iOS 実装
-            // (ToUIKeyboardType)で UIKeyboardTypeASCIICapable にマップされるのは
-            // これだけで、text は UIKeyboardTypeDefault(地球儀キーでかなに切替可)、
-            // emailAddress / url は ASCII だが @ や .com キーが出る。
-            // 入力内容を隠す指定ではない(obscureText は別)。
-            keyboardType: asciiOnly ? TextInputType.visiblePassword : null,
-            // 見出し語は入力どおりに保存されるため、勝手な補正・変換候補は出さない。
-            autocorrect: !asciiOnly,
-            enableSuggestions: !asciiOnly,
+            keyboardType: asciiKeyboard ? asciiKeyboardType : null,
+            // 複数行の欄(訳・例文)も Return キーは「完了」にする。入力するのは
+            // 1 文・1 行の内容で、一覧は訳を 1 行・例文を 2 行までで出すため、
+            // 改行は表示を崩すだけで要らない。改行にすると「完了」キーが消え、
+            // キーボードを閉じる手段も無くなる。長い文は欄の中で折り返して見える。
+            textInputAction: maxLines != 1 ? TextInputAction.done : null,
+            autocorrect: correction,
+            enableSuggestions: correction,
             cursorWidth: AppDimensions.mobileCursorWidth,
             cursorColor: palette.accent,
             // iOS で入力欄をタップしたときに拡大されないよう 16px 以上にする。

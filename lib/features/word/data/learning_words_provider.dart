@@ -18,7 +18,7 @@ final learnedWordsProvider = Provider<List<Word>>((ref) {
 });
 
 /// ツールバー検索でフィルタした学習中一覧(学習中カードビュー用)。
-/// 検索ロジックは filteredWordListProvider と同一(英=大文字小文字無視の部分一致、日=部分一致)。
+/// 検索ロジックは filteredWordListProvider と同一(英単語だけを大文字小文字無視の部分一致)。
 ///
 /// learningWordsProvider ではなく wordListProvider から直接算出する。派生を
 /// 2 段に重ねると、チェーン全体がリスナー 0 の間(iOS で学習中タブを離れている間)
@@ -32,9 +32,7 @@ final filteredLearningWordsProvider = Provider<List<Word>>((ref) {
       .where(
         (w) =>
             !w.isLearned &&
-            (query.isEmpty ||
-                w.word.toLowerCase().contains(lower) ||
-                w.meaning.contains(query)),
+            (query.isEmpty || w.word.toLowerCase().contains(lower)),
       )
       .toList();
 });

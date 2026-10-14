@@ -163,9 +163,10 @@ class _WordEditSheetState extends State<_WordEditSheet> {
               MobileLabeledField(
                 label: l10n.fieldWord,
                 controller: _wordController,
-                asciiOnly: true,
+                asciiKeyboard: true,
+                correction: false,
               ),
-              // IPA は非 ASCII なので asciiOnly を付けない。
+              // IPA は非 ASCII なので asciiKeyboard を付けない。
               MobileLabeledField(
                 label: l10n.fieldIpa,
                 controller: _ipaController,
@@ -189,6 +190,7 @@ class _WordEditSheetState extends State<_WordEditSheet> {
               MobileLabeledField(
                 label: l10n.fieldExampleEn,
                 controller: _exampleEnController,
+                asciiKeyboard: true,
                 minLines: 2,
                 maxLines: null,
               ),
