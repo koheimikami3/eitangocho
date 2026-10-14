@@ -8,7 +8,7 @@ import 'package:eitangocho/features/word/presentation/widgets/card_in.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learning_empty_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_edit_sheet.dart';
-import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/features/word/presentation/word_learned_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -66,10 +66,11 @@ class LearningWordsViewMobile extends ConsumerWidget {
                           word: word,
                           showIpa: showIpa,
                           singleColumn: columns == 1,
-                          onToggleLearned: (isLearned) => ref
-                              .read(databaseProvider)
-                              .wordDao
-                              .setLearned(word.id, isLearned: isLearned),
+                          onToggleLearned: (isLearned) => toggleWordLearned(
+                            ref,
+                            word,
+                            isLearned: isLearned,
+                          ),
                           onTap: () => showWordEditSheet(context, ref, word),
                         ),
                       ),

@@ -1,6 +1,8 @@
+import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/l10n/app_localizations.dart';
@@ -104,13 +106,20 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
       child: GestureDetector(
         // ページもアプリと同じ拡大率(ブラウザズーム相当の uiScale)で表示する。
         // 押したときだけ読むので build では watch しない。
-        onTap: () => openPronunciationWindow(
-          widget.word,
-          ref.read(translationLanguageProvider),
-          zoom:
-              ref.read(settingsProvider).value?.uiScale ??
-              AppDimensions.defaultUiScale,
-        ),
+        onTap: () {
+          // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、
+          // 今の主画面がそのまま押された場所になる。
+          ref
+              .read(analyticsLoggerProvider)
+              .logPronunciationOpened(ref.read(mainPageProvider).view);
+          openPronunciationWindow(
+            widget.word,
+            ref.read(translationLanguageProvider),
+            zoom:
+                ref.read(settingsProvider).value?.uiScale ??
+                AppDimensions.defaultUiScale,
+          );
+        },
         child: Container(
           height: variant.height,
           // アイコンのみの形は正方形にする。

@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -11,14 +12,16 @@ void main() {
     Brightness brightness = Brightness.light,
   }) async {
     await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ja'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: ThemeData(brightness: brightness),
-        home: Scaffold(
-          body: Center(
-            child: MobilePronunciationButton(word: 'apple', variant: variant),
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: ThemeData(brightness: brightness),
+          home: Scaffold(
+            body: Center(
+              child: MobilePronunciationButton(word: 'apple', variant: variant),
+            ),
           ),
         ),
       ),

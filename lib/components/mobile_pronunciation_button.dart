@@ -1,10 +1,13 @@
+import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_sheet.dart';
 import 'package:eitangocho/components/speaker_icon.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// [MobilePronunciationButton] の形。
 enum MobilePronunciationButtonVariant {
@@ -37,7 +40,7 @@ enum MobilePronunciationButtonVariant {
 /// カードのフッタの末尾に置かれるため、中央寄せだと円の右端がコンテンツの
 /// 右端より内側に入り、左端のチェックボックスに対して左寄りに見える。
 /// 幅を広げたぶんは左側に伸ばす(隣の要素との間隔が広がるだけで済む)。
-class MobilePronunciationButton extends StatelessWidget {
+class MobilePronunciationButton extends ConsumerWidget {
   const MobilePronunciationButton({
     required this.word,
     required this.variant,
@@ -60,13 +63,20 @@ class MobilePronunciationButton extends StatelessWidget {
   static const _iconSize = 15.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final label = variant.label(context.l10n);
     final icon = SpeakerIcon(size: _iconSize, color: palette.accentOnSoft);
 
     return MobilePressable(
-      onTap: () => showMobilePronunciationSheet(context, word),
+      onTap: () {
+        // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、
+        // 今の主画面がそのまま押された場所になる。
+        ref
+            .read(analyticsLoggerProvider)
+            .logPronunciationOpened(ref.read(mainPageProvider).view);
+        showMobilePronunciationSheet(context, word);
+      },
       builder: (context, _) => label == null
           ? SizedBox(
               width: minTapTarget,

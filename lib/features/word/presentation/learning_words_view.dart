@@ -9,7 +9,7 @@ import 'package:eitangocho/features/word/presentation/widgets/edit_word_dialog.d
 import 'package:eitangocho/features/word/presentation/widgets/learning_empty_state.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
-import 'package:eitangocho/providers/database_provider.dart';
+import 'package:eitangocho/features/word/presentation/word_learned_toggle.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,10 +78,11 @@ class LearningWordsView extends ConsumerWidget {
                           child: WordCard(
                             word: word,
                             showIpa: showIpa,
-                            onToggleLearned: (isLearned) => ref
-                                .read(databaseProvider)
-                                .wordDao
-                                .setLearned(word.id, isLearned: isLearned),
+                            onToggleLearned: (isLearned) => toggleWordLearned(
+                              ref,
+                              word,
+                              isLearned: isLearned,
+                            ),
                             onTap: () => showEditWordDialog(context, ref, word),
                             onContextMenu: (position) => showWordContextMenu(
                               context,
