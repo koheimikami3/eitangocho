@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   Future<TextField> pumpField(
     WidgetTester tester, {
-    bool asciiOnly = false,
+    bool asciiKeyboard = false,
+    bool correction = true,
     int? minLines,
     int? maxLines = 1,
   }) async {
@@ -19,7 +20,8 @@ void main() {
           body: MobileLabeledField(
             label: '英単語 *',
             controller: TextEditingController(),
-            asciiOnly: asciiOnly,
+            asciiKeyboard: asciiKeyboard,
+            correction: correction,
             minLines: minLines,
             maxLines: maxLines,
           ),
@@ -32,10 +34,29 @@ void main() {
   // ASCII キーボードを出せる TextInputType は visiblePassword だけなので、
   // 別の型に書き換えられていないことをここで固定する(Flutter の
   // ToUIKeyboardType が UIKeyboardTypeASCIICapable に写すのはこれのみ)。
-  testWidgets('asciiOnly は visiblePassword で ASCII キーボードに固定する', (tester) async {
-    final field = await pumpField(tester, asciiOnly: true);
+  testWidgets('asciiKeyboard は visiblePassword で ASCII キーボードに固定する', (
+    tester,
+  ) async {
+    final field = await pumpField(tester, asciiKeyboard: true);
 
     expect(field.keyboardType, TextInputType.visiblePassword);
+  });
+
+  // 英例文欄は英字キーボードでも補正を残す。キーボードと補正は独立に指定する。
+  testWidgets('asciiKeyboard だけなら補正は切らない', (tester) async {
+    final field = await pumpField(tester, asciiKeyboard: true);
+
+    expect(field.autocorrect, isTrue);
+    expect(field.enableSuggestions, isTrue);
+  });
+
+  testWidgets('correction: false で補正と変換候補を切る', (tester) async {
+    final field = await pumpField(
+      tester,
+      asciiKeyboard: true,
+      correction: false,
+    );
+
     expect(field.autocorrect, isFalse);
     expect(field.enableSuggestions, isFalse);
   });

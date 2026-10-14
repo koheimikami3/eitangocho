@@ -265,7 +265,8 @@ class _InputStep extends StatelessWidget {
           label: l10n.fieldWord,
           controller: controller,
           hintText: 'apple',
-          asciiOnly: true,
+          asciiKeyboard: true,
+          correction: false,
           onSubmitted: (_) => onAutoFill(),
         ),
         const SizedBox(height: 16),
@@ -391,9 +392,10 @@ class _FormStep extends StatelessWidget {
             MobileLabeledField(
               label: l10n.fieldWord,
               controller: wordController,
-              asciiOnly: true,
+              asciiKeyboard: true,
+              correction: false,
             ),
-            // IPA は非 ASCII なので asciiOnly を付けない。
+            // IPA は非 ASCII なので asciiKeyboard を付けない。
             MobileLabeledField(
               label: l10n.fieldIpa,
               controller: ipaController,
@@ -422,6 +424,7 @@ class _FormStep extends StatelessWidget {
             MobileLabeledField(
               label: l10n.fieldExampleEn,
               controller: exampleEnController,
+              asciiKeyboard: true,
               minLines: 2,
               maxLines: null,
               autoFilled: autoExampleEn,
