@@ -76,4 +76,22 @@ void main() {
     expect(field.minLines, 2);
     expect(field.maxLines, isNull);
   });
+
+  testWidgets('英字キーボードの複数行の欄でも Return キーで改行できる', (tester) async {
+    final field = await pumpField(
+      tester,
+      asciiKeyboard: true,
+      minLines: 2,
+      maxLines: null,
+    );
+
+    expect(field.keyboardType, TextInputType.visiblePassword);
+    expect(field.textInputAction, TextInputAction.newline);
+  });
+
+  testWidgets('英字キーボードの 1 行の欄は Return キーの既定を変えない', (tester) async {
+    final field = await pumpField(tester, asciiKeyboard: true);
+
+    expect(field.textInputAction, isNull);
+  });
 }

@@ -64,6 +64,12 @@ class MobileLabeledField extends StatelessWidget {
             maxLines: maxLines,
             onSubmitted: onSubmitted,
             keyboardType: asciiKeyboard ? asciiKeyboardType : null,
+            // Return キーの既定は keyboardType が multiline のときだけ改行になる。
+            // 英字キーボード(asciiKeyboardType)を指定すると複数行の欄でも
+            // 「完了」に変わり改行できなくなるため、明示して改行を保つ。
+            textInputAction: asciiKeyboard && maxLines != 1
+                ? TextInputAction.newline
+                : null,
             autocorrect: correction,
             enableSuggestions: correction,
             cursorWidth: AppDimensions.mobileCursorWidth,
