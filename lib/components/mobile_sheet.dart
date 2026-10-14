@@ -81,9 +81,22 @@ class MobileSheet extends StatelessWidget {
               ),
               Expanded(
                 child: scrollableBody
-                    ? SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
-                        child: child,
+                    // 入力欄の外をタップしたらキーボードを閉じる。複数行の欄は
+                    // Return が改行なので「完了」キーが無く、ほかに閉じる手段が
+                    // 無いため。TextField の onTapOutside は指を置いた瞬間に
+                    // 発火してスクロールでも閉じてしまう(フォームの下の欄を
+                    // 見に行くたびに閉じる)ので、タップだけを拾う onTap にする。
+                    // 入力欄やボタンのタップは内側の認識器が勝つため、ここに
+                    // 来るのは何も無いところのタップだけ。WebView を載せる
+                    // scrollableBody: false には付けない(WebView のタップと競合する)。
+                    ? GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
+                          child: child,
+                        ),
                       )
                     : child,
               ),
