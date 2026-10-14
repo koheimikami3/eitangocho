@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view_mobile.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -98,7 +99,9 @@ void main() {
 
   testWidgets('出題中は表面と「答えを表示」を出し、答えると裏面と判定ボタンになる', (tester) async {
     final container = await setupLearned([('serendipity', '偶然の幸運')]);
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
 
     await runQuiz(tester, container, () async {
       // 表面(既定は en→ja なので英単語)と進捗。
@@ -117,7 +120,9 @@ void main() {
 
   testWidgets('全問終えると結果画面になり、忘れた単語が一覧に出る', (tester) async {
     final container = await setupLearned([('serendipity', '偶然の幸運')]);
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
 
     await runQuiz(tester, container, () async {
       await tester.tap(find.text('答えを表示'));

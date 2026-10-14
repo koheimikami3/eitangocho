@@ -4,6 +4,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/ads/presentation/tab_bar_banner_visible_provider.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -53,7 +54,9 @@ void main() {
     final container = await setup();
 
     container.read(mainPageProvider.notifier).selectView(MainView.quiz);
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
 
     expect(container.read(quizPageProvider).phase, QuizPhase.active);
     expect(container.read(tabBarBannerVisibleProvider), isTrue);
@@ -63,7 +66,9 @@ void main() {
     final container = await setup();
 
     container.read(mainPageProvider.notifier).selectView(MainView.quiz);
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
     // 1 件だけなので 1 回答えれば結果画面になる。
     await container.read(quizPageProvider.notifier).answerKnew();
 

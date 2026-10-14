@@ -5,6 +5,7 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -54,8 +55,9 @@ class QuizResultView extends ConsumerWidget {
                 label: context.l10n.quizContinue,
                 verticalPadding: 11,
                 borderRadius: 9,
-                onPressed: () =>
-                    ref.read(quizPageProvider.notifier).startQuiz(),
+                onPressed: () => ref
+                    .read(quizPageProvider.notifier)
+                    .startQuiz(trigger: QuizTrigger.continued),
               ),
             ),
             const SizedBox(width: 10),

@@ -4,6 +4,7 @@ import 'package:eitangocho/app/widgets/sidebar_item.dart';
 import 'package:eitangocho/app/widgets/window_drag_area.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
@@ -69,7 +70,9 @@ class AppSidebar extends ConsumerWidget {
             selected: view == MainView.quiz,
             // クリックで常に新セッションを開始してからビューへ切り替える。
             onTap: () {
-              ref.read(quizPageProvider.notifier).startQuiz();
+              ref
+                  .read(quizPageProvider.notifier)
+                  .startQuiz(trigger: QuizTrigger.tab);
               ref.read(mainPageProvider.notifier).selectView(MainView.quiz);
             },
           ),

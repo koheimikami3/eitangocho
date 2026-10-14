@@ -4,6 +4,7 @@ import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,9 @@ class MobileTabBar extends ConsumerWidget {
                   selected: view == MainView.quiz,
                   // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
                   onTap: () {
-                    ref.read(quizPageProvider.notifier).startQuiz();
+                    ref
+                        .read(quizPageProvider.notifier)
+                        .startQuiz(trigger: QuizTrigger.tab);
                     ref
                         .read(mainPageProvider.notifier)
                         .selectView(MainView.quiz);

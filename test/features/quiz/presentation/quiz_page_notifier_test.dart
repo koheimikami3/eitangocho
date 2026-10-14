@@ -1,6 +1,10 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
+import 'package:eitangocho/app/main_page_notifier.dart';
+import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/data/analytics_client.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/domain/quiz_question_selection.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_state.dart';
@@ -11,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../analytics/fake_analytics_client.dart';
 import '../../review/review_test_overrides.dart';
 
 void main() {
@@ -31,7 +36,10 @@ void main() {
   /// 差し替えた container を返す。QuizPageNotifier は learnedWordsProvider しか
   /// 読まないため、drift の watch() ストリーム(wordListProvider)を購読させず、
   /// container 破棄時の購読解除タイマー衝突(drift #3323)を根本的に避ける。
-  Future<ProviderContainer> setupLearned(int n) async {
+  Future<ProviderContainer> setupLearned(
+    int n, {
+    FakeAnalyticsClient? analytics,
+  }) async {
     for (var i = 0; i < n; i++) {
       final id = await db.wordDao.insertWord(
         WordsCompanion(word: Value('word$i'), meaning: Value('訳$i')),
@@ -46,6 +54,8 @@ void main() {
         databaseProvider.overrideWithValue(db),
         learnedWordsProvider.overrideWithValue(learned),
         reviewDisabled,
+        if (analytics != null)
+          analyticsClientProvider.overrideWithValue(analytics),
       ],
     );
     addTearDown(container.dispose);
@@ -55,7 +65,9 @@ void main() {
   test('startQuiz は学習済みから出題数分を選んで出題する', () async {
     final container = await setupLearned(quizQuestionCount + 1);
 
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
 
     final state = container.read(quizPageProvider);
     expect(state.phase, QuizPhase.active);
@@ -67,7 +79,9 @@ void main() {
   test('学習済みが 0 件だと phase が empty になる', () async {
     final container = await setupLearned(0);
 
-    container.read(quizPageProvider.notifier).startQuiz();
+    container
+        .read(quizPageProvider.notifier)
+        .startQuiz(trigger: QuizTrigger.tab);
 
     expect(container.read(quizPageProvider).phase, QuizPhase.empty);
   });
@@ -75,7 +89,7 @@ void main() {
   test('answerKnew で index が進み okCount が加算され、最終問題で done になる', () async {
     final container = await setupLearned(2);
     final notifier = container.read(quizPageProvider.notifier);
-    notifier.startQuiz();
+    notifier.startQuiz(trigger: QuizTrigger.tab);
 
     await notifier.answerKnew();
     expect(container.read(quizPageProvider).index, 1);
@@ -91,7 +105,7 @@ void main() {
   test('answerForgot で単語が学習中に戻り forgotWords に追加される', () async {
     final container = await setupLearned(1);
     final notifier = container.read(quizPageProvider.notifier);
-    notifier.startQuiz();
+    notifier.startQuiz(trigger: QuizTrigger.tab);
     final target = container.read(quizPageProvider).questions.single;
 
     await notifier.answerForgot();
@@ -109,10 +123,89 @@ void main() {
   test('reveal で revealed が true になる', () async {
     final container = await setupLearned(1);
     final notifier = container.read(quizPageProvider.notifier);
-    notifier.startQuiz();
+    notifier.startQuiz(trigger: QuizTrigger.tab);
 
     notifier.reveal();
 
     expect(container.read(quizPageProvider).revealed, isTrue);
+  });
+
+  group('計測', () {
+    test('始めた契機と、最後まで答えた結果を送る', () async {
+      final analytics = FakeAnalyticsClient();
+      final container = await setupLearned(2, analytics: analytics);
+      final notifier = container.read(quizPageProvider.notifier)
+        ..startQuiz(trigger: QuizTrigger.continued);
+
+      await notifier.answerKnew();
+      await notifier.answerForgot();
+
+      expect(analytics.eventsNamed('quiz_started'), [
+        // 投入したばかりの単語は一度も答えていない。
+        {'trigger': 'continue', 'review_gap_bucket': '0_none'},
+      ]);
+      expect(analytics.eventsNamed('quiz_completed'), [
+        {'ok_count': 1, 'forgot_count': 1},
+      ]);
+      expect(analytics.eventsNamed('quiz_abandoned'), isEmpty);
+    });
+
+    test('学習済みが 0 件なら quiz_empty_shown だけを送る', () async {
+      final analytics = FakeAnalyticsClient();
+      final container = await setupLearned(0, analytics: analytics);
+
+      container
+          .read(quizPageProvider.notifier)
+          .startQuiz(trigger: QuizTrigger.tab);
+
+      expect(analytics.eventsNamed('quiz_empty_shown'), hasLength(1));
+      expect(analytics.eventsNamed('quiz_started'), isEmpty);
+    });
+
+    test('回の途中で別の画面へ移ると、答えた数を付けて離脱を 1 回だけ送る', () async {
+      final analytics = FakeAnalyticsClient();
+      final container = await setupLearned(3, analytics: analytics);
+      final main = container.read(mainPageProvider.notifier);
+      final notifier = container.read(quizPageProvider.notifier)
+        ..startQuiz(trigger: QuizTrigger.tab);
+      main.selectView(MainView.quiz);
+      await notifier.answerKnew();
+
+      main.selectView(MainView.learning);
+      // 戻ってきて新しい回を始めても、前の回を二重に数えない。
+      notifier.startQuiz(trigger: QuizTrigger.tab);
+      main.selectView(MainView.quiz);
+
+      expect(analytics.eventsNamed('quiz_abandoned'), [
+        {'answered_count': 1},
+      ]);
+    });
+
+    test('回の途中でクイズタブを押し直しても離脱として送る', () async {
+      final analytics = FakeAnalyticsClient();
+      final container = await setupLearned(3, analytics: analytics);
+      final notifier = container.read(quizPageProvider.notifier)
+        ..startQuiz(trigger: QuizTrigger.tab)
+        ..startQuiz(trigger: QuizTrigger.tab);
+
+      expect(notifier.state.phase, QuizPhase.active);
+      expect(analytics.eventsNamed('quiz_abandoned'), [
+        {'answered_count': 0},
+      ]);
+    });
+
+    test('最後まで答えた回は、画面を移っても離脱にしない', () async {
+      final analytics = FakeAnalyticsClient();
+      final container = await setupLearned(1, analytics: analytics);
+      final main = container.read(mainPageProvider.notifier);
+      final notifier = container.read(quizPageProvider.notifier)
+        ..startQuiz(trigger: QuizTrigger.tab);
+      main.selectView(MainView.quiz);
+      await notifier.answerKnew();
+
+      main.selectView(MainView.learning);
+
+      expect(analytics.eventsNamed('quiz_abandoned'), isEmpty);
+    });
   });
 }

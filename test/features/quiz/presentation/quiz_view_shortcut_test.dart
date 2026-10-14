@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_page_notifier.dart';
 import 'package:eitangocho/features/quiz/presentation/quiz_view.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
@@ -52,7 +53,9 @@ void main() {
           learnedWordsProvider.overrideWithValue(learned),
         ],
       );
-      container.read(quizPageProvider.notifier).startQuiz();
+      container
+          .read(quizPageProvider.notifier)
+          .startQuiz(trigger: QuizTrigger.tab);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
