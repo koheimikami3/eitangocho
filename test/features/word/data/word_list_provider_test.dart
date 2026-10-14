@@ -165,4 +165,13 @@ void main() {
       'date',
     ]);
   });
+
+  test('検索は訳には一致しない', () async {
+    final container = makeContainer();
+    await warmUp(container);
+
+    // 訳はすべて「<単語> の訳」なので、訳も対象なら全件が一致してしまう。
+    container.read(mainPageProvider.notifier).updateSearchQuery('訳');
+    expect(container.read(filteredWordListProvider), isEmpty);
+  });
 }

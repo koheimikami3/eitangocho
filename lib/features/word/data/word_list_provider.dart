@@ -26,7 +26,11 @@ final wordListLoadingProvider = Provider<bool>((ref) {
 
 /// ツールバー検索でフィルタし、設定の並び順([WordSortOrder])で並べた一覧
 /// (全単語ビュー用)。
-/// 英単語は大文字小文字を無視した部分一致、日本語訳はそのまま部分一致(プロトタイプ準拠)。
+/// 英単語だけを対象に、大文字小文字を無視した部分一致で絞る。
+///
+/// 訳は対象にしない。検索欄からは英単語の検索にしか見えず、訳で一致することが
+/// 利用者に伝わらないうえ、訳がラテン文字の言語(西・仏)では英単語の検索に
+/// 訳の一致が混ざるため。
 ///
 /// 並び替えは DB クエリではなくここで行う。wordListProvider は学習中一覧や
 /// 件数表示とも共有しており、クエリ側で並べると全単語以外にも波及するため。
@@ -41,13 +45,7 @@ final filteredWordListProvider = Provider<List<Word>>((ref) {
   final lower = query.toLowerCase();
   final filtered = query.isEmpty
       ? [...words]
-      : words
-            .where(
-              (w) =>
-                  w.word.toLowerCase().contains(lower) ||
-                  w.meaning.contains(query),
-            )
-            .toList();
+      : words.where((w) => w.word.toLowerCase().contains(lower)).toList();
   return filtered..sort((a, b) => _compareWords(a, b, order));
 });
 
