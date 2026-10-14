@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
@@ -137,8 +138,12 @@ class SettingsView extends ConsumerWidget {
                     // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
                     SettingsLinkRow(
                       label: l10n.writeReview,
-                      onTap: () =>
-                          ref.read(reviewPrompterProvider).openStoreListing(),
+                      onTap: () {
+                        ref
+                            .read(analyticsLoggerProvider)
+                            .logStoreListingOpened();
+                        ref.read(reviewPrompterProvider).openStoreListing();
+                      },
                     ),
                   ],
                 ),

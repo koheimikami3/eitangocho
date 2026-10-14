@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
 import 'package:eitangocho/features/purchase/domain/purchase_log.dart';
 import 'package:eitangocho/features/purchase/domain/purchase_state.dart';
@@ -104,17 +106,22 @@ class PurchaseNotifier extends Notifier<PurchaseState> {
     if (state.priceText == null) return;
 
     state = state.copyWith(purchasing: true, purchaseFailed: false);
+    final analytics = ref.read(analyticsLoggerProvider)
+      ..logProPurchase(ProPurchaseStage.tapped);
     final outcome = await ref.read(purchasesClientProvider).purchase();
     if (!ref.mounted) return;
 
     switch (outcome) {
       case PurchaseOutcome.purchased:
         state = state.copyWith(purchasing: false, proUnlocked: true);
+        analytics.logProPurchase(ProPurchaseStage.success);
       // ダイアログを閉じただけなので何も出さない。
       case PurchaseOutcome.cancelled:
         state = state.copyWith(purchasing: false);
+        analytics.logProPurchase(ProPurchaseStage.cancelled);
       case PurchaseOutcome.failed:
         state = state.copyWith(purchasing: false, purchaseFailed: true);
+        analytics.logProPurchase(ProPurchaseStage.failed);
         _scheduleMessageClear();
     }
   }

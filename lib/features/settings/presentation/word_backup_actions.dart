@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/document_exporter.dart';
 import 'package:eitangocho/features/settings/data/word_export_service.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/import_result_dialog.dart';
@@ -56,6 +57,7 @@ Future<void> exportWordsToFile(BuildContext context, WidgetRef ref) async {
     );
     await file.saveTo(location.path);
   }
+  ref.read(analyticsLoggerProvider).logDataExported();
 
   if (context.mounted) {
     ScaffoldMessenger.of(
@@ -72,8 +74,10 @@ Future<void> importWordsFromFile(BuildContext context, WidgetRef ref) async {
   final source = await file.readAsString();
   try {
     final result = await ref.read(wordExportServiceProvider).importJson(source);
+    ref.read(analyticsLoggerProvider).logDataImported(succeeded: true);
     if (context.mounted) await showImportResultDialog(context, result);
   } on WordExportFormatException catch (e) {
+    ref.read(analyticsLoggerProvider).logDataImported(succeeded: false);
     if (context.mounted) await showImportErrorDialog(context, e.error);
   }
 }

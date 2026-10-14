@@ -1,9 +1,11 @@
+import 'package:eitangocho/features/analytics/data/analytics_client.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
 import 'package:eitangocho/features/purchase/domain/purchase_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../analytics/fake_analytics_client.dart';
 import '../fake_purchases_client.dart';
 
 void main() {
@@ -11,8 +13,12 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late FakePurchasesClient client;
+  late FakeAnalyticsClient analytics;
 
-  setUp(() => client = FakePurchasesClient());
+  setUp(() {
+    client = FakePurchasesClient();
+    analytics = FakeAnalyticsClient();
+  });
   tearDown(() async => client.dispose());
 
   /// [messageDuration] は本番の 2.6 秒だとテストが待てないため縮める。
@@ -22,6 +28,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         purchasesClientProvider.overrideWithValue(client),
+        analyticsClientProvider.overrideWithValue(analytics),
         purchaseProvider.overrideWith(
           () => PurchaseNotifier(messageDuration: messageDuration),
         ),
@@ -202,5 +209,20 @@ void main() {
 
       await container.read(purchaseProvider.notifier).proUnlockedKnown;
     });
+  });
+
+  test('購入ボタンを押したことと、その結果を送る', () async {
+    final container = await initialized();
+    await container.read(purchaseProvider.notifier).buy();
+    client.purchaseOutcome = PurchaseOutcome.cancelled;
+    final cancelled = await initialized();
+    await cancelled.read(purchaseProvider.notifier).buy();
+
+    expect(analytics.eventsNamed('pro_purchase'), [
+      {'stage': 'tapped'},
+      {'stage': 'success'},
+      {'stage': 'tapped'},
+      {'stage': 'cancelled'},
+    ]);
   });
 }

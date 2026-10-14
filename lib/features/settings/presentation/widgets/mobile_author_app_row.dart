@@ -1,8 +1,10 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 設定の「作者の他のアプリ」に出す 1 行。タップで App Store を開く。
@@ -11,7 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// インストールできないため([AuthorApp] 参照)。
 ///
 /// カードの地・角丸・影・行間の区切り線は [MobileSettingsSection] が持つ。
-class MobileAuthorAppRow extends StatelessWidget {
+class MobileAuthorAppRow extends ConsumerWidget {
   const MobileAuthorAppRow({required this.app, super.key});
 
   final AuthorApp app;
@@ -21,17 +23,20 @@ class MobileAuthorAppRow extends StatelessWidget {
   /// **`LaunchMode.externalApplication` を明示するのが要点**。既定の
   /// `platformDefault` は iOS ではアプリ内 Safari になり、App Store アプリに
   /// 渡らない(発音リンクと同じ理由。google_translate_url.dart 参照)。
-  Future<void> _open() => launchUrl(
-    Uri.parse(app.appStoreUrl),
-    mode: LaunchMode.externalApplication,
-  );
+  Future<void> _open(WidgetRef ref) {
+    ref.read(analyticsLoggerProvider).logAuthorAppTapped(app);
+    return launchUrl(
+      Uri.parse(app.appStoreUrl),
+      mode: LaunchMode.externalApplication,
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
 
     return MobilePressable(
-      onTap: _open,
+      onTap: () => _open(ref),
       style: MobilePressStyle.row,
       builder: (context, pressed) => Container(
         color: pressed ? palette.pressBackground : Colors.transparent,

@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
@@ -157,7 +158,10 @@ class SettingsViewMobile extends ConsumerWidget {
             // (年 3 回)で出ないことがあるため、常設の導線を別に置く。
             MobileSettingsLinkRow(
               label: l10n.writeReview,
-              onTap: () => ref.read(reviewPrompterProvider).openStoreListing(),
+              onTap: () {
+                ref.read(analyticsLoggerProvider).logStoreListingOpened();
+                ref.read(reviewPrompterProvider).openStoreListing();
+              },
             ),
           ],
         ),
