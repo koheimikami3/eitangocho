@@ -108,13 +108,13 @@ abstract class AppLocalizations {
   /// 訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name
   ///
   /// In ja, this message translates to:
-  /// **'{language, select, ja{日本語} zhHant{中国語(繁体字)} es{スペイン語} fr{フランス語} other{}}'**
+  /// **'{language, select, ja{日本語} zhHant{中国語(繁体字)} es{スペイン語} fr{フランス語} enDefinition{英語(語義)} other{}}'**
   String translationLanguageName(String language);
 
   /// 訳の言語の短い名前(項目名・出題方向に差し込む)。es / fr は文中に差し込むので小文字で書く
   ///
   /// In ja, this message translates to:
-  /// **'{language, select, ja{日本語} zhHant{中国語} es{スペイン語} fr{フランス語} other{}}'**
+  /// **'{language, select, ja{日本語} zhHant{中国語} es{スペイン語} fr{フランス語} enDefinition{語義} other{}}'**
   String translationLanguageShortName(String language);
 
   /// No description provided for @navLearning.
@@ -273,6 +273,12 @@ abstract class AppLocalizations {
   /// **'{language}訳 *'**
   String fieldMeaning(String language);
 
+  /// 訳の言語が英語の語義のときの、訳の欄の項目名(fieldMeaning の代わり)
+  ///
+  /// In ja, this message translates to:
+  /// **'語義 *'**
+  String get fieldDefinition;
+
   /// No description provided for @fieldPartsOfSpeech.
   ///
   /// In ja, this message translates to:
@@ -302,6 +308,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'英単語を入力すると、発音記号・{language}訳・例文などを辞書から自動取得します。'**
   String registrationIntro(String language);
+
+  /// 訳の言語が英語の語義のときの登録画面の説明(registrationIntro の代わり)
+  ///
+  /// In ja, this message translates to:
+  /// **'英単語を入力すると、発音記号・英語の語義・例文などを辞書から自動取得します。'**
+  String get registrationIntroDefinition;
 
   /// No description provided for @autoFill.
   ///
@@ -489,6 +501,12 @@ abstract class AppLocalizations {
   /// **'訳を表示'**
   String get showMeaning;
 
+  /// 訳の言語が英語の語義のときの、カードの「訳を表示」ボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'語義を表示'**
+  String get showDefinition;
+
   /// No description provided for @correctCount.
   ///
   /// In ja, this message translates to:
@@ -596,6 +614,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'{language}訳'**
   String tableMeaning(String language);
+
+  /// 訳の言語が英語の語義のときの、全単語の表の列名(tableMeaning の代わり)
+  ///
+  /// In ja, this message translates to:
+  /// **'語義'**
+  String get tableDefinition;
 
   /// No description provided for @tableExample.
   ///

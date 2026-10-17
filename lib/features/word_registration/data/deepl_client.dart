@@ -18,6 +18,8 @@ class DeeplClient {
     String apiKey,
     TranslationLanguage targetLanguage,
   ) async {
+    final targetLang = targetLanguage.deeplTargetLang;
+    if (targetLang == null) return null;
     final uri = Uri.https('api-free.deepl.com', '/v2/translate');
     try {
       final response = await _client
@@ -30,7 +32,7 @@ class DeeplClient {
             body: jsonEncode({
               'text': [text],
               'source_lang': 'EN',
-              'target_lang': targetLanguage.deeplTargetLang,
+              'target_lang': targetLang,
             }),
           )
           .timeout(_timeout);

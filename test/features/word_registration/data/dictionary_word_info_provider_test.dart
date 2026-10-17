@@ -40,6 +40,16 @@ const achieveEsFrJsonl = '''
 {"word":"achieve","pos":"verb","senses":[],"translations":[{"lang":"French","code":"fr","lang_code":"fr","word":"accomplir"},{"lang":"French","code":"fr","lang_code":"fr","word":"réaliser"},{"lang":"Spanish","code":"es","lang_code":"es","word":"conseguir"},{"lang":"Spanish","code":"es","lang_code":"es","word":"lograr"},{"lang":"Spanish","code":"es","lang_code":"es","word":"conseguir"},{"lang":"Spanish","code":"es","lang_code":"es","word":"lograr"}]}
 ''';
 
+/// `commute` の実レスポンスから語義の形だけ抜き出したもの。品詞ごとに語義が
+/// 並び、廃用(obsolete)や活用形の参照(form-of)のタグが付く語義が混ざる。
+/// 下位の語義は glosses が [上位, この語義] の順で来る。
+const commuteDefinitionJsonl = '''
+{"word":"commute","pos":"verb","senses":[{"glosses":["To exchange."],"tags":["obsolete"]},{"glosses":["To reduce a sentence.","To reduce the sentence previously given."],"tags":["transitive"]}],"translations":[{"lang":"Japanese","code":"ja","lang_code":"ja","word":"減刑する"}]}
+{"word":"commute","pos":"noun","senses":[{"glosses":["A regular journey between two places, typically home and work."]}]}
+{"word":"commute","pos":"verb","senses":[{"glosses":["To regularly travel from one's home to one's workplace."]}]}
+{"word":"commuted","pos":"verb","senses":[{"glosses":["simple past of commute"],"tags":["form-of"]}]}
+''';
+
 void main() {
   late AppDatabase db;
   var kaikkiCallCount = 0;
@@ -536,6 +546,48 @@ void main() {
 
       expect(info!.exampleEn, 'How did you achieve that so quickly?');
       expect(info.exampleTranslation, '¿Cómo lo lograste tan rápido?');
+    });
+  });
+
+  group('訳の言語が英語の語義', () {
+    test('除外タグの無い最初の語義を 1 文だけ採る', () async {
+      await seedEjdict({'commute': '通勤する'});
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(commuteDefinitionJsonl, 200),
+        translationLanguage: TranslationLanguage.enDefinition,
+      );
+
+      final info = await provider.fetch('commute');
+
+      // obsolete を飛ばし、下位の語義はそれ自身(最後の文)を採る。
+      // 2 品詞目以降の語義は足さない。EJDict・訳語は使わない。
+      expect(info!.meaning, 'To reduce the sentence previously given.');
+      expect(info.translationLanguage, TranslationLanguage.enDefinition);
+    });
+
+    test('例文は訳無しで採り、DeepL で訳さない', () async {
+      final provider = buildProvider(
+        kaikkiResponse: () => utf8Response(commuteDefinitionJsonl, 200),
+        tatoebaResponseFn: () => utf8Response(
+          jsonEncode({
+            'data': [
+              {
+                'text': 'I commute to work by train every day.',
+                'translations': <Object>[],
+              },
+            ],
+          }),
+          200,
+        ),
+        deeplApiKey: 'key',
+        translationLanguage: TranslationLanguage.enDefinition,
+      );
+
+      final info = await provider.fetch('commute');
+
+      expect(info!.exampleEn, 'I commute to work by train every day.');
+      expect(info.exampleTranslation, isEmpty);
+      expect(deeplCallCount, 0);
     });
   });
 }

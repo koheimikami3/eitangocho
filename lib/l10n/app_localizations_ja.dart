@@ -15,6 +15,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'zhHant': '中国語(繁体字)',
       'es': 'スペイン語',
       'fr': 'フランス語',
+      'enDefinition': '英語(語義)',
       'other': '',
     });
     return '$_temp0';
@@ -27,6 +28,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'zhHant': '中国語',
       'es': 'スペイン語',
       'fr': 'フランス語',
+      'enDefinition': '語義',
       'other': '',
     });
     return '$_temp0';
@@ -117,6 +119,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get fieldDefinition => '語義 *';
+
+  @override
   String get fieldPartsOfSpeech => '品詞(複数選択可)';
 
   @override
@@ -134,6 +139,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String registrationIntro(String language) {
     return '英単語を入力すると、発音記号・$language訳・例文などを辞書から自動取得します。';
   }
+
+  @override
+  String get registrationIntroDefinition =>
+      '英単語を入力すると、発音記号・英語の語義・例文などを辞書から自動取得します。';
 
   @override
   String get autoFill => '自動入力';
@@ -241,6 +250,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showMeaning => '訳を表示';
 
   @override
+  String get showDefinition => '語義を表示';
+
+  @override
   String correctCount(int count) {
     return '覚えた $count回';
   }
@@ -300,6 +312,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String tableMeaning(String language) {
     return '$language訳';
   }
+
+  @override
+  String get tableDefinition => '語義';
 
   @override
   String get tableExample => '例文';

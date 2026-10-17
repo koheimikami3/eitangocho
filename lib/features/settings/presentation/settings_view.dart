@@ -6,7 +6,6 @@ import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
-import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/data_backup_rows.dart';
 // DeepL の欄を隠している間だけ未使用になる(下のコメントアウト箇所を参照)。
@@ -20,6 +19,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/settings_toggl
 import 'package:eitangocho/features/settings/presentation/widgets/settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/ui_scale_slider.dart';
 import 'package:eitangocho/features/sync/presentation/desktop_sync_rows.dart';
+import 'package:eitangocho/utils/app_locale.dart';
 import 'package:eitangocho/utils/app_platform.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +84,10 @@ class SettingsView extends ConsumerWidget {
                   children: [
                     SettingsCard(
                       children: [
-                        for (final language in TranslationLanguage.values)
+                        for (final language
+                            in AppLocale.deviceTranslationLanguageChoices(
+                              translationLanguage,
+                            ))
                           SettingsRadioRow(
                             label: language.label(l10n),
                             selected: translationLanguage == language,

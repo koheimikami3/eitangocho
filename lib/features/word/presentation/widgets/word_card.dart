@@ -245,11 +245,9 @@ class _RevealAreaState extends ConsumerState<_RevealArea> {
               : DottedBorderBox(
                   backgroundColor: _isHovered ? const Color(0x08000000) : null,
                   child: Text(
-                    context.l10n.showMeaningWithLanguage(
-                      ref
-                          .watch(translationLanguageProvider)
-                          .shortLabel(context.l10n),
-                    ),
+                    ref
+                        .watch(translationLanguageProvider)
+                        .showMeaningLabel(context.l10n),
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0x66000000),

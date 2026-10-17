@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/analytics/data/analytics_client.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/data/dictionary_word_info_provider.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_error.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
@@ -278,6 +279,27 @@ void main() {
       expect(
         container.read(wordRegistrationProvider).translationFailed,
         isTrue,
+      );
+    });
+
+    // 英語の語義は例文の訳を持たないので、空が正常。
+    test('英語の語義なら和訳が空でも translationFailed は立たない', () async {
+      container = buildContainer(
+        wordInfoProvider: _FakeWordInfoProvider(
+          (_) async => fetchedInfo.copyWith(
+            exampleTranslation: '',
+            translationLanguage: TranslationLanguage.enDefinition,
+          ),
+        ),
+      );
+
+      await container
+          .read(wordRegistrationProvider.notifier)
+          .autoFill('serendipity');
+
+      expect(
+        container.read(wordRegistrationProvider).translationFailed,
+        isFalse,
       );
     });
 

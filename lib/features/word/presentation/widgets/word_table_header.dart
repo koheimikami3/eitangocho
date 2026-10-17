@@ -17,9 +17,7 @@ class WordTableHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final languageLabel = ref
-        .watch(translationLanguageProvider)
-        .shortLabel(l10n);
+    final language = ref.watch(translationLanguageProvider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: const BoxDecoration(
@@ -47,7 +45,7 @@ class WordTableHeader extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: Text(l10n.tableMeaning(languageLabel), style: _headerStyle),
+            child: Text(language.meaningColumnLabel(l10n), style: _headerStyle),
           ),
           const SizedBox(width: 12),
           Expanded(

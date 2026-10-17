@@ -59,9 +59,14 @@ abstract class KaikkiTranslation with _$KaikkiTranslation {
       _$KaikkiTranslationFromJson(json);
 }
 
+/// 語義。[glosses] は語義の文で、下位の語義では `[上位の語義, この語義]` の
+/// ように上位から並ぶ(最後がこの語義そのもの)。[tags] は `obsolete` /
+/// `archaic` / `form-of` などの注記で、英語の語義を選ぶときの除外に使う。
 @freezed
 abstract class KaikkiSense with _$KaikkiSense {
   const factory KaikkiSense({
+    @Default(<String>[]) List<String> glosses,
+    @Default(<String>[]) List<String> tags,
     @Default(<KaikkiExample>[]) List<KaikkiExample> examples,
   }) = _KaikkiSense;
 

@@ -77,4 +77,54 @@ void main() {
       TranslationLanguage.ja,
     );
   });
+
+  group('対応外の言語の端末', () {
+    const korean = [Locale('ko', 'KR')];
+    const hans = [Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')];
+
+    test('対応言語が 1 つも無いときだけ対応外とみなす', () {
+      expect(AppLocale.isUnsupported(korean), isTrue);
+      expect(AppLocale.isUnsupported(hans), isTrue);
+      expect(AppLocale.isUnsupported(null), isTrue);
+      expect(AppLocale.isUnsupported(const [Locale('en', 'US')]), isFalse);
+      expect(
+        AppLocale.isUnsupported(const [Locale('ko'), Locale('ja')]),
+        isFalse,
+      );
+    });
+
+    test('訳の言語の既定は英語の語義。英語の端末は日本語のまま', () {
+      expect(
+        AppLocale.defaultTranslationLanguageFor(korean),
+        TranslationLanguage.enDefinition,
+      );
+      expect(
+        AppLocale.defaultTranslationLanguageFor(const [Locale('en', 'US')]),
+        TranslationLanguage.ja,
+      );
+      expect(
+        AppLocale.defaultTranslationLanguageFor(const [Locale('fr', 'CA')]),
+        TranslationLanguage.fr,
+      );
+    });
+
+    test('英語の語義は対応外の言語の端末と、選んでいる利用者にだけ選択肢に出す', () {
+      expect(
+        AppLocale.translationLanguageChoices(korean, TranslationLanguage.ja),
+        TranslationLanguage.values,
+      );
+      expect(
+        AppLocale.translationLanguageChoices(const [
+          Locale('ja'),
+        ], TranslationLanguage.ja),
+        isNot(contains(TranslationLanguage.enDefinition)),
+      );
+      expect(
+        AppLocale.translationLanguageChoices(const [
+          Locale('ja'),
+        ], TranslationLanguage.enDefinition),
+        contains(TranslationLanguage.enDefinition),
+      );
+    });
+  });
 }

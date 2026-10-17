@@ -846,7 +846,7 @@ as String?,
 /// @nodoc
 mixin _$KaikkiSense {
 
- List<KaikkiExample> get examples;
+ List<String> get glosses; List<String> get tags; List<KaikkiExample> get examples;
 /// Create a copy of KaikkiSense
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -859,16 +859,16 @@ $KaikkiSenseCopyWith<KaikkiSense> get copyWith => _$KaikkiSenseCopyWithImpl<Kaik
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiSense&&const DeepCollectionEquality().equals(other.examples, examples));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiSense&&const DeepCollectionEquality().equals(other.glosses, glosses)&&const DeepCollectionEquality().equals(other.tags, tags)&&const DeepCollectionEquality().equals(other.examples, examples));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(examples));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(glosses),const DeepCollectionEquality().hash(tags),const DeepCollectionEquality().hash(examples));
 
 @override
 String toString() {
-  return 'KaikkiSense(examples: $examples)';
+  return 'KaikkiSense(glosses: $glosses, tags: $tags, examples: $examples)';
 }
 
 
@@ -879,7 +879,7 @@ abstract mixin class $KaikkiSenseCopyWith<$Res>  {
   factory $KaikkiSenseCopyWith(KaikkiSense value, $Res Function(KaikkiSense) _then) = _$KaikkiSenseCopyWithImpl;
 @useResult
 $Res call({
- List<KaikkiExample> examples
+ List<String> glosses, List<String> tags, List<KaikkiExample> examples
 });
 
 
@@ -896,9 +896,11 @@ class _$KaikkiSenseCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiSense
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? examples = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? glosses = null,Object? tags = null,Object? examples = null,}) {
   return _then(_self.copyWith(
-examples: null == examples ? _self.examples : examples // ignore: cast_nullable_to_non_nullable
+glosses: null == glosses ? _self.glosses : glosses // ignore: cast_nullable_to_non_nullable
+as List<String>,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
+as List<String>,examples: null == examples ? _self.examples : examples // ignore: cast_nullable_to_non_nullable
 as List<KaikkiExample>,
   ));
 }
@@ -984,10 +986,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<KaikkiExample> examples)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<String> glosses,  List<String> tags,  List<KaikkiExample> examples)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KaikkiSense() when $default != null:
-return $default(_that.examples);case _:
+return $default(_that.glosses,_that.tags,_that.examples);case _:
   return orElse();
 
 }
@@ -1005,10 +1007,10 @@ return $default(_that.examples);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<KaikkiExample> examples)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<String> glosses,  List<String> tags,  List<KaikkiExample> examples)  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiSense():
-return $default(_that.examples);case _:
+return $default(_that.glosses,_that.tags,_that.examples);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1025,10 +1027,10 @@ return $default(_that.examples);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<KaikkiExample> examples)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<String> glosses,  List<String> tags,  List<KaikkiExample> examples)?  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiSense() when $default != null:
-return $default(_that.examples);case _:
+return $default(_that.glosses,_that.tags,_that.examples);case _:
   return null;
 
 }
@@ -1040,8 +1042,22 @@ return $default(_that.examples);case _:
 @JsonSerializable()
 
 class _KaikkiSense implements KaikkiSense {
-  const _KaikkiSense({final  List<KaikkiExample> examples = const <KaikkiExample>[]}): _examples = examples;
+  const _KaikkiSense({final  List<String> glosses = const <String>[], final  List<String> tags = const <String>[], final  List<KaikkiExample> examples = const <KaikkiExample>[]}): _glosses = glosses,_tags = tags,_examples = examples;
   factory _KaikkiSense.fromJson(Map<String, dynamic> json) => _$KaikkiSenseFromJson(json);
+
+ final  List<String> _glosses;
+@override@JsonKey() List<String> get glosses {
+  if (_glosses is EqualUnmodifiableListView) return _glosses;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_glosses);
+}
+
+ final  List<String> _tags;
+@override@JsonKey() List<String> get tags {
+  if (_tags is EqualUnmodifiableListView) return _tags;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tags);
+}
 
  final  List<KaikkiExample> _examples;
 @override@JsonKey() List<KaikkiExample> get examples {
@@ -1064,16 +1080,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiSense&&const DeepCollectionEquality().equals(other._examples, _examples));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiSense&&const DeepCollectionEquality().equals(other._glosses, _glosses)&&const DeepCollectionEquality().equals(other._tags, _tags)&&const DeepCollectionEquality().equals(other._examples, _examples));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_examples));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_glosses),const DeepCollectionEquality().hash(_tags),const DeepCollectionEquality().hash(_examples));
 
 @override
 String toString() {
-  return 'KaikkiSense(examples: $examples)';
+  return 'KaikkiSense(glosses: $glosses, tags: $tags, examples: $examples)';
 }
 
 
@@ -1084,7 +1100,7 @@ abstract mixin class _$KaikkiSenseCopyWith<$Res> implements $KaikkiSenseCopyWith
   factory _$KaikkiSenseCopyWith(_KaikkiSense value, $Res Function(_KaikkiSense) _then) = __$KaikkiSenseCopyWithImpl;
 @override @useResult
 $Res call({
- List<KaikkiExample> examples
+ List<String> glosses, List<String> tags, List<KaikkiExample> examples
 });
 
 
@@ -1101,9 +1117,11 @@ class __$KaikkiSenseCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiSense
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? examples = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? glosses = null,Object? tags = null,Object? examples = null,}) {
   return _then(_KaikkiSense(
-examples: null == examples ? _self._examples : examples // ignore: cast_nullable_to_non_nullable
+glosses: null == glosses ? _self._glosses : glosses // ignore: cast_nullable_to_non_nullable
+as List<String>,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
+as List<String>,examples: null == examples ? _self._examples : examples // ignore: cast_nullable_to_non_nullable
 as List<KaikkiExample>,
   ));
 }

@@ -79,6 +79,26 @@ void main() {
     expect(texts, ['The Loch Ness monster is a legend.', 'monster truck']);
   });
 
+  // 英語の語義(TranslationLanguage.enDefinition)に使うため、保存段階で落とさない。
+  test('語義の文とタグをキャッシュに残す', () async {
+    final mock = buildClient(
+      (_) => utf8Response(
+        '{"word":"thrive","pos":"verb","senses":[{"glosses":["To grow vigorously."],'
+        '"tags":["intransitive"]},{"glosses":["To prosper."],"tags":["obsolete"]}]}',
+        200,
+      ),
+    );
+
+    final entries = KaikkiApiClient.parseEntries(
+      (await mock.client.fetchEntriesJson('thrive'))!,
+    );
+
+    final senses = entries.single.senses;
+    expect(senses.first.glosses, ['To grow vigorously.']);
+    expect(senses.first.tags, ['intransitive']);
+    expect(senses.last.tags, ['obsolete']);
+  });
+
   test('大文字小文字を区別するため、404 なら頭大文字で引き直す', () async {
     final mock = buildClient(
       (path) => path.endsWith('/S/Se/September.jsonl')

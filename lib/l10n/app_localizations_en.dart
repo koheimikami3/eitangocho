@@ -15,6 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'zhHant': 'Chinese (Traditional)',
       'es': 'Spanish',
       'fr': 'French',
+      'enDefinition': 'English (definitions)',
       'other': '',
     });
     return '$_temp0';
@@ -27,6 +28,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'zhHant': 'Chinese',
       'es': 'Spanish',
       'fr': 'French',
+      'enDefinition': 'Definition',
       'other': '',
     });
     return '$_temp0';
@@ -129,6 +131,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get fieldDefinition => 'Definition *';
+
+  @override
   String get fieldPartsOfSpeech => 'Part of speech (choose any)';
 
   @override
@@ -146,6 +151,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String registrationIntro(String language) {
     return 'Enter an English word to fill in its pronunciation, $language translation, examples and more from the dictionary.';
   }
+
+  @override
+  String get registrationIntroDefinition =>
+      'Enter an English word to fill in its pronunciation, definition, examples and more from the dictionary.';
 
   @override
   String get autoFill => 'Auto-fill';
@@ -257,6 +266,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showMeaning => 'Show translation';
 
   @override
+  String get showDefinition => 'Show definition';
+
+  @override
   String correctCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -323,6 +335,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String tableMeaning(String language) {
     return 'Translation';
   }
+
+  @override
+  String get tableDefinition => 'Definition';
 
   @override
   String get tableExample => 'Example';

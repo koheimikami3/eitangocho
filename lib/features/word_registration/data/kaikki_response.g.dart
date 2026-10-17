@@ -55,6 +55,12 @@ Map<String, dynamic> _$KaikkiTranslationToJson(_KaikkiTranslation instance) =>
     <String, dynamic>{'word': instance.word, 'lang_code': instance.langCode};
 
 _KaikkiSense _$KaikkiSenseFromJson(Map<String, dynamic> json) => _KaikkiSense(
+  glosses:
+      (json['glosses'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const <String>[],
+  tags:
+      (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const <String>[],
   examples:
       (json['examples'] as List<dynamic>?)
           ?.map((e) => KaikkiExample.fromJson(e as Map<String, dynamic>))
@@ -63,7 +69,11 @@ _KaikkiSense _$KaikkiSenseFromJson(Map<String, dynamic> json) => _KaikkiSense(
 );
 
 Map<String, dynamic> _$KaikkiSenseToJson(_KaikkiSense instance) =>
-    <String, dynamic>{'examples': instance.examples};
+    <String, dynamic>{
+      'glosses': instance.glosses,
+      'tags': instance.tags,
+      'examples': instance.examples,
+    };
 
 _KaikkiExample _$KaikkiExampleFromJson(Map<String, dynamic> json) =>
     _KaikkiExample(

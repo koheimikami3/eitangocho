@@ -10,6 +10,7 @@ import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/ads/presentation/widgets/mobile_sheet_banner_ad.dart';
 import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word_registration/domain/registration_step.dart';
 import 'package:eitangocho/features/word_registration/domain/word_info.dart';
 import 'package:eitangocho/features/word_registration/presentation/registration_messages.dart';
@@ -182,7 +183,6 @@ class _WordRegistrationSheetState
     final isForm = state.step == RegistrationStep.form;
     final l10n = context.l10n;
     final language = ref.watch(translationLanguageProvider);
-    final languageLabel = language.shortLabel(l10n);
     final error = state.error;
     final errorMessage = error == null
         ? null
@@ -200,7 +200,7 @@ class _WordRegistrationSheetState
       child: switch (state.step) {
         RegistrationStep.input => _InputStep(
           controller: _wordController,
-          languageLabel: languageLabel,
+          language: language,
           errorMessage: errorMessage,
           onAutoFill: () => notifier.autoFill(_wordController.text),
           onSkip: notifier.skipToManual,
@@ -211,7 +211,7 @@ class _WordRegistrationSheetState
               ? null
               : registrationNoticeText(l10n, notice, language),
           translationFailed: state.translationFailed,
-          languageLabel: languageLabel,
+          language: language,
           errorMessage: errorMessage,
           wordController: _wordController,
           ipaController: _ipaController,
@@ -234,7 +234,7 @@ class _WordRegistrationSheetState
 class _InputStep extends StatelessWidget {
   const _InputStep({
     required this.controller,
-    required this.languageLabel,
+    required this.language,
     required this.errorMessage,
     required this.onAutoFill,
     required this.onSkip,
@@ -243,7 +243,7 @@ class _InputStep extends StatelessWidget {
   final TextEditingController controller;
 
   /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
-  final String languageLabel;
+  final TranslationLanguage language;
   final String? errorMessage;
   final VoidCallback onAutoFill;
   final VoidCallback onSkip;
@@ -257,7 +257,7 @@ class _InputStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l10n.registrationIntro(languageLabel),
+          language.registrationIntro(l10n),
           style: TextStyle(
             fontSize: 12,
             height: 1.6,
@@ -340,7 +340,7 @@ class _FormStep extends StatelessWidget {
   const _FormStep({
     required this.warningMessage,
     required this.translationFailed,
-    required this.languageLabel,
+    required this.language,
     required this.errorMessage,
     required this.wordController,
     required this.ipaController,
@@ -360,7 +360,7 @@ class _FormStep extends StatelessWidget {
   final bool translationFailed;
 
   /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
-  final String languageLabel;
+  final TranslationLanguage language;
   final String? errorMessage;
   final TextEditingController wordController;
   final TextEditingController ipaController;
@@ -388,7 +388,9 @@ class _FormStep extends StatelessWidget {
           const SizedBox(height: 14),
         ],
         if (translationFailed) ...[
-          _WarningBanner(message: l10n.exampleTranslationFailed(languageLabel)),
+          _WarningBanner(
+            message: l10n.exampleTranslationFailed(language.shortLabel(l10n)),
+          ),
           const SizedBox(height: 14),
         ],
         MobileFormRows(
@@ -406,7 +408,7 @@ class _FormStep extends StatelessWidget {
               autoFilled: autoIpa,
             ),
             MobileLabeledField(
-              label: l10n.fieldMeaning(languageLabel),
+              label: language.meaningFieldLabel(l10n),
               controller: meaningController,
               maxLines: null,
               autoFilled: autoMeaning,
@@ -433,13 +435,15 @@ class _FormStep extends StatelessWidget {
               maxLines: null,
               autoFilled: autoExampleEn,
             ),
-            MobileLabeledField(
-              label: l10n.fieldExampleTranslation(languageLabel),
-              controller: exampleTranslationController,
-              minLines: 2,
-              maxLines: null,
-              autoFilled: autoExampleTranslation,
-            ),
+            // 例文の訳を持たない言語(英語の語義)では欄ごと出さない
+            if (language.translatesExamples)
+              MobileLabeledField(
+                label: l10n.fieldExampleTranslation(language.shortLabel(l10n)),
+                controller: exampleTranslationController,
+                minLines: 2,
+                maxLines: null,
+                autoFilled: autoExampleTranslation,
+              ),
           ],
         ),
         if (errorMessage != null) ...[

@@ -331,4 +331,34 @@ void main() {
     expect(mock.requests.single.queryParameters['trans:lang'], 'spa');
     expect(example!.translation, '¿Cómo lo lograste tan rápido?');
   });
+
+  // 英語の語義では例文の訳を持たないので、訳の有無で絞らない。
+  test('英語の語義は trans:lang を付けず、訳の無い英文も採って訳を空にする', () async {
+    final mock = buildClient(
+      () => utf8Response(
+        jsonEncode({
+          'data': [
+            {
+              'text': 'The plants thrive in this warm, humid climate.',
+              'lang': 'eng',
+              'translations': <Object>[],
+            },
+          ],
+        }),
+        200,
+      ),
+    );
+
+    final example = await mock.client.findExample(
+      'thrive',
+      TranslationLanguage.enDefinition,
+    );
+
+    expect(
+      mock.requests.single.queryParameters.containsKey('trans:lang'),
+      isFalse,
+    );
+    expect(example!.en, 'The plants thrive in this warm, humid climate.');
+    expect(example.translation, isEmpty);
+  });
 }
