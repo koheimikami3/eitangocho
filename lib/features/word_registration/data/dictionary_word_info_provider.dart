@@ -56,9 +56,6 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
   /// kaikki の訳語から訳に採る最大件数。
   static const _maxMeaningWords = 5;
 
-  /// 英語の語義に採る最大件数。語義は 1 件が 1 文で長いため、訳語より少なくする。
-  static const _maxDefinitions = 2;
-
   /// 英語の語義から外すタグ。廃用・古風・方言・活用形の参照(`past participle
   /// of ...`)は、学習者が覚える意味にならない。
   static const _excludedDefinitionTags = {
@@ -207,30 +204,26 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     return words.join(' / ');
   }
 
-  /// kaikki の語義の文から英語の語義をまとめる([TranslationLanguage.enDefinition])。
+  /// kaikki の語義の文から英語の語義を 1 つ選ぶ([TranslationLanguage.enDefinition])。
   ///
-  /// 品詞のエントリごとに、[_excludedDefinitionTags] の付かない最初の語義を
-  /// 1 つ採り、重複を除いて [_maxDefinitions] 件まで ` / ` で連結する。
-  /// 1 品詞から複数採らないのは、多義語(`run` は動詞だけで 64 語義)で欄が
-  /// 長大になるのを防ぎ、品詞をまたいだ意味を見せるため。
+  /// 先頭の品詞から順に見て、[_excludedDefinitionTags] の付かない最初の語義を
+  /// 採る。**1 文だけにする**。2 品詞目の語義を足しても名詞形の言い換えか、
+  /// `vague` の「An indefinite expanse.」のような外れた意味がほとんどで、
+  /// 欄が長くなるだけだったため。
   ///
   /// Wiktionary の語義の並びは使用頻度順とは限らない(語源ごとにエントリが
   /// 分かれ、古い語源が先に来る)。自動入力は下書きで、利用者が直せる前提。
   String _selectDefinition(List<KaikkiEntry> entries) {
-    final definitions = <String>{};
     for (final entry in entries) {
       for (final sense in entry.senses) {
         if (sense.glosses.isEmpty) continue;
         if (sense.tags.any(_excludedDefinitionTags.contains)) continue;
         // 下位の語義は [上位, この語義] の順で来るので、最後がこの語義
         final gloss = sense.glosses.last.trim();
-        if (gloss.isEmpty) continue;
-        definitions.add(gloss);
-        break;
+        if (gloss.isNotEmpty) return gloss;
       }
-      if (definitions.length == _maxDefinitions) break;
     }
-    return definitions.join(' / ');
+    return '';
   }
 
   /// 中国語の訳語から繁体字の表記だけを取り出す。

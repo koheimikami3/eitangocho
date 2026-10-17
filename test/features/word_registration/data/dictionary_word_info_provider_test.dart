@@ -550,7 +550,7 @@ void main() {
   });
 
   group('訳の言語が英語の語義', () {
-    test('品詞ごとに除外タグの無い最初の語義を採り、2 件まで連結する', () async {
+    test('除外タグの無い最初の語義を 1 文だけ採る', () async {
       await seedEjdict({'commute': '通勤する'});
       final provider = buildProvider(
         kaikkiResponse: () => utf8Response(commuteDefinitionJsonl, 200),
@@ -559,13 +559,9 @@ void main() {
 
       final info = await provider.fetch('commute');
 
-      // 1 件目は obsolete を飛ばし、下位の語義はそれ自身(最後の文)を採る。
-      // EJDict・訳語は使わない。
-      expect(
-        info!.meaning,
-        'To reduce the sentence previously given. / '
-        'A regular journey between two places, typically home and work.',
-      );
+      // obsolete を飛ばし、下位の語義はそれ自身(最後の文)を採る。
+      // 2 品詞目以降の語義は足さない。EJDict・訳語は使わない。
+      expect(info!.meaning, 'To reduce the sentence previously given.');
       expect(info.translationLanguage, TranslationLanguage.enDefinition);
     });
 
