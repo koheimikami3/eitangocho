@@ -5,7 +5,7 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ja</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
@@ -82,7 +82,7 @@
 	<string>$(GAD_APPLICATION_IDENTIFIER)</string>
 	<!-- ATT ダイアログの説明文。パーソナライズ広告のためだけに使う。 -->
 	<key>NSUserTrackingUsageDescription</key>
-	<string>アプリ内に表示する広告を、あなたの興味に合ったものにするために使用します。</string>
+	<string>Used to show ads in the app that better match your interests.</string>
 	<!-- SKAdNetwork による広告の効果計測に参加する広告ネットワークの一覧。
 	     AdMob の公式ドキュメント(developers.google.com/admob/ios/quick-start)が
 	     公開している値をそのまま持つ。 -->

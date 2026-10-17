@@ -1,2 +1,6 @@
-/* アプリ名は英語の端末でも Info.plist の「英単語帳」のまま(英語の掲載は出さない方針)。 */
+/* 英語の端末と、対応外の言語の端末(開発言語が en のためここに落ちる)ではアプリ名を
+   英語名にする。固定の文字列で上書きするため、Debug ビルドの「dev」表記はこの言語では
+   付かない(許容している)。ホーム画面で省略されないよう短い名前にしている。 */
+"CFBundleDisplayName" = "English Vocab";
+"CFBundleName" = "English Vocab";
 "NSUserTrackingUsageDescription" = "Used to show ads in the app that better match your interests.";
