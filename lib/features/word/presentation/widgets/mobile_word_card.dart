@@ -4,6 +4,7 @@ import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_pos_badge.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_shrinking_ipa_text.dart';
@@ -71,6 +72,11 @@ class _MobileWordCardState extends State<MobileWordCard> {
           const SizedBox(height: 8),
           _RevealToggle(
             meaning: word.meaning,
+            // この端末の設定ではなく単語自身の訳の言語で文言を決める
+            // (このカードは Riverpod を使わず、単語だけで描けるようにしている)
+            language: TranslationLanguage.fromStorageCode(
+              word.translationLanguage,
+            ),
             revealed: _revealed,
             onTap: () => setState(() => _revealed = !_revealed),
           ),
@@ -247,11 +253,13 @@ class _CardHeader extends StatelessWidget {
 class _RevealToggle extends StatelessWidget {
   const _RevealToggle({
     required this.meaning,
+    required this.language,
     required this.revealed,
     required this.onTap,
   });
 
   final String meaning;
+  final TranslationLanguage language;
   final bool revealed;
   final VoidCallback onTap;
 
@@ -304,7 +312,7 @@ class _RevealToggle extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(_hintPadding),
                 child: Text(
-                  context.l10n.showMeaning,
+                  language.showMeaningShortLabel(context.l10n),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: _hintFontSize,

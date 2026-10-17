@@ -9,6 +9,7 @@ import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/word/presentation/widgets/delete_confirm_dialog.dart';
 import 'package:eitangocho/providers/database_provider.dart';
 import 'package:eitangocho/utils/headword.dart';
@@ -65,12 +66,21 @@ class _EditWordDialogState extends State<_EditWordDialog> {
     super.dispose();
   }
 
-  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
+  /// 今の訳の言語。
   ///
   /// ダイアログは呼び出し元の ref を借りているため watch せず read で引く
   /// (開いている間に訳の言語が変わることはない)。
+  TranslationLanguage get _language =>
+      widget.ref.read(translationLanguageProvider);
+
+  /// 訳の言語の短い名前(「日本語訳」の「日本語」)。
   String _languageLabel(BuildContext context) =>
-      widget.ref.read(translationLanguageProvider).shortLabel(context.l10n);
+      _language.shortLabel(context.l10n);
+
+  /// 例文の訳の欄を出すか。英語の語義では出さないが、切り替える前に
+  /// 登録した例文の訳がある単語では、消さずに直せるよう出す。
+  bool get _showsExampleTranslation =>
+      _language.translatesExamples || widget.word.exampleTranslation.isNotEmpty;
 
   Future<void> _save() async {
     final word = normalizeHeadword(_wordController.text);
@@ -190,7 +200,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                     ),
                     const SizedBox(height: 16),
                     LabeledTextField(
-                      label: l10n.fieldMeaning(languageLabel),
+                      label: _language.meaningFieldLabel(l10n),
                       controller: _meaningController,
                       maxLines: null,
                     ),
@@ -229,13 +239,15 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                       minLines: 2,
                       maxLines: null,
                     ),
-                    const SizedBox(height: 16),
-                    LabeledTextField(
-                      label: l10n.fieldExampleTranslation(languageLabel),
-                      controller: _exampleTranslationController,
-                      minLines: 2,
-                      maxLines: null,
-                    ),
+                    if (_showsExampleTranslation) ...[
+                      const SizedBox(height: 16),
+                      LabeledTextField(
+                        label: l10n.fieldExampleTranslation(languageLabel),
+                        controller: _exampleTranslationController,
+                        minLines: 2,
+                        maxLines: null,
+                      ),
+                    ],
                     if (_errorMessage != null) ...[
                       const SizedBox(height: 16),
                       Text(

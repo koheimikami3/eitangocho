@@ -11,7 +11,6 @@ import 'package:eitangocho/features/settings/domain/author_app.dart';
 import 'package:eitangocho/features/settings/domain/learning_card_layout.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
-import 'package:eitangocho/features/settings/domain/translation_language.dart';
 import 'package:eitangocho/features/settings/presentation/license_view_mobile.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_author_app_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_card_layout_preview.dart';
@@ -27,6 +26,7 @@ import 'package:eitangocho/features/settings/presentation/widgets/mobile_setting
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_value_row.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/mobile_settings_toggle_row.dart';
 import 'package:eitangocho/features/sync/presentation/mobile_sync_rows.dart';
+import 'package:eitangocho/utils/app_locale.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,7 +109,9 @@ class SettingsViewMobile extends ConsumerWidget {
         MobileSettingsSection(
           title: l10n.sectionTranslation,
           rows: [
-            for (final language in TranslationLanguage.values)
+            for (final language in AppLocale.deviceTranslationLanguageChoices(
+              translationLanguage,
+            ))
               MobileSettingsRadioRow(
                 label: language.label(l10n),
                 selected: translationLanguage == language,

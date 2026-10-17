@@ -28,9 +28,7 @@ class RegistrationInputStep extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.registrationIntro(
-            ref.watch(translationLanguageProvider).shortLabel(l10n),
-          ),
+          ref.watch(translationLanguageProvider).registrationIntro(l10n),
           style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
         ),
         const SizedBox(height: 14),

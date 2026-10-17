@@ -243,7 +243,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
         ),
         const SizedBox(height: 16),
         LabeledTextField(
-          label: l10n.fieldMeaning(languageLabel),
+          label: language.meaningFieldLabel(l10n),
           controller: _meaningController,
           maxLines: null,
           trailing: _autoMeaning ? const AutoFillBadge() : null,
@@ -286,14 +286,17 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           maxLines: null,
           trailing: _autoExampleEn ? const AutoFillBadge() : null,
         ),
-        const SizedBox(height: 16),
-        LabeledTextField(
-          label: l10n.fieldExampleTranslation(languageLabel),
-          controller: _exampleTranslationController,
-          minLines: 2,
-          maxLines: null,
-          trailing: _autoExampleTranslation ? const AutoFillBadge() : null,
-        ),
+        // 例文の訳を持たない言語(英語の語義)では欄ごと出さない
+        if (language.translatesExamples) ...[
+          const SizedBox(height: 16),
+          LabeledTextField(
+            label: l10n.fieldExampleTranslation(languageLabel),
+            controller: _exampleTranslationController,
+            minLines: 2,
+            maxLines: null,
+            trailing: _autoExampleTranslation ? const AutoFillBadge() : null,
+          ),
+        ],
         if (errorMessage != null) ...[
           const SizedBox(height: 16),
           Text(
