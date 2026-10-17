@@ -22,11 +22,16 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
-## 2.8.0 (build 19)
+## 2.8.0 (build 20)
 
 両プラットフォームに出したが、利用者から見える変化は iOS の入力まわり(キーボードとタブバー、英字キーボード、
-「完了」キー、欄の外のタップで閉じる)だけなので文面を分ける。新機能の欄は 2.7.0 と同じく 4 言語ぶん入れる。
+「完了」キー、欄の外のタップで閉じる)だけなので文面を分ける。
 計測の追加と、検索を英単語だけに一致させた変更は掲載していない。
+
+build 19 で提出したが、審査中に取り下げた(番号は使用済み)。対応外の言語の端末向けの英語対応
+(英語の語義、アプリ名・ATT の英語化)を入れて build 20 で出し直した。今回から英語(米国)の掲載を足し、
+プライマリ言語を英語にしたので、新機能の欄は 5 言語ぶん入れる。英語の語義は対応外の言語の利用者にしか
+関係しないので、英語の文面にだけ書いた。アプリ名・ATT の英語化はどの言語の文面にも書いていない。
 
 ### iOS
 
@@ -54,6 +59,13 @@ Français:
 Amélioration de l'ergonomie des champs de saisie.
 ```
 
+English:
+
+```
+Improved the usability of input fields.
+Added English definitions for languages without translations.
+```
+
 ### macOS
 
 日本語:
@@ -78,6 +90,13 @@ Français:
 
 ```
 Amélioration du fonctionnement interne de l'app en vue de futures évolutions.
+```
+
+English:
+
+```
+Improved the app's internals for future updates.
+Added English definitions for languages without translations.
 ```
 
 ---
