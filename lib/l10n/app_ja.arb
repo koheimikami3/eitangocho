@@ -1,6 +1,6 @@
 {
   "@@locale": "ja",
-  "translationLanguageName": "{language, select, ja{日本語} zhHant{中国語(繁体字)} es{スペイン語} fr{フランス語} other{}}",
+  "translationLanguageName": "{language, select, ja{日本語} zhHant{中国語(繁体字)} es{スペイン語} fr{フランス語} enDefinition{英語(語義)} other{}}",
   "@translationLanguageName": {
     "description": "訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name",
     "placeholders": {
@@ -9,7 +9,7 @@
       }
     }
   },
-  "translationLanguageShortName": "{language, select, ja{日本語} zhHant{中国語} es{スペイン語} fr{フランス語} other{}}",
+  "translationLanguageShortName": "{language, select, ja{日本語} zhHant{中国語} es{スペイン語} fr{フランス語} enDefinition{語義} other{}}",
   "@translationLanguageShortName": {
     "description": "訳の言語の短い名前(項目名・出題方向に差し込む)。es / fr は文中に差し込むので小文字で書く",
     "placeholders": {
@@ -84,6 +84,10 @@
       }
     }
   },
+  "fieldDefinition": "語義 *",
+  "@fieldDefinition": {
+    "description": "訳の言語が英語の語義のときの、訳の欄の項目名(fieldMeaning の代わり)"
+  },
   "fieldPartsOfSpeech": "品詞(複数選択可)",
   "fieldExampleEn": "英例文",
   "fieldExampleTranslation": "{language}例文",
@@ -103,6 +107,10 @@
         "type": "String"
       }
     }
+  },
+  "registrationIntroDefinition": "英単語を入力すると、発音記号・英語の語義・例文などを辞書から自動取得します。",
+  "@registrationIntroDefinition": {
+    "description": "訳の言語が英語の語義のときの登録画面の説明(registrationIntro の代わり)"
   },
   "autoFill": "自動入力",
   "autoFillBadge": "自動入力",
@@ -180,6 +188,10 @@
     }
   },
   "showMeaning": "訳を表示",
+  "showDefinition": "語義を表示",
+  "@showDefinition": {
+    "description": "訳の言語が英語の語義のときの、カードの「訳を表示」ボタン"
+  },
   "correctCount": "覚えた {count}回",
   "@correctCount": {
     "placeholders": {
@@ -221,6 +233,10 @@
         "type": "String"
       }
     }
+  },
+  "tableDefinition": "語義",
+  "@tableDefinition": {
+    "description": "訳の言語が英語の語義のときの、全単語の表の列名(tableMeaning の代わり)"
   },
   "tableExample": "例文",
   "tablePronunciation": "発音",

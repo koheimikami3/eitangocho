@@ -26,7 +26,7 @@ class KaikkiApiClient {
   /// 訳語のうち残す言語(kaikki の `lang_code`)。訳の言語のどれでも
   /// キャッシュから引けるよう、対応言語の分はすべて残す。
   static final _keptLangCodes = {
-    for (final language in TranslationLanguage.values) language.kaikkiLangCode,
+    for (final language in TranslationLanguage.values) ?language.kaikkiLangCode,
   };
 
   /// 正規化済みの JSON 配列文字列を返す(キャッシュにそのまま保存する形)。
@@ -96,6 +96,9 @@ class KaikkiApiClient {
   ///
   /// 訳語は訳の言語の分だけ残す。全言語ぶんを持っており(`give up` は
   /// 1 品詞に 243 件)、そのまま保存するとキャッシュを縮めた意味が無くなる。
+  ///
+  /// 語義の文(`glosses`)とタグは残す。英語の語義([TranslationLanguage.enDefinition])
+  /// に使うため。
   static List<KaikkiEntry> _parseJsonl(String body) {
     final entries = <KaikkiEntry>[];
     for (final line in const LineSplitter().convert(body)) {

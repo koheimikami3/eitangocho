@@ -15,6 +15,7 @@ class AppLocalizationsZh extends AppLocalizations {
       'zhHant': '繁體中文',
       'es': '西班牙文',
       'fr': '法文',
+      'enDefinition': '英文(釋義)',
       'other': '',
     });
     return '$_temp0';
@@ -27,6 +28,7 @@ class AppLocalizationsZh extends AppLocalizations {
       'zhHant': '中文',
       'es': '西班牙文',
       'fr': '法文',
+      'enDefinition': '釋義',
       'other': '',
     });
     return '$_temp0';
@@ -117,6 +119,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get fieldDefinition => '英文釋義 *';
+
+  @override
   String get fieldPartsOfSpeech => '詞性（可複選）';
 
   @override
@@ -134,6 +139,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String registrationIntro(String language) {
     return '輸入英文單字，就會從字典自動取得音標、$language翻譯、例句等資訊。';
   }
+
+  @override
+  String get registrationIntroDefinition => '輸入英文單字，就會從字典自動取得音標、英文釋義、例句等資訊。';
 
   @override
   String get autoFill => '自動填入';
@@ -241,6 +249,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showMeaning => '顯示翻譯';
 
   @override
+  String get showDefinition => '顯示釋義';
+
+  @override
   String correctCount(int count) {
     return '記住 $count 次';
   }
@@ -299,6 +310,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String tableMeaning(String language) {
     return '$language翻譯';
   }
+
+  @override
+  String get tableDefinition => '釋義';
 
   @override
   String get tableExample => '例句';
@@ -579,6 +593,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       'zhHant': '繁體中文',
       'es': '西班牙文',
       'fr': '法文',
+      'enDefinition': '英文(釋義)',
       'other': '',
     });
     return '$_temp0';
@@ -591,6 +606,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       'zhHant': '中文',
       'es': '西班牙文',
       'fr': '法文',
+      'enDefinition': '釋義',
       'other': '',
     });
     return '$_temp0';
@@ -681,6 +697,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String get fieldDefinition => '英文釋義 *';
+
+  @override
   String get fieldPartsOfSpeech => '詞性（可複選）';
 
   @override
@@ -698,6 +717,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String registrationIntro(String language) {
     return '輸入英文單字，就會從字典自動取得音標、$language翻譯、例句等資訊。';
   }
+
+  @override
+  String get registrationIntroDefinition => '輸入英文單字，就會從字典自動取得音標、英文釋義、例句等資訊。';
 
   @override
   String get autoFill => '自動填入';
@@ -805,6 +827,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get showMeaning => '顯示翻譯';
 
   @override
+  String get showDefinition => '顯示釋義';
+
+  @override
   String correctCount(int count) {
     return '記住 $count 次';
   }
@@ -863,6 +888,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String tableMeaning(String language) {
     return '$language翻譯';
   }
+
+  @override
+  String get tableDefinition => '釋義';
 
   @override
   String get tableExample => '例句';

@@ -24,8 +24,9 @@ class AppDatabase extends _$AppDatabase {
   /// v3: dictionary_cache_entries の中身を捨てる(辞書ソースの入れ替え)
   /// v4: words.translation_language を追加し、辞書キャッシュを捨てる(多言語化)
   /// v5: 辞書キャッシュを捨てる(訳の言語にスペイン語・フランス語を追加)
+  /// v6: 辞書キャッシュを捨てる(英語の語義のため glosses を残すようにした)
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -67,6 +68,13 @@ class AppDatabase extends _$AppDatabase {
       // 訳の言語を足すたびに、ここで捨て直す必要がある。v3 からの更新では
       // 上で既に捨てているが、二度消しても害は無い。
       if (from < 5) {
+        await m.database.customStatement(
+          'DELETE FROM dictionary_cache_entries',
+        );
+      }
+      // v5 → v6 も辞書キャッシュの削除のみ。キャッシュは語義の文(glosses)を
+      // 落として保存していたため、英語の語義を引けない。
+      if (from < 6) {
         await m.database.customStatement(
           'DELETE FROM dictionary_cache_entries',
         );

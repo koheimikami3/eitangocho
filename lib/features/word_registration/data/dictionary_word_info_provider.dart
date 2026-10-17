@@ -22,6 +22,7 @@ part 'dictionary_word_info_provider.g.dart';
 ///
 /// 訳は訳の言語(TranslationLanguage)で取得する。日本語は同梱の EJDict を
 /// 優先し、それ以外の言語は kaikki の訳語だけを使う(同梱できる辞書が無い)。
+/// 英語の語義は kaikki の語義の文から採る。
 /// 依存はすべてコンストラクタ注入し、テストでフェイクに差し替えられるようにする。
 class DictionaryWordInfoProvider implements WordInfoProvider {
   const DictionaryWordInfoProvider({
@@ -54,6 +55,24 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
 
   /// kaikki の訳語から訳に採る最大件数。
   static const _maxMeaningWords = 5;
+
+  /// 英語の語義に採る最大件数。語義は 1 件が 1 文で長いため、訳語より少なくする。
+  static const _maxDefinitions = 2;
+
+  /// 英語の語義から外すタグ。廃用・古風・方言・活用形の参照(`past participle
+  /// of ...`)は、学習者が覚える意味にならない。
+  static const _excludedDefinitionTags = {
+    'obsolete',
+    'archaic',
+    'rare',
+    'dated',
+    'dialectal',
+    'historical',
+    'nonstandard',
+    'misspelling',
+    'form-of',
+    'alt-of',
+  };
 
   @override
   Future<WordInfo?> fetch(String word) async {
@@ -120,8 +139,11 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
     // 5. 辞書にも例文にも何も無ければ未収録として扱う(手動入力へ倒す)。
     if (entries == null && meaning == null && example == null) return null;
 
-    // 6. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)
-    if (info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty) {
+    // 6. 和訳がまだ無くキー設定済みなら DeepL で訳す(失敗は空のまま続行)。
+    //    例文の訳を持たない言語(英語の語義)では訳さない。
+    if (language.translatesExamples &&
+        info.exampleEn.isNotEmpty &&
+        info.exampleTranslation.isEmpty) {
       final apiKey = await _getDeeplApiKey();
       if (apiKey.isNotEmpty) {
         final translated = await _deeplClient.translate(
@@ -150,7 +172,9 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       word: word,
       ipa: _selectIpa(entries),
       partsOfSpeech: partsOfSpeech,
-      meaning: _selectMeaning(entries, language),
+      meaning: language.usesDefinition
+          ? _selectDefinition(entries)
+          : _selectMeaning(entries, language),
       exampleEn: _selectExample(entries, word),
       translationLanguage: language,
     );
@@ -181,6 +205,32 @@ class DictionaryWordInfoProvider implements WordInfoProvider {
       }
     }
     return words.join(' / ');
+  }
+
+  /// kaikki の語義の文から英語の語義をまとめる([TranslationLanguage.enDefinition])。
+  ///
+  /// 品詞のエントリごとに、[_excludedDefinitionTags] の付かない最初の語義を
+  /// 1 つ採り、重複を除いて [_maxDefinitions] 件まで ` / ` で連結する。
+  /// 1 品詞から複数採らないのは、多義語(`run` は動詞だけで 64 語義)で欄が
+  /// 長大になるのを防ぎ、品詞をまたいだ意味を見せるため。
+  ///
+  /// Wiktionary の語義の並びは使用頻度順とは限らない(語源ごとにエントリが
+  /// 分かれ、古い語源が先に来る)。自動入力は下書きで、利用者が直せる前提。
+  String _selectDefinition(List<KaikkiEntry> entries) {
+    final definitions = <String>{};
+    for (final entry in entries) {
+      for (final sense in entry.senses) {
+        if (sense.glosses.isEmpty) continue;
+        if (sense.tags.any(_excludedDefinitionTags.contains)) continue;
+        // 下位の語義は [上位, この語義] の順で来るので、最後がこの語義
+        final gloss = sense.glosses.last.trim();
+        if (gloss.isEmpty) continue;
+        definitions.add(gloss);
+        break;
+      }
+      if (definitions.length == _maxDefinitions) break;
+    }
+    return definitions.join(' / ');
   }
 
   /// 中国語の訳語から繁体字の表記だけを取り出す。

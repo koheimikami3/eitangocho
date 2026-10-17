@@ -15,6 +15,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'zhHant': 'Chinois (traditionnel)',
       'es': 'Espagnol',
       'fr': 'Français',
+      'enDefinition': 'Anglais (définitions)',
       'other': '',
     });
     return '$_temp0';
@@ -27,6 +28,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'zhHant': 'chinois',
       'es': 'espagnol',
       'fr': 'français',
+      'enDefinition': 'définition',
       'other': '',
     });
     return '$_temp0';
@@ -129,6 +131,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get fieldDefinition => 'Définition *';
+
+  @override
   String get fieldPartsOfSpeech => 'Nature du mot (choix multiple)';
 
   @override
@@ -146,6 +151,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String registrationIntro(String language) {
     return 'Saisissez un mot anglais pour remplir automatiquement sa prononciation, sa traduction en $language, des exemples et plus encore à partir du dictionnaire.';
   }
+
+  @override
+  String get registrationIntroDefinition =>
+      'Saisissez un mot anglais pour remplir automatiquement sa prononciation, sa définition, des exemples et plus encore à partir du dictionnaire.';
 
   @override
   String get autoFill => 'Remplir automatiquement';
@@ -257,6 +266,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get showMeaning => 'Afficher la traduction';
 
   @override
+  String get showDefinition => 'Afficher la définition';
+
+  @override
   String correctCount(int count) {
     return 'Retenu $count fois';
   }
@@ -317,6 +329,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String tableMeaning(String language) {
     return 'Traduction';
   }
+
+  @override
+  String get tableDefinition => 'Définition';
 
   @override
   String get tableExample => 'Exemple';

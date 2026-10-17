@@ -63,14 +63,17 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
       // WordInfoProvider 抽象は翻訳失敗を返せないため、「英例文はあるのに
       // 和訳が空」をヒューリスティックに失敗とみなす(取得成功で空文字に
       // なることは実質ない)。辞書側(kaikki)の例文を採ったときは対訳が
-      // 無いのでここに該当する。
+      // 無いのでここに該当する。例文の訳を持たない言語(英語の語義)では
+      // 空が正常なので失敗としない。
       state = state.copyWith(
         step: RegistrationStep.form,
         fetched: info,
         notFound: false,
         selectedPartsOfSpeech: info.partsOfSpeech.toSet(),
         translationFailed:
-            info.exampleEn.isNotEmpty && info.exampleTranslation.isEmpty,
+            info.translationLanguage.translatesExamples &&
+            info.exampleEn.isNotEmpty &&
+            info.exampleTranslation.isEmpty,
       );
       analytics.logAutofillResult(
         result: AutofillResult.success,

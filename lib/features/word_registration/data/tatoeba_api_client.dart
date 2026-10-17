@@ -50,6 +50,9 @@ class TatoebaApiClient {
   static const _preferredMinWords = 6;
 
   /// [word] を含む英文と、[language] の訳の組を 1 つ返す。見つからなければ null。
+  ///
+  /// 対訳を持たない言語([TranslationLanguage.translatesExamples] が false)では、
+  /// 訳で絞らずに英文だけを選び、訳は空にする。
   Future<ExampleSentence?> findExample(
     String word,
     TranslationLanguage language,
@@ -60,7 +63,7 @@ class TatoebaApiClient {
     final uri = Uri.https('api.tatoeba.org', '/unstable/sentences', {
       'lang': 'eng',
       'q': normalized,
-      'trans:lang': language.tatoebaLang,
+      'trans:lang': ?language.tatoebaLang,
       // sort は必須。省略すると 400 が返る。
       'sort': 'relevance',
       'limit': '$_limit',
@@ -80,7 +83,8 @@ class TatoebaApiClient {
     return _select(parsed.data, normalized, language);
   }
 
-  /// 訳があり、見出し語を実際に含む文のうち最短のものを選ぶ。
+  /// 訳があり(対訳を持たない言語では問わない)、見出し語を実際に含む文のうち
+  /// 最短のものを選ぶ。
   ///
   /// Tatoeba の検索はステミングするため、`negligible` で検索しても
   /// `negligence` の文しか返らないことがある。語形フィルタを通さないと
@@ -104,10 +108,12 @@ class TatoebaApiClient {
       final en = (sentence.text ?? '').trim();
       if (en.isEmpty) continue;
       if (!containsWordForm(en, word)) continue;
-      final translation = sentence.translations
-          .where((t) => _matches(t, language))
-          .map((t) => t.text!.trim())
-          .firstOrNull;
+      final translation = language.translatesExamples
+          ? sentence.translations
+                .where((t) => _matches(t, language))
+                .map((t) => t.text!.trim())
+                .firstOrNull
+          : '';
       if (translation == null) continue;
       candidates.add(ExampleSentence(en: en, translation: translation));
     }
