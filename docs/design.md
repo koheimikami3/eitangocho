@@ -44,6 +44,10 @@
   `AppLocale.resolve` で決める(ja / zh-Hant / es / fr / en。es / fr は地域を区別しない。
   簡体字・対応外は en)。訳の言語は設定(`TranslationLanguage`)で、既定は画面と同じ
   言語があればそれ、無ければ ja。英語の画面を使う日本語話者(海外在住など)がいるため
+- **対応外の言語は、画面だけでなくアプリ名・権限の文言・ストアの掲載も英語に落とす。**
+  両 OS の開発言語(`CFBundleDevelopmentRegion`)を en にし、`en.lproj` でアプリ名を
+  「English Vocab」にする。ストアのプライマリ言語は英語(米国)にする。開発言語やプライマリ
+  言語が ja だと、画面は英語なのにアプリ名・ATT・掲載だけ日本語になるため
 - **訳は DB の `japanese` / `example_ja` 列と同期 JSON の `japanese` / `exampleJa` を
   言語によらず使い回す**(Dart 側の名前だけ `meaning` / `exampleTranslation`)。
   言語ごとに列を足すと、古い版の端末が同期ファイルを書き戻すときに未知のキーを
@@ -122,8 +126,9 @@
   `macos/Runner/Configs/*.xcconfig` と `ios/Flutter/*.xcconfig`
   - pbxproj では、変数を含む値を引用符で囲む(囲まないとパースエラーになる)
 - **表示名**: macOS は `PRODUCT_NAME`(= `.app` のファイル名)で決まる。Dock・Finder は
-  `CFBundleDisplayName` を見ないため。実行ファイル名は `EXECUTABLE_NAME` で ASCII に
-  固定する。iOS は `APP_DISPLAY_NAME` で「英単語帳」(ホーム画面で省略されない長さ)
+  `CFBundleDisplayName` を見ないため。他言語の名前は `LSHasLocalizedDisplayName` を
+  立てて `*.lproj/InfoPlist.strings` で上書きする(立てないと Finder・Dock は日本語名のまま)。
+  実行ファイル名は `EXECUTABLE_NAME` で ASCII に固定する。iOS は `APP_DISPLAY_NAME` で「英単語帳」(ホーム画面で省略されない長さ)
 - **バージョンは pubspec の 1 つを両プラットフォームで共有する**。片方にしか出さない
   版もある
 - **ビルド番号は全履歴を通じて単調増加で、再利用しない**(macOS の制約。iOS は
