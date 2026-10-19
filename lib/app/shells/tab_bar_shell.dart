@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/shells/widgets/mobile_header.dart';
@@ -48,6 +50,7 @@ class _ShellBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     // 広告が読み込まれていない間は 0。
     final bannerHeight = ref.watch(bannerAdHeightProvider);
@@ -97,15 +100,29 @@ class _ShellBody extends ConsumerWidget {
             ],
           ),
         ),
-        const Positioned(
+        Positioned(
           left: 0,
           right: 0,
           bottom: 0,
-          // バナー広告はタブバーの上に積む(デザインの並び)。広告が無い間は
-          // MobileBannerAd 自身が何も描かないため、見た目は従来どおり。
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [MobileBannerAd(), MobileTabBar()],
+          // バナー広告はタブバーの上に積み、半透明 + ぼかしの地と上端の影を
+          // 両方まとめて描いて一枚のバーに見せる(別々の帯にすると、地の色の
+          // 段差とタブバーの影で間に帯が挟まって見える)。広告が無い間は
+          // MobileBannerAd 自身が何も描かないため、タブバーだけの見た目になる。
+          // 上端の影はぼかしの ClipRect の外に出す必要があるため、外側で描く。
+          child: DecoratedBox(
+            decoration: BoxDecoration(boxShadow: palette.bottomBarShadow),
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                child: ColoredBox(
+                  color: palette.tabBar,
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [MobileBannerAd(), MobileTabBar()],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],
