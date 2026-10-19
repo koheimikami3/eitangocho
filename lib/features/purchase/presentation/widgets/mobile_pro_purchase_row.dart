@@ -41,7 +41,7 @@ class MobileProPurchaseRow extends ConsumerWidget {
                   Text(
                     context.l10n.proCoffeeThanks,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 12,
                       color: palette.textAlpha(45),
                     ),
                   )
@@ -60,7 +60,7 @@ class MobileProPurchaseRow extends ConsumerWidget {
                       priceText: state.priceText,
                     ),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 12,
                       color: state.purchaseFailed
                           ? palette.danger
                           : palette.textAlpha(45),
