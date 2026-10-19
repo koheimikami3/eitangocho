@@ -31,10 +31,14 @@ class MobileProLink extends ConsumerWidget {
       builder: (context, _) => Padding(
         // 文字だけでは押しにくいので、上下に余白を足してタップ領域を広げる。
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        // 末尾の › もリンクの印。前はノーブレークスペースにして、› だけが
+        // 次の行に送られないようにする。
         child: Text(
-          context.l10n.proCoffeeLink,
+          '${context.l10n.proCoffeeLink}\u00a0›',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, color: palette.textAlpha(55)),
+          // 押せることは末尾の › で示す。青字のリンクにすると広告の下で
+          // 目立ちすぎるため、本文と同じ色にする。
+          style: TextStyle(fontSize: 13, color: palette.text),
         ),
       ),
     );
