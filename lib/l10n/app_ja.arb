@@ -389,6 +389,7 @@
   "proCoffeeTitle": "開発者にコーヒーを1杯差し入れ ☕",
   "proCoffeeReward": "お礼に広告を非表示にします",
   "proCoffeeThanks": "コーヒーありがとうございます!",
+  "proCoffeeLink": "コーヒー1杯の差し入れで広告が消えます ☕",
   "priceUnavailable": "価格を取得できませんでした",
   "oneTimePrice": "買い切り {price}",
   "@oneTimePrice": {

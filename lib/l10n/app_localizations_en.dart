@@ -572,6 +572,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proCoffeeThanks => 'Thanks for the coffee!';
 
   @override
+  String get proCoffeeLink => 'Buy me a coffee to remove ads ☕';
+
+  @override
   String get priceUnavailable => 'Couldn\'t get the price';
 
   @override

@@ -127,6 +127,10 @@ class AnalyticsLogger {
 
   void logProPurchase(ProPurchaseStage stage) =>
       _log('pro_purchase', {'stage': stage.name});
+
+  /// クイズ結果の広告の下にある Pro への導線を押した。導線を残すか外すかの
+  /// 判断に使う(pro_purchase と並べて、導線経由で購入まで進む人がいるかを見る)。
+  void logProLinkTapped() => _log('pro_link_tapped');
 }
 
 /// riverpod_generator は drift 生成型(Word)を扱う @riverpod を

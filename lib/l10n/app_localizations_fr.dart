@@ -568,6 +568,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get proCoffeeThanks => 'Merci pour le café !';
 
   @override
+  String get proCoffeeLink => 'Offrez-moi un café pour retirer les pubs ☕';
+
+  @override
   String get priceUnavailable => 'Impossible d\'obtenir le prix';
 
   @override

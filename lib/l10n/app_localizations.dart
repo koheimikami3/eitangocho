@@ -1011,6 +1011,12 @@ abstract class AppLocalizations {
   /// **'コーヒーありがとうございます!'**
   String get proCoffeeThanks;
 
+  /// No description provided for @proCoffeeLink.
+  ///
+  /// In ja, this message translates to:
+  /// **'コーヒー1杯の差し入れで広告が消えます ☕'**
+  String get proCoffeeLink;
+
   /// No description provided for @priceUnavailable.
   ///
   /// In ja, this message translates to:

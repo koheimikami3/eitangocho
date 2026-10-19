@@ -542,6 +542,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proCoffeeThanks => 'コーヒーありがとうございます!';
 
   @override
+  String get proCoffeeLink => 'コーヒー1杯の差し入れで広告が消えます ☕';
+
+  @override
   String get priceUnavailable => '価格を取得できませんでした';
 
   @override
