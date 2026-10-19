@@ -101,7 +101,7 @@ void main() {
     expect(find.text('購入済み'), findsOneWidget);
   });
 
-  testWidgets('購入 → 処理中 → 購入済みでボタンの幅が変わらない', (tester) async {
+  testWidgets('購入 → 処理中 → 購入済みでボタンの大きさが変わらない', (tester) async {
     client.purchaseGate = Completer<void>();
     await pumpSection(tester);
 
@@ -120,8 +120,8 @@ void main() {
     await tester.pump();
     final after = buttonSize(find.text('購入済み'));
 
-    expect(purchasing.width, before.width);
-    expect(after.width, before.width);
+    expect(purchasing, before);
+    expect(after, before);
   });
 
   testWidgets('購入に失敗するとその場に出して、しばらくして消す', (tester) async {

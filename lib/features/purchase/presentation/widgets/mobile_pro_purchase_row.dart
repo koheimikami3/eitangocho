@@ -130,17 +130,17 @@ class _PurchaseButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(9),
           boxShadow: filled ? palette.buttonShadow : null,
         ),
-        // 幅は「購入」「購入済み」の長い方に固定し、表示の切り替え
-        // (購入 → インジケータ → 購入済み)でボタンが伸び縮みしないようにする。
-        child: SizedBox(
-          width: _labelWidth(context, textStyle),
+        // 大きさは「購入」「購入済み」・インジケータのうち最も大きいものに
+        // 固定し、表示の切り替え(購入 → インジケータ → 購入済み)でボタンが
+        // 伸び縮みしないようにする。
+        child: SizedBox.fromSize(
+          size: _contentSize(context, textStyle),
           child: Center(
             child: purchasing
-                // App Store のダイアログが出るまでの待ちを埋める。文字と同じ高さに
-                // 収めて、ボタンの高さが変わらないようにする。
+                // App Store のダイアログが出るまでの待ちを埋める。
                 ? const SizedBox(
-                    width: 16,
-                    height: 16,
+                    width: _indicatorSize,
+                    height: _indicatorSize,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
@@ -160,25 +160,34 @@ class _PurchaseButton extends StatelessWidget {
     );
   }
 
-  /// 「購入」「購入済み」の長い方の文字幅。どちらが長いかは言語で変わるため、
-  /// 決め打ちにせず実際の文字で測る。見えない文字を重ねて幅を取る手もあるが、
-  /// 読み上げやテストで同じ文言が二重に見つかるので測る方を取る。
-  double _labelWidth(BuildContext context, TextStyle style) {
+  /// 処理中のインジケータの直径。
+  static const _indicatorSize = 16.0;
+
+  /// ボタンの中身の大きさ。「購入」「購入済み」の大きい方で、インジケータより
+  /// 小さくはしない。どちらの文字が大きいかは言語や書体で変わるため、
+  /// 決め打ちにせず実際の文字で測る。見えない文字を重ねて大きさを取る手も
+  /// あるが、読み上げやテストで同じ文言が二重に見つかるので測る方を取る。
+  Size _contentSize(BuildContext context, TextStyle style) {
     // Text と同じ書体で測るため、既定の文字スタイルに重ねる。
     final resolved = DefaultTextStyle.of(context).style.merge(style);
-    double widthOf(String text) {
+    Size sizeOf(String text) {
       final painter = TextPainter(
         text: TextSpan(text: text, style: resolved),
         textDirection: Directionality.of(context),
         textScaler: MediaQuery.textScalerOf(context),
       )..layout();
-      final width = painter.width;
+      final size = painter.size;
       painter.dispose();
-      return width;
+      return size;
     }
 
-    return math
-        .max(widthOf(context.l10n.purchase), widthOf(context.l10n.purchased))
-        .ceilToDouble();
+    final purchase = sizeOf(context.l10n.purchase);
+    final purchased = sizeOf(context.l10n.purchased);
+    return Size(
+      math.max(purchase.width, purchased.width).ceilToDouble(),
+      math
+          .max(_indicatorSize, math.max(purchase.height, purchased.height))
+          .ceilToDouble(),
+    );
   }
 }
