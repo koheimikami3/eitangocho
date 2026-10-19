@@ -565,7 +565,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get proCoffeeTitle => 'Invítale un café al desarrollador ☕';
+  String get proCoffeeTitle => 'Invítale un café al desarrollador ☕';
 
   @override
   String get proCoffeeReward => 'Como agradecimiento, quitamos los anuncios';
@@ -574,7 +574,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get proCoffeeThanks => '¡Gracias por el café!';
 
   @override
-  String get proCoffeeLink => 'Invítame un café y adiós anuncios ☕';
+  String get proCoffeeLink => 'Invítame un café y adiós anuncios ☕';
 
   @override
   String get priceUnavailable => 'No se pudo obtener el precio';

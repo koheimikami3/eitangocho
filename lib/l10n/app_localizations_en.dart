@@ -563,7 +563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get proCoffeeTitle => 'Buy the developer a coffee ☕';
+  String get proCoffeeTitle => 'Buy the developer a coffee ☕';
 
   @override
   String get proCoffeeReward => 'Ads go away as a thank-you';
@@ -572,7 +572,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proCoffeeThanks => 'Thanks for the coffee!';
 
   @override
-  String get proCoffeeLink => 'Buy me a coffee to remove ads ☕';
+  String get proCoffeeLink => 'Buy me a coffee to remove ads ☕';
 
   @override
   String get priceUnavailable => 'Couldn\'t get the price';

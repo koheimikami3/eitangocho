@@ -35,7 +35,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('コーヒー1杯の差し入れで広告が消えます ☕'));
+    await tester.tap(find.text('コーヒー1杯の差し入れで広告が消えます\u00a0☕'));
     // 押下演出のアニメーションを終わらせる(残すと Timer が残って失敗する)。
     await tester.pumpAndSettle();
 

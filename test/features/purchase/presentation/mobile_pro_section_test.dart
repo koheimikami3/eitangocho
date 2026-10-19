@@ -45,7 +45,7 @@ void main() {
   testWidgets('未購入なら価格と購入ボタンを出す', (tester) async {
     await pumpSection(tester);
 
-    expect(find.text('開発者にコーヒーを1杯差し入れ ☕'), findsOneWidget);
+    expect(find.text('開発者にコーヒーを1杯差し入れ\u00a0☕'), findsOneWidget);
     expect(find.text('お礼に広告を非表示にします'), findsOneWidget);
     expect(find.text('買い切り ¥600'), findsOneWidget);
     expect(find.text('購入'), findsOneWidget);

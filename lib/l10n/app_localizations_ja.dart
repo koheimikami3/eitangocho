@@ -533,7 +533,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get proCoffeeTitle => '開発者にコーヒーを1杯差し入れ ☕';
+  String get proCoffeeTitle => '開発者にコーヒーを1杯差し入れ ☕';
 
   @override
   String get proCoffeeReward => 'お礼に広告を非表示にします';
@@ -542,7 +542,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proCoffeeThanks => 'コーヒーありがとうございます!';
 
   @override
-  String get proCoffeeLink => 'コーヒー1杯の差し入れで広告が消えます ☕';
+  String get proCoffeeLink => 'コーヒー1杯の差し入れで広告が消えます ☕';
 
   @override
   String get priceUnavailable => '価格を取得できませんでした';

@@ -529,7 +529,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
+  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
 
   @override
   String get proCoffeeReward => '作為謝禮，將移除廣告';
@@ -538,7 +538,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proCoffeeThanks => '謝謝你的咖啡！';
 
   @override
-  String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';
+  String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';
 
   @override
   String get priceUnavailable => '無法取得價格';
@@ -1113,7 +1113,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
+  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
 
   @override
   String get proCoffeeReward => '作為謝禮，將移除廣告';
@@ -1122,7 +1122,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get proCoffeeThanks => '謝謝你的咖啡！';
 
   @override
-  String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';
+  String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';
 
   @override
   String get priceUnavailable => '無法取得價格';
