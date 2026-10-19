@@ -207,24 +207,26 @@ class AppPalette {
           ),
         ];
 
-  /// タブバー・広告帯など画面下端に重なる面の上端の線と影(--elevUp)
+  /// タブバー・広告帯など画面下端に重なる面の上端の線と影(--elevUp)。
+  /// 影は [headerShadow] を上下反転した強さに揃えている(デザインのままでは
+  /// ヘッダより強く、下のバーだけが重く見えたため。ユーザー判断)。
   List<BoxShadow> get bottomBarShadow => isDark
       ? const [
           BoxShadow(color: Color(0x14FFFFFF), offset: Offset(0, -1)),
           BoxShadow(
-            color: Color(0xE6000000),
-            blurRadius: 20,
-            spreadRadius: -18,
-            offset: Offset(0, -10),
+            color: Color(0x99000000), // デザインは 0.9
+            blurRadius: 12,
+            spreadRadius: -12,
+            offset: Offset(0, -5),
           ),
         ]
       : const [
           BoxShadow(color: Color(0x14101828), offset: Offset(0, -1)),
           BoxShadow(
-            color: Color(0x8C101828),
-            blurRadius: 20,
-            spreadRadius: -18,
-            offset: Offset(0, -10),
+            color: Color(0x33101828), // デザインは 0.55
+            blurRadius: 12,
+            spreadRadius: -13,
+            offset: Offset(0, -5),
           ),
         ];
 

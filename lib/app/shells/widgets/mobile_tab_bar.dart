@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:eitangocho/app/main_page_notifier.dart';
 import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/components/mobile_pressable.dart';
@@ -15,8 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// 単語登録はタブに置かない(ヘッダの「＋ 登録」から開く)。そのため
 /// [MainView.registration] のときはどのタブも選択状態にならない。
 ///
-/// 半透明 + ぼかしでコンテンツの上に重なる。コンテンツ側は下端が隠れないよう
-/// [height] 分の余白を確保すること。
+/// コンテンツの上に重なる(半透明 + ぼかしの地はシェルが描く)。コンテンツ側は
+/// 下端が隠れないよう [height] 分の余白を確保すること。
 class MobileTabBar extends ConsumerWidget {
   const MobileTabBar({super.key});
 
@@ -33,68 +31,57 @@ class MobileTabBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final palette = context.palette;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final bottomInset = (MediaQuery.paddingOf(
       context,
     ).bottom).clamp(_minBottomInset, 40.0);
 
-    // 上端の影はぼかしの ClipRect の外に出す必要があるため、外側で描く。
-    return DecoratedBox(
-      decoration: BoxDecoration(boxShadow: palette.bottomBarShadow),
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(8, 8, 8, bottomInset),
-            color: palette.tabBar,
-            child: Row(
-              children: [
-                _TabItem(
-                  // デザインは「カードが 2 枚重なった」線画。style(扇状に開いた
-                  // カード)より、同じ大きさのカードが 2 枚ずれて重なる
-                  // filter_none の方が近い。
-                  icon: Icons.filter_none,
-                  label: context.l10n.navLearning,
-                  selected: view == MainView.learning,
-                  onTap: () => ref
-                      .read(mainPageProvider.notifier)
-                      .selectView(MainView.learning),
-                ),
-                _TabItem(
-                  icon: Icons.format_list_bulleted,
-                  label: context.l10n.navAllWords,
-                  selected: view == MainView.allWords,
-                  onTap: () => ref
-                      .read(mainPageProvider.notifier)
-                      .selectView(MainView.allWords),
-                ),
-                _TabItem(
-                  icon: Icons.bolt,
-                  label: context.l10n.navQuizShort,
-                  selected: view == MainView.quiz,
-                  // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
-                  onTap: () {
-                    ref
-                        .read(quizPageProvider.notifier)
-                        .startQuiz(trigger: QuizTrigger.tab);
-                    ref
-                        .read(mainPageProvider.notifier)
-                        .selectView(MainView.quiz);
-                  },
-                ),
-                _TabItem(
-                  icon: Icons.settings_outlined,
-                  label: context.l10n.navSettings,
-                  selected: view == MainView.settings,
-                  onTap: () => ref
-                      .read(mainPageProvider.notifier)
-                      .selectView(MainView.settings),
-                ),
-              ],
-            ),
+    // 地の色・ぼかし・上端の影は、上に積むバナー広告と一枚のバーに見せるため
+    // シェル(TabBarShell)がまとめて描く。
+    return Padding(
+      padding: EdgeInsets.fromLTRB(8, 8, 8, bottomInset),
+      child: Row(
+        children: [
+          _TabItem(
+            // デザインは「カードが 2 枚重なった」線画。style(扇状に開いた
+            // カード)より、同じ大きさのカードが 2 枚ずれて重なる
+            // filter_none の方が近い。
+            icon: Icons.filter_none,
+            label: context.l10n.navLearning,
+            selected: view == MainView.learning,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.learning),
           ),
-        ),
+          _TabItem(
+            icon: Icons.format_list_bulleted,
+            label: context.l10n.navAllWords,
+            selected: view == MainView.allWords,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.allWords),
+          ),
+          _TabItem(
+            icon: Icons.bolt,
+            label: context.l10n.navQuizShort,
+            selected: view == MainView.quiz,
+            // サイドバー版と同じく、遷移前に出題をシャッフルし直す。
+            onTap: () {
+              ref
+                  .read(quizPageProvider.notifier)
+                  .startQuiz(trigger: QuizTrigger.tab);
+              ref.read(mainPageProvider.notifier).selectView(MainView.quiz);
+            },
+          ),
+          _TabItem(
+            icon: Icons.settings_outlined,
+            label: context.l10n.navSettings,
+            selected: view == MainView.settings,
+            onTap: () => ref
+                .read(mainPageProvider.notifier)
+                .selectView(MainView.settings),
+          ),
+        ],
       ),
     );
   }

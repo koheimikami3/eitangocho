@@ -46,7 +46,9 @@ class MobileSheetBannerAd extends StatelessWidget {
           _bottomPadding,
         ),
         decoration: BoxDecoration(
-          color: palette.surfaceHeader,
+          // シートと同じ地の色にし、上の細い線だけで入力欄と分ける
+          // (灰色の帯にすると別の部品が挟まったように見えるため)。
+          color: palette.surface,
           border: Border(top: BorderSide(color: palette.borderAlpha(8))),
         ),
         child: adView,

@@ -30,9 +30,6 @@ class MobileBannerAd extends ConsumerStatefulWidget {
   static const _verticalPadding = 8.0;
   static const _horizontalPadding = 12.0;
 
-  /// 上境界の太さ([BorderSide] の既定値)。
-  static const _borderWidth = 1.0;
-
   @override
   ConsumerState<MobileBannerAd> createState() => _MobileBannerAdState();
 }
@@ -88,8 +85,6 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
       });
       return const SizedBox.shrink();
     }
-    final palette = context.palette;
-
     return MobileAdSlot(
       adUnitId: AdUnitIds.tabBarBanner,
       // 常設のこの枠だけ通常サイズのアンカー型アダプティブにする(大型は
@@ -108,25 +103,18 @@ class _MobileBannerAdState extends ConsumerState<MobileBannerAd>
           .update(
             size == null
                 ? 0
-                : size.height +
-                      MobileBannerAd._verticalPadding * 2 +
-                      MobileBannerAd._borderWidth,
+                : size.height + MobileBannerAd._verticalPadding * 2,
           ),
-      builder: (context, adView) => Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MobileBannerAd._horizontalPadding,
-          vertical: MobileBannerAd._verticalPadding,
-        ),
-        decoration: BoxDecoration(
-          color: palette.surfaceHeader,
-          border: Border(
-            top: BorderSide(
-              color: palette.borderAlpha(8),
-              width: MobileBannerAd._borderWidth,
-            ),
+      // 上端の影はシェル(TabBarShell)がタブバーとまとめて描く。
+      builder: (context, adView) => ColoredBox(
+        color: context.palette.surface,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: MobileBannerAd._horizontalPadding,
+            vertical: MobileBannerAd._verticalPadding,
           ),
+          child: adView,
         ),
-        child: adView,
       ),
     );
   }

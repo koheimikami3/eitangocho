@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
 import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
@@ -44,7 +45,8 @@ void main() {
   testWidgets('未購入なら価格と購入ボタンを出す', (tester) async {
     await pumpSection(tester);
 
-    expect(find.text('広告を非表示にする'), findsOneWidget);
+    expect(find.text('開発者にコーヒーを1杯差し入れ\u00a0☕'), findsOneWidget);
+    expect(find.text('お礼に広告を非表示にします'), findsOneWidget);
     expect(find.text('買い切り ¥600'), findsOneWidget);
     expect(find.text('購入'), findsOneWidget);
     expect(find.text('購入を復元'), findsOneWidget);
@@ -54,7 +56,10 @@ void main() {
     client.initialProUnlocked = true;
     await pumpSection(tester);
 
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    // 購入済みならお礼の 1 行だけにし、お礼の内容と価格は出さない。
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
+    expect(find.text('お礼に広告を非表示にします'), findsNothing);
+    expect(find.text('買い切り ¥600'), findsNothing);
     expect(find.text('購入済み'), findsOneWidget);
 
     await tester.tap(find.text('購入済み'));
@@ -71,7 +76,7 @@ void main() {
     await tester.pump();
 
     expect(client.purchaseCount, 1);
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
     expect(find.text('購入済み'), findsOneWidget);
   });
 
@@ -96,6 +101,29 @@ void main() {
     expect(find.text('購入済み'), findsOneWidget);
   });
 
+  testWidgets('購入 → 処理中 → 購入済みでボタンの大きさが変わらない', (tester) async {
+    client.purchaseGate = Completer<void>();
+    await pumpSection(tester);
+
+    Size buttonSize(Finder content) => tester.getSize(
+      find.ancestor(of: content, matching: find.byType(MobilePressable)).first,
+    );
+
+    final before = buttonSize(find.text('購入'));
+
+    await tester.tap(find.text('購入'));
+    await tester.pump();
+    final purchasing = buttonSize(find.byType(CircularProgressIndicator));
+
+    client.purchaseGate!.complete();
+    await tester.pump();
+    await tester.pump();
+    final after = buttonSize(find.text('購入済み'));
+
+    expect(purchasing, before);
+    expect(after, before);
+  });
+
   testWidgets('購入に失敗するとその場に出して、しばらくして消す', (tester) async {
     client.purchaseOutcome = PurchaseOutcome.failed;
     await pumpSection(tester);
@@ -105,6 +133,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('購入できませんでした'), findsOneWidget);
+    // 差し替えるのは価格の行だけで、お礼の行は残す。
+    expect(find.text('お礼に広告を非表示にします'), findsOneWidget);
 
     await tester.pump(messageDuration * 2);
 
@@ -133,7 +163,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('復元しました'), findsOneWidget);
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
 
     await tester.pump(messageDuration * 2);
 

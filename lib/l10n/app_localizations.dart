@@ -993,17 +993,29 @@ abstract class AppLocalizations {
   /// **'同期に失敗しました: {detail}'**
   String syncErrorFailed(String detail);
 
-  /// No description provided for @removeAds.
+  /// ☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ
   ///
   /// In ja, this message translates to:
-  /// **'広告を非表示にする'**
-  String get removeAds;
+  /// **'開発者にコーヒーを1杯差し入れ ☕'**
+  String get proCoffeeTitle;
 
-  /// No description provided for @proPurchasedCaption.
+  /// No description provided for @proCoffeeReward.
   ///
   /// In ja, this message translates to:
-  /// **'Pro を購入済みです'**
-  String get proPurchasedCaption;
+  /// **'お礼に広告を非表示にします'**
+  String get proCoffeeReward;
+
+  /// No description provided for @proCoffeeThanks.
+  ///
+  /// In ja, this message translates to:
+  /// **'コーヒーありがとうございます!'**
+  String get proCoffeeThanks;
+
+  /// ☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ
+  ///
+  /// In ja, this message translates to:
+  /// **'コーヒー1杯の差し入れで広告が消えます ☕'**
+  String get proCoffeeLink;
 
   /// No description provided for @priceUnavailable.
   ///
