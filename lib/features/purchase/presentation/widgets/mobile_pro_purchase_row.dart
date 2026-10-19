@@ -24,7 +24,10 @@ class MobileProPurchaseRow extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+      // ボタンは見出し(1 行目)の高さに揃える。説明が 3 行あるため、
+      // 中央揃えだとボタンが説明の途中に浮いて見える。
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
@@ -71,7 +74,9 @@ class MobileProPurchaseRow extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          // 見出しを 1 行に収めるため、ボタンとの間隔とボタンの左右の余白は
+          // 他の行より詰めている(ボタンの幅は「購入済み」に合わせて固定のため)。
+          const SizedBox(width: 8),
           _PurchaseButton(
             done: done,
             purchasing: state.purchasing,
@@ -122,7 +127,7 @@ class _PurchaseButton extends StatelessWidget {
     return MobilePressable(
       onTap: enabled ? onTap : null,
       builder: (context, _) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: filled ? null : palette.proButtonDone,
           gradient: filled ? palette.buttonGradient : null,
