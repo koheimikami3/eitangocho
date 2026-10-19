@@ -50,7 +50,7 @@ class MobileProPurchaseRow extends ConsumerWidget {
                   // 見え、何が得られるのかが伝わらないため。
                   Text(
                     context.l10n.proCoffeeReward,
-                    style: TextStyle(fontSize: 11, color: palette.text),
+                    style: TextStyle(fontSize: 12, color: palette.text),
                   ),
                   const SizedBox(height: 2),
                   Text(
