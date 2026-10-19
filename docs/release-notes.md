@@ -22,6 +22,49 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.9.0 (build 21)
+
+iOS のみ(macOS は出していない。利用者から見える変化が無いため)。2.8.0 と同じく新機能の欄は 5 言語ぶん入れる。
+Pro の値下げは App Store Connect での価格変更で、ビルドの変更ではない。「一部の画面」は設定画面の Pro の表示と、
+バナー広告まわり(タブバーとの一体化・影の調整)。クイズ結果に置いた Pro への導線は、1.5.0 の「作者の他のアプリ」と
+同じく宣伝の色が濃いため掲載していない。
+
+日本語:
+
+```
+広告を非表示にできる Pro を値下げしました。この機会にぜひご購入をご検討ください。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+可移除廣告的 Pro 降價了，歡迎趁此機會考慮購買。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+Bajamos el precio de Pro, que quita los anuncios. ¡Aprovecha para comprarlo!
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+Baisse du prix de Pro, qui supprime les pubs. Profitez-en pour l'acheter !
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Lowered the price of Pro, which removes ads. Consider purchasing it!
+Improved the design of some screens for readability.
+```
+---
+
 ## 2.8.0 (build 20)
 
 両プラットフォームに出したが、利用者から見える変化は iOS の入力まわり(キーボードとタブバー、英字キーボード、
