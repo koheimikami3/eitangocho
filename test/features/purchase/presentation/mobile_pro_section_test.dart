@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
 import 'package:eitangocho/features/purchase/data/purchases_client.dart';
 import 'package:eitangocho/features/purchase/presentation/mobile_pro_section.dart';
@@ -98,6 +99,29 @@ void main() {
     await tester.pump();
 
     expect(find.text('購入済み'), findsOneWidget);
+  });
+
+  testWidgets('購入 → 処理中 → 購入済みでボタンの幅が変わらない', (tester) async {
+    client.purchaseGate = Completer<void>();
+    await pumpSection(tester);
+
+    Size buttonSize(Finder content) => tester.getSize(
+      find.ancestor(of: content, matching: find.byType(MobilePressable)).first,
+    );
+
+    final before = buttonSize(find.text('購入'));
+
+    await tester.tap(find.text('購入'));
+    await tester.pump();
+    final purchasing = buttonSize(find.byType(CircularProgressIndicator));
+
+    client.purchaseGate!.complete();
+    await tester.pump();
+    await tester.pump();
+    final after = buttonSize(find.text('購入済み'));
+
+    expect(purchasing.width, before.width);
+    expect(after.width, before.width);
   });
 
   testWidgets('購入に失敗するとその場に出して、しばらくして消す', (tester) async {

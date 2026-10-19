@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/purchase/data/purchase_notifier.dart';
@@ -115,6 +117,7 @@ class _PurchaseButton extends StatelessWidget {
     // 押せる間と処理中は青いまま。押せなくなったらグレーに落とす
     // (購入済みだけでなく、価格を引けなかったときもこちら)。
     final filled = enabled || purchasing;
+    const textStyle = TextStyle(fontSize: 13, fontWeight: FontWeight.w600);
 
     return MobilePressable(
       onTap: enabled ? onTap : null,
@@ -126,28 +129,55 @@ class _PurchaseButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(9),
           boxShadow: filled ? palette.buttonShadow : null,
         ),
-        child: purchasing
-            // App Store のダイアログが出るまでの待ちを埋める。文字と同じ高さに
-            // 収めて、ボタンの大きさが変わらないようにする。
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : Text(
-                done ? context.l10n.purchased : context.l10n.purchase,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: filled
-                      ? Colors.white
-                      : palette.proButtonDoneForeground,
-                ),
-              ),
+        // 幅は「購入」「購入済み」の長い方に固定し、表示の切り替え
+        // (購入 → インジケータ → 購入済み)でボタンが伸び縮みしないようにする。
+        child: SizedBox(
+          width: _labelWidth(context, textStyle),
+          child: Center(
+            child: purchasing
+                // App Store のダイアログが出るまでの待ちを埋める。文字と同じ高さに
+                // 収めて、ボタンの高さが変わらないようにする。
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    done ? context.l10n.purchased : context.l10n.purchase,
+                    style: textStyle.copyWith(
+                      color: filled
+                          ? Colors.white
+                          : palette.proButtonDoneForeground,
+                    ),
+                  ),
+          ),
+        ),
       ),
     );
+  }
+
+  /// 「購入」「購入済み」の長い方の文字幅。どちらが長いかは言語で変わるため、
+  /// 決め打ちにせず実際の文字で測る。見えない文字を重ねて幅を取る手もあるが、
+  /// 読み上げやテストで同じ文言が二重に見つかるので測る方を取る。
+  double _labelWidth(BuildContext context, TextStyle style) {
+    // Text と同じ書体で測るため、既定の文字スタイルに重ねる。
+    final resolved = DefaultTextStyle.of(context).style.merge(style);
+    double widthOf(String text) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: resolved),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      final width = painter.width;
+      painter.dispose();
+      return width;
+    }
+
+    return math
+        .max(widthOf(context.l10n.purchase), widthOf(context.l10n.purchased))
+        .ceilToDouble();
   }
 }
