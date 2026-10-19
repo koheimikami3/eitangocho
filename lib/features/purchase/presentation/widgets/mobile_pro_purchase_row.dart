@@ -24,10 +24,7 @@ class MobileProPurchaseRow extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      // ボタンは見出し(1 行目)の高さに揃える。説明が 3 行あるため、
-      // 中央揃えだとボタンが説明の途中に浮いて見える。
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
@@ -49,12 +46,11 @@ class MobileProPurchaseRow extends ConsumerWidget {
                     ),
                   )
                 else ...[
+                  // お礼(広告の非表示)は薄字にしない。薄いと「差し入れるだけ」に
+                  // 見え、何が得られるのかが伝わらないため。
                   Text(
                     context.l10n.proCoffeeReward,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: palette.textAlpha(45),
-                    ),
+                    style: TextStyle(fontSize: 11, color: palette.text),
                   ),
                   const SizedBox(height: 2),
                   Text(
