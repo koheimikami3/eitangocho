@@ -533,10 +533,13 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get removeAds => '広告を非表示にする';
+  String get proCoffeeTitle => '開発者にコーヒーを1杯差し入れ ☕';
 
   @override
-  String get proPurchasedCaption => 'Pro を購入済みです';
+  String get proCoffeeReward => 'お礼に広告を非表示にします';
+
+  @override
+  String get proCoffeeThanks => 'コーヒーありがとうございます!';
 
   @override
   String get priceUnavailable => '価格を取得できませんでした';

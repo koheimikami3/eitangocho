@@ -565,10 +565,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get removeAds => 'Quitar anuncios';
+  String get proCoffeeTitle => 'Invítale un café al desarrollador ☕';
 
   @override
-  String get proPurchasedCaption => 'Tienes Pro';
+  String get proCoffeeReward => 'Como agradecimiento, quitamos los anuncios';
+
+  @override
+  String get proCoffeeThanks => '¡Gracias por el café!';
 
   @override
   String get priceUnavailable => 'No se pudo obtener el precio';

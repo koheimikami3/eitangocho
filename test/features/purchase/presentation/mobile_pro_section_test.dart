@@ -44,7 +44,8 @@ void main() {
   testWidgets('未購入なら価格と購入ボタンを出す', (tester) async {
     await pumpSection(tester);
 
-    expect(find.text('広告を非表示にする'), findsOneWidget);
+    expect(find.text('開発者にコーヒーを1杯差し入れ ☕'), findsOneWidget);
+    expect(find.text('お礼に広告を非表示にします'), findsOneWidget);
     expect(find.text('買い切り ¥600'), findsOneWidget);
     expect(find.text('購入'), findsOneWidget);
     expect(find.text('購入を復元'), findsOneWidget);
@@ -54,7 +55,10 @@ void main() {
     client.initialProUnlocked = true;
     await pumpSection(tester);
 
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    // 購入済みならお礼の 1 行だけにし、お礼の内容と価格は出さない。
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
+    expect(find.text('お礼に広告を非表示にします'), findsNothing);
+    expect(find.text('買い切り ¥600'), findsNothing);
     expect(find.text('購入済み'), findsOneWidget);
 
     await tester.tap(find.text('購入済み'));
@@ -71,7 +75,7 @@ void main() {
     await tester.pump();
 
     expect(client.purchaseCount, 1);
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
     expect(find.text('購入済み'), findsOneWidget);
   });
 
@@ -105,6 +109,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('購入できませんでした'), findsOneWidget);
+    // 差し替えるのは価格の行だけで、お礼の行は残す。
+    expect(find.text('お礼に広告を非表示にします'), findsOneWidget);
 
     await tester.pump(messageDuration * 2);
 
@@ -133,7 +139,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('復元しました'), findsOneWidget);
-    expect(find.text('Pro を購入済みです'), findsOneWidget);
+    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
 
     await tester.pump(messageDuration * 2);
 

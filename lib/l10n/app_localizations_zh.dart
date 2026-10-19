@@ -529,10 +529,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get removeAds => '移除廣告';
+  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
 
   @override
-  String get proPurchasedCaption => '已購買 Pro';
+  String get proCoffeeReward => '作為謝禮，將移除廣告';
+
+  @override
+  String get proCoffeeThanks => '謝謝你的咖啡！';
 
   @override
   String get priceUnavailable => '無法取得價格';
@@ -1107,10 +1110,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get removeAds => '移除廣告';
+  String get proCoffeeTitle => '請開發者喝杯咖啡 ☕';
 
   @override
-  String get proPurchasedCaption => '已購買 Pro';
+  String get proCoffeeReward => '作為謝禮，將移除廣告';
+
+  @override
+  String get proCoffeeThanks => '謝謝你的咖啡！';
 
   @override
   String get priceUnavailable => '無法取得價格';

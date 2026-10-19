@@ -993,17 +993,23 @@ abstract class AppLocalizations {
   /// **'同期に失敗しました: {detail}'**
   String syncErrorFailed(String detail);
 
-  /// No description provided for @removeAds.
+  /// No description provided for @proCoffeeTitle.
   ///
   /// In ja, this message translates to:
-  /// **'広告を非表示にする'**
-  String get removeAds;
+  /// **'開発者にコーヒーを1杯差し入れ ☕'**
+  String get proCoffeeTitle;
 
-  /// No description provided for @proPurchasedCaption.
+  /// No description provided for @proCoffeeReward.
   ///
   /// In ja, this message translates to:
-  /// **'Pro を購入済みです'**
-  String get proPurchasedCaption;
+  /// **'お礼に広告を非表示にします'**
+  String get proCoffeeReward;
+
+  /// No description provided for @proCoffeeThanks.
+  ///
+  /// In ja, this message translates to:
+  /// **'コーヒーありがとうございます!'**
+  String get proCoffeeThanks;
 
   /// No description provided for @priceUnavailable.
   ///

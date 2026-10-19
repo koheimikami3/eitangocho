@@ -7,6 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 設定画面「Pro」の購入行(説明 + 価格 + 購入ボタン)。
+///
+/// 「開発者へのコーヒーの差し入れ」を主役にし、広告の非表示はそのお礼として
+/// 見せる。商品(広告の非表示)と寄付(差し入れ)を同じ重さで並べると、
+/// 何を買うのかがぼやけるため。
 class MobileProPurchaseRow extends ConsumerWidget {
   const MobileProPurchaseRow({super.key});
 
@@ -25,24 +29,43 @@ class MobileProPurchaseRow extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.removeAds,
+                  context.l10n.proCoffeeTitle,
                   style: TextStyle(fontSize: 14, color: palette.text),
                 ),
                 const SizedBox(height: 3),
-                Text(
-                  _note(
-                    context.l10n,
-                    failed: state.purchaseFailed,
-                    priceText: state.priceText,
-                    done: done,
+                // 購入済みならお礼の 1 行だけ。価格もお礼の内容(広告の非表示)も
+                // もう要らない。
+                if (done)
+                  Text(
+                    context.l10n.proCoffeeThanks,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: palette.textAlpha(45),
+                    ),
+                  )
+                else ...[
+                  Text(
+                    context.l10n.proCoffeeReward,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: palette.textAlpha(45),
+                    ),
                   ),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: state.purchaseFailed
-                        ? palette.danger
-                        : palette.textAlpha(45),
+                  const SizedBox(height: 2),
+                  Text(
+                    _note(
+                      context.l10n,
+                      failed: state.purchaseFailed,
+                      priceText: state.priceText,
+                    ),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: state.purchaseFailed
+                          ? palette.danger
+                          : palette.textAlpha(45),
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -60,15 +83,14 @@ class MobileProPurchaseRow extends ConsumerWidget {
     );
   }
 
-  /// ボタンの下の補足。失敗メッセージは一時的に価格を置き換える。
+  /// 未購入のときの価格の行。失敗メッセージは一時的に価格を置き換える
+  /// (お礼の行はそのまま残す)。
   String _note(
     AppLocalizations l10n, {
     required bool failed,
     required String? priceText,
-    required bool done,
   }) {
     if (failed) return l10n.purchaseFailed;
-    if (done) return l10n.proPurchasedCaption;
     if (priceText == null) return l10n.priceUnavailable;
     return l10n.oneTimePrice(priceText);
   }
