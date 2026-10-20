@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/components/mobile_raised_surface.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/settings/domain/translation_language.dart';
@@ -213,7 +214,7 @@ class _CardHeader extends StatelessWidget {
                       word.ipa,
                       style: TextStyle(
                         fontSize: MobileShrinkingIpaText.maxFontSize,
-                        fontFamily: 'Menlo',
+                        fontFamily: AppFonts.ipa,
                         color: palette.textAlpha(45),
                       ),
                     ),
@@ -239,7 +240,9 @@ class _CardHeader extends StatelessWidget {
       children: [
         wordText,
         if (showIpa) ...[
-          const SizedBox(height: 3),
+          // 単語との間は下(品詞チップとの間)より少し広く取り、発音記号が
+          // 単語に詰まって見えないようにする。
+          const SizedBox(height: 5),
           MobileShrinkingIpaText(ipa: word.ipa),
         ],
         const SizedBox(height: 3),

@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/app_filled_button.dart';
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -83,8 +84,8 @@ class QuizCard extends StatelessWidget {
                   ipa,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 13,
-                    fontFamily: 'Menlo',
+                    fontSize: 15,
+                    fontFamily: AppFonts.ipa,
                     color: AppColors.textTertiary,
                   ),
                 ),

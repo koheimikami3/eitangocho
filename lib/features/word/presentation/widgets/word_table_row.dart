@@ -1,5 +1,6 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
@@ -108,8 +109,8 @@ class _WordTableRowState extends State<WordTableRow> {
                 child: Text(
                   word.ipa,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Menlo',
+                    fontSize: 14,
+                    fontFamily: AppFonts.ipa,
                     color: Color(0x80000000),
                   ),
                 ),

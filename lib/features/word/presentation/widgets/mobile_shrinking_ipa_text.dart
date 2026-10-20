@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -14,8 +15,9 @@ class MobileShrinkingIpaText extends StatelessWidget {
 
   final String ipa;
 
-  /// 通常の字送り(カードの他の補助テキストと同じ 11px)。
-  static const maxFontSize = 11.0;
+  /// 通常の字の大きさ。Andika は小文字の背が低く字幅も狭いため、
+  /// カードの他の補助テキスト(11px)より大きくして釣り合わせる。
+  static const maxFontSize = 13.0;
 
   /// これ以上は縮めない下限。
   static const minFontSize = 8.0;
@@ -47,7 +49,7 @@ class MobileShrinkingIpaText extends StatelessWidget {
   }
 
   static TextStyle _styleOf(double fontSize) =>
-      TextStyle(fontSize: fontSize, fontFamily: 'Menlo');
+      TextStyle(fontSize: fontSize, fontFamily: AppFonts.ipa);
 
   double _widthOf(double fontSize, TextScaler textScaler) {
     final painter = TextPainter(

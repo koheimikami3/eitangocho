@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
@@ -97,14 +98,16 @@ class _WordCardState extends State<WordCard> {
                 ),
               ),
               if (showIpa) ...[
-                const SizedBox(height: 3),
+                // 単語との間は下(品詞バッジとの間)より少し広く取り、発音記号が
+                // 単語に詰まって見えないようにする。
+                const SizedBox(height: 5),
                 Text(
                   word.ipa,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Menlo',
+                    fontSize: 14,
+                    fontFamily: AppFonts.ipa,
                     color: AppColors.textTertiary,
                   ),
                 ),
