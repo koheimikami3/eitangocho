@@ -36,10 +36,14 @@ class MobileSearchField extends ConsumerWidget {
           isDense: true,
           hintText: context.l10n.search,
           hintStyle: TextStyle(color: palette.textAlpha(30)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 9,
+          // 先頭に検索アイコンを置く。色はヒントと揃え、入力の邪魔をしない。
+          // 既定の最小寸法(48x48)だと欄が高くなるため、アイコンの大きさに詰める。
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Icon(Icons.search, size: 20, color: palette.textAlpha(30)),
           ),
+          prefixIconConstraints: const BoxConstraints(),
+          contentPadding: const EdgeInsets.fromLTRB(6, 9, 12, 9),
           border: InputBorder.none,
         ),
       ),
