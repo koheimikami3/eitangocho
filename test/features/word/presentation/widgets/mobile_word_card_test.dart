@@ -57,10 +57,6 @@ void main() {
     ),
   );
 
-  /// カード外形の右端。品詞バッジが右に寄っているかの基準にする。
-  double cardRight(WidgetTester tester) =>
-      tester.getRect(find.byType(MobileWordCard)).right;
-
   // 収まるときだけ同じ行に並べると、単語ごとにヘッダが 2 行にも 3 行にも
   // なって並びが揃わないため、長さに関わらず 1 項目 1 行にする。
   testWidgets('2 列では単語・IPA・品詞をそれぞれ別の行に積む', (tester) async {
@@ -159,19 +155,19 @@ void main() {
     }
   });
 
-  testWidgets('1 列では単語・IPA・品詞が同じ行に並ぶ', (tester) async {
+  // 品詞を同じ行に並べると、品詞が多いときに IPA が省略されるため。
+  testWidgets('1 列では単語と IPA が同じ行に並び、品詞は次の行に置く', (tester) async {
     await pumpCard(tester, singleColumn: true, showIpa: true);
 
     final wordRect = tester.getRect(find.text('apple'));
     final ipaRect = tester.getRect(find.text('/ˈæp.əl/'));
     final badgeRect = tester.getRect(find.text('名詞'));
 
-    // 3 つとも同じ行(単語の高さの範囲に収まる)。
+    // 単語と IPA は同じ行(単語の高さの範囲に収まる)で、単語 → IPA の順。
     expect(ipaRect.center.dy, closeTo(wordRect.center.dy, 6));
-    expect(badgeRect.center.dy, closeTo(wordRect.center.dy, 6));
-    // 左から 単語 → IPA → 品詞 の順で、品詞は右端に寄る。
     expect(ipaRect.left, greaterThan(wordRect.right));
-    expect(badgeRect.left, greaterThan(ipaRect.right));
-    expect(badgeRect.right, closeTo(cardRight(tester) - 13 - 7, 1));
+    // 品詞は次の行の左端(バッジの内側パディング 7px 分だけずれる)。
+    expect(badgeRect.top, greaterThan(wordRect.bottom - 1));
+    expect(badgeRect.left, closeTo(wordRect.left + 7, 1));
   });
 }
