@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -16,12 +17,18 @@ class MobileSettingsCaption extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
 
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 11,
-        height: 1.6,
-        color: color ?? palette.textAlpha(40),
+    // セクションの見出しと同じく、カードの角丸が終わる位置に揃える。
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.mobileCardRadius,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          height: 1.6,
+          color: color ?? palette.textAlpha(40),
+        ),
       ),
     );
   }

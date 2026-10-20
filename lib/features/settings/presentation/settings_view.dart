@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
@@ -98,12 +99,18 @@ class SettingsView extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                     // 説明文の意匠は DeepL の欄(DeeplApiKeyField)に合わせる。
-                    Text(
-                      l10n.translationLanguageCaption,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        height: 1.6,
-                        color: AppColors.textQuaternary,
+                    // 位置はセクションの見出しと同じく、カードの角丸が終わる位置。
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.mobileCardRadius,
+                      ),
+                      child: Text(
+                        l10n.translationLanguageCaption,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          height: 1.6,
+                          color: AppColors.textQuaternary,
+                        ),
                       ),
                     ),
                   ],

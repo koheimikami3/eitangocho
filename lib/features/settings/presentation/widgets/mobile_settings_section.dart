@@ -27,12 +27,20 @@ class MobileSettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: palette.textAlpha(50),
+        // 見出しはカードの外枠ではなく、角丸が終わる位置まで内側に寄せる
+        // (iOS 標準の設定画面と同じ考え方)。外枠に揃えると見出しだけが
+        // 左にはみ出して見え、行の文字の頭まで寄せると右に寄りすぎる。
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.mobileCardRadius,
+          ),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: palette.textAlpha(50),
+            ),
           ),
         ),
         const SizedBox(height: 8),
