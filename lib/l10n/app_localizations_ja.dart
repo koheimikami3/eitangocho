@@ -539,7 +539,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proCoffeeReward => 'お礼に広告を非表示にします';
 
   @override
-  String get proCoffeeThanks => 'コーヒーありがとうございます!';
+  String get proCoffeeThanks => 'ありがとうございます!';
 
   @override
   String get proCoffeeLink => 'コーヒー1杯の差し入れで広告が消えます ☕';

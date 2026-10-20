@@ -571,7 +571,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get proCoffeeReward => 'Como agradecimiento, quitamos los anuncios';
 
   @override
-  String get proCoffeeThanks => '¡Gracias por el café!';
+  String get proCoffeeThanks => '¡Gracias!';
 
   @override
   String get proCoffeeLink => 'Invítame un café y adiós anuncios ☕';
