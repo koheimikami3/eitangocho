@@ -119,6 +119,12 @@ class EitangochoApp extends ConsumerWidget {
     scaffoldBackgroundColor: palette.background,
     colorSchemeSeed: palette.accent,
     dialogTheme: DialogThemeData(backgroundColor: palette.surface),
+    // 白で塗った入力欄にマウスを当てると、Material 既定では黒 4% が重なって
+    // グレーになり、地に溶けて使えない欄のように見える。macOS 標準の入力欄と
+    // 同じく、ホバーでは見た目を変えない(I 字カーソルで入力できると分かる)。
+    inputDecorationTheme: const InputDecorationThemeData(
+      hoverColor: Colors.transparent,
+    ),
     // カーソルは web の既定キャレット相当の本文色にする。
     // 選択ハイライト・ハンドルはアクセント色を薄く敷く。
     textSelectionTheme: TextSelectionThemeData(
