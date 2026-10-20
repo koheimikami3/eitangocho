@@ -161,21 +161,28 @@ class _WordCardState extends State<WordCard> {
                     // チェック操作をカードのタップ(編集モーダル)に伝播させない。
                     GestureDetector(
                       onTap: () {},
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          LearnedCheckbox(
-                            value: word.isLearned,
-                            onChanged: widget.onToggleLearned,
-                          ),
-                          Text(
-                            context.l10n.markLearned,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                      // LearnedCheckbox はヒット領域の余白(6)を四辺に持つため、
+                      // そのままだと箱が区切り線の左端より内側に寄る。余白の分だけ
+                      // 左へ出して、箱の左端を区切り線・本文の左端に揃える
+                      // (ヒット領域はカードの padding の中に収まる)。
+                      child: Transform.translate(
+                        offset: const Offset(-6, 0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            LearnedCheckbox(
+                              value: word.isLearned,
+                              onChanged: widget.onToggleLearned,
                             ),
-                          ),
-                        ],
+                            Text(
+                              context.l10n.markLearned,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const Spacer(),
