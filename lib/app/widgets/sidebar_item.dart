@@ -43,14 +43,14 @@ class _SidebarItemState extends State<SidebarItem> {
           child: Row(
             children: [
               Expanded(
+                // 選択中も太さは変えない。太字にすると字幅が広がって文字列が
+                // 伸び、切り替えるたびにずれて見えるため。選択中は背景で示す
+                // (macOS 標準のサイドバーと同じ)。
                 child: Text(
                   widget.label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textPrimary,
-                    fontWeight: widget.selected
-                        ? FontWeight.w600
-                        : FontWeight.w400,
                   ),
                 ),
               ),
