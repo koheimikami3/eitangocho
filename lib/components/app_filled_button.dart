@@ -47,25 +47,32 @@ class _AppFilledButtonState extends State<AppFilledButton> {
         onTap: widget.onPressed,
         // alignment を指定すると高さ制約のある場所(ツールバー等)で
         // Container が上下いっぱいに広がるため、テキスト + padding に任せる。
+        // 高さを指定されたとき(入力欄の横に並べて引き伸ばす場合)だけ、
+        // Center で文字を上下中央に置く(heightFactor 1 なので、高さに
+        // 余裕があるだけの場所では広がらない)。
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: 14,
             vertical: widget.verticalPadding,
           ),
           decoration: _decoration(),
-          child: Text(
-            widget.label,
-            // ボタン幅がラベル幅より広い場面(全幅ボタン等)でも中央寄せにする。
-            // Container 自体に alignment は付けない(上記コメント参照)ため、
-            // Text 側で明示する。
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: widget.fontSize,
-              fontWeight: FontWeight.w600,
-              // 日本語フォールバックフォントの行高が大きく、ボタンの上下が
-              // プロトタイプより太って見えるため行高を明示する
-              height: 1.4,
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: Text(
+              widget.label,
+              // ボタン幅がラベル幅より広い場面(全幅ボタン等)でも中央寄せにする。
+              // Container 自体に alignment は付けない(上記コメント参照)ため、
+              // Text 側で明示する。
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: widget.fontSize,
+                fontWeight: FontWeight.w600,
+                // 日本語フォールバックフォントの行高が大きく、ボタンの上下が
+                // プロトタイプより太って見えるため行高を明示する
+                height: 1.4,
+              ),
             ),
           ),
         ),
