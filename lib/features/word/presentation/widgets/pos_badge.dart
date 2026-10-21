@@ -2,8 +2,11 @@ import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 
-/// 品詞バッジ(ピル)。色は先頭の品詞のものを使う
-/// (プロトタイプの pillFor が最初にマッチした品詞の色を使う挙動に準拠)。
+/// 品詞バッジ(ピル)。品詞ごとに 1 枚ずつ、その品詞の色で並べる。
+///
+/// 全品詞を 1 枚に連結していた頃は、表の狭い列で品詞が多いと 1 枚の中で
+/// 文字が折り返して塊になっていた。1 枚ずつなら、収まらない分は
+/// ピルの形のまま次の行に回る。
 class PosBadge extends StatelessWidget {
   const PosBadge({required this.partsOfSpeech, super.key});
 
@@ -11,9 +14,27 @@ class PosBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pos = partsOfSpeech.isEmpty
-        ? PartOfSpeech.other
-        : partsOfSpeech.first;
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: [
+        for (final pos
+            in partsOfSpeech.isEmpty
+                ? const [PartOfSpeech.other]
+                : partsOfSpeech)
+          _Pill(pos: pos),
+      ],
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({required this.pos});
+
+  final PartOfSpeech pos;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -21,9 +42,7 @@ class PosBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
-        partsOfSpeech.isEmpty
-            ? pos.label(context.l10n)
-            : partsOfSpeech.joinedLabel(context.l10n),
+        pos.label(context.l10n),
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,

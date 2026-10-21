@@ -105,9 +105,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get posOther => 'その他';
 
   @override
-  String get posSeparator => '・';
-
-  @override
   String get fieldWord => '英単語 *';
 
   @override

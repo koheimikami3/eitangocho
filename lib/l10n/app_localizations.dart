@@ -249,12 +249,6 @@ abstract class AppLocalizations {
   /// **'その他'**
   String get posOther;
 
-  /// 複数品詞を 1 つのバッジに並べるときの区切り
-  ///
-  /// In ja, this message translates to:
-  /// **'・'**
-  String get posSeparator;
-
   /// No description provided for @fieldWord.
   ///
   /// In ja, this message translates to:

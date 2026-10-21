@@ -43,12 +43,6 @@ enum PartOfSpeech {
   final Color badgeForeground;
 }
 
-/// 複数品詞の表示用連結(例: 「名詞・動詞」)
-extension PartOfSpeechListLabel on List<PartOfSpeech> {
-  String joinedLabel(AppLocalizations l10n) =>
-      map((p) => p.label(l10n)).join(l10n.posSeparator);
-}
-
 extension PartOfSpeechSelection on Set<PartOfSpeech> {
   /// 選択された品詞を保存順に並べる。
   ///

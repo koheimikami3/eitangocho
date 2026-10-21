@@ -69,10 +69,6 @@
   "posAdjective": "形容詞",
   "posAdverb": "副詞",
   "posOther": "その他",
-  "posSeparator": "・",
-  "@posSeparator": {
-    "description": "複数品詞を 1 つのバッジに並べるときの区切り"
-  },
   "fieldWord": "英単語 *",
   "fieldIpa": "発音記号 (IPA)",
   "fieldMeaning": "{language}訳 *",

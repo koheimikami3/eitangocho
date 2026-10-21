@@ -117,9 +117,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get posOther => 'otro';
 
   @override
-  String get posSeparator => '/';
-
-  @override
   String get fieldWord => 'Palabra en inglés *';
 
   @override

@@ -24,7 +24,6 @@
   "posAdjective": "adjectif",
   "posAdverb": "adverbe",
   "posOther": "autre",
-  "posSeparator": "/",
   "fieldWord": "Mot anglais *",
   "fieldIpa": "Prononciation (API)",
   "fieldMeaning": "Traduction ({language}) *",

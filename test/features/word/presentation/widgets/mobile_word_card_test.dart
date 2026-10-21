@@ -99,7 +99,8 @@ void main() {
 
     final ipa = tester.renderObject<RenderBox>(find.text('/ˈæp.əl/'));
     final ipaRect = tester.getRect(find.text('/ˈæp.əl/'));
-    final badgeRect = tester.getRect(find.text('名詞・動詞・形容詞'));
+    // 品詞は 1 枚ずつのチップなので、先頭のチップの位置で見る。
+    final badgeRect = tester.getRect(find.text('名詞'));
 
     // IPA は 1 行のまま(幅を削られて折り返していない)。
     expect(ipa.size.height, lessThan(20));
