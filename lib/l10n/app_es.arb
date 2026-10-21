@@ -39,7 +39,6 @@
   "skipToManual": "Omitir y escribir manualmente",
   "fetchingDictionary": "Buscando en el diccionario...",
   "exampleTranslationFailed": "No se pudo obtener la traducción del ejemplo al {language}. Puedes escribirla manualmente.",
-  "exampleTranslationFailedShort": "No se pudo traducir el ejemplo (puedes escribirlo manualmente)",
   "registerButton": "Añadir",
   "registerShort": "Añadir",
   "back": "Atrás",

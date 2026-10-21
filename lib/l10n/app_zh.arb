@@ -39,7 +39,6 @@
   "skipToManual": "略過，改為手動輸入",
   "fetchingDictionary": "正在查詢字典⋯",
   "exampleTranslationFailed": "無法取得例句的{language}翻譯，可以手動輸入。",
-  "exampleTranslationFailedShort": "例句翻譯失敗（可手動輸入）",
   "registerButton": "新增",
   "registerShort": "新增",
   "back": "返回",

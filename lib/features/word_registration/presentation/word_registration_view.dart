@@ -235,13 +235,10 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           ),
           const SizedBox(height: 16),
         ],
+        // iOS の登録シートと同じく、辞書の警告と同じバナーで出す。
         if (state.translationFailed) ...[
-          Text(
-            l10n.exampleTranslationFailedShort,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.warningBannerForeground,
-            ),
+          DictionaryWarningBanner(
+            message: l10n.exampleTranslationFailed(languageLabel),
           ),
           const SizedBox(height: 16),
         ],

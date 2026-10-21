@@ -159,9 +159,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例文の翻訳に失敗しました(手動で入力できます)';
-
-  @override
   String get registerButton => '登録する';
 
   @override

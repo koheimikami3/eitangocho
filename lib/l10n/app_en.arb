@@ -39,7 +39,6 @@
   "skipToManual": "Skip and enter manually",
   "fetchingDictionary": "Looking up the dictionary...",
   "exampleTranslationFailed": "Couldn't get the {language} translation of the example. You can enter it manually.",
-  "exampleTranslationFailedShort": "Couldn't translate the example (you can enter it manually)",
   "registerButton": "Add",
   "registerShort": "Add",
   "back": "Back",

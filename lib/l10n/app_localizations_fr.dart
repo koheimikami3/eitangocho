@@ -171,10 +171,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort =>
-      'Impossible de traduire l\'exemple (vous pouvez le saisir manuellement)';
-
-  @override
   String get registerButton => 'Ajouter';
 
   @override

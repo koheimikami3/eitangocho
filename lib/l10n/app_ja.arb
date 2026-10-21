@@ -123,7 +123,6 @@
       }
     }
   },
-  "exampleTranslationFailedShort": "例文の翻訳に失敗しました(手動で入力できます)",
   "registerButton": "登録する",
   "registerShort": "登録",
   "back": "戻る",

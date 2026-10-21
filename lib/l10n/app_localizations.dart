@@ -339,12 +339,6 @@ abstract class AppLocalizations {
   /// **'例文の{language}訳を取得できませんでした。手動で入力できます。'**
   String exampleTranslationFailed(String language);
 
-  /// No description provided for @exampleTranslationFailedShort.
-  ///
-  /// In ja, this message translates to:
-  /// **'例文の翻訳に失敗しました(手動で入力できます)'**
-  String get exampleTranslationFailedShort;
-
   /// No description provided for @registerButton.
   ///
   /// In ja, this message translates to:

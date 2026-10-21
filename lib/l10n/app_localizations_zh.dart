@@ -158,9 +158,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
-
-  @override
   String get registerButton => '新增';
 
   @override
@@ -742,9 +739,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String exampleTranslationFailed(String language) {
     return '無法取得例句的$language翻譯，可以手動輸入。';
   }
-
-  @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
 
   @override
   String get registerButton => '新增';
