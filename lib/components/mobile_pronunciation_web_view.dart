@@ -2,6 +2,8 @@ import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
 import 'package:eitangocho/utils/google_translate_url.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -128,7 +130,15 @@ class _MobilePronunciationWebViewState
 
     return Stack(
       children: [
-        WebViewWidget(controller: _controller),
+        WebViewWidget(
+          controller: _controller,
+          // 触れた指はすべて WebView に渡す。指定しないとボトムシートの
+          // 下スワイプ(閉じる)の認識器が縦のドラッグを奪い、ページを
+          // スクロールできない。
+          gestureRecognizers: {
+            Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
+          },
+        ),
         if (_isLoading)
           // 読み込み中は白紙が見えるため、面の色で覆ってインジケータを出す。
           Positioned.fill(
