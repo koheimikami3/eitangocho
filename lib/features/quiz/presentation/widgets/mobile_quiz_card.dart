@@ -1,4 +1,5 @@
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -63,8 +64,8 @@ class MobileQuizCard extends StatelessWidget {
             Text(
               ipa,
               style: TextStyle(
-                fontSize: 13,
-                fontFamily: 'Menlo',
+                fontSize: 15,
+                fontFamily: AppFonts.ipa,
                 color: palette.textAlpha(45),
               ),
             ),

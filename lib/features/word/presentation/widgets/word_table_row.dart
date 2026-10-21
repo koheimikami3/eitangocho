@@ -1,5 +1,6 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/learned_checkbox.dart';
 import 'package:eitangocho/features/word/presentation/widgets/pos_badge.dart';
@@ -61,9 +62,11 @@ class _WordTableRowState extends State<WordTableRow> {
             children: [
               SizedBox(
                 width: 64,
-                // 行上端の単語テキストと視覚的に揃うよう少し下げる。
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                // LearnedCheckbox はヒット領域の余白(6)を四辺に持つため、
+                // その分だけ左上へ出す。箱の左端が見出し(学習済み)の左端に、
+                // 箱の上下中央が 1 行目の単語(13px)の中ほどに揃う。
+                child: Transform.translate(
+                  offset: const Offset(-6, -6),
                   child: GestureDetector(
                     onTap: () {},
                     child: LearnedCheckbox(
@@ -108,8 +111,8 @@ class _WordTableRowState extends State<WordTableRow> {
                 child: Text(
                   word.ipa,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Menlo',
+                    fontSize: 14,
+                    fontFamily: AppFonts.ipa,
                     color: Color(0x80000000),
                   ),
                 ),
@@ -161,10 +164,11 @@ class _WordTableRowState extends State<WordTableRow> {
                   alignment: Alignment.topLeft,
                   // 行は上揃え(デザインの align-items:start)なので、28px の
                   // ボタンをそのまま置くと 13px のテキスト行より低く見える。
-                  // デザインの margin:-3px 0 と同じだけ引き上げる
+                  // 上下中央を先頭列のチェックボックスの箱(上端から 9)に
+                  // 揃えるだけ引き上げる
                   // (レイアウト高は変えたくないので Transform で見た目だけ)。
                   child: Transform.translate(
-                    offset: const Offset(0, -3),
+                    offset: const Offset(0, -5),
                     child: PronunciationButton(
                       word: word.word,
                       variant: PronunciationButtonVariant.tableIcon,

@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 
 /// 設定画面のセクション(見出し + 中身)。プロトタイプの見出し意匠に合わせる。
@@ -13,12 +14,19 @@ class SettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textMuted,
+        // 見出しはカードの外枠ではなく、角丸が終わる位置まで内側に寄せる
+        // (iOS の MobileSettingsSection と同じ)。
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.mobileCardRadius,
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textMuted,
+            ),
           ),
         ),
         const SizedBox(height: 8),

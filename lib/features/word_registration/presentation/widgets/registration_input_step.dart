@@ -32,20 +32,18 @@ class RegistrationInputStep extends ConsumerWidget {
           style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
         ),
         const SizedBox(height: 14),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: LabeledTextField(
-                label: l10n.fieldWord,
-                controller: wordController,
-                hintText: 'apple',
-                onSubmitted: (_) => onAutoFill(),
-              ),
-            ),
-            const SizedBox(width: 10),
-            AppFilledButton(label: l10n.autoFill, onPressed: onAutoFill),
-          ],
+        LabeledTextField(
+          label: l10n.fieldWord,
+          controller: wordController,
+          hintText: 'apple',
+          onSubmitted: (_) => onAutoFill(),
+          // 入力欄の高さに引き伸ばすので、ボタン自身の上下の余白は持たせない
+          // (余白があるとボタンの方が高くなり、入力欄が合わせて伸びない)。
+          fieldTrailing: AppFilledButton(
+            label: l10n.autoFill,
+            onPressed: onAutoFill,
+            verticalPadding: 0,
+          ),
         ),
         if (errorMessage != null) ...[
           const SizedBox(height: 10),

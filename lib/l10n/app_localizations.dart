@@ -1008,7 +1008,7 @@ abstract class AppLocalizations {
   /// No description provided for @proCoffeeThanks.
   ///
   /// In ja, this message translates to:
-  /// **'コーヒーありがとうございます!'**
+  /// **'ありがとうございます!'**
   String get proCoffeeThanks;
 
   /// ☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ

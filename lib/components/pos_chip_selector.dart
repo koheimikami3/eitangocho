@@ -59,11 +59,14 @@ class _Chip extends StatelessWidget {
             color: isSelected ? foreground : AppColors.inputBorder,
           ),
         ),
+        // 選択しても太さは変えない。チップは文字の幅に合わせて伸び縮みする
+        // ため、太字にすると押すたびに幅が変わって並びがずれる(選択は配色と
+        // 縁取りで示す)。iOS は幅が固定なので太字にしている。
         child: Text(
           pos.label(context.l10n),
           style: TextStyle(
             fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            fontWeight: FontWeight.w600,
             color: isSelected ? foreground : const Color(0xA6000000),
           ),
         ),

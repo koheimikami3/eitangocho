@@ -57,7 +57,7 @@ void main() {
     await pumpSection(tester);
 
     // 購入済みならお礼の 1 行だけにし、お礼の内容と価格は出さない。
-    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
+    expect(find.text('ありがとうございます!'), findsOneWidget);
     expect(find.text('お礼に広告を非表示にします'), findsNothing);
     expect(find.text('買い切り ¥600'), findsNothing);
     expect(find.text('購入済み'), findsOneWidget);
@@ -76,7 +76,7 @@ void main() {
     await tester.pump();
 
     expect(client.purchaseCount, 1);
-    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
+    expect(find.text('ありがとうございます!'), findsOneWidget);
     expect(find.text('購入済み'), findsOneWidget);
   });
 
@@ -163,7 +163,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('復元しました'), findsOneWidget);
-    expect(find.text('コーヒーありがとうございます!'), findsOneWidget);
+    expect(find.text('ありがとうございます!'), findsOneWidget);
 
     await tester.pump(messageDuration * 2);
 

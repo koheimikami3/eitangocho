@@ -391,7 +391,7 @@
     "description": "☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ"
   },
   "proCoffeeReward": "お礼に広告を非表示にします",
-  "proCoffeeThanks": "コーヒーありがとうございます!",
+  "proCoffeeThanks": "ありがとうございます!",
   "proCoffeeLink": "コーヒー1杯の差し入れで広告が消えます ☕",
   "@proCoffeeLink": {
     "description": "☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ"

@@ -2,6 +2,7 @@ import 'package:eitangocho/components/mobile_pronunciation_button.dart';
 import 'package:eitangocho/components/mobile_raised_surface.dart';
 import 'package:eitangocho/components/mobile_well.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/settings/domain/translation_language.dart';
@@ -160,7 +161,8 @@ class _MobileWordCardState extends State<MobileWordCard> {
 /// カード上部(単語 + IPA + 品詞バッジ)。列数で組み方が変わる。
 ///
 /// - 2 列: 単語・IPA・バッジをそれぞれ独立した行に積む。
-/// - 1 列: 幅に余裕があるので単語・IPA・バッジを 1 行に並べ、バッジだけ右端。
+/// - 1 列: 幅に余裕があるので単語と IPA を 1 行に並べ、バッジは次の行に置く。
+///   バッジまで同じ行に並べると、品詞が多いときに IPA が省略されるため。
 class _CardHeader extends StatelessWidget {
   const _CardHeader({
     required this.word,
@@ -191,38 +193,34 @@ class _CardHeader extends StatelessWidget {
     final badge = MobilePosBadge(partsOfSpeech: word.partsOfSpeech);
 
     if (singleColumn) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // 単語 + IPA を Expanded で包み、バッジを右端に押し出す。
-          // Flexible と Spacer を並べると空きを両者で折半してしまい、
-          // 幅に余裕があっても長い単語が折り返す。
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Flexible(child: wordText),
-                if (showIpa) ...[
-                  const SizedBox(width: _gap),
-                  // 1 列は幅に余裕があり、単語と同じ行に置く都合で
-                  // ベースラインを揃える必要があるため縮小はしない。
-                  Flexible(
-                    child: Text(
-                      word.ipa,
-                      style: TextStyle(
-                        fontSize: MobileShrinkingIpaText.maxFontSize,
-                        fontFamily: 'Menlo',
-                        color: palette.textAlpha(45),
-                      ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Flexible(child: wordText),
+              if (showIpa) ...[
+                const SizedBox(width: _gap),
+                // 1 列は幅に余裕があり、単語と同じ行に置く都合で
+                // ベースラインを揃える必要があるため縮小はしない。
+                Flexible(
+                  child: Text(
+                    word.ipa,
+                    style: TextStyle(
+                      fontSize: MobileShrinkingIpaText.maxFontSize,
+                      fontFamily: AppFonts.ipa,
+                      color: palette.textAlpha(45),
                     ),
                   ),
-                ],
+                ),
               ],
-            ),
+            ],
           ),
-          const SizedBox(width: _gap),
+          // 2 列の IPA とバッジの間と同じ間隔。
+          const SizedBox(height: 3),
           badge,
         ],
       );
@@ -239,7 +237,9 @@ class _CardHeader extends StatelessWidget {
       children: [
         wordText,
         if (showIpa) ...[
-          const SizedBox(height: 3),
+          // 単語との間は下(品詞チップとの間)より少し広く取り、発音記号が
+          // 単語に詰まって見えないようにする。
+          const SizedBox(height: 5),
           MobileShrinkingIpaText(ipa: word.ipa),
         ],
         const SizedBox(height: 3),

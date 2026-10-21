@@ -535,7 +535,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proCoffeeReward => '作為謝禮，將移除廣告';
 
   @override
-  String get proCoffeeThanks => '謝謝你的咖啡！';
+  String get proCoffeeThanks => '謝謝你！';
 
   @override
   String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';
@@ -1119,7 +1119,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get proCoffeeReward => '作為謝禮，將移除廣告';
 
   @override
-  String get proCoffeeThanks => '謝謝你的咖啡！';
+  String get proCoffeeThanks => '謝謝你！';
 
   @override
   String get proCoffeeLink => '請我喝杯咖啡即可移除廣告 ☕';

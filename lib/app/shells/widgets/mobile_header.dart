@@ -3,6 +3,7 @@ import 'package:eitangocho/app/main_page_state.dart';
 import 'package:eitangocho/app/shells/widgets/mobile_search_field.dart';
 import 'package:eitangocho/components/mobile_filled_button.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/word/data/learning_words_provider.dart';
 import 'package:eitangocho/features/word/data/word_list_provider.dart';
@@ -22,12 +23,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MobileHeader extends ConsumerWidget {
   const MobileHeader({super.key});
 
+  static const _titleFontSize = 20.0;
+  static const _countFontSize = 12.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final showSearchAndAdd =
         view == MainView.learning || view == MainView.allWords;
+    // 漢字・かなは字面の下端がベースラインより下に出て、その量は字の大きさに
+    // 比例する。ベースラインで揃えてもタイトルの方が下まで伸び、件数が上に
+    // 寄って見えるため、和文・繁体字の画面では差の分だけ件数を下げる
+    // (英語などの欧文はベースラインで揃えば足元が揃う)。
+    final countOffset = AppFonts.isCjk(Localizations.localeOf(context))
+        ? (_titleFontSize - _countFontSize) * AppFonts.cjkEmBoxDescent
+        : 0.0;
 
     return Container(
       decoration: BoxDecoration(
@@ -54,14 +65,18 @@ class MobileHeader extends ConsumerWidget {
                     // タイトルと Spacer を並べると余った幅が両者に配分され、
                     // 登録ボタンが右端まで寄らない。
                     Expanded(
+                      // 件数はタイトルとベースラインで揃える。上下中央だと
+                      // 小さい件数がタイトルの中ほどに浮き、上に寄って見える。
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
                         children: [
                           Flexible(
                             child: Text(
                               _titleOf(context, view),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: _titleFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: palette.text,
                               ),
@@ -69,11 +84,14 @@ class MobileHeader extends ConsumerWidget {
                           ),
                           if (showSearchAndAdd) ...[
                             const SizedBox(width: 8),
-                            Text(
-                              _countOf(context, ref, view),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: palette.textAlpha(40),
+                            Transform.translate(
+                              offset: Offset(0, countOffset),
+                              child: Text(
+                                _countOf(context, ref, view),
+                                style: TextStyle(
+                                  fontSize: _countFontSize,
+                                  color: palette.textAlpha(40),
+                                ),
                               ),
                             ),
                           ],

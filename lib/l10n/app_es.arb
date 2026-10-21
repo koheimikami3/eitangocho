@@ -150,7 +150,7 @@
   "syncErrorFailed": "Error al sincronizar: {detail}",
   "proCoffeeTitle": "Invítale un café al desarrollador ☕",
   "proCoffeeReward": "Como agradecimiento, quitamos los anuncios",
-  "proCoffeeThanks": "¡Gracias por el café!",
+  "proCoffeeThanks": "¡Gracias!",
   "proCoffeeLink": "Invítame un café y adiós anuncios ☕",
   "priceUnavailable": "No se pudo obtener el precio",
   "oneTimePrice": "Pago único {price}",

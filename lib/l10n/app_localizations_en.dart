@@ -569,7 +569,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proCoffeeReward => 'Ads go away as a thank-you';
 
   @override
-  String get proCoffeeThanks => 'Thanks for the coffee!';
+  String get proCoffeeThanks => 'Thank you!';
 
   @override
   String get proCoffeeLink => 'Buy me a coffee to remove ads ☕';

@@ -1,5 +1,6 @@
 import 'package:eitangocho/components/mobile_pressable.dart';
 import 'package:eitangocho/components/mobile_pronunciation_button.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/word/presentation/widgets/mobile_learned_checkbox.dart';
@@ -82,8 +83,8 @@ class MobileWordRow extends StatelessWidget {
                         Text(
                           word.ipa,
                           style: TextStyle(
-                            fontSize: 11,
-                            fontFamily: 'Menlo',
+                            fontSize: 13,
+                            fontFamily: AppFonts.ipa,
                             color: palette.textAlpha(45),
                           ),
                         ),

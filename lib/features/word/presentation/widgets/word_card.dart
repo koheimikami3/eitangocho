@@ -1,6 +1,7 @@
 import 'package:eitangocho/components/pronunciation_button.dart';
 import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/db/app_database.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
@@ -97,14 +98,16 @@ class _WordCardState extends State<WordCard> {
                 ),
               ),
               if (showIpa) ...[
-                const SizedBox(height: 3),
+                // 単語との間は下(品詞バッジとの間)より少し広く取り、発音記号が
+                // 単語に詰まって見えないようにする。
+                const SizedBox(height: 5),
                 Text(
                   word.ipa,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Menlo',
+                    fontSize: 14,
+                    fontFamily: AppFonts.ipa,
                     color: AppColors.textTertiary,
                   ),
                 ),
@@ -158,21 +161,28 @@ class _WordCardState extends State<WordCard> {
                     // チェック操作をカードのタップ(編集モーダル)に伝播させない。
                     GestureDetector(
                       onTap: () {},
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          LearnedCheckbox(
-                            value: word.isLearned,
-                            onChanged: widget.onToggleLearned,
-                          ),
-                          Text(
-                            context.l10n.markLearned,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                      // LearnedCheckbox はヒット領域の余白(6)を四辺に持つため、
+                      // そのままだと箱が区切り線の左端より内側に寄る。余白の分だけ
+                      // 左へ出して、箱の左端を区切り線・本文の左端に揃える
+                      // (ヒット領域はカードの padding の中に収まる)。
+                      child: Transform.translate(
+                        offset: const Offset(-6, 0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            LearnedCheckbox(
+                              value: word.isLearned,
+                              onChanged: widget.onToggleLearned,
                             ),
-                          ),
-                        ],
+                            Text(
+                              context.l10n.markLearned,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const Spacer(),

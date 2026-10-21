@@ -1,6 +1,7 @@
 import 'package:eitangocho/app/app_route_observer.dart';
 import 'package:eitangocho/app/main_page.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
+import 'package:eitangocho/constants/app_fonts.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/domain/app_appearance.dart';
@@ -54,7 +55,8 @@ class EitangochoApp extends ConsumerWidget {
       // ノッチ・ホームインジケータ周りのレイアウトが崩れるため)。
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
-        if (!AppPlatform.isMacOS) return child;
+        final themed = _withAppFonts(context, child);
+        if (!AppPlatform.isMacOS) return themed;
         return LayoutBuilder(
           builder: (context, constraints) {
             final size = Size(
@@ -74,7 +76,7 @@ class EitangochoApp extends ConsumerWidget {
                   maxWidth: size.width,
                   minHeight: size.height,
                   maxHeight: size.height,
-                  child: child,
+                  child: themed,
                 ),
               ),
             );
@@ -82,6 +84,30 @@ class EitangochoApp extends ConsumerWidget {
         );
       },
       home: const MainPage(),
+    );
+  }
+
+  /// 同梱フォントを文字のテーマに当てる。
+  ///
+  /// 和文・繁体字の優先順は解決済みの表示言語で決めるため、[ThemeData] の
+  /// fontFamily ではなく、Localizations より下にある builder の中で当てる。
+  /// 各ウィジェットの TextStyle は fontFamily を持たないので、ここで当てた
+  /// フォントがそのまま継承される。
+  Widget _withAppFonts(BuildContext context, Widget child) {
+    final theme = Theme.of(context);
+    final fallback = AppFonts.cjkFallback(Localizations.localeOf(context));
+    return Theme(
+      data: theme.copyWith(
+        textTheme: theme.textTheme.apply(
+          fontFamily: AppFonts.sans,
+          fontFamilyFallback: fallback,
+        ),
+        primaryTextTheme: theme.primaryTextTheme.apply(
+          fontFamily: AppFonts.sans,
+          fontFamilyFallback: fallback,
+        ),
+      ),
+      child: child,
     );
   }
 
@@ -93,6 +119,12 @@ class EitangochoApp extends ConsumerWidget {
     scaffoldBackgroundColor: palette.background,
     colorSchemeSeed: palette.accent,
     dialogTheme: DialogThemeData(backgroundColor: palette.surface),
+    // 白で塗った入力欄にマウスを当てると、Material 既定では黒 4% が重なって
+    // グレーになり、地に溶けて使えない欄のように見える。macOS 標準の入力欄と
+    // 同じく、ホバーでは見た目を変えない(I 字カーソルで入力できると分かる)。
+    inputDecorationTheme: const InputDecorationThemeData(
+      hoverColor: Colors.transparent,
+    ),
     // カーソルは web の既定キャレット相当の本文色にする。
     // 選択ハイライト・ハンドルはアクセント色を薄く敷く。
     textSelectionTheme: TextSelectionThemeData(
