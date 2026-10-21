@@ -22,6 +22,50 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.10.0 (build 22)
+
+iOS・macOS 共通。新機能の欄は 5 言語ぶん入れる。macOS は 2.8.0 以来のリリースだが、2.9.0 の変更(Pro の値下げ、
+Pro・バナー広告まわりの調整)は macOS に関係しないため文面は分けない。「一部の画面」は検索欄のアイコン、
+設定画面のタイトル位置、チェックボックスの位置、1 列カードの並びなど。発音記号の書体・大きさの変更は
+フォントの変更に含めた。Pro のお礼の文言を短くした変更と、レビュー依頼の計測の追加は掲載していない。
+
+日本語:
+
+```
+アプリ全体のフォントを変更しました。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+更換了整個 App 的字型。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+Cambiamos la fuente de toda la app.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+Nouvelle police dans toute l'app.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Changed the app's font.
+Improved the design of some screens for readability.
+```
+
+---
+
 ## 2.9.0 (build 21)
 
 iOS のみ(macOS は出していない。利用者から見える変化が無いため)。2.8.0 と同じく新機能の欄は 5 言語ぶん入れる。
