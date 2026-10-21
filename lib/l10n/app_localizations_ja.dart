@@ -196,6 +196,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String wordRegistered(String word) {
+    return '「$word」を登録しました。';
+  }
+
+  @override
   String get errorEmptyWord => '英単語を入力してください。';
 
   @override

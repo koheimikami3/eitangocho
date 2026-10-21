@@ -148,6 +148,15 @@
       }
     }
   },
+  "wordRegistered": "「{word}」を登録しました。",
+  "@wordRegistered": {
+    "description": "macOS の登録画面で、保存後に入力欄の下に出す知らせ",
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
   "errorEmptyWord": "英単語を入力してください。",
   "errorFetchFailed": "辞書データの取得に失敗しました。通信環境を確認してください。",
   "errorRequiredFields": "英単語と{language}訳は必須です。",

@@ -212,6 +212,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String wordRegistered(String word) {
+    return '\"$word\" se añadió a tu lista de palabras.';
+  }
+
+  @override
   String get errorEmptyWord => 'Escribe una palabra en inglés.';
 
   @override

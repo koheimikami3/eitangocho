@@ -50,6 +50,7 @@
   "noticeMeaningNotFound": "No se encontró la traducción al {language} en el diccionario (escríbela manualmente)",
   "noticeOnlyMeaningFound": "No se encontró la pronunciación ni ejemplos (solo se completó la traducción)",
   "errorDuplicate": "\"{word}\" ya está en tu lista de palabras.",
+  "wordRegistered": "\"{word}\" se añadió a tu lista de palabras.",
   "errorEmptyWord": "Escribe una palabra en inglés.",
   "errorFetchFailed": "No se pudo conectar con el diccionario. Revisa tu conexión.",
   "errorRequiredFields": "La palabra en inglés y la traducción son obligatorias.",

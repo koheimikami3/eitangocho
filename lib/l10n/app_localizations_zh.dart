@@ -195,6 +195,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String wordRegistered(String word) {
+    return '已新增「$word」。';
+  }
+
+  @override
   String get errorEmptyWord => '請輸入英文單字。';
 
   @override
@@ -773,6 +778,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String errorDuplicate(String word) {
     return '「$word」已經新增過了。';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '已新增「$word」。';
   }
 
   @override

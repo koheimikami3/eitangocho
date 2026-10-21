@@ -405,6 +405,12 @@ abstract class AppLocalizations {
   /// **'「{word}」は既に登録されています。'**
   String errorDuplicate(String word);
 
+  /// macOS の登録画面で、保存後に入力欄の下に出す知らせ
+  ///
+  /// In ja, this message translates to:
+  /// **'「{word}」を登録しました。'**
+  String wordRegistered(String word);
+
   /// No description provided for @errorEmptyWord.
   ///
   /// In ja, this message translates to:

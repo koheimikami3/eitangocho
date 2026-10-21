@@ -118,6 +118,10 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
     );
   }
 
+  /// 保存後に最初の状態(ステップ 1)へ戻す。macOS は登録後も登録画面に
+  /// 留まり、続けて次の単語を登録できるようにするため。
+  void reset() => state = const WordRegistrationState();
+
   void togglePartOfSpeech(PartOfSpeech pos) {
     final current = state.selectedPartsOfSpeech;
     state = state.copyWith(
@@ -188,7 +192,7 @@ class WordRegistrationNotifier extends _$WordRegistrationNotifier {
         );
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。
     // macOS / iOS で共有するこの Notifier を呼び出し口にする。true を返すと
-    // 呼び出し側がシートを閉じる(macOS は学習中リストへ切り替える)ので、
+    // 呼び出し側がシートを閉じる(macOS はステップ 1 に戻す)ので、
     // 依頼は ReviewConfig.promptDelay だけ待ってその後に出る。
     // 依頼の成否は登録に関係しないので待たない。
     unawaited(ref.read(reviewPrompterProvider).onWordRegistered());

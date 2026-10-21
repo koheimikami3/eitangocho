@@ -17,6 +17,7 @@ import 'package:eitangocho/features/word_registration/presentation/widgets/regis
 import 'package:eitangocho/features/word_registration/presentation/widgets/registration_loading_step.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_notifier.dart';
 import 'package:eitangocho/features/word_registration/presentation/word_registration_state.dart';
+import 'package:eitangocho/utils/headword.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   final _meaningController = TextEditingController();
   final _exampleEnController = TextEditingController();
   final _exampleTranslationController = TextEditingController();
+  final _wordFocusNode = FocusNode();
+
+  /// 直前に登録した単語。ステップ 1 に「登録しました」と出すために持つ。
+  /// 次の単語の取得・手動入力に進んだら消す。
+  String? _registeredWord;
 
   // 「自動入力」バッジの表示フラグ。プレフィル時に立て、ユーザーが
   // その項目を空にしたら消す(プロトタイプ準拠)。View の揮発状態でよい。
@@ -95,6 +101,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
     _meaningController.dispose();
     _exampleEnController.dispose();
     _exampleTranslationController.dispose();
+    _wordFocusNode.dispose();
     super.dispose();
   }
 
@@ -131,6 +138,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   }
 
   Future<void> _save() async {
+    final headword = normalizeHeadword(_wordController.text);
     final saved = await ref
         .read(wordRegistrationProvider.notifier)
         .save(
@@ -141,7 +149,15 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           exampleTranslation: _exampleTranslationController.text,
         );
     if (saved && mounted) {
-      ref.read(mainPageProvider.notifier).selectView(MainView.learning);
+      // 続けて登録できるよう、学習中リストへは移らずステップ 1 に戻し、
+      // 次の単語をすぐ打てるよう入力欄にフォーカスを置く。
+      setState(() => _registeredWord = headword);
+      _wordController.clear();
+      ref.read(wordRegistrationProvider.notifier).reset();
+      // 入力欄はステップ 1 に戻った後のビルドで作られるため、描画後に当てる。
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _wordFocusNode.requestFocus();
+      });
     }
   }
 
@@ -153,6 +169,9 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
   Widget build(BuildContext context) {
     ref.listen(wordRegistrationProvider, (previous, next) {
       if (previous?.step == next.step) return;
+      if (next.step != RegistrationStep.input && _registeredWord != null) {
+        setState(() => _registeredWord = null);
+      }
       if (next.step == RegistrationStep.form) {
         final fetched = next.fetched;
         if (fetched != null) {
@@ -180,7 +199,11 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           child: switch (state.step) {
             RegistrationStep.input => RegistrationInputStep(
               wordController: _wordController,
+              wordFocusNode: _wordFocusNode,
               errorMessage: errorMessage,
+              registeredMessage: _registeredWord == null
+                  ? null
+                  : context.l10n.wordRegistered(_registeredWord!),
               onAutoFill: () => ref
                   .read(wordRegistrationProvider.notifier)
                   .autoFill(_wordController.text),

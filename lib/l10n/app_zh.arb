@@ -50,6 +50,7 @@
   "noticeMeaningNotFound": "字典中找不到{language}翻譯（請手動輸入）",
   "noticeOnlyMeaningFound": "字典中找不到音標和例句（只自動填入翻譯）",
   "errorDuplicate": "「{word}」已經新增過了。",
+  "wordRegistered": "已新增「{word}」。",
   "errorEmptyWord": "請輸入英文單字。",
   "errorFetchFailed": "無法取得字典資料，請確認網路連線。",
   "errorRequiredFields": "英文單字和{language}翻譯為必填欄位。",

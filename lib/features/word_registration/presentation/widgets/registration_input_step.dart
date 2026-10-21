@@ -13,13 +13,19 @@ class RegistrationInputStep extends ConsumerWidget {
     required this.onAutoFill,
     required this.onSkip,
     super.key,
+    this.wordFocusNode,
     this.errorMessage,
+    this.registeredMessage,
   });
 
   final TextEditingController wordController;
+  final FocusNode? wordFocusNode;
   final VoidCallback onAutoFill;
   final VoidCallback onSkip;
   final String? errorMessage;
+
+  /// 直前の登録が済んだ知らせ。エラーがあればそちらを優先して出す。
+  final String? registeredMessage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,6 +41,7 @@ class RegistrationInputStep extends ConsumerWidget {
         LabeledTextField(
           label: l10n.fieldWord,
           controller: wordController,
+          focusNode: wordFocusNode,
           hintText: 'apple',
           onSubmitted: (_) => onAutoFill(),
           // 入力欄の高さに引き伸ばすので、ボタン自身の上下の余白は持たせない
@@ -50,6 +57,12 @@ class RegistrationInputStep extends ConsumerWidget {
           Text(
             errorMessage!,
             style: const TextStyle(fontSize: 12, color: AppColors.danger),
+          ),
+        ] else if (registeredMessage != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            registeredMessage!,
+            style: const TextStyle(fontSize: 12, color: AppColors.success),
           ),
         ],
         const SizedBox(height: 14),
