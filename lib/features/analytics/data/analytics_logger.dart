@@ -131,6 +131,11 @@ class AnalyticsLogger {
   /// クイズ結果の広告の下にある Pro への導線を押した。導線を残すか外すかの
   /// 判断に使う(pro_purchase と並べて、導線経由で購入まで進む人がいるかを見る)。
   void logProLinkTapped() => _log('pro_link_tapped');
+
+  /// OS のレビュー依頼を呼んだ。実際に表示されたかは OS が教えてくれないため、
+  /// 「依頼を試みた回数」の目安として見る(契機ごとの条件が厳しすぎないかの判断用)。
+  void logReviewRequested(ReviewTrigger trigger) =>
+      _log('review_requested', {'trigger': snakeCase(trigger.name)});
 }
 
 /// riverpod_generator は drift 生成型(Word)を扱う @riverpod を
