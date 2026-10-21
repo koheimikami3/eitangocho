@@ -75,10 +75,15 @@ class _WordCardState extends State<WordCard> {
         child: Container(
           padding: const EdgeInsets.all(16),
           // iOS のカードと同じく枠線なし + 淡い影で浮かせる(2.2.0)。
-          // ホバーは青い枠をやめ、影を一段足して少し持ち上げる。
+          // ホバーは影を一段足して少し持ち上げ、薄い青の枠も付ける。
+          // 枠は透明色で常に描く。ホバー時だけ足すと、枠の太さの分だけ
+          // 中身がずれるため。
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+            border: Border.all(
+              color: _isHovered ? AppColors.accentLine : Colors.transparent,
+            ),
             boxShadow: _isHovered ? _hoverShadow : AppPalette.light.elevation,
           ),
           child: Column(
