@@ -55,54 +55,55 @@ class MobileSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    // キーボードが出ている分だけシートを持ち上げる。
+    // キーボードが出ている分だけ中身を持ち上げる。
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
-    return Padding(
+    // 余白はシートの面の内側に取り、キーボードの裏も面の色で埋める。
+    // 外側に取ると(シートごと持ち上げると)キーボードの裏がオーバーレイに
+    // なり、iOS のキーボードの角丸の外側にその灰色が覗く。
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      clipBehavior: Clip.antiAlias,
       padding: EdgeInsets.only(bottom: keyboardInset),
       child: FractionallySizedBox(
         heightFactor: _heightFactor,
-        child: Container(
-          decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              _SheetHeader(
-                showGrabber: showGrabber,
-                title: title,
-                titleFontSize: titleFontSize,
-                leftLabel: leftLabel,
-                onLeft: onLeft,
-                rightLabel: rightLabel,
-                onRight: onRight,
-              ),
-              Expanded(
-                child: scrollableBody
-                    // 入力欄の外をタップしたらキーボードを閉じる。複数行の欄は
-                    // Return が改行なので「完了」キーが無く、ほかに閉じる手段が
-                    // 無いため。TextField の onTapOutside は指を置いた瞬間に
-                    // 発火してスクロールでも閉じてしまう(フォームの下の欄を
-                    // 見に行くたびに閉じる)ので、タップだけを拾う onTap にする。
-                    // 入力欄やボタンのタップは内側の認識器が勝つため、ここに
-                    // 来るのは何も無いところのタップだけ。WebView を載せる
-                    // scrollableBody: false には付けない(WebView のタップと競合する)。
-                    ? GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
-                          child: child,
-                        ),
-                      )
-                    : child,
-              ),
-              ?footer,
-            ],
-          ),
+        child: Column(
+          children: [
+            _SheetHeader(
+              showGrabber: showGrabber,
+              title: title,
+              titleFontSize: titleFontSize,
+              leftLabel: leftLabel,
+              onLeft: onLeft,
+              rightLabel: rightLabel,
+              onRight: onRight,
+            ),
+            Expanded(
+              child: scrollableBody
+                  // 入力欄の外をタップしたらキーボードを閉じる。複数行の欄は
+                  // Return が改行なので「完了」キーが無く、ほかに閉じる手段が
+                  // 無いため。TextField の onTapOutside は指を置いた瞬間に
+                  // 発火してスクロールでも閉じてしまう(フォームの下の欄を
+                  // 見に行くたびに閉じる)ので、タップだけを拾う onTap にする。
+                  // 入力欄やボタンのタップは内側の認識器が勝つため、ここに
+                  // 来るのは何も無いところのタップだけ。WebView を載せる
+                  // scrollableBody: false には付けない(WebView のタップと競合する)。
+                  ? GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
+                        child: child,
+                      ),
+                    )
+                  : child,
+            ),
+            ?footer,
+          ],
         ),
       ),
     );
