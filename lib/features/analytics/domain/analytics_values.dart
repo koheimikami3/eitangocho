@@ -20,6 +20,15 @@ enum QuizTrigger {
 /// Pro 購入の段階(pro_purchase の stage)。
 enum ProPurchaseStage { tapped, success, cancelled, failed }
 
+/// レビュー依頼を出した契機(review_requested の trigger)。
+enum ReviewTrigger {
+  /// クイズを最後まで終えた直後。
+  quiz,
+
+  /// 登録単語数が節目(50 / 100 語)に達した直後。
+  wordMilestone,
+}
+
 /// enum の名前(lowerCamelCase)を snake_case にする。
 String snakeCase(String camel) =>
     camel.replaceAllMapped(RegExp('[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');

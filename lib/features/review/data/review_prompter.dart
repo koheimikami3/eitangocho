@@ -1,4 +1,6 @@
 import 'package:eitangocho/db/daos/word_dao.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
+import 'package:eitangocho/features/analytics/domain/analytics_values.dart';
 import 'package:eitangocho/features/review/data/review_client.dart';
 import 'package:eitangocho/features/review/domain/review_config.dart';
 import 'package:eitangocho/features/review/domain/review_log.dart';
@@ -19,6 +21,7 @@ class ReviewPrompter {
   ReviewPrompter({
     required this.client,
     required this.wordDao,
+    required this.analytics,
     this.promptDelay = ReviewConfig.promptDelay,
   });
 
@@ -27,6 +30,7 @@ class ReviewPrompter {
 
   final ReviewClient client;
   final WordDao wordDao;
+  final AnalyticsLogger analytics;
 
   /// 契機の画面遷移から依頼を出すまでの待ち時間。
   final Duration promptDelay;
@@ -56,7 +60,7 @@ class ReviewPrompter {
         return;
       }
 
-      await _request('累計クイズ完了 $completions 回');
+      await _request('累計クイズ完了 $completions 回', ReviewTrigger.quiz);
     } on Object catch (error) {
       reviewLog('レビュー依頼に失敗しました: $error');
     }
@@ -73,7 +77,7 @@ class ReviewPrompter {
       if (!ReviewConfig.wordCountMilestones.contains(wordCount)) return;
       if (await _isWithinInterval()) return;
 
-      await _request('登録単語 $wordCount 語');
+      await _request('登録単語 $wordCount 語', ReviewTrigger.wordMilestone);
     } on Object catch (error) {
       reviewLog('レビュー依頼に失敗しました: $error');
     }
@@ -146,8 +150,9 @@ class ReviewPrompter {
   }
 
   /// 待ち時間を置いてから依頼を出し、依頼した日時を記録する。
-  /// [reason] はログに出す契機の説明。例外は呼び出し側で握る。
-  Future<void> _request(String reason) async {
+  /// [reason] はログに出す契機の説明、[trigger] は計測に送る契機。
+  /// 例外は呼び出し側で握る。
+  Future<void> _request(String reason, ReviewTrigger trigger) async {
     // 契機の画面遷移とアニメーションが落ち着いてからシートを重ねる。
     await Future<void>.delayed(promptDelay);
 
@@ -164,6 +169,7 @@ class ReviewPrompter {
       _keyLastRequestedAt,
       DateTime.now().millisecondsSinceEpoch,
     );
+    analytics.logReviewRequested(trigger);
     reviewLog('レビュー依頼を出しました($reason)');
   }
 }
@@ -175,5 +181,6 @@ final reviewPrompterProvider = Provider<ReviewPrompter>(
   (ref) => ReviewPrompter(
     client: ref.watch(reviewClientProvider),
     wordDao: ref.watch(databaseProvider).wordDao,
+    analytics: ref.watch(analyticsLoggerProvider),
   ),
 );

@@ -1,23 +1,27 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:eitangocho/db/app_database.dart';
+import 'package:eitangocho/features/analytics/data/analytics_logger.dart';
 import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+import '../../analytics/fake_analytics_client.dart';
 import '../fake_review_client.dart';
 
 void main() {
   late AppDatabase db;
   late FakeReviewClient client;
+  late FakeAnalyticsClient analytics;
 
   setUp(() {
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
     db = AppDatabase.forTesting(NativeDatabase.memory());
     client = FakeReviewClient();
+    analytics = FakeAnalyticsClient();
   });
 
   tearDown(() async {
@@ -28,6 +32,7 @@ void main() {
   ReviewPrompter createPrompter() => ReviewPrompter(
     client: client,
     wordDao: db.wordDao,
+    analytics: AnalyticsLogger(analytics),
     promptDelay: Duration.zero,
   );
 
@@ -66,6 +71,9 @@ void main() {
     // 4 回目以降は間隔(120 日)に引っかかるので出さない。
     await completeGoodSessions(prompter, 1);
     expect(client.requestCount, 1);
+    expect(analytics.eventsNamed('review_requested'), [
+      {'trigger': 'quiz'},
+    ]);
   });
 
   test('出題数が少ないセッションでは依頼しない', () async {
@@ -139,6 +147,7 @@ void main() {
     await completeGoodSessions(prompter, 3);
 
     expect(client.requestCount, 0);
+    expect(analytics.eventsNamed('review_requested'), isEmpty);
   });
 
   test('依頼が失敗しても例外を漏らさず、記録もしないので次回また試す', () async {
@@ -184,6 +193,9 @@ void main() {
 
       await register(prompter, 'w51');
       expect(client.requestCount, 1);
+      expect(analytics.eventsNamed('review_requested'), [
+        {'trigger': 'word_milestone'},
+      ]);
     });
 
     test('100 語目の登録でも依頼する', () async {
