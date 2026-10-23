@@ -281,10 +281,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rememberedCheck => 'Learned';
 
   @override
-  String get learningHint =>
-      'Check a word to mark it as learned and remove it from this list. Click a card to edit it (right-click for more).';
-
-  @override
   String get noWordsYet => 'No words yet.';
 
   @override

@@ -259,9 +259,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rememberedCheck => '已學會';
 
   @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
-
-  @override
   String get noWordsYet => '還沒有單字。';
 
   @override
@@ -840,9 +837,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get rememberedCheck => '已學會';
-
-  @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
 
   @override
   String get noWordsYet => '還沒有單字。';

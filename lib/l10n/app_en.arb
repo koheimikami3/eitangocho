@@ -68,7 +68,6 @@
   "showDefinition": "Show definition",
   "correctCount": "Remembered {count, plural, =1{once} other{{count} times}}",
   "rememberedCheck": "Learned",
-  "learningHint": "Check a word to mark it as learned and remove it from this list. Click a card to edit it (right-click for more).",
   "noWordsYet": "No words yet.",
   "learningEmpty": "No words in progress.\nAdd some words to get started.",
   "sortOrderLabel": "Sort: {order}",

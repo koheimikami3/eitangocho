@@ -275,10 +275,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rememberedCheck => 'Appris';
 
   @override
-  String get learningHint =>
-      'Cochez un mot pour le marquer comme appris et le retirer de cette liste. Cliquez sur une carte pour la modifier (clic droit pour plus d\'options).';
-
-  @override
   String get noWordsYet => 'Aucun mot pour l\'instant.';
 
   @override

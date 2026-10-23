@@ -10,7 +10,6 @@ import 'package:eitangocho/features/word/presentation/widgets/learning_empty_sta
 import 'package:eitangocho/features/word/presentation/widgets/word_card.dart';
 import 'package:eitangocho/features/word/presentation/widgets/word_context_menu.dart';
 import 'package:eitangocho/features/word/presentation/word_learned_toggle.dart';
-import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,69 +35,46 @@ class LearningWordsView extends ConsumerWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimensions.contentPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Text(
-              // このビューは macOS 専用(iOS は LearningWordsViewMobile)。
-              context.l10n.learningHint,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textTertiary,
-              ),
-            ),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) 相当。
-              // 横幅に収まる最大列数を求め、gridGap で等分する。
-              const minWidth = AppDimensions.cardMinWidth;
-              const gap = AppDimensions.gridGap;
-              final maxColumns =
-                  ((constraints.maxWidth + gap) / (minWidth + gap)).floor();
-              final columns = maxColumns < 1 ? 1 : maxColumns;
-              final cardWidth =
-                  (constraints.maxWidth - gap * (columns - 1)) / columns;
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) 相当。
+          // 横幅に収まる最大列数を求め、gridGap で等分する。
+          const minWidth = AppDimensions.cardMinWidth;
+          const gap = AppDimensions.gridGap;
+          final maxColumns = ((constraints.maxWidth + gap) / (minWidth + gap))
+              .floor();
+          final columns = maxColumns < 1 ? 1 : maxColumns;
+          final cardWidth =
+              (constraints.maxWidth - gap * (columns - 1)) / columns;
 
-              return Wrap(
-                spacing: gap,
-                runSpacing: gap,
-                children: [
-                  for (final word in words)
-                    // ValueKey(word.id) により、検索フィルタや削除での再構築では
-                    // 既存カードの State が保持され再アニメーションしない
-                    // (新規カードとビュー再入場時のみ cardIn が再生される)。
-                    KeyedSubtree(
-                      key: ValueKey(word.id),
-                      child: SizedBox(
-                        width: cardWidth,
-                        child: CardIn(
-                          child: WordCard(
-                            word: word,
-                            showIpa: showIpa,
-                            onToggleLearned: (isLearned) => toggleWordLearned(
-                              ref,
-                              word,
-                              isLearned: isLearned,
-                            ),
-                            onTap: () => showEditWordDialog(context, ref, word),
-                            onContextMenu: (position) => showWordContextMenu(
-                              context,
-                              ref,
-                              word,
-                              position,
-                            ),
-                          ),
-                        ),
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: [
+              for (final word in words)
+                // ValueKey(word.id) により、検索フィルタや削除での再構築では
+                // 既存カードの State が保持され再アニメーションしない
+                // (新規カードとビュー再入場時のみ cardIn が再生される)。
+                KeyedSubtree(
+                  key: ValueKey(word.id),
+                  child: SizedBox(
+                    width: cardWidth,
+                    child: CardIn(
+                      child: WordCard(
+                        word: word,
+                        showIpa: showIpa,
+                        onToggleLearned: (isLearned) =>
+                            toggleWordLearned(ref, word, isLearned: isLearned),
+                        onTap: () => showEditWordDialog(context, ref, word),
+                        onContextMenu: (position) =>
+                            showWordContextMenu(context, ref, word, position),
                       ),
                     ),
-                ],
-              );
-            },
-          ),
-        ],
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

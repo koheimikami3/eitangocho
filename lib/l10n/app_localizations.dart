@@ -513,12 +513,6 @@ abstract class AppLocalizations {
   /// **'覚えた'**
   String get rememberedCheck;
 
-  /// No description provided for @learningHint.
-  ///
-  /// In ja, this message translates to:
-  /// **'チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。'**
-  String get learningHint;
-
   /// No description provided for @noWordsYet.
   ///
   /// In ja, this message translates to:

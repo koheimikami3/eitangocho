@@ -68,7 +68,6 @@
   "showDefinition": "Mostrar definición",
   "correctCount": "{count, plural, =1{Recordada 1 vez} other{Recordada {count} veces}}",
   "rememberedCheck": "Aprendida",
-  "learningHint": "Marca una palabra como aprendida para quitarla de esta lista. Haz clic en una tarjeta para editarla (clic derecho para más opciones).",
   "noWordsYet": "Aún no hay palabras.",
   "learningEmpty": "No hay palabras en estudio.\nAñade algunas palabras para empezar.",
   "sortOrderLabel": "Orden: {order}",

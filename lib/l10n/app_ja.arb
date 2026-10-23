@@ -208,7 +208,6 @@
   "@rememberedCheck": {
     "description": "学習中カードのチェックの横の文言"
   },
-  "learningHint": "チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。",
   "noWordsYet": "単語がまだありません。",
   "learningEmpty": "学習中の単語はありません。\n単語を登録しましょう。",
   "sortOrderLabel": "並び順: {order}",

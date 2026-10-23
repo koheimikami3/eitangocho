@@ -68,7 +68,6 @@
   "showDefinition": "顯示釋義",
   "correctCount": "記住 {count} 次",
   "rememberedCheck": "已學會",
-  "learningHint": "勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。",
   "noWordsYet": "還沒有單字。",
   "learningEmpty": "目前沒有學習中的單字。\n來新增單字吧。",
   "sortOrderLabel": "排序：{order}",

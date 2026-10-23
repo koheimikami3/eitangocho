@@ -260,10 +260,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get rememberedCheck => '覚えた';
 
   @override
-  String get learningHint =>
-      'チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。';
-
-  @override
   String get noWordsYet => '単語がまだありません。';
 
   @override
