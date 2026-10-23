@@ -117,9 +117,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get posOther => 'autre';
 
   @override
-  String get posSeparator => '/';
-
-  @override
   String get fieldWord => 'Mot anglais *';
 
   @override
@@ -174,10 +171,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort =>
-      'Impossible de traduire l\'exemple (vous pouvez le saisir manuellement)';
-
-  @override
   String get registerButton => 'Ajouter';
 
   @override
@@ -211,6 +204,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String errorDuplicate(String word) {
     return '« $word » est déjà dans votre liste de mots.';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '« $word » a été ajouté à votre liste de mots.';
   }
 
   @override
@@ -275,10 +273,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get rememberedCheck => 'Appris';
-
-  @override
-  String get learningHint =>
-      'Cochez un mot pour le marquer comme appris et le retirer de cette liste. Cliquez sur une carte pour la modifier (clic droit pour plus d\'options).';
 
   @override
   String get noWordsYet => 'Aucun mot pour l\'instant.';

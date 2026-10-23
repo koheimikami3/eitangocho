@@ -249,12 +249,6 @@ abstract class AppLocalizations {
   /// **'その他'**
   String get posOther;
 
-  /// 複数品詞を 1 つのバッジに並べるときの区切り
-  ///
-  /// In ja, this message translates to:
-  /// **'・'**
-  String get posSeparator;
-
   /// No description provided for @fieldWord.
   ///
   /// In ja, this message translates to:
@@ -345,12 +339,6 @@ abstract class AppLocalizations {
   /// **'例文の{language}訳を取得できませんでした。手動で入力できます。'**
   String exampleTranslationFailed(String language);
 
-  /// No description provided for @exampleTranslationFailedShort.
-  ///
-  /// In ja, this message translates to:
-  /// **'例文の翻訳に失敗しました(手動で入力できます)'**
-  String get exampleTranslationFailedShort;
-
   /// No description provided for @registerButton.
   ///
   /// In ja, this message translates to:
@@ -410,6 +398,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'「{word}」は既に登録されています。'**
   String errorDuplicate(String word);
+
+  /// macOS の登録画面で、保存後に入力欄の下に出す知らせ
+  ///
+  /// In ja, this message translates to:
+  /// **'「{word}」を登録しました。'**
+  String wordRegistered(String word);
 
   /// No description provided for @errorEmptyWord.
   ///
@@ -518,12 +512,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'覚えた'**
   String get rememberedCheck;
-
-  /// No description provided for @learningHint.
-  ///
-  /// In ja, this message translates to:
-  /// **'チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。'**
-  String get learningHint;
 
   /// No description provided for @noWordsYet.
   ///

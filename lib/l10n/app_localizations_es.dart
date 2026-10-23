@@ -117,9 +117,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get posOther => 'otro';
 
   @override
-  String get posSeparator => '/';
-
-  @override
   String get fieldWord => 'Palabra en inglés *';
 
   @override
@@ -175,10 +172,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort =>
-      'No se pudo traducir el ejemplo (puedes escribirlo manualmente)';
-
-  @override
   String get registerButton => 'Añadir';
 
   @override
@@ -212,6 +205,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String errorDuplicate(String word) {
     return '\"$word\" ya está en tu lista de palabras.';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '\"$word\" se añadió a tu lista de palabras.';
   }
 
   @override
@@ -282,10 +280,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get rememberedCheck => 'Aprendida';
-
-  @override
-  String get learningHint =>
-      'Marca una palabra como aprendida para quitarla de esta lista. Haz clic en una tarjeta para editarla (clic derecho para más opciones).';
 
   @override
   String get noWordsYet => 'Aún no hay palabras.';

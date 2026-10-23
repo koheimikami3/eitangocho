@@ -24,6 +24,7 @@ abstract final class AppColors {
   /// macOS 専用の値。iOS は 1.6.0 の刷新で別の値を持つ(AppPalette.accentOnSoft)。
   static const accentOnSoft = Color(0xFF176AB4);
   static const danger = Color(0xFFC03030); // 削除系
+  static const success = Color(0xFF1C7A3F); // 完了の知らせ(登録しました 等)
   static const dangerHover = Color(0xFFA82828);
   static const dangerHoverBackground = Color(0xFFFDF2F2);
   static const textPrimary = Color(0xFF1D1D1F);

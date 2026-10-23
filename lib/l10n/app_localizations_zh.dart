@@ -105,9 +105,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get posOther => '其他';
 
   @override
-  String get posSeparator => '、';
-
-  @override
   String get fieldWord => '英文單字 *';
 
   @override
@@ -161,9 +158,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
-
-  @override
   String get registerButton => '新增';
 
   @override
@@ -195,6 +189,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String errorDuplicate(String word) {
     return '「$word」已經新增過了。';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '已新增「$word」。';
   }
 
   @override
@@ -258,9 +257,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get rememberedCheck => '已學會';
-
-  @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
 
   @override
   String get noWordsYet => '還沒有單字。';
@@ -689,9 +685,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get posOther => '其他';
 
   @override
-  String get posSeparator => '、';
-
-  @override
   String get fieldWord => '英文單字 *';
 
   @override
@@ -745,9 +738,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例句翻譯失敗（可手動輸入）';
-
-  @override
   String get registerButton => '新增';
 
   @override
@@ -779,6 +769,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String errorDuplicate(String word) {
     return '「$word」已經新增過了。';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '已新增「$word」。';
   }
 
   @override
@@ -842,9 +837,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get rememberedCheck => '已學會';
-
-  @override
-  String get learningHint => '勾選後會標記為已學會，並從這個清單移除。按一下卡片即可編輯（按右鍵可開啟選單）。';
 
   @override
   String get noWordsYet => '還沒有單字。';

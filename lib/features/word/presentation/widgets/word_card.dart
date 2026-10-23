@@ -75,10 +75,15 @@ class _WordCardState extends State<WordCard> {
         child: Container(
           padding: const EdgeInsets.all(16),
           // iOS のカードと同じく枠線なし + 淡い影で浮かせる(2.2.0)。
-          // ホバーは青い枠をやめ、影を一段足して少し持ち上げる。
+          // ホバーは影を一段足して少し持ち上げ、薄い青の枠も付ける。
+          // 枠は透明色で常に描く。ホバー時だけ足すと、枠の太さの分だけ
+          // 中身がずれるため。
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
+            border: Border.all(
+              color: _isHovered ? AppColors.accentLine : Colors.transparent,
+            ),
             boxShadow: _isHovered ? _hoverShadow : AppPalette.light.elevation,
           ),
           child: Column(
@@ -122,14 +127,17 @@ class _WordCardState extends State<WordCard> {
               ),
               const SizedBox(height: 10),
               // カード高さを揃えるため英例文の領域は常に 2 行分を確保し、
-              // 超過分は末尾を … で省略する(全文は編集ダイアログで確認できる)。
-              SizedBox(
-                height: _exampleAreaHeight,
-                width: double.infinity,
+              // 超過分は末尾を … で省略する。訳を表示している間は省略しない
+              // (例文の訳は全文出るため、英文だけ切れていると突き合わせられない)。
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: _exampleAreaHeight,
+                  minWidth: double.infinity,
+                ),
                 child: Text(
                   hasExample ? word.exampleEn : context.l10n.noExample,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: _revealed ? null : 2,
+                  overflow: _revealed ? null : TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: _exampleFontSize,
                     color: hasExample

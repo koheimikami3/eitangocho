@@ -69,10 +69,6 @@
   "posAdjective": "形容詞",
   "posAdverb": "副詞",
   "posOther": "その他",
-  "posSeparator": "・",
-  "@posSeparator": {
-    "description": "複数品詞を 1 つのバッジに並べるときの区切り"
-  },
   "fieldWord": "英単語 *",
   "fieldIpa": "発音記号 (IPA)",
   "fieldMeaning": "{language}訳 *",
@@ -127,7 +123,6 @@
       }
     }
   },
-  "exampleTranslationFailedShort": "例文の翻訳に失敗しました(手動で入力できます)",
   "registerButton": "登録する",
   "registerShort": "登録",
   "back": "戻る",
@@ -146,6 +141,15 @@
   "noticeOnlyMeaningFound": "発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)",
   "errorDuplicate": "「{word}」は既に登録されています。",
   "@errorDuplicate": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "wordRegistered": "「{word}」を登録しました。",
+  "@wordRegistered": {
+    "description": "macOS の登録画面で、保存後に入力欄の下に出す知らせ",
     "placeholders": {
       "word": {
         "type": "String"
@@ -204,7 +208,6 @@
   "@rememberedCheck": {
     "description": "学習中カードのチェックの横の文言"
   },
-  "learningHint": "チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。",
   "noWordsYet": "単語がまだありません。",
   "learningEmpty": "学習中の単語はありません。\n単語を登録しましょう。",
   "sortOrderLabel": "並び順: {order}",

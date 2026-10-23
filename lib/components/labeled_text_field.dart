@@ -17,6 +17,7 @@ class LabeledTextField extends StatelessWidget {
     this.maxLines = 1,
     this.hintText,
     this.onSubmitted,
+    this.focusNode,
   });
 
   final String label;
@@ -38,11 +39,13 @@ class LabeledTextField extends StatelessWidget {
 
   /// Enter キー確定時のコールバック(ステップ 1 の自動入力発火等)
   final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
     final field = TextField(
       controller: controller,
+      focusNode: focusNode,
       minLines: minLines,
       maxLines: maxLines,
       onSubmitted: onSubmitted,

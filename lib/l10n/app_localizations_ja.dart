@@ -105,9 +105,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get posOther => 'その他';
 
   @override
-  String get posSeparator => '・';
-
-  @override
   String get fieldWord => '英単語 *';
 
   @override
@@ -162,9 +159,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get exampleTranslationFailedShort => '例文の翻訳に失敗しました(手動で入力できます)';
-
-  @override
   String get registerButton => '登録する';
 
   @override
@@ -196,6 +190,11 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String errorDuplicate(String word) {
     return '「$word」は既に登録されています。';
+  }
+
+  @override
+  String wordRegistered(String word) {
+    return '「$word」を登録しました。';
   }
 
   @override
@@ -259,10 +258,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get rememberedCheck => '覚えた';
-
-  @override
-  String get learningHint =>
-      'チェックを入れると学習済みになり、このリストから消えます。カードをクリックすると編集できます(右クリックでメニュー)。';
 
   @override
   String get noWordsYet => '単語がまだありません。';
