@@ -22,6 +22,55 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.11.0 (build 23)
+
+iOS のみ(macOS は出していない。Xcode 27 の lipo の不具合で、Flutter 3.44 では macOS をビルドできないため)。
+macOS 27 で Xcode 26 が起動しなくなったため、この版から Xcode 27.1(iOS 27.1 SDK)でビルドしている。
+「一部の画面」は全単語リストの品詞の位置と、訳を表示したときの英例文の全文表示。「細かな不具合」は
+キーボードの角丸の外側に背景が見えていたことと、発音確認の画面がスクロールできなかったこと。
+
+日本語:
+
+```
+品詞を色分けして表示するようにしました。
+一部の画面のデザインを見やすく調整しました。
+細かな不具合を修正しました。
+```
+
+繁體中文:
+
+```
+詞性改為以不同顏色分開顯示。
+調整了部分畫面的設計，使其更易於閱讀。
+修正了一些小問題。
+```
+
+Español:
+
+```
+Ahora cada categoría gramatical se muestra con su propio color.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+Corregimos pequeños errores.
+```
+
+Français:
+
+```
+Affichage de chaque catégorie grammaticale avec sa propre couleur.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+Correction de petits bugs.
+```
+
+English:
+
+```
+Each part of speech now has its own color.
+Improved the design of some screens for readability.
+Fixed minor bugs.
+```
+
+---
+
 ## 2.10.0 (build 22)
 
 iOS・macOS 共通。新機能の欄は 5 言語ぶん入れる。macOS は 2.8.0 以来のリリースだが、2.9.0 の変更(Pro の値下げ、
