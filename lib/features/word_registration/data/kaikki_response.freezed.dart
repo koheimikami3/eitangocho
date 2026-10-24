@@ -580,7 +580,7 @@ as List<String>,
 /// @nodoc
 mixin _$KaikkiTranslation {
 
- String? get word;@JsonKey(name: 'lang_code') String? get langCode;
+ String? get word;@JsonKey(name: 'lang_code') String? get langCode;@JsonKey(includeToJson: false) String? get lang;
 /// Create a copy of KaikkiTranslation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -593,16 +593,16 @@ $KaikkiTranslationCopyWith<KaikkiTranslation> get copyWith => _$KaikkiTranslatio
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode)&&(identical(other.lang, lang) || other.lang == lang));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,langCode);
+int get hashCode => Object.hash(runtimeType,word,langCode,lang);
 
 @override
 String toString() {
-  return 'KaikkiTranslation(word: $word, langCode: $langCode)';
+  return 'KaikkiTranslation(word: $word, langCode: $langCode, lang: $lang)';
 }
 
 
@@ -613,7 +613,7 @@ abstract mixin class $KaikkiTranslationCopyWith<$Res>  {
   factory $KaikkiTranslationCopyWith(KaikkiTranslation value, $Res Function(KaikkiTranslation) _then) = _$KaikkiTranslationCopyWithImpl;
 @useResult
 $Res call({
- String? word,@JsonKey(name: 'lang_code') String? langCode
+ String? word,@JsonKey(name: 'lang_code') String? langCode,@JsonKey(includeToJson: false) String? lang
 });
 
 
@@ -630,10 +630,11 @@ class _$KaikkiTranslationCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiTranslation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? word = freezed,Object? langCode = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? word = freezed,Object? langCode = freezed,Object? lang = freezed,}) {
   return _then(_self.copyWith(
 word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String?,langCode: freezed == langCode ? _self.langCode : langCode // ignore: cast_nullable_to_non_nullable
+as String?,lang: freezed == lang ? _self.lang : lang // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -719,10 +720,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode, @JsonKey(includeToJson: false)  String? lang)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KaikkiTranslation() when $default != null:
-return $default(_that.word,_that.langCode);case _:
+return $default(_that.word,_that.langCode,_that.lang);case _:
   return orElse();
 
 }
@@ -740,10 +741,10 @@ return $default(_that.word,_that.langCode);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? word, @JsonKey(name: 'lang_code')  String? langCode, @JsonKey(includeToJson: false)  String? lang)  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiTranslation():
-return $default(_that.word,_that.langCode);case _:
+return $default(_that.word,_that.langCode,_that.lang);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -760,10 +761,10 @@ return $default(_that.word,_that.langCode);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? word, @JsonKey(name: 'lang_code')  String? langCode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? word, @JsonKey(name: 'lang_code')  String? langCode, @JsonKey(includeToJson: false)  String? lang)?  $default,) {final _that = this;
 switch (_that) {
 case _KaikkiTranslation() when $default != null:
-return $default(_that.word,_that.langCode);case _:
+return $default(_that.word,_that.langCode,_that.lang);case _:
   return null;
 
 }
@@ -775,11 +776,12 @@ return $default(_that.word,_that.langCode);case _:
 @JsonSerializable()
 
 class _KaikkiTranslation implements KaikkiTranslation {
-  const _KaikkiTranslation({this.word, @JsonKey(name: 'lang_code') this.langCode});
+  const _KaikkiTranslation({this.word, @JsonKey(name: 'lang_code') this.langCode, @JsonKey(includeToJson: false) this.lang});
   factory _KaikkiTranslation.fromJson(Map<String, dynamic> json) => _$KaikkiTranslationFromJson(json);
 
 @override final  String? word;
 @override@JsonKey(name: 'lang_code') final  String? langCode;
+@override@JsonKey(includeToJson: false) final  String? lang;
 
 /// Create a copy of KaikkiTranslation
 /// with the given fields replaced by the non-null parameter values.
@@ -794,16 +796,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KaikkiTranslation&&(identical(other.word, word) || other.word == word)&&(identical(other.langCode, langCode) || other.langCode == langCode)&&(identical(other.lang, lang) || other.lang == lang));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,word,langCode);
+int get hashCode => Object.hash(runtimeType,word,langCode,lang);
 
 @override
 String toString() {
-  return 'KaikkiTranslation(word: $word, langCode: $langCode)';
+  return 'KaikkiTranslation(word: $word, langCode: $langCode, lang: $lang)';
 }
 
 
@@ -814,7 +816,7 @@ abstract mixin class _$KaikkiTranslationCopyWith<$Res> implements $KaikkiTransla
   factory _$KaikkiTranslationCopyWith(_KaikkiTranslation value, $Res Function(_KaikkiTranslation) _then) = __$KaikkiTranslationCopyWithImpl;
 @override @useResult
 $Res call({
- String? word,@JsonKey(name: 'lang_code') String? langCode
+ String? word,@JsonKey(name: 'lang_code') String? langCode,@JsonKey(includeToJson: false) String? lang
 });
 
 
@@ -831,10 +833,11 @@ class __$KaikkiTranslationCopyWithImpl<$Res>
 
 /// Create a copy of KaikkiTranslation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? word = freezed,Object? langCode = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? word = freezed,Object? langCode = freezed,Object? lang = freezed,}) {
   return _then(_KaikkiTranslation(
 word: freezed == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
 as String?,langCode: freezed == langCode ? _self.langCode : langCode // ignore: cast_nullable_to_non_nullable
+as String?,lang: freezed == lang ? _self.lang : lang // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

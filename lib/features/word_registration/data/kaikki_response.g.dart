@@ -49,6 +49,7 @@ _KaikkiTranslation _$KaikkiTranslationFromJson(Map<String, dynamic> json) =>
     _KaikkiTranslation(
       word: json['word'] as String?,
       langCode: json['lang_code'] as String?,
+      lang: json['lang'] as String?,
     );
 
 Map<String, dynamic> _$KaikkiTranslationToJson(_KaikkiTranslation instance) =>

@@ -48,11 +48,16 @@ abstract class KaikkiSound with _$KaikkiSound {
 /// [word] は日本語なら漢字表記(`諦める`)で、かなは `alt` に入るが読みは
 /// 使わないので読み飛ばす。中国語は `實現 /实现` のように繁体字と簡体字が
 /// 並んで来る。同じ訳語が語義ごとに重複して来るため、使う側で畳む。
+///
+/// [lang] は言語名(`Chinese Mandarin` など)。北京語の訳語には `lang_code` が
+/// `zh` で来るものがあり、それを見分けるためだけに読む。詰め直す時点で
+/// `cmn` に揃えるので、キャッシュには書き出さない。
 @freezed
 abstract class KaikkiTranslation with _$KaikkiTranslation {
   const factory KaikkiTranslation({
     String? word,
     @JsonKey(name: 'lang_code') String? langCode,
+    @JsonKey(includeToJson: false) String? lang,
   }) = _KaikkiTranslation;
 
   factory KaikkiTranslation.fromJson(Map<String, dynamic> json) =>

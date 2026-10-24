@@ -25,8 +25,9 @@ class AppDatabase extends _$AppDatabase {
   /// v4: words.translation_language を追加し、辞書キャッシュを捨てる(多言語化)
   /// v5: 辞書キャッシュを捨てる(訳の言語にスペイン語・フランス語を追加)
   /// v6: 辞書キャッシュを捨てる(英語の語義のため glosses を残すようにした)
+  /// v7: 辞書キャッシュを捨てる(`zh` で来る北京語の訳語も残すようにした)
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +76,14 @@ class AppDatabase extends _$AppDatabase {
       // v5 → v6 も辞書キャッシュの削除のみ。キャッシュは語義の文(glosses)を
       // 落として保存していたため、英語の語義を引けない。
       if (from < 6) {
+        await m.database.customStatement(
+          'DELETE FROM dictionary_cache_entries',
+        );
+      }
+      // v6 → v7 も辞書キャッシュの削除のみ。キャッシュは lang_code が `zh` の
+      // 北京語の訳語(apple の「蘋果」など)を落として保存していたため、
+      // 一度引いた語では自動入力し直しても繁体字の訳が空のままになる。
+      if (from < 7) {
         await m.database.customStatement(
           'DELETE FROM dictionary_cache_entries',
         );
