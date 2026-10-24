@@ -78,7 +78,7 @@ void main() {
     await db.wordDao.deleteWord(id);
     expect((await db.wordDao.getDeletions()).single.word, 'apple');
 
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
   });
 
   // 辞書ソースを Free Dictionary から kaikki に入れ替えた際の後始末。
@@ -101,7 +101,7 @@ void main() {
 
     expect((await db.wordDao.getAll()).single.word, 'apple');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
   });
 
   // 多言語化。キャッシュは訳語を日本語だけに絞っていたため捨てる。
@@ -126,7 +126,7 @@ void main() {
     expect(word.meaning, 'りんご');
     expect(word.translationLanguage, 'ja');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
   });
 
   // v4 で列を足した後に v3 のアプリで開くと、列はそのまま user_version だけ
@@ -155,7 +155,7 @@ void main() {
     final word = (await db.wordDao.getAll()).single;
     expect(word.translationLanguage, 'ja');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
   });
 
   // 訳の言語の追加(スペイン語・フランス語)。キャッシュは訳語を ja / cmn に
@@ -186,7 +186,7 @@ void main() {
     expect(word.meaning, '蘋果');
     expect(word.translationLanguage, 'zh-Hant');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
   });
 
   // 英語の語義。キャッシュは語義の文(glosses)を落としていたため捨てる。
@@ -216,7 +216,37 @@ void main() {
     expect(word.meaning, 'manzana');
     expect(word.translationLanguage, 'es');
     expect(await db.dictionaryCacheDao.find('apple'), isNull);
-    expect(raw.userVersion, 6);
+    expect(raw.userVersion, 7);
+  });
+
+  // キャッシュは lang_code が zh の北京語の訳語を落としていたため捨てる。
+  test('v6 の DB を開くと辞書キャッシュが空になり、単語と訳の言語は残る', () async {
+    final raw = sqlite3.openInMemory();
+    createV2Schema(raw);
+    raw
+      ..execute(
+        'ALTER TABLE words ADD COLUMN translation_language '
+        "TEXT NOT NULL DEFAULT 'ja'",
+      )
+      ..execute('PRAGMA user_version = 6')
+      ..execute(
+        'INSERT INTO words '
+        '(word, japanese, translation_language, created_at, updated_at) '
+        "VALUES ('apple', '蘋果', 'zh-Hant', 0, 0)",
+      )
+      ..execute(
+        'INSERT INTO dictionary_cache_entries (word, response_json, fetched_at) '
+        """VALUES ('apple', '[{"word":"apple"}]', 0)""",
+      );
+
+    final db = AppDatabase.forTesting(NativeDatabase.opened(raw));
+    addTearDown(db.close);
+
+    final word = (await db.wordDao.getAll()).single;
+    expect(word.meaning, '蘋果');
+    expect(word.translationLanguage, 'zh-Hant');
+    expect(await db.dictionaryCacheDao.find('apple'), isNull);
+    expect(raw.userVersion, 7);
   });
 
   test('新規 DB は最新スキーマで作られ、deleted_words が使える', () async {

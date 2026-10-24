@@ -80,6 +80,29 @@ void main() {
   });
 
   // 英語の語義(TranslationLanguage.enDefinition)に使うため、保存段階で落とさない。
+  test('zh で来る北京語の訳語は cmn に揃えて残し、閩南語などは捨てる', () async {
+    final mock = buildClient(
+      (_) => utf8Response(
+        '{"word":"apple","pos":"noun","translations":['
+        '{"lang":"Chinese","lang_code":"zh","word":"蘋果 /苹果","tags":["Hokkien"]},'
+        '{"lang":"Chinese Mandarin","lang_code":"zh","word":"蘋果 /苹果"},'
+        '{"lang":"Chinese Mandarin","lang_code":"cmn","word":"預訂 /预订"},'
+        '{"lang":"Chinese Cantonese","lang_code":"yue","word":"蘋果 /苹果"}]}',
+        200,
+      ),
+    );
+
+    final json = (await mock.client.fetchEntriesJson('apple'))!;
+    final translations = KaikkiApiClient.parseEntries(json).single.translations;
+
+    expect(translations.map((t) => (t.langCode, t.word)), [
+      ('cmn', '蘋果 /苹果'),
+      ('cmn', '預訂 /预订'),
+    ]);
+    // 言語名は見分けるためだけに読み、キャッシュには書き出さない
+    expect(json, isNot(contains('Chinese Mandarin')));
+  });
+
   test('語義の文とタグをキャッシュに残す', () async {
     final mock = buildClient(
       (_) => utf8Response(

@@ -99,6 +99,8 @@ class KaikkiApiClient {
   ///
   /// 語義の文(`glosses`)とタグは残す。英語の語義([TranslationLanguage.enDefinition])
   /// に使うため。
+  ///
+  /// 北京語の訳語は [_normalizeLangCode] で `cmn` に揃えてから絞る。
   static List<KaikkiEntry> _parseJsonl(String body) {
     final entries = <KaikkiEntry>[];
     for (final line in const LineSplitter().convert(body)) {
@@ -124,7 +126,9 @@ class KaikkiApiClient {
               ),
           ],
           translations: [
-            for (final translation in entry.translations)
+            for (final translation in entry.translations.map(
+              _normalizeLangCode,
+            ))
               if (_keptLangCodes.contains(translation.langCode)) translation,
           ],
         ),
@@ -132,4 +136,16 @@ class KaikkiApiClient {
     }
     return entries;
   }
+
+  /// 北京語の訳語の `lang_code` を `cmn` に揃える。
+  ///
+  /// Wiktionary の訳語表は語によって北京語を `cmn` と書くもの(run・happy)と、
+  /// `zh` + 言語名 `Chinese Mandarin` と書くもの(apple・dog・water)がある。
+  /// 後者を拾わないと、基本語でも中国語の訳が空になる。`zh` には閩南語
+  /// (Hokkien)や東干語(Dungan)も言語名 `Chinese` で混ざるため、`zh` を
+  /// まるごと北京語として扱わず、言語名で見分ける。
+  static KaikkiTranslation _normalizeLangCode(KaikkiTranslation translation) =>
+      translation.langCode == 'zh' && translation.lang == 'Chinese Mandarin'
+      ? translation.copyWith(langCode: 'cmn')
+      : translation;
 }
