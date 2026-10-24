@@ -22,6 +22,44 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.11.1 (build 24)
+
+iOS のみ(macOS は 2.11.0 と同じく Xcode 27 の lipo の不具合でビルドできないため出していない)。
+アプリの変更は無く、ストアの掲載内容(スクリーンショット・アプリ名・説明文など)を更新するために出した版
+(スクリーンショットなどは公開中のバージョンでは差し替えられないため)。
+
+日本語:
+
+```
+App Store の掲載内容を更新しました。
+```
+
+繁體中文:
+
+```
+更新了 App Store 頁面的內容。
+```
+
+Español:
+
+```
+Actualizamos el contenido de nuestra página en la App Store.
+```
+
+Français:
+
+```
+Mise à jour du contenu de notre page App Store.
+```
+
+English:
+
+```
+Updated our App Store page.
+```
+
+---
+
 ## 2.11.0 (build 23)
 
 iOS のみ(macOS は出していない。Xcode 27 の lipo の不具合で、Flutter 3.44 では macOS をビルドできないため)。
