@@ -94,7 +94,7 @@ void main() {
       );
 
       final text = tester.widget<Text>(find.text(message));
-      expect(text.style?.color, AppColors.danger);
+      expect(text.style?.color, AppColors.light.danger);
     });
   }
 }
