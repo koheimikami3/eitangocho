@@ -83,12 +83,16 @@ class _MobileWordCardState extends State<MobileWordCard> {
           ),
           const SizedBox(height: 8),
           // 例文の行数差でも、例文が無いカードでも高さが揃うよう、
-          // 常に固定行数分を確保する(child が無ければ空白のまま)。
+          // 訳を隠している間は固定行数分を確保する(child が無ければ空白のまま)。
           // 訳を表示している間は省略しない。例文の訳は全文出るため、
-          // 英文だけが途中で切れていると突き合わせられない。
+          // 英文だけが途中で切れていると突き合わせられない。確保もしない。
+          // 表示中は訳の分だけカードの高さがどのみち変わるため、確保すると
+          // 1 行の例文と訳の間が空くだけになる。
           ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: _exampleFontSize * _exampleLineHeight * _exampleLines,
+              minHeight: _revealed
+                  ? 0
+                  : _exampleFontSize * _exampleLineHeight * _exampleLines,
             ),
             child: hasExample
                 ? Text(
