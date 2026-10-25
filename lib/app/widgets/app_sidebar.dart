@@ -22,7 +22,6 @@ class AppSidebar extends ConsumerWidget {
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final wordCount = ref.watch(wordListProvider).value?.length ?? 0;
     final learningCount = ref.watch(learningWordsProvider).length;
-    final learnedCount = ref.watch(learnedWordsProvider).length;
 
     return Container(
       width: AppDimensions.sidebarWidth,
@@ -67,7 +66,8 @@ class AppSidebar extends ConsumerWidget {
           ),
           SidebarItem(
             label: context.l10n.navQuiz,
-            count: '$learnedCount',
+            // 件数は出さない。学習済みの語数を出しても、1 回に出題するのは
+            // quizQuestionCount 語なので、何の数か分かりにくいため。
             selected: view == MainView.quiz,
             // クリックで常に新セッションを開始してからビューへ切り替える。
             onTap: () {
