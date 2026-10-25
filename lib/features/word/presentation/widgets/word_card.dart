@@ -128,12 +128,14 @@ class _WordCardState extends State<WordCard> {
                 onToggle: () => setState(() => _revealed = !_revealed),
               ),
               const SizedBox(height: 10),
-              // カード高さを揃えるため英例文の領域は常に 2 行分を確保し、
+              // カード高さを揃えるため英例文の領域は 2 行分を確保し、
               // 超過分は末尾を … で省略する。訳を表示している間は省略しない
               // (例文の訳は全文出るため、英文だけ切れていると突き合わせられない)。
+              // 確保も訳を隠している間だけにする。表示中は訳の分だけカードの
+              // 高さがどのみち変わるため、確保すると 1 行の例文と訳の間が空くだけになる。
               ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: _exampleAreaHeight,
+                constraints: BoxConstraints(
+                  minHeight: _revealed ? 0 : _exampleAreaHeight,
                   minWidth: double.infinity,
                 ),
                 child: Text(
@@ -149,7 +151,11 @@ class _WordCardState extends State<WordCard> {
                   ),
                 ),
               ),
-              if (hasExample && _revealed) ...[
+              // 例文の訳が無い単語では欄ごと出さない(空の Text でも 1 行分の
+              // 高さを取り、例文の下が空く)。iOS の MobileWordCard と同じ条件。
+              if (hasExample &&
+                  _revealed &&
+                  word.exampleTranslation.trim().isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
                   word.exampleTranslation,
