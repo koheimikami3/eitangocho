@@ -107,7 +107,8 @@
 - **iOS の画面は macOS と別ファイルに分ける**。Provider・Notifier・DAO は共有し、
   presentation だけを分ける。削除の導線は macOS が右クリック、iOS が編集シート
   (長押しメニューは置かない)
-- `uiScale` は macOS 専用。iOS は OS の文字サイズ設定に従う。ダークモードは iOS 専用
+- `uiScale` は macOS 専用。iOS は OS の文字サイズ設定に従う。ダークモードは両方にあり、
+  macOS は 2.11.1 から(配色は macOS が `AppColors`、iOS が `AppPalette`)
 - iOS のストア対象は iPhone のみ・縦向きのみ(iPad を含めると 13 インチの
   スクリーンショットが必須になる)。最低 OS は iOS 15.0
 - `ITSAppUsesNonExemptEncryption = false`(独自の暗号実装が無い)

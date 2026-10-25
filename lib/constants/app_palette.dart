@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 /// iOS 版の配色。ライト / ダークの 2 セットを持つ。
 ///
-/// macOS 版は [AppColors] のライト固定配色をそのまま使い続ける
-/// (ダーク対応は iOS のみ。macOS 1.0 のリリース済み外観を変えないため)。
+/// macOS 版は [AppColors] を使う(ライトの値が iOS と異なるため別に持つ)。
+/// ただし地の色・面の影・品詞バッジなど両者で同じものは macOS からも引く。
 /// 値は Claude Design の iOS プロトタイプ(THEME_LIGHT / THEME_DARK)を起点に、
 /// 2.0.0 の「立体案」で面・本文色・影を更新したもの。立体案は輪郭を枠線ではなく
 /// 影で出す: 地の上の面は [elevation] で浮かせ、入力欄などは [wellShadow]
@@ -334,8 +334,8 @@ class AppPalette {
 
   /// 品詞バッジの配色(背景色, 文字色)。
   ///
-  /// ライトは enum が持つ定数をそのまま使う(macOS の PosBadge も同じ定数を
-  /// 直接引くため、二重に持つと片方だけ直す事故になる)。
+  /// ライトは enum が持つ定数をそのまま使う(二重に持つと片方だけ直す
+  /// 事故になる)。macOS の PosBadge・PosChipSelector もここから引く。
   /// ダークは同じ色相を明るい文字 + 半透明の地に振り直したもので、
   /// 色相の間隔・明度差・コントラストの根拠は PartOfSpeech のコメントを参照。
   (Color, Color) posBadge(PartOfSpeech pos) => isDark

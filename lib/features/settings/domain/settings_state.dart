@@ -23,7 +23,7 @@ abstract class SettingsState with _$SettingsState {
     /// macOS 専用。iOS では OS の文字サイズ設定に委ねるため無視される。
     @Default(AppDimensions.defaultUiScale) double uiScale,
 
-    /// 配色(ライト / ダーク)。iOS 専用で、macOS は常にライト。
+    /// 配色(ライト / ダーク)。
     @Default(AppAppearance.light) AppAppearance appearance,
 
     /// 学習中カードの並び(1 列 / 2 列)。iOS 専用。

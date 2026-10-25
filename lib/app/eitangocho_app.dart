@@ -8,6 +8,7 @@ import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/l10n/app_localizations.dart';
 import 'package:eitangocho/utils/app_locale.dart';
 import 'package:eitangocho/utils/app_platform.dart';
+import 'package:eitangocho/utils/window_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,16 +25,24 @@ class EitangochoApp extends ConsumerWidget {
               AppDimensions.defaultUiScale
         : 1.0;
 
-    // 配色は iOS のみ設定で切り替えられる。macOS はライト固定
-    // (1.0 でリリース済みの外観を変えないため)。
-    final palette = AppPlatform.isMacOS
-        ? AppPalette.light
-        : AppPalette.of(switch (ref.watch(
-            settingsProvider.select((s) => s.value?.appearance),
-          )) {
-            AppAppearance.dark => Brightness.dark,
-            AppAppearance.light || null => Brightness.light,
-          });
+    // 配色は設定で切り替える(macOS は 2.11.1 から。それまではライト固定)。
+    // ロード前はライト。
+    final appearanceProvider = settingsProvider.select(
+      (s) => s.value?.appearance,
+    );
+    final palette = AppPalette.of(switch (ref.watch(appearanceProvider)) {
+      AppAppearance.dark => Brightness.dark,
+      AppAppearance.light || null => Brightness.light,
+    });
+    // macOS は AppKit が描く部分(信号機ボタン等)にも伝える。設定のロード完了
+    // (null → 値)でも呼ばれるので、起動時の分もこれで足りる。
+    if (AppPlatform.isMacOS) {
+      ref.listen(appearanceProvider, (_, next) {
+        if (next != null) {
+          setWindowAppearance(dark: next == AppAppearance.dark);
+        }
+      });
+    }
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
