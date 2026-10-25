@@ -22,9 +22,14 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
-## 2.11.1 (build 24)
+## 2.11.1 (iOS build 24 / macOS build 25)
 
-iOS のみ(macOS は 2.11.0 と同じく Xcode 27 の lipo の不具合でビルドできないため出していない)。
+iOS は build 24、macOS は build 25 で出した。macOS は iOS より後に、2.10.0 以来のリリースとして出した
+(2.11.0 から Xcode 27 の lipo の不具合でビルドできず、Flutter 3.47.8 で解消したため)。
+タグは iOS が `v2.11.1`、macOS が `v2.11.1-macos`。
+
+### iOS
+
 アプリの変更は繁体字の訳の取得漏れの修正だけ(apple・dog・water など、北京語の訳が lang_code zh で来る語)。
 主目的はストアの掲載内容(スクリーンショット・アプリ名・説明文など)の更新
 (スクリーンショットなどは公開中のバージョンでは差し替えられないため)。
@@ -59,6 +64,52 @@ English:
 
 ```
 Updated our App Store page.
+```
+
+### macOS
+
+文面には 2.11.0 の変更のうち macOS に届くものを含めた。「一部の画面」は、訳を表示したときの英例文の全文表示、
+カードのホバー時の枠、学習中リストの上の説明文の削除、例文の訳が取れなかったときのバナー表示、登録後も登録画面に
+留まる変更、設定画面のスクロールバーの位置。繁体字の訳の取得漏れの修正と、掲載内容の更新は書いていない。
+
+日本語:
+
+```
+ダークモードに対応しました。
+品詞を色分けして表示するようにしました。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+新增深色模式。
+詞性改為以不同顏色分開顯示。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+Añadimos el modo oscuro.
+Ahora cada categoría gramatical se muestra con su propio color.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+Ajout du mode sombre.
+Affichage de chaque catégorie grammaticale avec sa propre couleur.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Added dark mode.
+Each part of speech now has its own color.
+Improved the design of some screens for readability.
 ```
 
 ---
