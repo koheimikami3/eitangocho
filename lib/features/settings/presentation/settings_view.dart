@@ -41,10 +41,13 @@ class SettingsView extends ConsumerWidget {
     final l10n = context.l10n;
     final translationLanguage = ref.watch(translationLanguageProvider);
 
-    return Align(
-      alignment: Alignment.topLeft,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
+    // スクロール領域はビュー全幅に広げ、中身だけを左に寄せる。Align で
+    // スクロール領域ごと寄せると、スクロールバーがカードのすぐ横に出る
+    // (全単語の表と同じく、ビューの右端に出す)。
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child: Align(
+        alignment: Alignment.topLeft,
         child: SizedBox(
           width: 560,
           child: Column(
