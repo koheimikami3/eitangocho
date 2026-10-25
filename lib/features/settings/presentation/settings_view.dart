@@ -5,6 +5,7 @@ import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
@@ -26,7 +27,8 @@ import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// macOS 版の設定画面(表示・クイズ・データ・サポート・情報)。変更は即保存。
+/// macOS 版の設定画面(表示・テーマ・クイズ・訳の言語・データ・サポート・情報)。
+/// 変更は即保存。
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
@@ -61,6 +63,23 @@ class SettingsView extends ConsumerWidget {
                     // iOS では OS の文字サイズ設定に委ねるため出さない。
                     if (AppPlatform.isMacOS)
                       UiScaleSlider(value: settings.uiScale),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              // iOS は「表示」の中に小見出しで置くが、macOS のカードには
+              // 小見出しの部品が無いため、クイズの出題方向と同じく独立した
+              // セクションのラジオ行にする。
+              SettingsSection(
+                title: l10n.theme,
+                child: SettingsCard(
+                  children: [
+                    for (final appearance in AppAppearance.values)
+                      SettingsRadioRow(
+                        label: appearance.label(l10n),
+                        selected: settings.appearance == appearance,
+                        onTap: () => notifier.setAppearance(appearance),
+                      ),
                   ],
                 ),
               ),
