@@ -17,6 +17,7 @@ class QuizAnswerButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -26,7 +27,7 @@ class QuizAnswerButtons extends StatelessWidget {
               // iOS と同じく、枠線ではなく影で浮かせた面の副ボタンにする。
               child: AppRaisedButton(
                 label: context.l10n.quizForgot,
-                textColor: AppColors.danger,
+                textColor: colors.danger,
                 verticalPadding: 11,
                 borderRadius: 9,
                 onPressed: onForgot,
@@ -47,7 +48,7 @@ class QuizAnswerButtons extends StatelessWidget {
         Text(
           context.l10n.quizForgotHint,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, color: AppColors.textTertiary),
+          style: TextStyle(fontSize: 11, color: colors.textTertiary),
         ),
       ],
     );

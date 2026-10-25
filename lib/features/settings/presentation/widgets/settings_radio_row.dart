@@ -15,11 +15,9 @@ class SettingsRadioRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  /// 非選択時の枠線色(プロトタイプの rgba(0,0,0,0.25))。
-  static const _unselectedBorder = Color(0x40000000);
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -35,10 +33,10 @@ class SettingsRadioRow extends StatelessWidget {
                 height: 16,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: selected ? AppColors.accent : Colors.white,
+                  color: selected ? colors.accent : colors.inputFill,
                   border: selected
-                      ? Border.all(color: AppColors.accent)
-                      : Border.all(color: _unselectedBorder, width: 1.5),
+                      ? Border.all(color: colors.accent)
+                      : Border.all(color: colors.controlBorder, width: 1.5),
                 ),
                 child: Center(
                   child: AnimatedOpacity(
@@ -58,10 +56,7 @@ class SettingsRadioRow extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textPrimary,
-                ),
+                style: TextStyle(fontSize: 13, color: colors.textPrimary),
               ),
             ],
           ),

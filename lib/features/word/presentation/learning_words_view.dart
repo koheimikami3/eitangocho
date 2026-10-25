@@ -19,6 +19,7 @@ class LearningWordsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final words = ref.watch(filteredLearningWordsProvider);
     // 設定 showIpa はカードの IPA 表示のみに適用する(テーブルは常時表示)。
     // ロード前は既定 true。
@@ -27,9 +28,7 @@ class LearningWordsView extends ConsumerWidget {
         const SettingsState().showIpa;
 
     if (ref.watch(wordListLoadingProvider)) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.accent),
-      );
+      return Center(child: CircularProgressIndicator(color: colors.accent));
     }
     if (words.isEmpty) return const LearningEmptyState();
 

@@ -38,11 +38,12 @@ class _WordTableRowState extends State<WordTableRow> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final word = widget.word;
     final hasExample = word.exampleEn.trim().isNotEmpty;
     final background = _isHovered
-        ? AppColors.rowHoverBackground
-        : (word.isLearned ? AppColors.learnedRowBackground : Colors.white);
+        ? colors.rowHoverBackground
+        : (word.isLearned ? colors.learnedRowBackground : colors.surface);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -55,7 +56,7 @@ class _WordTableRowState extends State<WordTableRow> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: background,
-            border: const Border(bottom: BorderSide(color: Color(0x0F000000))),
+            border: Border(bottom: BorderSide(color: colors.borderAlpha(6))),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,10 +85,10 @@ class _WordTableRowState extends State<WordTableRow> {
                   children: [
                     Text(
                       word.word,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     // 単語列は幅が狭いため、iOS と違い横ではなく下に置く。
@@ -95,10 +96,10 @@ class _WordTableRowState extends State<WordTableRow> {
                       const SizedBox(height: 2),
                       Text(
                         context.l10n.correctCount(word.correctCount),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.accentOnSoft,
+                          color: colors.accentOnSoft,
                         ),
                       ),
                     ],
@@ -110,10 +111,10 @@ class _WordTableRowState extends State<WordTableRow> {
                 width: 130,
                 child: Text(
                   word.ipa,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: AppFonts.ipa,
-                    color: Color(0x80000000),
+                    color: colors.textAlpha(50),
                   ),
                 ),
               ),
@@ -131,10 +132,7 @@ class _WordTableRowState extends State<WordTableRow> {
                 flex: 2,
                 child: Text(
                   word.meaning,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xBF000000),
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textAlpha(75)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -143,17 +141,17 @@ class _WordTableRowState extends State<WordTableRow> {
                 child: hasExample
                     ? Text(
                         '${word.exampleEn}\n${word.exampleTranslation}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                           height: 1.5,
                         ),
                       )
                     : Text(
                         context.l10n.noExample,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textDisabled,
+                          color: colors.textDisabled,
                         ),
                       ),
               ),

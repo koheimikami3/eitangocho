@@ -15,11 +15,9 @@ class LearnedCheckbox extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  /// 未チェック時の枠線色(プロトタイプの rgba(0,0,0,0.25))。
-  static const _uncheckedBorder = Color(0x40000000);
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onChanged(!value),
@@ -36,11 +34,11 @@ class LearnedCheckbox extends StatelessWidget {
             width: 18,
             height: 18,
             decoration: BoxDecoration(
-              color: value ? AppColors.accent : Colors.white,
+              color: value ? colors.accent : colors.inputFill,
               borderRadius: BorderRadius.circular(4),
               border: value
-                  ? Border.all(color: AppColors.accent)
-                  : Border.all(color: _uncheckedBorder, width: 1.5),
+                  ? Border.all(color: colors.accent)
+                  : Border.all(color: colors.controlBorder, width: 1.5),
             ),
             child: Center(
               child: AnimatedOpacity(

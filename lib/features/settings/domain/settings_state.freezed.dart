@@ -18,7 +18,7 @@ mixin _$SettingsState {
 /// ローカル個人アプリとして平文保存を許容する(確定済みの設計判断)。
  String get deeplApiKey;/// UI 全体の拡大率(EitangochoApp がブラウザズーム相当で適用する)。
 /// macOS 専用。iOS では OS の文字サイズ設定に委ねるため無視される。
- double get uiScale;/// 配色(ライト / ダーク)。iOS 専用で、macOS は常にライト。
+ double get uiScale;/// 配色(ライト / ダーク)。
  AppAppearance get appearance;/// 学習中カードの並び(1 列 / 2 列)。iOS 専用。
  LearningCardLayout get cardLayout;/// 全単語一覧の並び順。
  WordSortOrder get wordSortOrder;/// 訳の言語。未保存のときは端末の言語から決める(SettingsNotifier.build)。
@@ -232,7 +232,7 @@ class _SettingsState implements SettingsState {
 /// UI 全体の拡大率(EitangochoApp がブラウザズーム相当で適用する)。
 /// macOS 専用。iOS では OS の文字サイズ設定に委ねるため無視される。
 @override@JsonKey() final  double uiScale;
-/// 配色(ライト / ダーク)。iOS 専用で、macOS は常にライト。
+/// 配色(ライト / ダーク)。
 @override@JsonKey() final  AppAppearance appearance;
 /// 学習中カードの並び(1 列 / 2 列)。iOS 専用。
 @override@JsonKey() final  LearningCardLayout cardLayout;

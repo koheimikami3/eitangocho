@@ -108,26 +108,25 @@ void main() {
       greaterThanOrEqualTo(4.5),
       reason: 'iOS dark',
     );
-    expect(
-      _contrastRatio(
-        AppColors.accentOnSoft,
-        AppColors.accentSoft,
-        Colors.white,
-      ),
-      greaterThanOrEqualTo(4.5),
-      reason: 'macOS',
-    );
+    for (final colors in [AppColors.light, AppColors.dark]) {
+      final name = 'macOS ${colors.brightness.name}';
+      expect(
+        _contrastRatio(colors.accentOnSoft, colors.accentSoft, colors.surface),
+        greaterThanOrEqualTo(4.5),
+        reason: name,
+      );
 
-    // macOS の hover は地が濃くなるぶんコントラストが下がる。ここも割らない。
-    expect(
-      _contrastRatio(
-        AppColors.accentOnSoft,
-        AppColors.accentSoftHover,
-        Colors.white,
-      ),
-      greaterThanOrEqualTo(4.5),
-      reason: 'macOS hover',
-    );
+      // macOS の hover は地が濃くなるぶんコントラストが下がる。ここも割らない。
+      expect(
+        _contrastRatio(
+          colors.accentOnSoft,
+          colors.accentSoftHover,
+          colors.surface,
+        ),
+        greaterThanOrEqualTo(4.5),
+        reason: '$name hover',
+      );
+    }
   });
 
   test('購入を復元などカード地に直接載る青文字は 4.5:1 以上ある', () {
@@ -138,6 +137,14 @@ void main() {
         _contrastRatio(palette.accentOnSoft, palette.surface, palette.surface),
         greaterThanOrEqualTo(4.5),
         reason: palette.isDark ? 'dark' : 'light',
+      );
+    }
+    // macOS の「今すぐ同期」など、設定カードに直接載る青文字。
+    for (final colors in [AppColors.light, AppColors.dark]) {
+      expect(
+        _contrastRatio(colors.accentOnSoft, colors.surface, colors.surface),
+        greaterThanOrEqualTo(4.5),
+        reason: 'macOS ${colors.brightness.name}',
       );
     }
   });
@@ -174,5 +181,32 @@ void main() {
 
     await pump(Brightness.dark);
     expect(seen, AppPalette.dark);
+  });
+
+  testWidgets('context.colors(macOS)も ThemeData.brightness に追従する', (
+    tester,
+  ) async {
+    late AppColors seen;
+    Future<void> pump(Brightness brightness) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: brightness),
+          home: Builder(
+            builder: (context) {
+              seen = context.colors;
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      // context.palette の検証と同じく、テーマの補間が落ち着くまで進める。
+      await tester.pumpAndSettle();
+    }
+
+    await pump(Brightness.light);
+    expect(seen, AppColors.light);
+
+    await pump(Brightness.dark);
+    expect(seen, AppColors.dark);
   });
 }

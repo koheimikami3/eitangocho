@@ -16,6 +16,7 @@ class MainToolbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final title = switch (view) {
       MainView.learning => context.l10n.navLearningWords,
@@ -30,11 +31,11 @@ class MainToolbar extends ConsumerWidget {
     return Container(
       height: AppDimensions.toolbarHeight,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      // iOS のヘッダと同じく白地にし、下のグレーの地(カードを並べる面)と
-      // 分ける(2.2.0)。
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      // iOS のヘッダと同じく面の色(ライトは白)にし、下のグレーの地
+      // (カードを並べる面)と分ける(2.2.0)。
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       // タイトルバーの代わり: 空いている所のドラッグで移動、ダブルクリックで
       // 拡大 / 元に戻す。ボタン・検索欄はその上に重なるので影響しない。
@@ -50,10 +51,10 @@ class MainToolbar extends ConsumerWidget {
               IgnorePointer(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
               ),

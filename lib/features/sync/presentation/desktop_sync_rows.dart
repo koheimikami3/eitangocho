@@ -68,11 +68,9 @@ class _SyncNowRow extends StatefulWidget {
 class _SyncNowRowState extends State<_SyncNowRow> {
   bool _hovered = false;
 
-  /// ホバー背景(プロトタイプの #f7f7f8)。他のリンク行と同じ。
-  static const _hoverBackground = AppColors.inputBackground;
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       cursor: widget.syncing
           ? SystemMouseCursors.basic
@@ -83,7 +81,7 @@ class _SyncNowRowState extends State<_SyncNowRow> {
         behavior: HitTestBehavior.opaque,
         onTap: widget.syncing ? null : widget.onTap,
         child: Container(
-          color: _hovered && !widget.syncing ? _hoverBackground : null,
+          color: _hovered && !widget.syncing ? colors.inputBackground : null,
           // 寸法は SettingsLinkRow に合わせる(同じカードに並ぶため)。
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           child: Row(
@@ -96,27 +94,24 @@ class _SyncNowRowState extends State<_SyncNowRow> {
                     // カード地に載るアクセント文字は accentOnSoft を使う
                     // (accent のままだと 4.5:1 に届かない)。
                     color: widget.syncing
-                        ? AppColors.textDisabled
-                        : AppColors.accentOnSoft,
+                        ? colors.textDisabled
+                        : colors.accentOnSoft,
                   ),
                 ),
               ),
               // 右端の状態はバージョン行(SettingsValueRow)と同じ体裁。
               Text(
                 widget.status,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textTertiary,
-                ),
+                style: TextStyle(fontSize: 13, color: colors.textTertiary),
               ),
               if (widget.syncing) ...[
                 const SizedBox(width: 8),
-                const SizedBox(
+                SizedBox(
                   width: 14,
                   height: 14,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.accent,
+                    color: colors.accent,
                   ),
                 ),
               ],
@@ -135,16 +130,13 @@ class _SyncErrorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       child: Text(
         message,
         // 行というより注記なので、他の行(13px)より小さくする。
-        style: const TextStyle(
-          fontSize: 12,
-          height: 1.5,
-          color: AppColors.danger,
-        ),
+        style: TextStyle(fontSize: 12, height: 1.5, color: colors.danger),
       ),
     );
   }

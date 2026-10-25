@@ -1,4 +1,5 @@
 import 'package:eitangocho/constants/app_colors.dart';
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -44,19 +45,19 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     // 選択中は品詞バッジと同じ配色にし、文字色で縁取る
     // (iOS の MobilePosChipSelector と揃える。2.2.0 で単色の青から変更)。
-    final background = pos.badgeBackground;
-    final foreground = pos.badgeForeground;
+    final (background, foreground) = context.palette.posBadge(pos);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? background : Colors.white,
+          color: isSelected ? background : colors.surface,
           borderRadius: BorderRadius.circular(99),
           border: Border.all(
-            color: isSelected ? foreground : AppColors.inputBorder,
+            color: isSelected ? foreground : colors.inputBorder,
           ),
         ),
         // 選択しても太さは変えない。チップは文字の幅に合わせて伸び縮みする
@@ -67,7 +68,7 @@ class _Chip extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isSelected ? foreground : const Color(0xA6000000),
+            color: isSelected ? foreground : colors.textAlpha(65),
           ),
         ),
       ),

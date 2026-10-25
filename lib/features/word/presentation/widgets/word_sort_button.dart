@@ -16,6 +16,7 @@ class WordSortButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final order = ref.watch(
       settingsProvider.select(
         (s) => s.value?.wordSortOrder ?? const SettingsState().wordSortOrder,
@@ -29,9 +30,9 @@ class WordSortButton extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: AppColors.accentSoft,
+            color: colors.accentSoft,
             borderRadius: BorderRadius.circular(99),
-            border: Border.all(color: AppColors.accentLine),
+            border: Border.all(color: colors.accentLine),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -41,19 +42,15 @@ class WordSortButton extends ConsumerWidget {
                   context.l10n.sortOrderLabel(order.label(context.l10n)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.accentOnSoft,
+                    color: colors.accentOnSoft,
                   ),
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
-                Icons.expand_more,
-                size: 16,
-                color: AppColors.accentOnSoft,
-              ),
+              Icon(Icons.expand_more, size: 16, color: colors.accentOnSoft),
             ],
           ),
         ),
@@ -85,10 +82,10 @@ class WordSortButton extends ConsumerWidget {
         bottomLeft.dx,
         bottomLeft.dy,
       ),
-      color: const Color.fromRGBO(250, 250, 251, 0.98),
+      color: context.colors.menuBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(color: Color(0x1F000000)),
+        side: BorderSide(color: context.colors.borderAlpha(12)),
       ),
       constraints: const BoxConstraints(minWidth: 180),
       menuPadding: const EdgeInsets.all(4),

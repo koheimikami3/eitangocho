@@ -44,6 +44,7 @@ class QuizCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final hasExample = exampleEn.trim().isNotEmpty;
 
     return Column(
@@ -53,7 +54,7 @@ class QuizCard extends StatelessWidget {
         Text(
           progress,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+          style: TextStyle(fontSize: 12, color: colors.textTertiary),
         ),
         const SizedBox(height: 16),
         Container(
@@ -61,9 +62,9 @@ class QuizCard extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 220),
           // iOS のクイズカードと同じく枠線なし + 淡い影(2.2.0)。
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: AppPalette.light.elevation,
+            boxShadow: context.palette.elevation,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -72,10 +73,10 @@ class QuizCard extends StatelessWidget {
               Text(
                 front,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               if (ipa.isNotEmpty) ...[
@@ -83,10 +84,10 @@ class QuizCard extends StatelessWidget {
                 Text(
                   ipa,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontFamily: AppFonts.ipa,
-                    color: AppColors.textTertiary,
+                    color: colors.textTertiary,
                   ),
                 ),
               ],
@@ -104,16 +105,13 @@ class QuizCard extends StatelessWidget {
                   // 明示的に広げないとテキスト幅まで縮む)。
                   width: double.infinity,
                   padding: const EdgeInsets.only(top: 14),
-                  decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: Color(0x14000000))),
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: colors.border)),
                   ),
                   child: Text(
                     back,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: TextStyle(fontSize: 18, color: colors.textPrimary),
                   ),
                 ),
                 if (!pronunciationOnFront) ...[
@@ -128,9 +126,9 @@ class QuizCard extends StatelessWidget {
                   Text(
                     '$exampleEn\n$exampleTranslation',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                       height: 1.6,
                     ),
                   ),

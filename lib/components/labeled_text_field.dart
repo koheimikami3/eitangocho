@@ -43,6 +43,7 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final field = TextField(
       controller: controller,
       focusNode: focusNode,
@@ -58,10 +59,11 @@ class LabeledTextField extends StatelessWidget {
         isDense: true,
         hintText: hintText ?? context.l10n.manualInputHint,
         // 既定のヒント色は濃く入力済みの値に見えるため、明示的に薄くする
-        hintStyle: const TextStyle(color: AppColors.textDisabled),
-        // 塗りなしだと画面の地のグレーが透けるため、白で塗る。
+        hintStyle: TextStyle(color: colors.textDisabled),
+        // 塗りなしだと画面の地のグレーが透けるため、入力欄の地で塗る
+        // (ライトは白。ダークは面より暗く沈める)。
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colors.inputFill,
         // 上下に余裕を持たせる。
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 10,
@@ -69,17 +71,17 @@ class LabeledTextField extends StatelessWidget {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
+          borderSide: BorderSide(color: colors.inputBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
+          borderSide: BorderSide(color: colors.inputBorder),
         ),
         // フォーカス時も枠色は変えず通常時と同じにする
         // (Material 既定の太い黒枠が出るのを防ぐ)。
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
+          borderSide: BorderSide(color: colors.inputBorder),
         ),
       ),
     );
@@ -91,10 +93,10 @@ class LabeledTextField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
             if (trailing != null) ...[const SizedBox(width: 6), trailing!],

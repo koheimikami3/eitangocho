@@ -21,10 +21,10 @@ Future<void> showImportResultDialog(BuildContext context, ImportResult result) {
             children: [
               Text(
                 context.l10n.importDoneTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -64,10 +64,10 @@ Future<void> showImportErrorDialog(
             children: [
               Text(
                 context.l10n.importFailedTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -78,7 +78,7 @@ Future<void> showImportErrorDialog(
                   context.l10n.importErrorInvalidFormat,
                 WordExportFormatError.unsupportedVersion =>
                   context.l10n.importErrorUnsupportedVersion,
-              }, style: const TextStyle(color: AppColors.textSecondary)),
+              }, style: TextStyle(color: context.colors.textSecondary)),
               const SizedBox(height: 16),
               AppFilledButton(
                 label: context.l10n.close,

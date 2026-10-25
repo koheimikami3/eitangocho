@@ -2,7 +2,7 @@ import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:flutter/material.dart';
 
-/// 影で浮かせた白い面のボタン(副操作)。
+/// 影で浮かせた面のボタン(副操作)。
 ///
 /// iOS のクイズの「忘れていた」(MobileRaisedSurface の面ボタン)に相当する。
 /// 枠線は持たず、カードと同じ影([AppPalette.elevation])で輪郭を出す。
@@ -12,7 +12,7 @@ class AppRaisedButton extends StatefulWidget {
     required this.label,
     required this.onPressed,
     super.key,
-    this.textColor = AppColors.textPrimary,
+    this.textColor,
     this.verticalPadding = 9,
     this.fontSize = 14,
     this.borderRadius = 8,
@@ -20,7 +20,9 @@ class AppRaisedButton extends StatefulWidget {
 
   final String label;
   final VoidCallback onPressed;
-  final Color textColor;
+
+  /// 文字色。null なら本文色(AppColors.textPrimary)。
+  final Color? textColor;
   final double verticalPadding;
   final double fontSize;
   final double borderRadius;
@@ -34,6 +36,7 @@ class _AppRaisedButtonState extends State<AppRaisedButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -45,16 +48,15 @@ class _AppRaisedButtonState extends State<AppRaisedButton> {
             vertical: widget.verticalPadding,
           ),
           decoration: BoxDecoration(
-            color: _isHovered ? AppColors.rowHoverBackground : Colors.white,
+            color: _isHovered ? colors.rowHoverBackground : colors.surface,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            // macOS はライト固定なので AppPalette.light の値を直接使う。
-            boxShadow: AppPalette.light.elevation,
+            boxShadow: context.palette.elevation,
           ),
           child: Text(
             widget.label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: widget.textColor,
+              color: widget.textColor ?? colors.textPrimary,
               fontSize: widget.fontSize,
               fontWeight: FontWeight.w600,
             ),

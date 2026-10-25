@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 /// iOS 版の品詞バッジ(ピル)。品詞ごとに 1 枚ずつ、その品詞の色で並べる。
 ///
-/// macOS 版の [PosBadge] と違い、色は [AppPalette] から引く
-/// (ダーク時に別配色を使うため。enum が持つ色定数はライト固定)。
+/// 色は macOS 版の [PosBadge] と同じく [AppPalette] から引く
+/// (ダーク時に別配色を使うため。enum が持つ色定数はライトの分だけ)。
 /// 1 枚ずつにする理由は [PosBadge] と同じ(収まらない分はピルの形のまま
 /// 次の行に回す)。
 class MobilePosBadge extends StatelessWidget {

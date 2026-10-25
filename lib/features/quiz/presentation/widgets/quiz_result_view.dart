@@ -24,6 +24,7 @@ class QuizResultView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -34,14 +35,14 @@ class QuizResultView extends ConsumerWidget {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
         Text(
           context.l10n.quizSummary(okCount, forgotWords.length),
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 14, color: colors.textSecondary),
         ),
         if (forgotWords.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -86,12 +87,13 @@ class _ForgotList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     // iOS の忘れた単語一覧と同じく、枠線なし + 影の面に、淡い赤の見出しを
-    // 載せる(2.2.0)。macOS はライト固定なので AppPalette.light を直接使う。
-    const palette = AppPalette.light;
+    // 載せる(2.2.0)。
+    final palette = context.palette;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
         boxShadow: palette.elevation,
       ),
@@ -110,7 +112,7 @@ class _ForgotList extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppColors.danger,
+                color: colors.danger,
               ),
             ),
           ),
@@ -134,10 +136,10 @@ class _ForgotList extends StatelessWidget {
                     width: 110,
                     child: Text(
                       words[i].word,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
@@ -145,9 +147,9 @@ class _ForgotList extends StatelessWidget {
                   Expanded(
                     child: Text(
                       words[i].meaning,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ),

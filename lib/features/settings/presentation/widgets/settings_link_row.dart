@@ -15,11 +15,9 @@ class SettingsLinkRow extends StatefulWidget {
 class _SettingsLinkRowState extends State<SettingsLinkRow> {
   bool _hovered = false;
 
-  /// ホバー背景(プロトタイプの #f7f7f8)。
-  static const _hoverBackground = AppColors.inputBackground;
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -28,25 +26,22 @@ class _SettingsLinkRowState extends State<SettingsLinkRow> {
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: Container(
-          color: _hovered ? _hoverBackground : null,
+          color: _hovered ? colors.inputBackground : null,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   widget.label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textPrimary),
                 ),
               ),
-              const Text(
+              Text(
                 '›',
                 style: TextStyle(
                   fontSize: 14,
                   height: 1,
-                  color: AppColors.textDisabled,
+                  color: colors.textDisabled,
                 ),
               ),
             ],

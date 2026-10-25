@@ -34,6 +34,7 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -50,10 +51,10 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
             isDense: true,
             hintText: context.l10n.deeplKeyHint,
             // LabeledTextField と同様、ヒント色は明示的に薄くする
-            hintStyle: const TextStyle(color: AppColors.textDisabled),
-            // LabeledTextField と同様、地のグレーが透けないよう白で塗る。
+            hintStyle: TextStyle(color: colors.textDisabled),
+            // LabeledTextField と同様、地のグレーが透けないよう入力欄の地で塗る。
             filled: true,
-            fillColor: Colors.white,
+            fillColor: colors.inputFill,
             // 他の一行フィールドと同様に上下へ余裕を持たせる
             // (プロトタイプの 8px から拡張)。
             contentPadding: const EdgeInsets.symmetric(
@@ -62,17 +63,17 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
-              borderSide: const BorderSide(color: AppColors.inputBorder),
+              borderSide: BorderSide(color: colors.inputBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
-              borderSide: const BorderSide(color: AppColors.inputBorder),
+              borderSide: BorderSide(color: colors.inputBorder),
             ),
             // フォーカス時も枠色は変えず通常時と同じにする
             // (Material 既定の太い黒枠が出るのを防ぐ)。
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
-              borderSide: const BorderSide(color: AppColors.inputBorder),
+              borderSide: BorderSide(color: colors.inputBorder),
             ),
           ),
         ),
@@ -81,10 +82,10 @@ class _DeeplApiKeyFieldState extends ConsumerState<DeeplApiKeyField> {
           context.l10n.deeplDescription(
             ref.watch(translationLanguageProvider).shortLabel(context.l10n),
           ),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             height: 1.6,
-            color: AppColors.textQuaternary,
+            color: colors.textQuaternary,
           ),
         ),
       ],

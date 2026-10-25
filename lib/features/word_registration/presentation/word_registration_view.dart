@@ -223,6 +223,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
     TranslationLanguage language,
     String? errorMessage,
   ) {
+    final colors = context.colors;
     final l10n = context.l10n;
     final notice = state.notice;
     final languageLabel = language.shortLabel(l10n);
@@ -276,10 +277,10 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
               children: [
                 Text(
                   l10n.fieldPartsOfSpeech,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
                 // 品詞は「空にしたら消す」= 選択が 0 件になったらバッジを消す
@@ -321,7 +322,7 @@ class _WordRegistrationViewState extends ConsumerState<WordRegistrationView> {
           const SizedBox(height: 16),
           Text(
             errorMessage,
-            style: const TextStyle(fontSize: 12, color: AppColors.danger),
+            style: TextStyle(fontSize: 12, color: colors.danger),
           ),
         ],
         const SizedBox(height: 16),
@@ -359,6 +360,7 @@ class _TextActionButtonState extends State<_TextActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -370,9 +372,7 @@ class _TextActionButtonState extends State<_TextActionButton> {
             widget.label,
             style: TextStyle(
               fontSize: 14,
-              color: _isHovered
-                  ? AppColors.textPrimary
-                  : const Color(0x80000000),
+              color: _isHovered ? colors.textPrimary : colors.textAlpha(50),
             ),
           ),
         ),

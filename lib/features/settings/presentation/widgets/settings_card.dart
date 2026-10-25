@@ -1,9 +1,10 @@
+import 'package:eitangocho/constants/app_colors.dart';
 import 'package:eitangocho/constants/app_dimensions.dart';
 import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/features/settings/presentation/widgets/settings_divider.dart';
 import 'package:flutter/material.dart';
 
-/// 設定画面の白カード。子の行を縦に並べ、行間に区切り線を挟む。
+/// 設定画面のカード。子の行を縦に並べ、行間に区切り線を挟む。
 class SettingsCard extends StatelessWidget {
   const SettingsCard({required this.children, super.key});
 
@@ -14,9 +15,9 @@ class SettingsCard extends StatelessWidget {
     return Container(
       // iOS の設定セクションと同じく枠線なし + 淡い影(2.2.0)。
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
-        boxShadow: AppPalette.light.elevation,
+        boxShadow: context.palette.elevation,
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(

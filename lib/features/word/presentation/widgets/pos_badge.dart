@@ -1,3 +1,4 @@
+import 'package:eitangocho/constants/app_palette.dart';
 import 'package:eitangocho/enums/part_of_speech.dart';
 import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,12 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 品詞の色は iOS と共通(ライト / ダークとも AppPalette.posBadge が持つ)。
+    final (background, foreground) = context.palette.posBadge(pos);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: pos.badgeBackground,
+        color: background,
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
@@ -46,7 +49,7 @@ class _Pill extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: pos.badgeForeground,
+          color: foreground,
         ),
       ),
     );

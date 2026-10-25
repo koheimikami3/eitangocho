@@ -5,6 +5,7 @@ import 'package:eitangocho/features/review/data/review_prompter.dart';
 import 'package:eitangocho/features/settings/data/app_version_provider.dart';
 import 'package:eitangocho/features/settings/data/settings_notifier.dart';
 import 'package:eitangocho/features/settings/data/translation_language_provider.dart';
+import 'package:eitangocho/features/settings/domain/app_appearance.dart';
 import 'package:eitangocho/features/settings/domain/quiz_direction.dart';
 import 'package:eitangocho/features/settings/domain/settings_state.dart';
 import 'package:eitangocho/features/settings/presentation/license_dialog.dart';
@@ -26,22 +27,27 @@ import 'package:eitangocho/utils/l10n_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// macOS 版の設定画面(表示・クイズ・データ・サポート・情報)。変更は即保存。
+/// macOS 版の設定画面(表示・テーマ・クイズ・訳の言語・データ・サポート・情報)。
+/// 変更は即保存。
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     // ロード前は既定値でフォールバックする。
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
     final l10n = context.l10n;
     final translationLanguage = ref.watch(translationLanguageProvider);
 
-    return Align(
-      alignment: Alignment.topLeft,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
+    // スクロール領域はビュー全幅に広げ、中身だけを左に寄せる。Align で
+    // スクロール領域ごと寄せると、スクロールバーがカードのすぐ横に出る
+    // (全単語の表と同じく、ビューの右端に出す)。
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child: Align(
+        alignment: Alignment.topLeft,
         child: SizedBox(
           width: 560,
           child: Column(
@@ -60,6 +66,23 @@ class SettingsView extends ConsumerWidget {
                     // iOS では OS の文字サイズ設定に委ねるため出さない。
                     if (AppPlatform.isMacOS)
                       UiScaleSlider(value: settings.uiScale),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              // iOS は「表示」の中に小見出しで置くが、macOS のカードには
+              // 小見出しの部品が無いため、クイズの出題方向と同じく独立した
+              // セクションのラジオ行にする。
+              SettingsSection(
+                title: l10n.theme,
+                child: SettingsCard(
+                  children: [
+                    for (final appearance in AppAppearance.values)
+                      SettingsRadioRow(
+                        label: appearance.label(l10n),
+                        selected: settings.appearance == appearance,
+                        onTap: () => notifier.setAppearance(appearance),
+                      ),
                   ],
                 ),
               ),
@@ -106,10 +129,10 @@ class SettingsView extends ConsumerWidget {
                       ),
                       child: Text(
                         l10n.translationLanguageCaption,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           height: 1.6,
-                          color: AppColors.textQuaternary,
+                          color: colors.textQuaternary,
                         ),
                       ),
                     ),

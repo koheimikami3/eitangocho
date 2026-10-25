@@ -4,6 +4,8 @@
 // (MainFlutterWindow)。そのためタイトルバー相当の位置でも mouse イベントは
 // Flutter が受け取り、macOS 標準の「ドラッグで移動」「ダブルクリックで拡大」が
 // 起きない。Flutter 側(WindowDragArea)で拾った操作をここで標準動作に戻す。
+//
+// アプリの外観(ライト / ダーク)を AppKit が描く部分に反映するのもここで行う。
 
 import Cocoa
 import FlutterMacOS
@@ -38,6 +40,12 @@ final class WindowControlPlugin: NSObject {
       result(nil)
     case "titleBarDoubleClick":
       handleDoubleClick(window)
+      result(nil)
+    case "setAppearance":
+      // 設定はアプリ全体の外観なので、ウィンドウ単位ではなく NSApp に当てる
+      // (発音確認のウィンドウ・ファイル選択パネルにも行き渡らせるため)。
+      let dark = call.arguments as? Bool ?? false
+      NSApp.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
       result(nil)
     default:
       result(FlutterMethodNotImplemented)
