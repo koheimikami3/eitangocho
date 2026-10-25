@@ -18,6 +18,7 @@ class ToolbarSearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     return SizedBox(
       width: 200,
       child: TextField(
@@ -32,33 +33,33 @@ class ToolbarSearchField extends ConsumerWidget {
         decoration: InputDecoration(
           isDense: true,
           hintText: context.l10n.search,
-          // 他の入力欄(LabeledTextField)と同じく白地 + 枠線にする。
+          // 他の入力欄(LabeledTextField)と同じく入力欄の地 + 枠線にする。
           // 以前は枠なしの塗り潰しだったが、ツールバーの地と色が近く
           // 欄の範囲が分からなかった。
           filled: true,
-          fillColor: Colors.white,
+          fillColor: colors.inputFill,
           // 先頭に検索アイコンを置く。既定の最小寸法(48x48)だと欄が高くなる
           // ため、アイコンの大きさに詰める。
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Icon(Icons.search, size: 17, color: AppColors.textTertiary),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Icon(Icons.search, size: 17, color: colors.textTertiary),
           ),
           prefixIconConstraints: const BoxConstraints(),
           // 上下に余裕を持たせる(ツールバー高さ 52 に収まる範囲)。
           contentPadding: const EdgeInsets.fromLTRB(5, 10, 10, 10),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
+            borderSide: BorderSide(color: colors.inputBorder),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
+            borderSide: BorderSide(color: colors.inputBorder),
           ),
           // フォーカス時も枠色は変えず通常時と同じにする
           // (Material 既定の太い黒枠が出るのを防ぐ)。
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(7),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
+            borderSide: BorderSide(color: colors.inputBorder),
           ),
         ),
       ),

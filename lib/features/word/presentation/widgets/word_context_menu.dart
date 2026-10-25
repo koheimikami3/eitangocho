@@ -19,15 +19,16 @@ Future<void> showWordContextMenu(
   // position はウィンドウのグローバル座標。Overlay は UI 全体拡大
   // (EitangochoApp の uiScale)の内側にあるため、変換を挟まないと
   // メニューが右下方向にずれる。globalToLocal が拡大の逆変換も行う。
+  final colors = context.colors;
   final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
   final local = overlay.globalToLocal(position);
   final selected = await showMenu<_ContextMenuAction>(
     context: context,
     position: RelativeRect.fromLTRB(local.dx, local.dy, local.dx, local.dy),
-    color: const Color.fromRGBO(250, 250, 251, 0.98),
+    color: colors.menuBackground,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
-      side: const BorderSide(color: Color(0x1F000000)),
+      side: BorderSide(color: colors.borderAlpha(12)),
     ),
     constraints: const BoxConstraints(minWidth: 140),
     menuPadding: const EdgeInsets.all(4),
@@ -44,8 +45,8 @@ Future<void> showWordContextMenu(
         height: 0,
         child: HoverMenuItem(
           label: context.l10n.deleteEllipsis,
-          color: AppColors.danger,
-          hoverColor: AppColors.danger,
+          color: colors.danger,
+          hoverColor: colors.danger,
         ),
       ),
     ],

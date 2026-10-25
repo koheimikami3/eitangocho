@@ -25,9 +25,10 @@ class _SidebarItemState extends State<SidebarItem> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final background = widget.selected
-        ? AppColors.sidebarSelected
-        : (_isHovered ? const Color(0x0F000000) : Colors.transparent);
+        ? colors.sidebarSelected
+        : (_isHovered ? colors.textAlpha(6) : Colors.transparent);
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -48,19 +49,13 @@ class _SidebarItemState extends State<SidebarItem> {
                 // (macOS 標準のサイドバーと同じ)。
                 child: Text(
                   widget.label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textPrimary),
                 ),
               ),
               if (widget.count.isNotEmpty)
                 Text(
                   widget.count,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0x61000000),
-                  ),
+                  style: TextStyle(fontSize: 11, color: colors.textAlpha(38)),
                 ),
             ],
           ),

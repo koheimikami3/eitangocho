@@ -32,6 +32,7 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     // ロード前は既定値でフォールバックする。
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final notifier = ref.read(settingsProvider.notifier);
@@ -106,10 +107,10 @@ class SettingsView extends ConsumerWidget {
                       ),
                       child: Text(
                         l10n.translationLanguageCaption,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           height: 1.6,
-                          color: AppColors.textQuaternary,
+                          color: colors.textQuaternary,
                         ),
                       ),
                     ),

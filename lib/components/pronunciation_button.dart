@@ -72,7 +72,7 @@ enum PronunciationButtonVariant {
 /// 埋め込むと再生ボタンを押せないため、ネイティブのウィンドウに出す
 /// ([openPronunciationWindow]。docs/design.md 参照)。
 ///
-/// 配色は macOS がライト固定のため [AppColors] から直接引く。
+/// 配色は macOS の [AppColors] から引く(iOS 版は AppPalette)。
 ///
 /// 自身がタップを消費するため、カード・行のクリック(編集モーダル)には
 /// 伝播しない。
@@ -96,6 +96,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final variant = widget.variant;
     final label = variant.label(context.l10n);
 
@@ -126,24 +127,17 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
           width: label == null ? variant.height : null,
           padding: EdgeInsets.symmetric(horizontal: variant.horizontalPadding),
           decoration: BoxDecoration(
-            color: _isHovered
-                ? AppColors.accentSoftHover
-                : AppColors.accentSoft,
+            color: _isHovered ? colors.accentSoftHover : colors.accentSoft,
             borderRadius: BorderRadius.circular(variant.borderRadius),
             border: Border.all(
-              color: _isHovered
-                  ? AppColors.accentLineHover
-                  : AppColors.accentLine,
+              color: _isHovered ? colors.accentLineHover : colors.accentLine,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SpeakerIcon(
-                size: variant.iconSize,
-                color: AppColors.accentOnSoft,
-              ),
+              SpeakerIcon(size: variant.iconSize, color: colors.accentOnSoft),
               if (label != null) ...[
                 SizedBox(width: variant.gap),
                 Text(
@@ -151,7 +145,7 @@ class _PronunciationButtonState extends ConsumerState<PronunciationButton> {
                   style: TextStyle(
                     fontSize: variant.fontSize,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.accentOnSoft,
+                    color: colors.accentOnSoft,
                   ),
                 ),
               ],

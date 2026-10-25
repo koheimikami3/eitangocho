@@ -29,19 +29,19 @@ Future<bool> showDeleteConfirmDialog(
               Text(
                 context.l10n.deleteConfirmTitle(word.word),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 context.l10n.deleteConfirmBody,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -57,8 +57,8 @@ Future<bool> showDeleteConfirmDialog(
                   Expanded(
                     child: AppFilledButton(
                       label: context.l10n.deleteConfirmOk,
-                      color: AppColors.danger,
-                      hoverColor: AppColors.dangerHover,
+                      color: context.colors.danger,
+                      hoverColor: context.colors.dangerHover,
                       onPressed: () => Navigator.of(context).pop(true),
                     ),
                   ),

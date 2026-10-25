@@ -18,6 +18,7 @@ class AppSidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final view = ref.watch(mainPageProvider.select((s) => s.view));
     final wordCount = ref.watch(wordListProvider).value?.length ?? 0;
     final learningCount = ref.watch(learningWordsProvider).length;
@@ -25,9 +26,9 @@ class AppSidebar extends ConsumerWidget {
 
     return Container(
       width: AppDimensions.sidebarWidth,
-      decoration: const BoxDecoration(
-        color: AppColors.sidebarBackground,
-        border: Border(right: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: colors.sidebarBackground,
+        border: Border(right: BorderSide(color: colors.border)),
       ),
       child: Column(
         children: [
@@ -40,10 +41,10 @@ class AppSidebar extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 context.l10n.sidebarTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textTertiary,
+                  color: colors.textTertiary,
                 ),
               ),
             ),
@@ -94,8 +95,8 @@ class AppSidebar extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
             child: DecoratedBox(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0x0F000000))),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: colors.borderAlpha(6))),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 12),
@@ -103,10 +104,7 @@ class AppSidebar extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     context.l10n.sidebarSavedLocally,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0x59000000),
-                    ),
+                    style: TextStyle(fontSize: 11, color: colors.textAlpha(35)),
                   ),
                 ),
               ),

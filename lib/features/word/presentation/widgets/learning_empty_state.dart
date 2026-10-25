@@ -12,6 +12,7 @@ class LearningEmptyState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -19,9 +20,9 @@ class LearningEmptyState extends ConsumerWidget {
           Text(
             context.l10n.learningEmpty,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textTertiary,
+              color: colors.textTertiary,
               height: 1.7,
             ),
           ),

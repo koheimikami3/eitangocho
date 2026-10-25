@@ -44,8 +44,8 @@ class _WordCardState extends State<WordCard> {
 
   // 英例文は行数差でカード高さがばらつくため、常に 2 行分の高さを確保する。
   /// ホバー中の影。通常の影に、下へ広く落ちる影を 1 枚足す。
-  static final _hoverShadow = [
-    ...AppPalette.light.elevation,
+  static List<BoxShadow> _hoverShadow(AppPalette palette) => [
+    ...palette.elevation,
     const BoxShadow(
       color: Color(0x14101828), // rgba(16,24,40,0.08)
       blurRadius: 16,
@@ -61,6 +61,8 @@ class _WordCardState extends State<WordCard> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final palette = context.palette;
     final word = widget.word;
     final hasExample = word.exampleEn.trim().isNotEmpty;
     final showIpa = widget.showIpa && word.ipa.isNotEmpty;
@@ -79,12 +81,12 @@ class _WordCardState extends State<WordCard> {
           // 枠は透明色で常に描く。ホバー時だけ足すと、枠の太さの分だけ
           // 中身がずれるため。
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(AppDimensions.mobileCardRadius),
             border: Border.all(
-              color: _isHovered ? AppColors.accentLine : Colors.transparent,
+              color: _isHovered ? colors.accentLine : Colors.transparent,
             ),
-            boxShadow: _isHovered ? _hoverShadow : AppPalette.light.elevation,
+            boxShadow: _isHovered ? _hoverShadow(palette) : palette.elevation,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,10 +98,10 @@ class _WordCardState extends State<WordCard> {
               // IPA は補助情報なので 1 行に留め、溢れる分は末尾を省略する。
               Text(
                 word.word,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               if (showIpa) ...[
@@ -110,10 +112,10 @@ class _WordCardState extends State<WordCard> {
                   word.ipa,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontFamily: AppFonts.ipa,
-                    color: AppColors.textTertiary,
+                    color: colors.textTertiary,
                   ),
                 ),
               ],
@@ -141,8 +143,8 @@ class _WordCardState extends State<WordCard> {
                   style: TextStyle(
                     fontSize: _exampleFontSize,
                     color: hasExample
-                        ? const Color(0xB3000000)
-                        : AppColors.textDisabled,
+                        ? colors.textAlpha(70)
+                        : colors.textDisabled,
                     height: _exampleLineHeight,
                   ),
                 ),
@@ -151,9 +153,9 @@ class _WordCardState extends State<WordCard> {
                 const SizedBox(height: 4),
                 Text(
                   word.exampleTranslation,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0x80000000),
+                    color: colors.textAlpha(50),
                     height: 1.5,
                   ),
                 ),
@@ -161,8 +163,8 @@ class _WordCardState extends State<WordCard> {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.only(top: 6),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: Color(0x0F000000))),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: colors.borderAlpha(6))),
                 ),
                 child: Row(
                   children: [
@@ -184,9 +186,9 @@ class _WordCardState extends State<WordCard> {
                             ),
                             Text(
                               context.l10n.markLearned,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: colors.textSecondary,
                               ),
                             ),
                           ],
@@ -230,6 +232,7 @@ class _RevealAreaState extends ConsumerState<_RevealArea> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     // チェック操作と同様、訳トグルはカードクリック(編集)に伝播させない。
     return GestureDetector(
       onTap: () {},
@@ -246,30 +249,24 @@ class _RevealAreaState extends ConsumerState<_RevealArea> {
                     horizontal: 10,
                     vertical: 8,
                   ),
-                  // macOS の入力欄と同じ白地 + 枠(iOS の訳の表示枠に対応)。
+                  // macOS の入力欄と同じ地 + 枠(iOS の訳の表示枠に対応)。
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.inputFill,
                     borderRadius: BorderRadius.circular(7),
-                    border: Border.all(color: AppColors.inputBorder),
+                    border: Border.all(color: colors.inputBorder),
                   ),
                   child: Text(
                     widget.meaning,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textPrimary),
                   ),
                 )
               : DottedBorderBox(
-                  backgroundColor: _isHovered ? const Color(0x08000000) : null,
+                  backgroundColor: _isHovered ? colors.textAlpha(3) : null,
                   child: Text(
                     ref
                         .watch(translationLanguageProvider)
                         .showMeaningLabel(context.l10n),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0x66000000),
-                    ),
+                    style: TextStyle(fontSize: 12, color: colors.textAlpha(40)),
                   ),
                 ),
         ),
@@ -289,7 +286,7 @@ class DottedBorderBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _DashedBorderPainter(),
+      painter: _DashedBorderPainter(context.colors.borderAlpha(18)),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -301,6 +298,11 @@ class DottedBorderBox extends StatelessWidget {
 }
 
 class _DashedBorderPainter extends CustomPainter {
+  _DashedBorderPainter(this.color);
+
+  /// 破線の色(ライトはプロトタイプの rgba(0,0,0,0.18))。
+  final Color color;
+
   static const _radius = 7.0;
   static const _dashWidth = 4.0;
   static const _dashGap = 3.0;
@@ -308,7 +310,7 @@ class _DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0x2E000000)
+      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
     final rrect = RRect.fromRectAndRadius(
@@ -329,5 +331,6 @@ class _DashedBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

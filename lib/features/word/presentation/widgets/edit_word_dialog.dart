@@ -146,6 +146,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final l10n = context.l10n;
     final languageLabel = _languageLabel(context);
     // 高さは固定の上限を持たず、ウィンドウに収まる範囲まで広げる(Dialog が
@@ -173,10 +174,10 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                   children: [
                     Text(
                       l10n.editWordTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -210,10 +211,10 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                       children: [
                         Text(
                           l10n.fieldPartsOfSpeech,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: colors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -252,10 +253,7 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.danger,
-                        ),
+                        style: TextStyle(fontSize: 12, color: colors.danger),
                       ),
                     ],
                   ],
@@ -280,8 +278,8 @@ class _EditWordDialogState extends State<_EditWordDialog> {
                   const Spacer(),
                   AppOutlinedButton(
                     label: l10n.deleteEllipsis,
-                    textColor: AppColors.danger,
-                    hoverBackground: AppColors.dangerHoverBackground,
+                    textColor: colors.danger,
+                    hoverBackground: colors.dangerHoverBackground,
                     onPressed: _delete,
                   ),
                 ],

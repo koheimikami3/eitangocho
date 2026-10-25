@@ -12,6 +12,7 @@ class QuizEmptyState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -21,7 +22,7 @@ class QuizEmptyState extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textTertiary,
+              color: colors.textTertiary,
               height: 1.8,
             ),
           ),

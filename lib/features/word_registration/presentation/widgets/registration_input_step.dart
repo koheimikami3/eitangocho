@@ -29,13 +29,14 @@ class RegistrationInputStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           ref.watch(translationLanguageProvider).registrationIntro(l10n),
-          style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+          style: TextStyle(fontSize: 12, color: colors.textTertiary),
         ),
         const SizedBox(height: 14),
         LabeledTextField(
@@ -56,13 +57,13 @@ class RegistrationInputStep extends ConsumerWidget {
           const SizedBox(height: 10),
           Text(
             errorMessage!,
-            style: const TextStyle(fontSize: 12, color: AppColors.danger),
+            style: TextStyle(fontSize: 12, color: colors.danger),
           ),
         ] else if (registeredMessage != null) ...[
           const SizedBox(height: 10),
           Text(
             registeredMessage!,
-            style: const TextStyle(fontSize: 12, color: AppColors.success),
+            style: TextStyle(fontSize: 12, color: colors.success),
           ),
         ],
         const SizedBox(height: 14),
@@ -90,6 +91,7 @@ class _SkipLinkState extends State<_SkipLink> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -100,7 +102,7 @@ class _SkipLinkState extends State<_SkipLink> {
           context.l10n.skipToManual,
           style: TextStyle(
             fontSize: 13,
-            color: _isHovered ? AppColors.accentOnSoft : AppColors.accent,
+            color: _isHovered ? colors.accentOnSoft : colors.accent,
           ),
         ),
       ),

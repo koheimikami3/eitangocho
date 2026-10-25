@@ -8,14 +8,18 @@ class HoverMenuItem extends StatefulWidget {
   const HoverMenuItem({
     required this.label,
     super.key,
-    this.color = AppColors.textPrimary,
-    this.hoverColor = AppColors.accent,
+    this.color,
+    this.hoverColor,
     this.checked,
   });
 
   final String label;
-  final Color color;
-  final Color hoverColor;
+
+  /// 文字色。null なら本文色(AppColors.textPrimary)。
+  final Color? color;
+
+  /// ホバー中の地。null ならアクセント色。
+  final Color? hoverColor;
 
   /// 選択中の印。null ならチェック欄ごと出さない(コンテキストメニュー)。
   /// true / false のときは欄を確保し、ラベルの頭を項目間で揃える。
@@ -30,7 +34,10 @@ class _HoverMenuItemState extends State<HoverMenuItem> {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = _isHovered ? Colors.white : widget.color;
+    final colors = context.colors;
+    final foreground = _isHovered
+        ? Colors.white
+        : widget.color ?? colors.textPrimary;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -39,7 +46,7 @@ class _HoverMenuItemState extends State<HoverMenuItem> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: _isHovered ? widget.hoverColor : null,
+          color: _isHovered ? widget.hoverColor ?? colors.accent : null,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Row(

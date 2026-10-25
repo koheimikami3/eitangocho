@@ -15,11 +15,9 @@ class SettingsToggleRow extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  /// OFF 時のトラック色(プロトタイプの rgba(0,0,0,0.18))。
-  static const _trackOff = Color(0x2E000000);
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       child: Row(
@@ -27,10 +25,7 @@ class SettingsToggleRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textPrimary,
-              ),
+              style: TextStyle(fontSize: 13, color: colors.textPrimary),
             ),
           ),
           MouseRegion(
@@ -43,7 +38,8 @@ class SettingsToggleRow extends StatelessWidget {
                 height: 26,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(99),
-                  color: value ? AppColors.accent : _trackOff,
+                  // OFF はプロトタイプの rgba(0,0,0,0.18)。
+                  color: value ? colors.accent : colors.borderAlpha(18),
                 ),
                 child: Stack(
                   children: [

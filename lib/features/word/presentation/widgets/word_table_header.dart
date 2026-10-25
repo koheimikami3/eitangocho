@@ -8,54 +8,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class WordTableHeader extends ConsumerWidget {
   const WordTableHeader({super.key});
 
-  static const _headerStyle = TextStyle(
-    fontSize: 11,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textTertiary,
-  );
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final l10n = context.l10n;
     final language = ref.watch(translationLanguageProvider);
+    final headerStyle = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.bold,
+      color: colors.textTertiary,
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: const BoxDecoration(
-        color: AppColors.tableHeaderBackground,
-        border: Border(bottom: BorderSide(color: AppColors.borderStrong)),
+      decoration: BoxDecoration(
+        color: colors.tableHeaderBackground,
+        border: Border(bottom: BorderSide(color: colors.borderStrong)),
       ),
       child: Row(
         children: [
           SizedBox(
             width: 64,
-            child: Text(l10n.tableLearned, style: _headerStyle),
+            child: Text(l10n.tableLearned, style: headerStyle),
           ),
           const SizedBox(width: 12),
-          SizedBox(
-            width: 140,
-            child: Text(l10n.tableWord, style: _headerStyle),
-          ),
+          SizedBox(width: 140, child: Text(l10n.tableWord, style: headerStyle)),
           const SizedBox(width: 12),
-          SizedBox(width: 130, child: Text(l10n.tableIpa, style: _headerStyle)),
+          SizedBox(width: 130, child: Text(l10n.tableIpa, style: headerStyle)),
           const SizedBox(width: 12),
           SizedBox(
             width: 100,
-            child: Text(l10n.tablePartOfSpeech, style: _headerStyle),
+            child: Text(l10n.tablePartOfSpeech, style: headerStyle),
           ),
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: Text(language.meaningColumnLabel(l10n), style: _headerStyle),
+            child: Text(language.meaningColumnLabel(l10n), style: headerStyle),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            flex: 3,
-            child: Text(l10n.tableExample, style: _headerStyle),
-          ),
+          Expanded(flex: 3, child: Text(l10n.tableExample, style: headerStyle)),
           const SizedBox(width: 12),
           SizedBox(
             width: 56,
-            child: Text(l10n.tablePronunciation, style: _headerStyle),
+            child: Text(l10n.tablePronunciation, style: headerStyle),
           ),
         ],
       ),

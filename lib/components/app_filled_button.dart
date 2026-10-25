@@ -89,14 +89,14 @@ class _AppFilledButtonState extends State<AppFilledButton> {
         borderRadius: radius,
       );
     }
-    // macOS はライト固定なので AppPalette.light の値を直接使う。
-    const palette = AppPalette.light;
+    final colors = context.colors;
+    final palette = context.palette;
     return BoxDecoration(
       gradient: _isHovered
-          ? const LinearGradient(
+          ? LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: AppColors.buttonGradientHover,
+              colors: colors.buttonGradientHover,
             )
           : palette.buttonGradient,
       borderRadius: radius,

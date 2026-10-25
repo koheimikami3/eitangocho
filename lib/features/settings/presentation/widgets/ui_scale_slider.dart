@@ -13,11 +13,9 @@ class UiScaleSlider extends ConsumerWidget {
 
   final double value;
 
-  /// 未到達側のトラック色(プロトタイプの rgba(0,0,0,0.12))。
-  static const _inactiveTrack = Color(0x1F000000);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     const divisions =
         ((AppDimensions.maxUiScale - AppDimensions.minUiScale) * 10);
 
@@ -27,15 +25,16 @@ class UiScaleSlider extends ConsumerWidget {
         children: [
           Text(
             context.l10n.uiScale,
-            style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+            style: TextStyle(fontSize: 13, color: colors.textPrimary),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: SliderTheme(
               data: SliderThemeData(
                 trackHeight: 4,
-                activeTrackColor: AppColors.accent,
-                inactiveTrackColor: _inactiveTrack,
+                activeTrackColor: colors.accent,
+                // 未到達側はプロトタイプの rgba(0,0,0,0.12)。
+                inactiveTrackColor: colors.borderAlpha(12),
                 thumbShape: const _CircleThumbShape(),
                 overlayShape: SliderComponentShape.noOverlay,
               ),
@@ -61,7 +60,7 @@ class UiScaleSlider extends ConsumerWidget {
             child: Text(
               '${value.toStringAsFixed(1)}x',
               textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 12, color: colors.textMuted),
             ),
           ),
         ],

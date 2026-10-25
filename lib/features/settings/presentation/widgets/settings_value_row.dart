@@ -10,6 +10,7 @@ class SettingsValueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       child: Row(
@@ -17,15 +18,12 @@ class SettingsValueRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textPrimary,
-              ),
+              style: TextStyle(fontSize: 13, color: colors.textPrimary),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
+            style: TextStyle(fontSize: 13, color: colors.textTertiary),
           ),
         ],
       ),

@@ -9,20 +9,18 @@ class DictionaryWarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.warningBannerBackground,
-        border: Border.all(color: AppColors.warningBannerBorder),
+        color: colors.warningBannerBackground,
+        border: Border.all(color: colors.warningBannerBorder),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         message,
-        style: const TextStyle(
-          fontSize: 13,
-          color: AppColors.warningBannerForeground,
-        ),
+        style: TextStyle(fontSize: 13, color: colors.warningBannerForeground),
       ),
     );
   }

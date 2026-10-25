@@ -70,7 +70,7 @@ class AppPalette {
   bool get isDark => brightness == Brightness.dark;
 
   /// アクセント色はライト / ダーク共通。
-  Color get accent => AppColors.accent;
+  Color get accent => AppColors.light.accent;
 
   /// 発音ボタンの淡い地(--acc-soft)。ダークは地が暗いぶん濃く敷く。
   ///

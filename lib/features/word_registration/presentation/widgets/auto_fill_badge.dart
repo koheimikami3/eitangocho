@@ -8,18 +8,19 @@ class AutoFillBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
       decoration: BoxDecoration(
-        color: AppColors.autoFillBadgeBackground,
+        color: colors.autoFillBadgeBackground,
         borderRadius: BorderRadius.circular(99),
       ),
       child: Text(
         context.l10n.autoFillBadge,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: AppColors.autoFillBadgeForeground,
+          color: colors.autoFillBadgeForeground,
         ),
       ),
     );
