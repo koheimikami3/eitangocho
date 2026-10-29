@@ -36,6 +36,12 @@ final class AppModel {
 
   private(set) var phase: Phase = .loading
 
+  /// 設定。DB に依存しないので、起動の流れより先に読む(配色・倍率を最初の画面から効かせるため)。
+  let settings = SettingsStore()
+
+  /// 表示中の画面と検索語。メニューからも触るので、DB を開く前から持つ。
+  let shell = MainShellModel()
+
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
 
   /// App Group の ID。Bundle ID に `group.` を付けたもの(Debug は .dev 付きで本番と分かれる)。

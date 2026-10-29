@@ -78,6 +78,13 @@ nonisolated struct AppColors: Equatable, Sendable {
   /// 補足文
   var textQuaternary: Color { textAlpha(40) }
 
+  /// Flutter 版で色を指定していない文字・入力欄の文字の色(Material 3 の onSurface。
+  /// アクセント色から作られる配色の値をそのまま写した)。
+  var materialOnSurface: Color { isDark ? Color(argb: 0xFFE0_E2E8) : Color(argb: 0xFF19_1C20) }
+
+  /// Flutter 版の入力欄のヒントの色(Material 3 の onSurfaceVariant)。
+  var materialOnSurfaceVariant: Color { isDark ? Color(argb: 0xFFC2_C7CF) : Color(argb: 0xFF42_474E) }
+
   // MARK: - 面
 
   /// アプリの地(Scaffold の背景。iOS の AppPalette.background と同じ値)。
