@@ -37,6 +37,10 @@ public final class AppDatabase: Sendable {
     try AppDatabase(DatabaseQueue())
   }
 
+  public var wordDao: WordDao { WordDao(writer: writer) }
+  public var ejdictDao: EjdictDao { EjdictDao(writer: writer) }
+  public var dictionaryCacheDao: DictionaryCacheDao { DictionaryCacheDao(writer: writer) }
+
   // MARK: - スキーマ
 
   /// 空の DB ならスキーマを作り、古い版なら drift と同じ手順で最新まで上げる。
