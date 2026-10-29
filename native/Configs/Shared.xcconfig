@@ -1,0 +1,63 @@
+// 全構成に共通の設定。Debug.xcconfig / Release.xcconfig から include する。
+//
+// pbxproj にはビルド設定を書かず、ここにまとめる(差分を読みやすく保つため)。
+// BUNDLE_ID_SUFFIX などの構成ごとの変数は Debug / Release 側で定義する。
+
+// 1 つのターゲットで iOS と macOS の両方をビルドする。
+SDKROOT = auto
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator macosx
+SUPPORTS_MACCATALYST = NO
+SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO
+SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO
+// iOS のストア対象は iPhone のみ(iPad を含めると 13 インチのスクリーンショットが要る)。
+TARGETED_DEVICE_FAMILY = 1
+IPHONEOS_DEPLOYMENT_TARGET = 18.0
+MACOSX_DEPLOYMENT_TARGET = 15.0
+
+// Flutter 版と同じ Bundle ID。Debug だけ .dev が付き、DB・iCloud コンテナ・
+// App Group が本番と分かれる(開発中のビルドが本番のデータを触らないため)。
+PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho$(BUNDLE_ID_SUFFIX)
+DEVELOPMENT_TEAM = M5WP527J7Y
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = Support/Eitangocho-iOS.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Support/Eitangocho-macOS.entitlements
+
+// macOS の Dock・Finder は CFBundleDisplayName ではなく .app のファイル名を
+// ラベルにするため、macOS は表示名を PRODUCT_NAME に持たせる(Flutter 版の
+// macos/Runner/Configs/AppInfo.xcconfig と同じ)。.app の名前を揃えておくと、
+// /Applications の Flutter 版をそのまま置き換えられる。
+PRODUCT_NAME = Eitangocho
+PRODUCT_NAME[sdk=macosx*] = シンプル英単語帳$(APP_DISPLAY_SUFFIX)
+// PRODUCT_NAME が日本語でもモジュール名・実行ファイル名は ASCII に固定する。
+PRODUCT_MODULE_NAME = Eitangocho
+EXECUTABLE_NAME = eitangocho
+
+// アイコンは shared/ の Icon Composer 形式を Flutter 版と共有する。
+ASSETCATALOG_COMPILER_APPICON_NAME = $(APP_ICON_NAME)
+
+// バージョンは Flutter 版(pubspec.yaml)の値に合わせてある。更新はリリースの作業で行う。
+MARKETING_VERSION = 2.11.1
+CURRENT_PROJECT_VERSION = 26
+
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_CFBundleDisplayName = $(APP_DISPLAY_NAME)
+INFOPLIST_KEY_CFBundleDisplayName[sdk=macosx*] = $(PRODUCT_NAME)
+INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.education
+INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES
+INFOPLIST_KEY_UILaunchScreen_Generation = YES
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait
+
+SWIFT_VERSION = 6.0
+// アプリ本体は画面のコードが大半なので、既定を MainActor にする
+// (パッケージ側は既定のまま。DB・同期は主スレッドの外で動く)。
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+SWIFT_APPROACHABLE_CONCURRENCY = YES
+SWIFT_EMIT_LOC_STRINGS = YES
+ENABLE_PREVIEWS = YES
+ENABLE_USER_SCRIPT_SANDBOXING = YES
+ALWAYS_SEARCH_USER_PATHS = NO
+CLANG_ENABLE_MODULES = YES
+ENABLE_STRICT_OBJC_MSGSEND = YES
+LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks
