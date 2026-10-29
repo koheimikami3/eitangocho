@@ -1,0 +1,23 @@
+// アプリのモデルのテスト(EitangochoTests)の設定。プロジェクトの Debug / Release.xcconfig の
+// 上に重ねる(target の baseConfiguration)。アプリ用の名前・entitlements はここで打ち消す。
+
+PRODUCT_NAME = EitangochoTests
+PRODUCT_MODULE_NAME = EitangochoTests
+EXECUTABLE_NAME = EitangochoTests
+PRODUCT_BUNDLE_IDENTIFIER = com.kohei.mikami.eitangocho.tests
+CODE_SIGN_ENTITLEMENTS =
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] =
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] =
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_CFBundleDisplayName =
+INFOPLIST_KEY_CFBundleDisplayName[sdk=macosx*] =
+ASSETCATALOG_COMPILER_APPICON_NAME =
+STRING_CATALOG_GENERATE_SYMBOLS = NO
+
+// アプリに読み込ませて動かす(@testable import Eitangocho でアプリのモデルを使うため)。
+// アプリは起動してもテスト中は引き継ぎ・同期を始めない(EitangochoApp.isRunningTests)。
+TEST_HOST[sdk=macosx*] = $(BUILT_PRODUCTS_DIR)/シンプル英単語帳$(APP_DISPLAY_SUFFIX).app/Contents/MacOS/eitangocho
+TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/Eitangocho.app/eitangocho
+BUNDLE_LOADER = $(TEST_HOST)
+LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
