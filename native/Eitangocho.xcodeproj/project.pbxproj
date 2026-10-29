@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1000000000000000000001E /* EitangochoData in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001D /* EitangochoData */; };
 		A10000000000000000000014 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppIcon.icon */; };
 		A10000000000000000000015 /* AppIcon-dev.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* AppIcon-dev.icon */; };
 /* End PBXBuildFile section */
@@ -31,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000000000000000000001E /* EitangochoData in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +106,7 @@
 			);
 			name = Eitangocho;
 			packageProductDependencies = (
+				A1000000000000000000001D /* EitangochoData */,
 			);
 			productName = Eitangocho;
 			productReference = A10000000000000000000004 /* Eitangocho.app */;
@@ -137,6 +140,9 @@
 			);
 			mainGroup = A10000000000000000000002;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1000000000000000000001C /* XCLocalSwiftPackageReference "Packages/EitangochoCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A10000000000000000000003 /* Products */;
 			projectDirPath = "";
@@ -218,6 +224,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1000000000000000000001C /* XCLocalSwiftPackageReference "Packages/EitangochoCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/EitangochoCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1000000000000000000001D /* EitangochoData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EitangochoData;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000001 /* Project object */;
 }
