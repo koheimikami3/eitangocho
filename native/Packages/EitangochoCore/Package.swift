@@ -22,7 +22,7 @@ let package = Package(
     ),
     .target(
       name: "EitangochoSync",
-      dependencies: ["EitangochoData"]
+      dependencies: ["EitangochoData", .product(name: "GRDB", package: "GRDB.swift")]
     ),
     .testTarget(
       name: "EitangochoDataTests",
