@@ -102,6 +102,24 @@
     削除ログの保持期間より古い競合版は取り込まない(掃除済みの削除を知らず単語が復活する)
 - 設定値は `shared_preferences` に平文で保存してよい(DeepL キーを含む)
 
+### ネイティブ版(native/)への引き継ぎ
+
+- **同期 JSON の互換は恒久に保つ。** iOS 18 / macOS 15 未満の端末は Swift 版に更新できず、
+  Flutter の最終版のまま同期し続ける。形式のバージョンを上げず、必須のキーを足さない
+- **Flutter 版の DB(`Documents/eitangocho.sqlite`)は開かず、書き換えず、消さない。**
+  ファイルとしてコピーし、復旧・スキーマ更新・検証はコピーの方で行ってから App Group の
+  `Database/` へ移す。元ファイルが残っていれば Flutter 版を入れ直すだけで戻れる
+- **移すのは、WAL のチェックポイント後に接続を閉じ、`-wal` / `-shm` が残っていないことを
+  確かめた本体だけ。** 本体だけを動かすと `-wal` にしか無い書き込みが失われる。
+  Apple の SQLite は WAL を閉じても残す設定が既定なので、移す前の接続だけそれを切る
+- **引き継ぎに失敗したら空の DB で始めない。** 印を書かず失敗の画面を出し、次の起動でやり直す。
+  元ファイルからの引き継ぎ直しは自動では行わない(引き継ぎ後の変更を失うため)
+- **スキーマは drift と互換のまま保つ。** 版は `PRAGMA user_version` で drift の番号を引き継ぎ、
+  GRDB の `DatabaseMigrator` は使わない。日時は UNIX 秒の整数で書く(GRDB の既定の文字列にしない)。
+  Flutter に戻す版が要るときは、drift で App Group の DB を開くだけで済む
+- **設定値は Flutter 版と同じキー・同じ型で `UserDefaults.standard` を読み書きする。**
+  `SharedPreferencesAsync` は接頭辞を付けないので、Bundle ID が同じなら移す処理は要らない
+
 ## プラットフォーム
 
 - **iOS の画面は macOS と別ファイルに分ける**。Provider・Notifier・DAO は共有し、

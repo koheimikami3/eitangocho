@@ -80,6 +80,34 @@ plutil -extract CFBundleIconName raw "$APP/Contents/Info.plist"   # AppIcon
 iconutil -c iconset "$APP/Contents/Resources/AppIcon.icns" -o /tmp/appicon.iconset
 ```
 
+## ネイティブ版(Swift / SwiftUI、移行中)
+
+Flutter 版を置き換える Swift 版を `native/` で作っている。1 つのターゲットで iOS 18 / macOS 15 の
+両方をビルドし、Bundle ID は Flutter 版と同じ(Debug は `.dev` 付き)。データ引き継ぎの規則は
+[design.md](design.md) の「ネイティブ版(native/)への引き継ぎ」。
+
+```
+native/
+├── Eitangocho.xcodeproj      # ビルド設定は書かず Configs/ の xcconfig に置く。Eitangocho/ は同期フォルダ
+├── Configs/                  # Shared / Debug / Release の xcconfig(BUNDLE_ID_SUFFIX・表示名・アイコン)
+├── Support/                  # OS ごとの entitlements(iCloud コンテナ・App Group)
+├── Eitangocho/               # SwiftUI のアプリ(Diagnostics/ は Dev ビルドだけの診断画面)
+└── Packages/EitangochoCore/  # 画面を持たない部分(EitangochoData = DB / EitangochoSync = 書き出し・同期)
+```
+
+```bash
+swift test --package-path native/Packages/EitangochoCore    # パッケージのテスト
+xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 'generic/platform=macOS' build
+xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 'generic/platform=iOS Simulator' build
+```
+
+- Swift 版が書き出した JSON を Flutter 版が読めることは
+  `test/features/settings/data/native_export_compat_test.dart` で確かめる。書き出しの形を変えたら
+  `UPDATE_FIXTURES=1 swift test --package-path native/Packages/EitangochoCore` で固定データを作り直し、
+  そのテストも通す
+- Swift 版の Dev ビルドを入れると Flutter 版の Dev ビルドを置き換える(Bundle ID が同じ)。
+  Flutter 版を入れ直すと、引き継いだ時点の元ファイルで起動する
+
 ## 技術的な疑問の解決
 
 1. プロジェクト固有の設計: `docs/*.md` や既存コードを参照する
