@@ -10,6 +10,7 @@ let package = Package(
   products: [
     .library(name: "EitangochoData", targets: ["EitangochoData"]),
     .library(name: "EitangochoSync", targets: ["EitangochoSync"]),
+    .library(name: "EitangochoWordInfo", targets: ["EitangochoWordInfo"]),
   ],
   dependencies: [
     // 版は固定する。DB ファイルの扱いに関わるため、上げるときは変更点を読んでから上げる。
@@ -24,6 +25,10 @@ let package = Package(
       name: "EitangochoSync",
       dependencies: ["EitangochoData", .product(name: "GRDB", package: "GRDB.swift")]
     ),
+    .target(
+      name: "EitangochoWordInfo",
+      dependencies: ["EitangochoData"]
+    ),
     .testTarget(
       name: "EitangochoDataTests",
       dependencies: ["EitangochoData"]
@@ -32,6 +37,10 @@ let package = Package(
       name: "EitangochoSyncTests",
       dependencies: ["EitangochoSync"],
       resources: [.copy("Fixtures")]
+    ),
+    .testTarget(
+      name: "EitangochoWordInfoTests",
+      dependencies: ["EitangochoWordInfo"]
     ),
   ]
 )

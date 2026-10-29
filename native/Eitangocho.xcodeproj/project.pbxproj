@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000036 /* EitangochoWordInfo in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* EitangochoWordInfo */; };
+		A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000038 /* ejdict-hand-utf8.txt */; };
 		A10000000000000000000130 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000030 /* Inter.ttf */; };
 		A10000000000000000000131 /* NotoSansJP.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* NotoSansJP.ttf */; };
 		A10000000000000000000132 /* NotoSansTC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000032 /* NotoSansTC.ttf */; };
@@ -28,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A10000000000000000000038 /* ejdict-hand-utf8.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ejdict-hand-utf8.txt"; path = "../assets/ejdict/ejdict-hand-utf8.txt"; sourceTree = "<group>"; };
 		A10000000000000000000030 /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
 		A10000000000000000000031 /* NotoSansJP.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansJP.ttf; path = ../assets/fonts/NotoSansJP.ttf; sourceTree = "<group>"; };
 		A10000000000000000000032 /* NotoSansTC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansTC.ttf; path = ../assets/fonts/NotoSansTC.ttf; sourceTree = "<group>"; };
@@ -56,6 +59,7 @@
 			files = (
 				A1000000000000000000001E /* EitangochoData in Frameworks */,
 				A10000000000000000000020 /* EitangochoSync in Frameworks */,
+				A10000000000000000000036 /* EitangochoWordInfo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,6 +80,7 @@
 				A10000000000000000000023 /* EitangochoTests */,
 				A1000000000000000000000F /* Icons */,
 				A10000000000000000000034 /* Fonts */,
+				A10000000000000000000039 /* Dictionary */,
 				A10000000000000000000008 /* Configs */,
 				A1000000000000000000000C /* Support */,
 				A10000000000000000000003 /* Products */,
@@ -131,6 +136,14 @@
 			name = Fonts;
 			sourceTree = "<group>";
 		};
+		A10000000000000000000039 /* Dictionary */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000038 /* ejdict-hand-utf8.txt */,
+			);
+			name = Dictionary;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -153,6 +166,7 @@
 			packageProductDependencies = (
 				A1000000000000000000001D /* EitangochoData */,
 				A1000000000000000000001F /* EitangochoSync */,
+				A10000000000000000000035 /* EitangochoWordInfo */,
 			);
 			productName = Eitangocho;
 			productReference = A10000000000000000000004 /* Eitangocho.app */;
@@ -236,6 +250,7 @@
 				A10000000000000000000131 /* NotoSansJP.ttf in Resources */,
 				A10000000000000000000132 /* NotoSansTC.ttf in Resources */,
 				A10000000000000000000133 /* Andika-Regular.ttf in Resources */,
+				A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +376,10 @@
 		A1000000000000000000001F /* EitangochoSync */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EitangochoSync;
+		};
+		A10000000000000000000035 /* EitangochoWordInfo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EitangochoWordInfo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
