@@ -10,6 +10,10 @@ struct EitangochoApp: App {
   /// (テストを走らせただけで Dev ビルドのデータを引き継いでしまわないため)。
   static let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 
+  init() {
+    AppFonts.register()
+  }
+
   var body: some Scene {
     WindowGroup {
       if Self.isRunningTests {
