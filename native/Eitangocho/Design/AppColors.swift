@@ -122,6 +122,9 @@ nonisolated struct AppColors: Equatable, Sendable {
   /// Flutter 版のメニューの区切り線(Material 3 の outlineVariant)。
   var materialOutlineVariant: Color { isDark ? Color(argb: 0xFF42_474E) : Color(argb: 0xFFC2_C7CF) }
 
+  /// Flutter 版のスライダーの目盛りの色(Material 3 の onPrimary と onSurfaceVariant。どちらも 38% で描く)。
+  var materialOnPrimary: Color { isDark ? Color(argb: 0xFF00_3256) : .white }
+
   /// Flutter 版の InkWell のホバーの重ね色(ThemeData.hoverColor)。
   var materialHover: Color { isDark ? Color(argb: 0x0AFF_FFFF) : Color(argb: 0x0A00_0000) }
 

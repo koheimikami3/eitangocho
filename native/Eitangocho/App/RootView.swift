@@ -59,7 +59,7 @@ struct RootView: View {
 
 #if os(macOS)
   extension RootView {
-    /// シェルの中身(表示中の画面)。設定は Phase 3 の後のコミットで移すまで空にしておく。
+    /// シェルの中身(表示中の画面)。
     @ViewBuilder
     fileprivate func mainContent(_ view: MainView, session: AppModel.Session) -> some View {
       switch view {
@@ -73,7 +73,7 @@ struct RootView: View {
       case .quiz:
         QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
       case .settings:
-        Color.clear
+        SettingsView(settings: model.settings)
       }
     }
   }
