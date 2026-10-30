@@ -7,6 +7,10 @@ import Testing
 
 /// Flutter 版の DB を App Group へ引き継ぐ処理のテスト。
 /// 一時ディレクトリに「Flutter 版の Documents」と「App Group」を作って確かめる。
+///
+/// 中断の通知(AppDatabase.setSuspended)はプロセス内の `open` で開いた DB すべてに届くので、
+/// このスイートの中は並べて走らせない(`open` を使うのはこのスイートだけ)。
+@Suite(.serialized)
 final class DriftDatabaseImporterTests {
   let root: URL
   let defaults: UserDefaults
@@ -47,6 +51,21 @@ final class DriftDatabaseImporterTests {
 
   private func filesInDatabaseDirectory() throws -> [String] {
     try FileManager.default.contentsOfDirectory(atPath: destination.deletingLastPathComponent().path).sorted()
+  }
+
+  @Test("開いた DB は中断の通知で書き込みを止め、再開の通知で戻す(iOS の 0xdead10cc 対策)")
+  func suspendsWritesWhileSuspended() async throws {
+    _ = try importer.run()
+    let database = try openDestination()
+    defer { AppDatabase.setSuspended(false) }
+
+    AppDatabase.setSuspended(true)
+    await #expect(throws: DatabaseError.self) {
+      try await database.wordDao.insertWord(NewWord(word: "apple", meaning: "りんご"))
+    }
+    AppDatabase.setSuspended(false)
+    try await database.wordDao.insertWord(NewWord(word: "apple", meaning: "りんご"))
+    #expect(try await database.wordDao.countWords() == 1)
   }
 
   @Test("元の DB が無ければ新規インストールとして始め、ファイルは作らない")

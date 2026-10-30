@@ -1,3 +1,4 @@
+import EitangochoData
 import SwiftUI
 
 @main
@@ -27,6 +28,10 @@ struct EitangochoApp: App {
       }
     }
     .onChange(of: scenePhase) { _, phase in
+      #if os(iOS)
+        // App Group の DB のロックを持ったまま中断されないよう、中断の前に DB を止める。
+        AppDatabase.setSuspended(phase == .background)
+      #endif
       // iOS はアプリを終了させずに中断するので、戻ったときの同期が要る。
       guard phase == .active, !Self.isRunningTests else { return }
       Task { await model.appDidBecomeActive() }

@@ -26,10 +26,20 @@ public final class AppDatabase: Sendable {
   /// WAL の `DatabasePool` で開く。DB は App Group に置いて将来のウィジェットと
   /// 共有するため、iOS では中断時にファイルロックを手放す設定も入れる
   /// (App Group の中でロックを持ったまま中断されると、OS に 0xdead10cc で落とされる)。
+  /// 設定は `setSuspended` の通知で初めて効くので、アプリが中断の前後に呼ぶ。
   public static func open(at url: URL) throws -> AppDatabase {
     var configuration = Configuration()
     configuration.observesSuspensionNotifications = true
     return try AppDatabase(DatabasePool(path: url.path, configuration: configuration))
+  }
+
+  /// iOS でアプリが中断される前に `true`、戻ったときに `false` で呼ぶ。
+  ///
+  /// `open` で開いた DB はこの通知を受けてロックを取らなくなる(GRDB は通知を自分では出さない)。
+  /// 止めている間の書き込みは `SQLITE_ABORT` で失敗する(同期などは次の契機でやり直す)。
+  public static func setSuspended(_ suspended: Bool) {
+    NotificationCenter.default.post(
+      name: suspended ? Database.suspendNotification : Database.resumeNotification, object: nil)
   }
 
   /// テスト用のメモリ上の DB。
