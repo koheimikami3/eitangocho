@@ -1,5 +1,6 @@
 import EitangochoData
 import EitangochoSync
+import EitangochoWordInfo
 import Foundation
 import Observation
 import OSLog
@@ -22,6 +23,8 @@ final class AppModel {
     let sync: SyncController
     let importOutcome: DatabaseImportOutcome
     let locations: DriftDatabaseImporter.Locations
+    let words: WordStore
+    let wordInfo: any WordInfoProvider
   }
 
   /// 起動の失敗。
@@ -45,7 +48,7 @@ final class AppModel {
   /// 画面の上に重ねるメニューとダイアログ。
   let overlay = AppOverlay()
 
-  private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
+  nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
 
   /// App Group の ID。Bundle ID に `group.` を付けたもの(Debug は .dev 付きで本番と分かれる)。
   static var appGroupIdentifier: String {
@@ -96,9 +99,42 @@ final class AppModel {
       phase = .failed(failure)
     case .success(let (outcome, database)):
       let sync = SyncController(service: SyncService(store: ICloudFileStore(), database: database), database: database)
-      phase = .ready(Session(database: database, sync: sync, importOutcome: outcome, locations: locations))
+      let words = WordStore(dao: database.wordDao)
+      words.start()
+      phase = .ready(
+        Session(
+          database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
+          wordInfo: makeWordInfoProvider(database)))
       await sync.start()
     }
+  }
+
+  /// 単語情報の自動取得。EJDict の初回の取り込みは起動直後にバックグラウンドで始め、
+  /// 自動入力の側はその完了を待ってから引く(取り込み中に自動入力された場合に備える)。
+  private func makeWordInfoProvider(_ database: AppDatabase) -> any WordInfoProvider {
+    let ejdictDao = database.ejdictDao
+    let source = Bundle.main.url(forResource: "ejdict-hand-utf8", withExtension: "txt")
+    let ejdictImport = Task.detached {
+      guard let source else { return }
+      do {
+        try await EjdictImporter.importIfNeeded(dao: ejdictDao, source: source)
+      } catch {
+        Self.logger.error("EJDict の取り込みに失敗: \(String(describing: error), privacy: .public)")
+      }
+    }
+    // URLSession はアプリの生存期間で 1 つ共有する(接続を使い回すため)。
+    let session = URLSession(configuration: .default)
+    let settings = settings
+    return DictionaryWordInfoProvider(
+      kaikkiClient: KaikkiClient(session: session),
+      tatoebaClient: TatoebaClient(session: session),
+      deeplClient: DeeplClient(session: session),
+      cacheDao: database.dictionaryCacheDao,
+      ejdictDao: ejdictDao,
+      ensureEjdictImported: { await ejdictImport.value },
+      getDeeplApiKey: { await settings.deeplApiKey },
+      getTranslationLanguage: { await settings.translationLanguage }
+    )
   }
 
   /// アプリがアクティブになったとき。
