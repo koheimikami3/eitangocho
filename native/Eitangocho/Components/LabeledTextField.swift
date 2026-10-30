@@ -21,8 +21,7 @@ struct LabeledTextField<Trailing: View, FieldTrailing: View>: View {
   @Environment(\.colors) private var colors
   @Environment(\.uiScale) private var px
 
-  /// Flutter 版の TextField は bodyLarge(行の高さ 1.5・字間 0.5)を継承する。
-  private static var textStyle: AppTextStyle { AppTextStyle(size: 14, height: 1.5, letterSpacing: 0.5) }
+  private static var textStyle: AppTextStyle { .input(size: 14) }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -91,6 +90,18 @@ extension LabeledTextField where Trailing == EmptyView, FieldTrailing == EmptyVi
     self.init(
       label: label, text: text, hint: hint, lineLimit: lineLimit, onSubmit: onSubmit, focus: focus,
       trailing: { EmptyView() }, fieldTrailing: { EmptyView() })
+  }
+}
+
+extension LabeledTextField where FieldTrailing == EmptyView {
+  /// ラベル横の補助(自動入力バッジ等)だけを置くとき。
+  init(
+    label: String, text: Binding<String>, lineLimit: ClosedRange<Int>? = nil,
+    @ViewBuilder trailing: @escaping () -> Trailing
+  ) {
+    self.init(
+      label: label, text: text, hint: nil, lineLimit: lineLimit, onSubmit: nil, focus: nil,
+      trailing: trailing, fieldTrailing: { EmptyView() })
   }
 }
 

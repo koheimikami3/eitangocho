@@ -86,13 +86,12 @@ struct WordRegistrationView: View {
       }
       HStack(alignment: .top, spacing: px(14)) {
         LabeledTextField(label: String(localized: .fieldWord), text: $model.word)
-        LabeledTextField(
-          label: String(localized: .fieldIpa), text: $model.ipa, trailing: { badge(.ipa) }, fieldTrailing: { EmptyView() })
+        LabeledTextField(label: String(localized: .fieldIpa), text: $model.ipa) { badge(.ipa) }
       }
       Spacer().frame(height: px(16))
       LabeledTextField(
-        label: String(localized: language.meaningFieldLabel), text: $model.meaning, lineLimit: 1...Int.max,
-        trailing: { badge(.meaning) }, fieldTrailing: { EmptyView() })
+        label: String(localized: language.meaningFieldLabel), text: $model.meaning, lineLimit: 1...Int.max
+      ) { badge(.meaning) }
       Spacer().frame(height: px(16))
       HStack(spacing: px(6)) {
         AppText(.fieldPartsOfSpeech, style: AppTextStyle(size: 12, weight: .w600))
@@ -103,14 +102,15 @@ struct WordRegistrationView: View {
       PosChipSelector(selected: model.selectedPartsOfSpeech) { model.togglePartOfSpeech($0) }
       Spacer().frame(height: px(16))
       LabeledTextField(
-        label: String(localized: .fieldExampleEn), text: $model.exampleEn, lineLimit: 2...Int.max,
-        trailing: { badge(.exampleEn) }, fieldTrailing: { EmptyView() })
+        label: String(localized: .fieldExampleEn), text: $model.exampleEn, lineLimit: 2...Int.max
+      ) { badge(.exampleEn) }
       // 例文の訳を持たない言語(英語の語義)では欄ごと出さない
       if language.translatesExamples {
         Spacer().frame(height: px(16))
         LabeledTextField(
           label: String(localized: .fieldExampleTranslation(languageLabel)), text: $model.exampleTranslation,
-          lineLimit: 2...Int.max, trailing: { badge(.exampleTranslation) }, fieldTrailing: { EmptyView() })
+          lineLimit: 2...Int.max
+        ) { badge(.exampleTranslation) }
       }
       if let errorMessage = errorText(language) {
         Spacer().frame(height: px(16))

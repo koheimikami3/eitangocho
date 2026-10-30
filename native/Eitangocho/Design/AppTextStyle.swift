@@ -43,6 +43,11 @@ struct AppTextStyle: Hashable, Sendable {
     self.family = family
   }
 
+  /// 入力欄の文字。Flutter 版の TextField は bodyLarge(行の高さ 1.5・字間 0.5)を継承する。
+  static func input(size: CGFloat) -> AppTextStyle {
+    AppTextStyle(size: size, height: 1.5, letterSpacing: 0.5)
+  }
+
   /// 倍率を掛けた SwiftUI のフォント(入力欄など AppText を使えない所で使う)。
   func font(_ scale: UIScale) -> Font {
     Font(AppFonts.ctFont(family, size: scale(size), weight: weight.rawValue))
