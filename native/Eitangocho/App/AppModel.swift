@@ -25,6 +25,7 @@ final class AppModel {
     let locations: DriftDatabaseImporter.Locations
     let words: WordStore
     let wordInfo: any WordInfoProvider
+    let quiz: QuizModel
   }
 
   /// 起動の失敗。
@@ -104,7 +105,8 @@ final class AppModel {
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
-          wordInfo: makeWordInfoProvider(database)))
+          wordInfo: makeWordInfoProvider(database),
+          quiz: QuizModel(dao: database.wordDao) { [words] in WordListing.learned(words.words) }))
       await sync.start()
     }
   }
