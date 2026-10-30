@@ -47,7 +47,7 @@ final class SettingsStore {
   init(defaults: UserDefaults = .standard, preferredLanguages: [String] = Locale.preferredLanguages) {
     self.defaults = defaults
     func value<T: RawRepresentable>(_ key: String, default fallback: T) -> T where T.RawValue == String {
-      defaults.string(forKey: key).flatMap(T.init(rawValue:)) ?? fallback
+      defaults.string(forKey: key).flatMap { T(rawValue: $0) } ?? fallback
     }
     quizDirection = value(Key.quizDirection, default: .enToJa)
     showIpa = defaults.object(forKey: Key.showIpa) as? Bool ?? true
