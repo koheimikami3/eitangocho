@@ -49,6 +49,12 @@ final class AppModel {
   /// 画面の上に重ねるメニューとダイアログ。
   let overlay = AppOverlay()
 
+  /// 独自イベントの送信口。DB に依存しないので最初に作る(Firebase の初期化もここで行う)。
+  let analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
+
+  /// ユーザープロパティと screen_view。送った値を起動から終了まで覚えておくため、画面ではなくここで持つ。
+  @ObservationIgnored private(set) lazy var analyticsReporter = AnalyticsReporter(analytics)
+
   nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
 
   /// App Group の ID。Bundle ID に `group.` を付けたもの(Debug は .dev 付きで本番と分かれる)。
@@ -100,6 +106,7 @@ final class AppModel {
       phase = .failed(failure)
     case .success(let (outcome, database)):
       let sync = SyncController(service: SyncService(store: ICloudFileStore(), database: database), database: database)
+      sync.onFailure = { [analytics] reason in analytics.logSyncFailed(reason) }
       let words = WordStore(dao: database.wordDao)
       words.start()
       phase = .ready(

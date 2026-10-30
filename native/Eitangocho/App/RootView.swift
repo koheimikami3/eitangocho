@@ -9,6 +9,7 @@ struct RootView: View {
     content
       .overlay { AppOverlayHost(overlay: model.overlay) }
       .environment(\.appOverlay, model.overlay)
+      .environment(\.analytics, model.analytics)
       .environment(\.colors, model.settings.appearance.colors)
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
@@ -39,22 +40,30 @@ struct RootView: View {
     case .failed(let failure):
       StartupFailureView(failure: failure, model: model)
     case .ready(let session):
-      #if os(macOS)
-        MacMainShell(
-          shell: model.shell, settings: model.settings,
-          learningCount: WordListing.learning(session.words.words).count,
-          wordCount: session.words.words.count,
-          onStartQuiz: { session.quiz.start() }
-        ) { view in
-          mainContent(view, session: session)
-        }
-      #elseif DEBUG
-        // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
-        DiagnosticsView(session: session)
-      #else
-        Text(verbatim: "\(session.importOutcome)")
-      #endif
+      readyContent(session)
+        .modifier(
+          AnalyticsReporting(reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session))
     }
+  }
+
+  /// 起動に成功した後の画面。
+  @ViewBuilder
+  private func readyContent(_ session: AppModel.Session) -> some View {
+    #if os(macOS)
+      MacMainShell(
+        shell: model.shell, settings: model.settings,
+        learningCount: WordListing.learning(session.words.words).count,
+        wordCount: session.words.words.count,
+        onStartQuiz: { session.quiz.start() }
+      ) { view in
+        mainContent(view, session: session)
+      }
+    #elseif DEBUG
+      // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
+      DiagnosticsView(session: session)
+    #else
+      Text(verbatim: "\(session.importOutcome)")
+    #endif
   }
 }
 
