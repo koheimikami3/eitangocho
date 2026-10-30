@@ -126,6 +126,8 @@ private struct MenuPlacement: Layout {
 /// ダイアログの面(Flutter の Dialog: 面の色・影なし・最小幅 280・画面の縁から 40 / 24 空ける)。
 struct AppDialogSurface<Content: View>: View {
   var cornerRadius: CGFloat
+  /// 画面の上下の縁から空ける量(Flutter の Dialog の insetPadding の上下。既定は 24)。
+  var verticalInset: CGFloat = 24
   @ViewBuilder let content: () -> Content
 
   @Environment(\.colors) private var colors
@@ -140,7 +142,7 @@ struct AppDialogSurface<Content: View>: View {
       .contentShape(Rectangle())
       .onTapGesture {}
       .padding(.horizontal, px(40))
-      .padding(.vertical, px(24))
+      .padding(.vertical, px(verticalInset))
   }
 }
 

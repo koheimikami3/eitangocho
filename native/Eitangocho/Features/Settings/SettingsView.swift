@@ -12,6 +12,7 @@
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
     @Environment(\.openURL) private var openURL
+    @Environment(\.appOverlay) private var overlay
 
     var body: some View {
       // スクロール領域はビューの全幅に広げ、中身だけを左に寄せる。スクロール領域ごと寄せると、
@@ -68,6 +69,9 @@
           SettingsSection(title: String(localized: .sectionInfo)) {
             SettingsCard {
               SettingsValueRow(label: String(localized: .version), value: Self.appVersion)
+              SettingsLinkRow(label: String(localized: .licenses)) {
+                overlay?.present { dismiss in LicenseDialog(dismiss: dismiss) }
+              }
             }
           }
         }

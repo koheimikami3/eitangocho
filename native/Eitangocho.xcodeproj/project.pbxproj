@@ -13,6 +13,10 @@
 		A10000000000000000000131 /* NotoSansJP.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* NotoSansJP.ttf */; };
 		A10000000000000000000132 /* NotoSansTC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000032 /* NotoSansTC.ttf */; };
 		A10000000000000000000133 /* Andika-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000033 /* Andika-Regular.ttf */; };
+		A10000000000000000000140 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000040 /* Inter-OFL.txt */; };
+		A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000041 /* NotoSansJP-OFL.txt */; };
+		A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000042 /* NotoSansTC-OFL.txt */; };
+		A10000000000000000000143 /* Andika-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000043 /* Andika-OFL.txt */; };
 		A1000000000000000000001E /* EitangochoData in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001D /* EitangochoData */; };
 		A10000000000000000000020 /* EitangochoSync in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001F /* EitangochoSync */; };
 		A10000000000000000000014 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppIcon.icon */; };
@@ -35,6 +39,10 @@
 		A10000000000000000000031 /* NotoSansJP.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansJP.ttf; path = ../assets/fonts/NotoSansJP.ttf; sourceTree = "<group>"; };
 		A10000000000000000000032 /* NotoSansTC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansTC.ttf; path = ../assets/fonts/NotoSansTC.ttf; sourceTree = "<group>"; };
 		A10000000000000000000033 /* Andika-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Andika-Regular.ttf; path = ../assets/fonts/Andika-Regular.ttf; sourceTree = "<group>"; };
+		A10000000000000000000040 /* Inter-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Inter-OFL.txt"; path = "../assets/fonts/licenses/Inter-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000041 /* NotoSansJP-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansJP-OFL.txt"; path = "../assets/fonts/licenses/NotoSansJP-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000042 /* NotoSansTC-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansTC-OFL.txt"; path = "../assets/fonts/licenses/NotoSansTC-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000043 /* Andika-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Andika-OFL.txt"; path = "../assets/fonts/licenses/Andika-OFL.txt"; sourceTree = "<group>"; };
 		A10000000000000000000021 /* EitangochoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EitangochoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		A10000000000000000000004 /* Eitangocho.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eitangocho.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,6 +88,7 @@
 				A10000000000000000000023 /* EitangochoTests */,
 				A1000000000000000000000F /* Icons */,
 				A10000000000000000000034 /* Fonts */,
+				A10000000000000000000044 /* FontLicenses */,
 				A10000000000000000000039 /* Dictionary */,
 				A10000000000000000000008 /* Configs */,
 				A1000000000000000000000C /* Support */,
@@ -134,6 +143,17 @@
 				A10000000000000000000033 /* Andika-Regular.ttf */,
 			);
 			name = Fonts;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000044 /* FontLicenses */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000040 /* Inter-OFL.txt */,
+				A10000000000000000000041 /* NotoSansJP-OFL.txt */,
+				A10000000000000000000042 /* NotoSansTC-OFL.txt */,
+				A10000000000000000000043 /* Andika-OFL.txt */,
+			);
+			name = FontLicenses;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000039 /* Dictionary */ = {
@@ -251,6 +271,10 @@
 				A10000000000000000000132 /* NotoSansTC.ttf in Resources */,
 				A10000000000000000000133 /* Andika-Regular.ttf in Resources */,
 				A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */,
+				A10000000000000000000140 /* Inter-OFL.txt in Resources */,
+				A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */,
+				A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */,
+				A10000000000000000000143 /* Andika-OFL.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
