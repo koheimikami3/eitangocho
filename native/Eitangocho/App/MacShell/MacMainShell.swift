@@ -7,13 +7,14 @@
     let settings: SettingsStore
     let learningCount: Int
     let wordCount: Int
+    let onStartQuiz: () -> Void
     @ViewBuilder let content: (MainView) -> Content
 
     @Environment(\.colors) private var colors
 
     var body: some View {
       HStack(spacing: 0) {
-        AppSidebar(shell: shell, learningCount: learningCount, wordCount: wordCount)
+        AppSidebar(shell: shell, learningCount: learningCount, wordCount: wordCount, onStartQuiz: onStartQuiz)
         VStack(spacing: 0) {
           MainToolbar(shell: shell, settings: settings)
           // 各画面を中身の幅に関わらず全幅に広げる。

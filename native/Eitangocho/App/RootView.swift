@@ -42,7 +42,8 @@ struct RootView: View {
         MacMainShell(
           shell: model.shell, settings: model.settings,
           learningCount: WordListing.learning(session.words.words).count,
-          wordCount: session.words.words.count
+          wordCount: session.words.words.count,
+          onStartQuiz: { session.quiz.start() }
         ) { view in
           mainContent(view, session: session)
         }
@@ -58,7 +59,7 @@ struct RootView: View {
 
 #if os(macOS)
   extension RootView {
-    /// シェルの中身(表示中の画面)。クイズと設定は Phase 3 で移すまで空にしておく。
+    /// シェルの中身(表示中の画面)。設定は Phase 3 の後のコミットで移すまで空にしておく。
     @ViewBuilder
     fileprivate func mainContent(_ view: MainView, session: AppModel.Session) -> some View {
       switch view {
@@ -69,7 +70,9 @@ struct RootView: View {
       case .registration:
         WordRegistrationView(
           shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo)
-      case .quiz, .settings:
+      case .quiz:
+        QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
+      case .settings:
         Color.clear
       }
     }

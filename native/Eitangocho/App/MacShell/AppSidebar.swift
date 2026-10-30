@@ -6,6 +6,8 @@
     let shell: MainShellModel
     let learningCount: Int
     let wordCount: Int
+    /// クイズを押したとき(選択中に押し直したときも)。画面を移す前に出題をやり直す。
+    let onStartQuiz: () -> Void
 
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
@@ -23,8 +25,7 @@
         item(.navAllWords, count: "\(wordCount)", view: .allWords)
         // 件数は出さない。学習済みの語数を出しても、1 回に出題するのは
         // 決まった語数なので、何の数か分かりにくいため。
-        // 押すたびに出題をやり直す処理は、クイズの画面を移すときに足す。
-        item(.navQuiz, view: .quiz)
+        item(.navQuiz, view: .quiz, onSelect: onStartQuiz)
         item(.navRegistration, view: .registration)
         Spacer(minLength: 0)
         item(.navSettings, view: .settings)
@@ -48,8 +49,11 @@
       }
     }
 
-    private func item(_ label: LocalizedStringResource, count: String = "", view: MainView) -> some View {
+    private func item(
+      _ label: LocalizedStringResource, count: String = "", view: MainView, onSelect: @escaping () -> Void = {}
+    ) -> some View {
       SidebarItem(label: String(localized: label), count: count, selected: shell.view == view) {
+        onSelect()
         shell.selectView(view)
       }
     }

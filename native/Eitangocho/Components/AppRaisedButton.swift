@@ -11,6 +11,8 @@ struct AppRaisedButton: View {
   var verticalPadding: CGFloat = 9
   var fontSize: CGFloat = 14
   var borderRadius: CGFloat = 8
+  /// 横いっぱいに広げるか(Flutter の Expanded の中に置いたとき)。
+  var expands = false
   let action: () -> Void
 
   @Environment(\.colors) private var colors
@@ -22,6 +24,7 @@ struct AppRaisedButton: View {
     AppText(label, style: AppTextStyle(size: fontSize, weight: .w600))
       .foregroundStyle(textColor ?? colors.textPrimary)
       .multilineTextAlignment(.center)
+      .frame(maxWidth: expands ? .infinity : nil)
       .padding(.horizontal, px(18))
       .padding(.vertical, px(verticalPadding))
       .background(shape.fill(isHovered ? colors.rowHoverBackground : colors.surface))

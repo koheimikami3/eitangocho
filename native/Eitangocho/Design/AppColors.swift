@@ -93,6 +93,9 @@ nonisolated struct AppColors: Equatable, Sendable {
   var dangerHover: Color { isDark ? Color(argb: 0xFFFF_8F8F) : Color(argb: 0xFFA8_2828) }
   var dangerHoverBackground: Color { isDark ? Color(argb: 0x1FFF_6B6B) : Color(argb: 0xFFFD_F2F2) }
 
+  /// 淡い赤の地(クイズ結果の「忘れていた単語」の見出し。iOS の AppPalette.dangerSoft と同じ値)。
+  var dangerSoft: Color { isDark ? Color(argb: 0x1FFF_6B6B) : Color(argb: 0x12C0_3030) }
+
   /// 完了の知らせ(登録しました 等)
   var success: Color { isDark ? Color(argb: 0xFF6F_D39A) : Color(argb: 0xFF1C_7A3F) }
 
@@ -153,6 +156,9 @@ nonisolated struct AppColors: Equatable, Sendable {
   // MARK: - 線
 
   var border: Color { borderAlpha(8) }
+
+  /// 影で浮かせた面の中の区切り線(クイズ結果の一覧。iOS の AppPalette.rowLine と同じ値)。
+  var rowLine: Color { borderAlpha(7) }
   var borderStrong: Color { borderAlpha(14) }
   var inputBorder: Color { borderAlpha(15) }
 
