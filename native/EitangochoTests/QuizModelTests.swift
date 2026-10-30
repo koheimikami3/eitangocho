@@ -22,7 +22,9 @@ struct QuizModelTests {
       try await database.wordDao.setLearned(id: id, true)
     }
     let learned = WordListing.learned(try await database.wordDao.getAll())
-    return QuizModel(dao: database.wordDao, analytics: AnalyticsLogger(analytics)) { learned }
+    return QuizModel(
+      dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao)
+    ) { learned }
   }
 
   @Test func startは学習済みから出題数分を選んで出題する() async throws {

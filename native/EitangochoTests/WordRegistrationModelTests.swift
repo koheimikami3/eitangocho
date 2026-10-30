@@ -36,7 +36,7 @@ struct WordRegistrationModelTests {
   ) -> WordRegistrationModel {
     WordRegistrationModel(
       dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), analytics: AnalyticsLogger(analytics),
-      currentLanguage: { language })
+      review: disabledReviewPrompter(dao: database.wordDao), currentLanguage: { language })
   }
 
   private func fill(_ model: WordRegistrationModel, word: String, meaning: String, ipa: String = "", exampleEn: String = "") {

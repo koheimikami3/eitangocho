@@ -1,15 +1,20 @@
 import EitangochoSync
+import StoreKit
 import SwiftUI
 
 /// 起動の段階に応じて画面を出し分ける。配色と表示倍率はここで設定から配る。
 struct RootView: View {
   let model: AppModel
 
+  @Environment(\.requestReview) private var requestReview
+
   var body: some View {
     content
       .overlay { AppOverlayHost(overlay: model.overlay) }
       .environment(\.appOverlay, model.overlay)
       .environment(\.analytics, model.analytics)
+      // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
+      .onAppear { model.reviewClient.action = requestReview }
       .environment(\.colors, model.settings.appearance.colors)
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
@@ -82,7 +87,7 @@ struct RootView: View {
       case .registration:
         WordRegistrationView(
           shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
-          analytics: model.analytics)
+          analytics: model.analytics, review: session.review)
       case .quiz:
         QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
       case .settings:

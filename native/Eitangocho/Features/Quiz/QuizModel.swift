@@ -35,14 +35,16 @@ final class QuizModel {
 
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let analytics: AnalyticsLogger
+  @ObservationIgnored private let review: ReviewPrompter
   @ObservationIgnored private let learnedWords: () -> [Word]
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "quiz")
 
   /// `learnedWords` は出題元(学習済みの単語)。始めるたびに読む。
-  init(dao: WordDao, analytics: AnalyticsLogger, learnedWords: @escaping () -> [Word]) {
+  init(dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, learnedWords: @escaping () -> [Word]) {
     self.dao = dao
     self.analytics = analytics
+    self.review = review
     self.learnedWords = learnedWords
   }
 
@@ -150,6 +152,10 @@ final class QuizModel {
     if next >= questions.count {
       phase = .done
       analytics.logQuizCompleted(okCount: okCount, forgotCount: forgotWords.count)
+      // 最後まで終えた直後がクイズでのレビュー依頼の契機(条件は ReviewPrompter が判定し、
+      // 満たさなければ何も起きない)。依頼の成否はクイズの進行に関係しないので待たない。
+      let (okCount, total) = (okCount, questions.count)
+      Task { await review.onQuizCompleted(okCount: okCount, total: total) }
     }
   }
 }

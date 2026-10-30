@@ -14,12 +14,12 @@ struct WordRegistrationView: View {
 
   init(
     shell: MainShellModel, settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider,
-    analytics: AnalyticsLogger
+    analytics: AnalyticsLogger, review: ReviewPrompter
   ) {
     self.shell = shell
     self.settings = settings
     _model = State(
-      initialValue: WordRegistrationModel(dao: dao, wordInfo: wordInfo, analytics: analytics) {
+      initialValue: WordRegistrationModel(dao: dao, wordInfo: wordInfo, analytics: analytics, review: review) {
         settings.translationLanguage
       })
   }

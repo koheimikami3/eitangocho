@@ -26,6 +26,7 @@ final class AppModel {
     let words: WordStore
     let wordInfo: any WordInfoProvider
     let quiz: QuizModel
+    let review: ReviewPrompter
   }
 
   /// 起動の失敗。
@@ -54,6 +55,9 @@ final class AppModel {
 
   /// ユーザープロパティと screen_view。送った値を起動から終了まで覚えておくため、画面ではなくここで持つ。
   @ObservationIgnored private(set) lazy var analyticsReporter = AnalyticsReporter(analytics)
+
+  /// レビュー依頼の実体。依頼の口(`requestReview`)は画面から渡す(RootView)。
+  let reviewClient = StoreReviewClient()
 
   init() {
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
@@ -114,11 +118,15 @@ final class AppModel {
       sync.onFailure = { [analytics] reason in analytics.logSyncFailed(reason) }
       let words = WordStore(dao: database.wordDao, analytics: analytics)
       words.start()
+      let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
           wordInfo: makeWordInfoProvider(database),
-          quiz: QuizModel(dao: database.wordDao, analytics: analytics) { [words] in WordListing.learned(words.words) }))
+          quiz: QuizModel(dao: database.wordDao, analytics: analytics, review: review) { [words] in
+            WordListing.learned(words.words)
+          },
+          review: review))
       await sync.start()
     }
   }

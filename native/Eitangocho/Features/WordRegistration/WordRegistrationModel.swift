@@ -72,15 +72,17 @@ final class WordRegistrationModel {
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let wordInfo: any WordInfoProvider
   @ObservationIgnored private let analytics: AnalyticsLogger
+  @ObservationIgnored private let review: ReviewPrompter
   @ObservationIgnored private let currentLanguage: () -> TranslationLanguage
 
   init(
-    dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger,
+    dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger, review: ReviewPrompter,
     currentLanguage: @escaping () -> TranslationLanguage
   ) {
     self.dao = dao
     self.wordInfo = wordInfo
     self.analytics = analytics
+    self.review = review
     self.currentLanguage = currentLanguage
   }
 
@@ -208,6 +210,9 @@ final class WordRegistrationModel {
       editedMeaning: fetched.map { trim($0.meaning) != trimmedMeaning } ?? false,
       editedExample: fetched.map { trim($0.exampleEn) != trim(exampleEn) } ?? false,
       editedIpa: fetched.map { trim($0.ipa) != trim(ipa) } ?? false)
+    // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。依頼は
+    // ReviewConfig.promptDelay だけ待ってから出る。成否は登録に関係しないので待たない。
+    Task { [review] in await review.onWordRegistered() }
     reset()
     registeredWord = headword
     return true
