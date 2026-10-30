@@ -74,6 +74,16 @@ public struct DriftDatabaseImporter {
     // 作ったものだけ。あればそれを正として使う(印が欠けていても作り直さない。
     // 移動の直後に落ちて印だけ書けなかった場合に、引き継ぎ後の変更を失わないため)。
     if fileManager.fileExists(atPath: locations.destination.path) {
+      let record = record
+      // 引き継いだ DB は移す時点でスキーマを持つので、0 バイトなら中身を失っている。
+      // そのまま開くと空のスキーマが作られ、空の単語帳で始まってしまう。
+      // (新規インストールの DB は、作った直後に中身が -wal にしか無いことがあるので見ない)
+      if record?.kind == .imported,
+        let size = (try? fileManager.attributesOfItem(atPath: locations.destination.path))?[.size] as? NSNumber,
+        size.int64Value == 0
+      {
+        throw DatabaseImportError.destinationEmpty
+      }
       return .alreadyImported(record)
     }
     try fileManager.createDirectory(
@@ -162,8 +172,16 @@ public struct DriftDatabaseImporter {
           throw DatabaseImportError.integrityCheckFailed(check.joined(separator: "\n"))
         }
         let version = try AppDatabase.userVersion(db)
-        let words = try db.tableExists("words")
-          ? try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM words") ?? 0 : 0
+        let hasWords = try db.tableExists("words")
+        // drift の DB なら words がある。表が 1 つも無く版も 0 なのは、drift が表を作る前の
+        // 中身の無いファイル(0 バイトを含む)だけで、新規インストールと同じく空で始めてよい
+        // (元から取り出せるデータが無く、失敗にすると起動のたびに失敗し続ける)。
+        // それ以外で words が無いのは drift の DB ではないので、空のスキーマを作って移さない。
+        let tables = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'") ?? 0
+        guard hasWords || (version == 0 && tables == 0) else {
+          throw DatabaseImportError.schemaMissing(userVersion: version)
+        }
+        let words = hasWords ? try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM words") ?? 0 : 0
         return (version, words)
       }
     } catch let error as DatabaseImportError {
@@ -288,6 +306,8 @@ public enum DatabaseImportError: Error, Equatable, Sendable {
   case openFailed(String)
   /// `quick_check` が ok を返さなかった。
   case integrityCheckFailed(String)
+  /// SQLite としては開けたが、drift の DB の表(words)が無い。
+  case schemaMissing(userVersion: Int)
   /// スキーマの更新の前後で単語の数が変わった。
   case wordCountChanged(before: Int, after: Int)
   /// WAL に切り替えられなかった(返ってきたジャーナルモード)。
@@ -296,4 +316,6 @@ public enum DatabaseImportError: Error, Equatable, Sendable {
   case sidecarsRemain([String])
   /// 本来の場所へ移せなかった。
   case moveFailed(String)
+  /// 引き継ぎ済みの DB が 0 バイトになっている(開くと空の単語帳になる)。元ファイルから引き継ぎ直せる。
+  case destinationEmpty
 }

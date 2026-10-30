@@ -97,6 +97,9 @@ final class AppModel {
       let outcome: DatabaseImportOutcome
       do {
         outcome = try runImport(DriftDatabaseImporter(locations: locations))
+      } catch DatabaseImportError.destinationEmpty {
+        // 引き継いだ DB を開けないのと同じ扱いにし、失敗の画面に「引き継ぎ直す」を出す。
+        return .failure(.openFailed(String(describing: DatabaseImportError.destinationEmpty)))
       } catch let error as DatabaseImportError {
         return .failure(.importFailed(error))
       } catch {

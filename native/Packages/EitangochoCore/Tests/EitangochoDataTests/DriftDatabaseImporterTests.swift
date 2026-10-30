@@ -225,6 +225,58 @@ final class DriftDatabaseImporterTests {
     #expect(try filesInDatabaseDirectory().isEmpty)
   }
 
+  @Test("表はあるのに words が無い元ファイル(drift の DB ではない)は失敗にし、空の DB を作らない")
+  func rejectsSourceWithoutWordsTable() throws {
+    try makeSource { db in
+      try db.execute(sql: "CREATE TABLE other (id INTEGER)")
+      try db.execute(sql: "PRAGMA user_version = 7")
+    }
+
+    let importer = importer
+    #expect(throws: DatabaseImportError.schemaMissing(userVersion: 7)) { try importer.run() }
+
+    #expect(!FileManager.default.fileExists(atPath: destination.path))
+    #expect(importer.record == nil)
+  }
+
+  @Test("中身の無い元ファイル(0 バイト)は、取り出せるデータが無いので空のまま引き継ぐ")
+  func importsEmptySourceAsEmpty() async throws {
+    try Data().write(to: source)
+
+    guard case .performed(let record) = try importer.run() else { Issue.record(); return }
+
+    #expect(record.kind == .imported)
+    #expect(record.sourceSize == 0)
+    #expect(record.counts?.words == 0)
+    #expect(try await openDestination().wordDao.countWords() == 0)
+  }
+
+  @Test("引き継いだ DB が 0 バイトになっていたら、開かずに失敗にする")
+  func rejectsEmptiedDestination() throws {
+    try makeSource { db in
+      try DriftSchemaFixtures.createV4(db, userVersion: 7)
+      try DriftSchemaFixtures.insertApple(db)
+    }
+    _ = try importer.run()
+    try Data().write(to: destination)
+
+    let importer = importer
+    #expect(throws: DatabaseImportError.destinationEmpty) { try importer.run() }
+    // 元ファイルから引き継ぎ直せば戻る。
+    guard case .performed = try importer.reimport() else { Issue.record(); return }
+  }
+
+  @Test("新規インストールの DB は 0 バイトでもそのまま開く(中身が -wal にしか無いことがある)")
+  func acceptsEmptyFreshInstallDestination() throws {
+    _ = try importer.run()
+    try FileManager.default.createDirectory(
+      at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try Data().write(to: destination)
+
+    guard case .alreadyImported(let record) = try importer.run() else { Issue.record(); return }
+    #expect(record?.kind == .freshInstall)
+  }
+
   @Test("引き継ぎ済みなら元ファイルを読み直さない")
   func skipsWhenAlreadyImported() throws {
     try makeSource { db in
