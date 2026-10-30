@@ -37,18 +37,24 @@ SOURCE_LANGUAGE = "en"
 SPECIFIERS = {"String": "@", "int": "lld"}
 
 
+def after_closing_brace(text, open_index):
+    """text[open_index] の `{` に対応する `}` の次の位置。"""
+    depth, j = 1, open_index + 1
+    while depth:
+        if j >= len(text):
+            raise ValueError(f"閉じていない括弧: {text}")
+        depth += {"{": 1, "}": -1}.get(text[j], 0)
+        j += 1
+    return j
+
+
 def parse(text):
     """ICU のメッセージを、文字列と {...} の部分の並びに分ける。"""
     parts, buffer, i = [], "", 0
     while i < len(text):
         char = text[i]
         if char == "{":
-            depth, j = 1, i + 1
-            while depth:
-                if j >= len(text):
-                    raise ValueError(f"閉じていない括弧: {text}")
-                depth += {"{": 1, "}": -1}.get(text[j], 0)
-                j += 1
+            j = after_closing_brace(text, i)
             if buffer:
                 parts.append(buffer)
                 buffer = ""
@@ -75,10 +81,7 @@ def parse_argument(body):
     while rest:
         open_index = rest.index("{")
         label = rest[:open_index].strip()
-        depth, j = 1, open_index + 1
-        while depth:
-            depth += {"{": 1, "}": -1}.get(rest[j], 0)
-            j += 1
+        j = after_closing_brace(rest, open_index)
         cases[label] = parse(rest[open_index + 1 : j - 1])
         rest = rest[j:].strip()
     return (kind, name, cases)
