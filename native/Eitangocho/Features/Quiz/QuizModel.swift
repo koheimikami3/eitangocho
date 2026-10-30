@@ -58,12 +58,7 @@ final class QuizModel {
     // 回の途中でサイドバーのクイズを押し直した場合も、前の回は離脱として数える。
     abandonIfActive()
     let questions = selectQuizQuestions(learnedWords())
-    self.questions = questions
-    phase = questions.isEmpty ? .empty : .active
-    index = 0
-    revealed = false
-    okCount = 0
-    forgotWords = []
+    resetSession(questions, phase: questions.isEmpty ? .empty : .active)
     if questions.isEmpty {
       analytics.logQuizEmptyShown()
     } else {
@@ -84,8 +79,13 @@ final class QuizModel {
   private func abandonIfActive() {
     guard phase == .active else { return }
     analytics.logQuizAbandoned(answeredCount: index)
-    phase = .empty
-    questions = []
+    resetSession([], phase: .empty)
+  }
+
+  /// 回の状態を最初に戻し、`questions` を出題にする。
+  private func resetSession(_ questions: [Word], phase: Phase) {
+    self.questions = questions
+    self.phase = phase
     index = 0
     revealed = false
     okCount = 0
