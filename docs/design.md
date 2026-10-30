@@ -204,7 +204,10 @@
   プラットフォームはユーザープロパティ `app_platform` で分ける
 - 自動の screen_view は Info.plist で止めている(Flutter は画面が 1 つで意味のある名前が
   出ない)。画面遷移はアプリから送る
-- `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする
+- `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする。
+  ネイティブ版は `native/Eitangocho/Resources/GoogleService-Info.plist`(Flutter 版の写し)だけを持ち、
+  オプションをコードに書かない。firebase-ios-sdk は Flutter 版がリンクしている版に固定する
+  (同じ SDK で app_instance_id が引き継がれることを確かめるため)
 - `flutterfire configure` は pbxproj を丸ごと書き直して並び順を崩す。再実行したら、
   plist の追加分だけを残して他の差分は戻す
 

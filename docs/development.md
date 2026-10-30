@@ -135,6 +135,10 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **ライセンス一覧**: SwiftPM はライセンスを集めないので `Features/Settings/Licenses/LicenseCatalog.swift` で
   手で持つ。Swift パッケージを足したら、その LICENSE を `Eitangocho/Resources/Licenses/` に置き、
   `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)
+- **計測**: イベントは `Features/Analytics/AnalyticsLogger.swift` の送り口から送る(名前と値は Flutter 版と同じ)。
+  モデルには `AnalyticsLogger` を渡し、画面からは `@Environment(\.analytics)` で取る。ユーザープロパティと
+  screen_view は `AnalyticsReporting` が状態の変化を拾って送る。Firebase は Release ビルドだけ初期化し、
+  Debug は送るはずだった内容をログ(カテゴリ analytics)に出す
 - **String Catalog**: 文言は `Eitangocho/Resources/Localizable.xcstrings` に置き、`Text(.navLearning)` /
   `String(localized: .wordCount(3))` のように生成された記号で引く(キーは ARB と同じ)。
   `tool/arb_to_xcstrings.py` は移行のときに 1 回だけ使ったもので、以後は xcstrings を直接直す
