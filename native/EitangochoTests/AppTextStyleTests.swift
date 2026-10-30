@@ -8,8 +8,9 @@ import Testing
 
 /// 文字の書式が Flutter 版と同じ行の高さ・ベースラインになることを確かめる。
 ///
-/// 期待値は Flutter 版で同じ書式の TextPainter を組んで測った値(文字の大きさ 20)。
-/// Flutter のテスト環境は行の高さを整数に丸めて返すので、許容差を 0.6 にしている。
+/// 期待値は Flutter 版で、Scaffold の既定の書式(bodyMedium: 行の高さ 1.43・字間 0.25・行間は上下に均等)を
+/// 継承した TextPainter を同梱フォントで組んで測った値(文字の大きさ 20)。Flutter のテスト環境は
+/// 行の高さを整数に丸めて返すので、高さは行の高さとベースラインから求めた値を書き、許容差を 0.6 にしている。
 @MainActor
 struct AppTextStyleTests {
   init() { AppFonts.register() }
@@ -34,25 +35,36 @@ struct AppTextStyleTests {
   }
 
   @Test(arguments: [
-    // (文字, family, height, Flutter の高さ, Flutter のベースライン)
-    ("Hello", AppFonts.Family.sans, nil, 24.2, 19.375),
-    ("Hello", .sans, 1.4, 28, 22.418),
-    ("学習中", .sans, nil, 28.96, 22.08),
-    ("学習中", .sans, 1.4, 28, 21.348),
-    ("Ab学", .sans, 1.0, 20.76, 16.013),
-    ("Ab学", .sans, 1.4, 29.06, 22.418),
-    ("Hello\nWorld", .sans, 1.4, 56, 22.418),
-    ("学習\n中です", .sans, 1.4, 56, 21.348),
-    ("Hello\nWorld", .sans, nil, 48.4, 19.375),
-    ("/ˈhɛloʊ/", .ipa, nil, 32.2, 21.143),
-    ("Hello", .ipa, 1.4, 28, 18.37),
+    // (文字, family, height(nil は書かない = 継承の 1.43), Flutter の高さ, Flutter のベースライン)
+    ("Hello", AppFonts.Family.sans, nil, 28.6, 21.575),
+    ("Hello", .sans, 1.4, 28, 21.275),
+    ("Hello", .sans, 1.5, 30, 22.275),
+    ("Hello", .sans, 1.0, 20, 17.275),
+    ("学習中", .sans, nil, 28.6, 21.9),
+    ("学習中", .sans, 1.4, 28, 21.6),
+    // 和文と欧文が混ざる行は、上下それぞれでフォントの最大を取るので行の高さより少し高い。
+    ("Ab学", .sans, nil, 28.925, 21.9),
+    ("Ab学", .sans, 1.0, 20.325, 17.6),
+    ("Ab学", .sans, 1.4, 28.325, 21.6),
+    ("Hello\nWorld", .sans, 1.4, 56, 21.275),
+    ("学習\n中です", .sans, 1.4, 56, 21.6),
+    ("Hello\nWorld", .sans, nil, 57.2, 21.575),
+    ("/ˈhɛloʊ/", .ipa, nil, 28.6, 19.329),
+    ("Hello", .ipa, 1.4, 28, 19.029),
   ] as [(String, AppFonts.Family, CGFloat?, CGFloat, CGFloat)])
   func Flutterと同じ行の高さとベースラインになる(
     text: String, family: AppFonts.Family, height: CGFloat?, expectedHeight: CGFloat, expectedBaseline: CGFloat
   ) {
-    let measured = measure(text, AppTextStyle(size: 20, height: height, family: family))
+    let style = height.map { AppTextStyle(size: 20, height: $0, family: family) } ?? AppTextStyle(size: 20, family: family)
+    let measured = measure(text, style)
     #expect(abs(measured.height - expectedHeight) < 0.6, "高さ \(measured.height)")
     #expect(abs(measured.baseline - expectedBaseline) < 0.6, "ベースライン \(measured.baseline)")
+  }
+
+  @Test func 既定はFlutterが継承するbodyMediumの行の高さと字間() {
+    let style = AppTextStyle(size: 13)
+    #expect(style.height == 1.43)
+    #expect(style.letterSpacing == 0.25)
   }
 
   @Test func 同梱フォントが登録されていて名前で引ける() {

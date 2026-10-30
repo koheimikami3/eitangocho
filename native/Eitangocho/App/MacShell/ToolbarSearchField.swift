@@ -12,7 +12,8 @@
     @Environment(\.uiScale) private var px
     @FocusState private var focused: Bool
 
-    private static let textStyle = AppTextStyle(size: 13)
+    /// Flutter 版の TextField は bodyLarge(行の高さ 1.5・字間 0.5)を継承する。
+    private static let textStyle = AppTextStyle(size: 13, height: 1.5, letterSpacing: 0.5)
 
     var body: some View {
       let hint = String(localized: .search)
@@ -27,6 +28,7 @@
         )
         .textFieldStyle(.plain)
         .font(Self.textStyle.font(px))
+        .tracking(px(Self.textStyle.letterSpacing))
         .foregroundStyle(colors.materialOnSurface)
         .focused($focused)
         .focusEffectDisabled()

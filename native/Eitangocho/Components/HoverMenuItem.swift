@@ -27,7 +27,8 @@ struct HoverMenuItem: View {
         }
         .frame(width: px(20), alignment: .leading)
       }
-      AppText(label, style: AppTextStyle(size: 13))
+      // Flutter 版の PopupMenuItem は labelLarge(w500・字間 0.1)を継承する。
+      AppText(label, style: AppTextStyle(size: 13, weight: .w500, letterSpacing: 0.1))
         .foregroundStyle(foreground)
         .lineLimit(1)
     }

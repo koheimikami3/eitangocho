@@ -121,6 +121,9 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **文字の書式**: 文字は `AppText(文字列, style: AppTextStyle(size:weight:height:letterSpacing:))` で組む。
   Flutter の `TextStyle` と同じ値を書けば、行の高さ・ベースラインが Flutter 版と同じになる
   (SwiftUI は代替フォントの行の高さを使わないので、和文を含むかで余白を足している)。
+  height・letterSpacing の既定は、Flutter 版の文字が Material から継承する bodyMedium の値
+  (1.43・0.25。行間は上下に均等)なので、Flutter 版で書いてある所だけ書く。継承元が違う所は値を書く
+  (メニューの項目は labelLarge = w500・字間 0.1、入力欄は bodyLarge = 行の高さ 1.5・字間 0.5)。
   入力欄など `Text` 以外は `style.font(px)` を使い、高さは `AppTextField.height` で Flutter と揃える
 - **フォント**: `assets/fonts/` を Xcode のファイル参照で同梱し、起動時に `AppFonts.register()` で登録する。
   可変フォントは太さを wght 軸で指定し、Inter の光学サイズ(opsz)は 14 に止める(CoreText は自動で動かす)

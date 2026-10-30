@@ -3,6 +3,11 @@ import SwiftUI
 /// 文字の書式。Flutter の `TextStyle(fontSize, fontWeight, height, letterSpacing)` と
 /// 同じ値を書けば、同じ大きさ・同じ行の高さ・同じベースラインの位置になる。
 ///
+/// Flutter 版の文字は、Scaffold・ダイアログの Material が敷く既定の書式(Material 3 の bodyMedium:
+/// 行の高さ 1.43・字間 0.25・行間は上下に均等)を継承している。height・letterSpacing の既定はその値で、
+/// Flutter 版で書いてある所だけ書けばよい。継承元が違う所は、その値を書く
+/// (メニューの項目は labelLarge = w500・字間 0.1、入力欄は bodyLarge = 行の高さ 1.5・字間 0.5)。
+///
 /// 値は素の値(倍率を掛ける前)で書く。色は書式に含めず `foregroundStyle` で付ける。
 struct AppTextStyle: Hashable, Sendable {
   /// Flutter の FontWeight と同じ名前の太さ。
@@ -19,11 +24,16 @@ struct AppTextStyle: Hashable, Sendable {
   var weight: Weight = .w400
   /// Flutter の `TextStyle.height`(文字の大きさに対する行の高さの比)。nil はフォントの既定。
   var height: CGFloat?
-  var letterSpacing: CGFloat = 0
+  var letterSpacing: CGFloat
   var family: AppFonts.Family = .sans
 
+  /// Flutter 版の文字が継承する bodyMedium の行の高さと字間。
+  static let inheritedHeight: CGFloat = 1.43
+  static let inheritedLetterSpacing: CGFloat = 0.25
+
   init(
-    size: CGFloat, weight: Weight = .w400, height: CGFloat? = nil, letterSpacing: CGFloat = 0,
+    size: CGFloat, weight: Weight = .w400, height: CGFloat? = inheritedHeight,
+    letterSpacing: CGFloat = inheritedLetterSpacing,
     family: AppFonts.Family = .sans
   ) {
     self.size = size
@@ -40,10 +50,11 @@ struct AppTextStyle: Hashable, Sendable {
 
   /// `text` をこの書式で 1 行に組んだときの、Flutter と同じ行の寸法。
   ///
-  /// Flutter(SkParagraph)は行に含まれるフォントごとの数値の最大で行を組み、
-  /// `height` があればフォントごとに上下の比を保ったまま行の高さを `size * height` にする。
-  /// SwiftUI は代替フォントが入っても主のフォントの数値だけで行を組むので、
-  /// その差を上下の余白と行間で埋める(LineLayout)。
+  /// Flutter(SkParagraph)は行に含まれるフォントごとの数値の最大で行を組む。`height` があれば、
+  /// フォントごとに行の高さ `size * height` と文字の高さの差を上下に半分ずつ足す(継承した書式の
+  /// leadingDistribution が even のため)。代替フォントが混ざる行は、上下それぞれの最大を取るので
+  /// `size * height` より少し高くなる。SwiftUI は代替フォントが入っても主のフォントの数値だけで
+  /// 行を組むので、その差を上下の余白と行間で埋める(LineLayout)。
   func lineLayout(for text: String, scale: UIScale) -> LineLayout {
     let size = scale(self.size)
     let primary = AppFonts.verticalMetrics(postScriptName: AppFonts.primaryName(family))
@@ -56,8 +67,8 @@ struct AppTextStyle: Hashable, Sendable {
     let descent: CGFloat
     if let height {
       let lineHeight = size * height
-      ascent = fonts.map { $0.ascent / ($0.ascent + $0.descent) * lineHeight }.max()!
-      descent = fonts.map { $0.descent / ($0.ascent + $0.descent) * lineHeight }.max()!
+      ascent = fonts.map { (lineHeight + ($0.ascent - $0.descent) * size) / 2 }.max()!
+      descent = fonts.map { (lineHeight - ($0.ascent - $0.descent) * size) / 2 }.max()!
     } else {
       ascent = fonts.map { $0.ascent * size }.max()!
       descent = fonts.map { $0.descent * size }.max()!

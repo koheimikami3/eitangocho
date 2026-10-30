@@ -51,7 +51,7 @@ private struct SnackBarView: View {
   @Environment(\.uiScale) private var px
 
   var body: some View {
-    AppText(message, style: AppTextStyle(size: 14, height: 20.0 / 14, letterSpacing: 0.25))
+    AppText(message, style: AppTextStyle(size: 14))
       .foregroundStyle(colors.materialOnInverseSurface)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.horizontal, px(24))

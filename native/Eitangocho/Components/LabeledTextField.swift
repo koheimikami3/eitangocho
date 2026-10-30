@@ -21,7 +21,8 @@ struct LabeledTextField<Trailing: View, FieldTrailing: View>: View {
   @Environment(\.colors) private var colors
   @Environment(\.uiScale) private var px
 
-  private static var textStyle: AppTextStyle { AppTextStyle(size: 14) }
+  /// Flutter 版の TextField は bodyLarge(行の高さ 1.5・字間 0.5)を継承する。
+  private static var textStyle: AppTextStyle { AppTextStyle(size: 14, height: 1.5, letterSpacing: 0.5) }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -57,6 +58,7 @@ struct LabeledTextField<Trailing: View, FieldTrailing: View>: View {
     }
     .textFieldStyle(.plain)
     .font(Self.textStyle.font(px))
+    .tracking(px(Self.textStyle.letterSpacing))
     .foregroundStyle(colors.materialOnSurface)
     .focusEffectDisabled()
     .modifier(OptionalFocus(focus: focus))

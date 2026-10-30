@@ -27,7 +27,7 @@ struct ImportErrorDialog: View {
 /// 読み込みの結果・失敗のダイアログの本文の書式。Flutter 版は文字の大きさを指定せず、
 /// ダイアログ(Material)の既定の bodyMedium のまま。
 enum ImportDialogStyle {
-  static let body = AppTextStyle(size: 14, height: 20.0 / 14, letterSpacing: 0.25)
+  static let body = AppTextStyle(size: 14)
 }
 
 /// 読み込みの結果・失敗のダイアログの枠(見出し・本文・「閉じる」)。
