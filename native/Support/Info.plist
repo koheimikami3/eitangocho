@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 生成の Info.plist(GENERATE_INFOPLIST_FILE)では書けないキーだけをここに置き、生成分に重ねる。 -->
+<plist version="1.0">
+<dict>
+	<!-- Firebase Analytics の自動の screen_view を止める。画面名はアプリが MainView から送る
+	     (AnalyticsReporting)。自動のものは画面の型名になり、Flutter 版から続く画面名を汚すため。 -->
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
+</dict>
+</plist>

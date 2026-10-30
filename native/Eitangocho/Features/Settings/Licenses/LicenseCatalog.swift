@@ -35,7 +35,14 @@ enum LicenseCatalog {
 
   /// Swift パッケージ(パッケージ名, Resources/Licenses のファイル名)。
   static let packages = [
-    ("GRDB.swift", "GRDB.swift-LICENSE")
+    ("GRDB.swift", "GRDB.swift-LICENSE"),
+    // FirebaseAnalytics と、それがリンクするパッケージ(解決結果の Package.resolved のうち、実際にリンクされるもの)。
+    ("Firebase", "Firebase-LICENSE"),
+    ("GoogleAppMeasurement", "GoogleAppMeasurement-LICENSE"),
+    ("GoogleAdsOnDeviceConversion", "GoogleAdsOnDeviceConversion-LICENSE"),
+    ("GoogleUtilities", "GoogleUtilities-LICENSE"),
+    ("Promises", "Promises-LICENSE"),
+    ("nanopb", "nanopb-LICENSE"),
   ]
 
   /// 辞書・例文データの出典。CC BY / CC BY-SA は帰属表示が義務(docs/design.md「ライセンス・レビュー」)。

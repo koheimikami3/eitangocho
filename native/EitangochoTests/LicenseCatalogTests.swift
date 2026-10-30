@@ -99,12 +99,14 @@ struct LicenseCatalogTests {
     let items = try LicenseCatalog.load()
     #expect(
       items.map(\.name) == [
-        "Andika", "EJDict-hand", "Google Translate", "GRDB.swift", "Inter", "Noto Sans JP", "Noto Sans TC",
-        "Tatoeba", "Wiktionary / kaikki.org",
+        "Andika", "EJDict-hand", "Firebase", "Google Translate", "GoogleAdsOnDeviceConversion",
+        "GoogleAppMeasurement", "GoogleUtilities", "GRDB.swift", "Inter", "nanopb", "Noto Sans JP", "Noto Sans TC",
+        "Promises", "Tatoeba", "Wiktionary / kaikki.org",
       ])
     let summaries = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.summary) })
     #expect(summaries["Inter"] == "SIL Open Font License 1.1")
     #expect(summaries["GRDB.swift"] == "MIT License")
+    #expect(summaries["Firebase"] == "Apache License 2.0")
     #expect(summaries["Tatoeba"] == "CC BY 2.0 FR")
   }
 }
