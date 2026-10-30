@@ -19,7 +19,7 @@ enum WordListing {
 
   /// 検索で絞った学習中の一覧(学習中のカードの画面)。
   static func filteredLearning(_ words: [Word], query: String) -> [Word] {
-    filter(words, query: query).filter { !$0.isLearned }
+    learning(filter(words, query: query))
   }
 
   /// 検索で絞り、設定の並び順で並べた一覧(全単語の画面)。

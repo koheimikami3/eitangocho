@@ -35,9 +35,7 @@ struct AllWordsView: View {
                   onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
                   onContextMenu: { position in
                     WordContextMenu.show(
-                      at: position, word: word, overlay: overlay, colors: colors,
-                      onEdit: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
-                      onDelete: { DeleteConfirmDialog.present(word, store: store, overlay: overlay) })
+                      at: position, word: word, store: store, language: language, overlay: overlay, colors: colors)
                   })
               }
             }

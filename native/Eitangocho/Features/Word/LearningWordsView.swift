@@ -33,18 +33,17 @@ struct LearningWordsView: View {
   }
 
   private func card(_ word: Word) -> some View {
+    let language = settings.translationLanguage
     // 設定 showIpa はカードの IPA の表示だけに効く(表は常に出す)。
-    WordCard(
+    return WordCard(
       word: word,
       showIpa: settings.showIpa,
-      meaningLabel: String(localized: settings.translationLanguage.showMeaningLabel),
+      meaningLabel: String(localized: language.showMeaningLabel),
       onToggleLearned: { value in Task { await store.setLearned(word, value) } },
-      onTap: { EditWordDialog.present(word, store: store, language: settings.translationLanguage, overlay: overlay) },
+      onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
       onContextMenu: { position in
         WordContextMenu.show(
-          at: position, word: word, overlay: overlay, colors: colors,
-          onEdit: { EditWordDialog.present(word, store: store, language: settings.translationLanguage, overlay: overlay) },
-          onDelete: { DeleteConfirmDialog.present(word, store: store, overlay: overlay) })
+          at: position, word: word, store: store, language: language, overlay: overlay, colors: colors)
       }
     )
   }
