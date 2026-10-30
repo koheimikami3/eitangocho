@@ -33,6 +33,10 @@ final class QuizModel {
   /// 二重に答えないよう、書き終えて次の問題に進むまで次の回答を受け付けない。
   @ObservationIgnored private var answering = false
 
+  /// 回ごとに変わる番号。回答の書き込み中に離脱・始め直しで回が変わったとき、
+  /// 書き終えた回答で別の回を進めない(離脱した回を完了と数えない)ために持つ。
+  @ObservationIgnored private var session = 0
+
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let review: ReviewPrompter
@@ -84,6 +88,7 @@ final class QuizModel {
 
   /// 回の状態を最初に戻し、`questions` を出題にする。
   private func resetSession(_ questions: [Word], phase: Phase) {
+    session += 1
     self.questions = questions
     self.phase = phase
     index = 0
@@ -128,6 +133,7 @@ final class QuizModel {
     guard let word = current, !answering else { return }
     answering = true
     defer { answering = false }
+    let session = session
     do {
       if !knew {
         try await dao.setLearned(id: word.id, false)
@@ -137,6 +143,8 @@ final class QuizModel {
       Self.logger.error("クイズの回答を記録できない: \(String(describing: error), privacy: .public)")
       return
     }
+    // 書き込みの間に回が変わっていたら進めない(回答の記録は残す。答えたこと自体は事実なので)。
+    guard session == self.session else { return }
     advance(knew: knew, word: word)
   }
 

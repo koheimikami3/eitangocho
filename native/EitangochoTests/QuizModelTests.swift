@@ -151,6 +151,37 @@ struct QuizModelTests {
     #expect(model.okCount == 1)
   }
 
+  @Test func 回答の書き込み中に画面を移ったら書き終えても回を進めない() async throws {
+    let model = try await setupLearned(1)
+    model.start(trigger: .tab)
+    model.reveal()
+    let answer = model.handleKey(.rightArrow)
+    // 回答を始めさせ、DB への書き込みで待たせている間に別の画面へ移る。
+    await Task.yield()
+    model.viewChanged(from: .quiz, to: .learning)
+    await answer?.value
+
+    #expect(model.phase == .empty)
+    #expect(analytics.eventsNamed("quiz_abandoned") == [["answered_count": 0]])
+    #expect(analytics.eventsNamed("quiz_completed").isEmpty)
+    // 答えた記録そのものは残す。
+    #expect(try await database.wordDao.getAll().first?.lastReviewedAt != nil)
+  }
+
+  @Test func 回答の書き込み中に始め直したら新しい回を進めない() async throws {
+    let model = try await setupLearned(3)
+    model.start(trigger: .tab)
+    model.reveal()
+    let answer = model.handleKey(.rightArrow)
+    await Task.yield()
+    model.start(trigger: .tab)
+    await answer?.value
+
+    #expect(model.phase == .active)
+    #expect(model.index == 0)
+    #expect(model.okCount == 0)
+  }
+
   // MARK: - 計測
 
   @Test func 始めた契機と最後まで答えた結果を送る() async throws {
