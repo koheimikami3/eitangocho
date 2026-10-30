@@ -130,13 +130,33 @@ struct WordExportServiceTests {
     #expect(try await dao.getAll().map(\.word) == ["valid"])
   }
 
-  @Test("未知の version は失敗にして中断する", arguments: [#"99"#, #""2""#, #"true"#])
+  @Test(
+    "未知の version は失敗にして中断する(Int に収まらない数でも落ちない)",
+    arguments: [#"99"#, #""2""#, #"true"#, #"1.5"#, #"1e300"#, #"99999999999999999999"#])
   func rejectsUnknownVersion(version: String) async throws {
     let json = #"{"version": \#(version), "exportedAt": "2026-01-01T00:00:00Z", "words": []}"#
 
     await #expect(throws: WordExportFormatError.unsupportedVersion) {
       try await service.importJson(json)
     }
+  }
+
+  @Test("correctCount が Int に収まらない行は落ちずに飛ばす", arguments: [#"1e300"#, #"-1e300"#, #"99999999999999999999"#])
+  func skipsOutOfRangeCorrectCount(count: String) async throws {
+    let json = """
+      {"version": 2, "exportedAt": "2026-01-01T00:00:00.000Z", "words": [
+        {"word": "huge", "japanese": "巨大", "correctCount": \(count)},
+        {"word": "valid", "japanese": "有効", "correctCount": 3.9}
+      ]}
+      """
+
+    let result = try await service.importJson(json)
+
+    #expect(result.skipped == 1)
+    #expect(result.added == 1)
+    let words = try await dao.getAll()
+    #expect(words.map(\.word) == ["valid"])
+    #expect(words.first?.correctCount == 3)
   }
 
   @Test("壊れた JSON は失敗にする")

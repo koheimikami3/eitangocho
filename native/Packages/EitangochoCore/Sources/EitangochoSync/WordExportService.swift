@@ -275,10 +275,10 @@ struct OrderedEntries<Value> {
 /// JSON の値の読み取り(Dart の json_serializable と同じく、型が違えば読めない扱い)。
 enum JSONValue {
   /// 数値の整数。JSONSerialization は真偽値も NSNumber で返すので除く。
+  /// 小数や Int に収まらない値は nil(`Int(_:)` で変換すると範囲外で落ちるため `exactly` で見る)。
   static func integer(_ value: Any?) -> Int? {
     guard let number = value as? NSNumber, !isBoolean(number) else { return nil }
-    let double = number.doubleValue
-    return double.rounded(.towardZero) == double ? Int(double) : nil
+    return Int(exactly: number.doubleValue)
   }
 
   static func number(_ value: Any?) -> Double? {

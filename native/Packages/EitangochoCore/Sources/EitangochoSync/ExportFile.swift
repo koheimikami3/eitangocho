@@ -149,8 +149,11 @@ struct ExportFile: Encodable {
       case nil, is NSNull: correctCount = 0
       case let value:
         // Dart は `(json['correctCount'] as num?)?.toInt()` で読む(小数は切り捨て)。
-        guard let number = JSONValue.number(value) else { return nil }
-        correctCount = Int(number.rounded(.towardZero))
+        // Int に収まらない値は、変換で落ちないよう型の違いと同じく行ごと読めない扱いにする
+        // (同期ファイルが壊れていると、起動のたびに同期で落ち続けるため)。
+        guard let number = JSONValue.number(value), let count = Int(exactly: number.rounded(.towardZero))
+        else { return nil }
+        correctCount = count
       }
     }
 
