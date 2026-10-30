@@ -45,12 +45,12 @@ enum WordListing {
     case .newest: primary = 0
     case .oldest: primary = -compareNewest(a, b)
     // 大文字小文字は区別しない(登録時の重複判定 WordDao.matchKey と揃える)。
-    case .alphabetical: primary = compareStrings(a.word.lowercased(), b.word.lowercased())
-    case .reverseAlphabetical: primary = compareStrings(b.word.lowercased(), a.word.lowercased())
-    case .learningFirst: primary = learnedRank(a) - learnedRank(b)
-    case .learnedFirst: primary = learnedRank(b) - learnedRank(a)
-    case .mostCorrect: primary = b.correctCount - a.correctCount
-    case .leastCorrect: primary = a.correctCount - b.correctCount
+    case .alphabetical: primary = threeWay(a.word.lowercased(), b.word.lowercased())
+    case .reverseAlphabetical: primary = threeWay(b.word.lowercased(), a.word.lowercased())
+    case .learningFirst: primary = threeWay(learnedRank(a), learnedRank(b))
+    case .learnedFirst: primary = threeWay(learnedRank(b), learnedRank(a))
+    case .mostCorrect: primary = threeWay(b.correctCount, a.correctCount)
+    case .leastCorrect: primary = threeWay(a.correctCount, b.correctCount)
     }
     return primary != 0 ? primary : compareNewest(a, b)
   }
@@ -61,7 +61,9 @@ enum WordListing {
     return a.id == b.id ? 0 : (a.id > b.id ? -1 : 1)
   }
 
-  private static func compareStrings(_ a: String, _ b: String) -> Int {
+  /// 大小を -1 / 0 / 1 で返す。引き算で比べると、取り込んだ極端な覚えた回数(Int.min など)で
+  /// 桁あふれして落ちるため、大小比較だけで決める。
+  private static func threeWay<T: Comparable>(_ a: T, _ b: T) -> Int {
     a == b ? 0 : (a < b ? -1 : 1)
   }
 

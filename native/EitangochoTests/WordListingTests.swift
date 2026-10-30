@@ -79,6 +79,18 @@ struct WordListingTests {
     #expect(sorted(.leastCorrect) == ["date", "banana", "Apple", "cherry"])
   }
 
+  @Test(arguments: [WordSortOrder.mostCorrect, .leastCorrect])
+  func 覚えた回数が極端な値でも落ちずに並べる(order: WordSortOrder) {
+    // 取り込みは Int の範囲の負の数も受け付ける。引き算で比べると桁あふれする組み合わせ。
+    let extreme = [
+      Self.word(2, "min", createdAt: Self.date(2026), correctCount: .min),
+      Self.word(1, "max", createdAt: Self.date(2026), correctCount: .max),
+      Self.word(3, "one", createdAt: Self.date(2026), correctCount: 1),
+    ]
+    let sorted = WordListing.filteredAll(extreme, query: "", order: order).map(\.word)
+    #expect(sorted == (order == .mostCorrect ? ["max", "one", "min"] : ["min", "one", "max"]))
+  }
+
   @Test func 検索で絞った結果も設定の並び順で返す() {
     // "a" は banana / Apple / date に一致する(英単語は大文字小文字を無視)。
     #expect(WordListing.filteredAll(words, query: "a", order: .alphabetical).map(\.word) == ["Apple", "banana", "date"])
