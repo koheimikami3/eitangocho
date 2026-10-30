@@ -69,6 +69,10 @@ final class WordRegistrationModel {
   /// 「自動入力」バッジを出している欄。取得結果で埋めたときに立て、その欄を空にしたら消す。
   private(set) var autoFilledFields: Set<Field> = []
 
+  /// 自動入力の取得・保存の途中か。連打(ボタンと Enter の重ね押しを含む)で 2 回目が
+  /// 1 回目の重複の確認を待っている間に通ると、同じ単語が 2 件登録されるので止める。
+  @ObservationIgnored private var busy = false
+
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let wordInfo: any WordInfoProvider
   @ObservationIgnored private let analytics: AnalyticsLogger
@@ -106,11 +110,14 @@ final class WordRegistrationModel {
 
   /// ステップ 1 の「自動入力」。取得成功・未収録ならフォームへ、失敗ならステップ 1 に戻す。
   func autoFill() async {
+    guard !busy else { return }
     let headword = normalizeHeadword(word)
     guard !headword.isEmpty else {
       error = .emptyWord
       return
     }
+    busy = true
+    defer { busy = false }
     // 辞書を引く前に重複を弾く(登録できない単語のために通信しない)。
     if await rejectIfDuplicate(headword) { return }
     step = .loading
@@ -169,12 +176,15 @@ final class WordRegistrationModel {
   /// 続けて次の単語を登録できるようにするため)。
   @discardableResult
   func save() async -> Bool {
+    guard !busy else { return false }
     let headword = normalizeHeadword(word)
     let trimmedMeaning = meaning.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !headword.isEmpty, !trimmedMeaning.isEmpty else {
       error = .requiredFields
       return false
     }
+    busy = true
+    defer { busy = false }
     // フォームでも英単語を書き換えられるため、保存時にも重複を見る
     // (ステップ 1 で弾いた単語に戻された場合もここで止まる)。
     if await rejectIfDuplicate(headword) { return false }

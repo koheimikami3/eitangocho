@@ -77,6 +77,32 @@ struct WordRegistrationModelTests {
     #expect(model.registeredWord == "apple")
   }
 
+  @Test func 保存の途中に重ねて押しても1件だけ登録する() async throws {
+    let model = makeModel()
+    fill(model, word: "apple", meaning: "りんご")
+    // 登録の連打。1 回目が重複の確認(DB)を待っている間に 2 回目が来る。
+    let first = Task { await model.save() }
+    let second = Task { await model.save() }
+    #expect(await first.value)
+    #expect(await second.value == false)
+    #expect(try await database.wordDao.getAll().map(\.word) == ["apple"])
+  }
+
+  @Test func 自動入力の途中に重ねて呼んでも取得は1回だけ() async throws {
+    let calls = Box(0)
+    let model = makeModel { _ in
+      calls.value += 1
+      return Self.fetchedInfo
+    }
+    model.word = "serendipity"
+    let first = Task { await model.autoFill() }
+    let second = Task { await model.autoFill() }
+    await first.value
+    await second.value
+    #expect(calls.value == 1)
+    #expect(analytics.eventsNamed("autofill_result").count == 1)
+  }
+
   @Test func 品詞を未選択のまま保存するとその他が補われる() async throws {
     let model = makeModel()
     fill(model, word: "apple", meaning: "りんご")
