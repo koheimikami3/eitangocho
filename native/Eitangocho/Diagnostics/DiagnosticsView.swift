@@ -53,7 +53,7 @@
       row("元の更新日時", record.sourceModifiedAt?.formatted() ?? "-")
       row("付属ファイル", record.sourceSidecars.isEmpty ? "なし" : record.sourceSidecars.joined(separator: ", "))
       if let counts = record.counts {
-        row("件数", "単語 \(counts.words) / 削除 \(counts.deletions) / EJDict \(counts.ejdict) / キャッシュ \(counts.dictionaryCache)")
+        countsRow(counts)
       }
     }
 
@@ -79,7 +79,7 @@
         if let inspection = model.inspection {
           row("user_version", "\(inspection.userVersion)")
           row("journal_mode", inspection.journalMode)
-          row("件数", "単語 \(inspection.words) / 削除 \(inspection.deletions) / EJDict \(inspection.ejdict) / キャッシュ \(inspection.dictionaryCache)")
+          countsRow(inspection.counts)
         }
         if let error = model.errorMessage {
           row("エラー", error)
@@ -149,6 +149,10 @@
       } header: {
         Text(verbatim: "単語(\(model.words.count))")
       }
+    }
+
+    private func countsRow(_ counts: DatabaseImportRecord.Counts) -> some View {
+      row("件数", "単語 \(counts.words) / 削除 \(counts.deletions) / EJDict \(counts.ejdict) / キャッシュ \(counts.dictionaryCache)")
     }
 
     private func row(_ title: String, _ value: String) -> some View {

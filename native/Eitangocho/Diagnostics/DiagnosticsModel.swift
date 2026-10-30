@@ -66,7 +66,7 @@
         exists: fileManager.fileExists(atPath: sourceURL.path),
         size: (attributes?[.size] as? NSNumber)?.int64Value,
         modifiedAt: attributes?[.modificationDate] as? Date,
-        sidecars: ["-journal", "-wal", "-shm"].filter { fileManager.fileExists(atPath: sourceURL.path + $0) })
+        sidecars: DriftDatabaseImporter.sidecarSuffixes.filter { fileManager.fileExists(atPath: sourceURL.path + $0) })
     }
 
     // MARK: - 混在同期を確かめるための操作

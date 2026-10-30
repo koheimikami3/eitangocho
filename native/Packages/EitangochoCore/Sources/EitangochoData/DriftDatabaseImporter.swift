@@ -43,7 +43,7 @@ public struct DriftDatabaseImporter {
   public static let fileName = "eitangocho.sqlite"
 
   /// SQLite が本体の横に作る付属ファイル。
-  static let sidecarSuffixes = ["-journal", "-wal", "-shm"]
+  public static let sidecarSuffixes = ["-journal", "-wal", "-shm"]
 
   /// 引き継ぎの記録を置く UserDefaults のキー。
   public static let recordKey = "nativeDatabaseImport"
@@ -175,14 +175,7 @@ public struct DriftDatabaseImporter {
     let counts: DatabaseImportRecord.Counts
     do {
       let database = try AppDatabase(queue)
-      counts = try database.writer.read { db in
-        func count(_ table: String) throws -> Int {
-          try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM \(table)") ?? 0
-        }
-        return .init(
-          words: try count("words"), deletions: try count("deleted_words"),
-          ejdict: try count("ejdict_entries"), dictionaryCache: try count("dictionary_cache_entries"))
-      }
+      counts = try database.writer.read(AppDatabase.tableCounts)
     } catch {
       throw DatabaseImportError.openFailed(String(describing: error))
     }
