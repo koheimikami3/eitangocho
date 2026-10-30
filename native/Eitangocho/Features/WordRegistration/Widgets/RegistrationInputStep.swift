@@ -21,10 +21,9 @@ struct RegistrationInputStep: View {
         trailing: { EmptyView() },
         fieldTrailing: {
           // 入力欄の高さに引き伸ばすので、ボタン自身の上下の余白は持たせない。
-          AppFilledButton(label: String(localized: .autoFill), verticalPadding: 0) {
+          AppFilledButton(label: String(localized: .autoFill), verticalPadding: 0, fillsHeight: true) {
             Task { await model.autoFill() }
           }
-          .frame(maxHeight: .infinity)
         })
       // エラーがあればそちらを優先して出す。
       if let errorMessage {

@@ -4,7 +4,7 @@
   import Observation
 
   /// Dev ビルドの診断画面の状態。引き継ぎと混在同期を手で確かめるためだけに置く
-  /// (Phase 2 で本来の画面に置き換える)。
+  /// (本来の画面とは別のウィンドウで、メニューの「Debug」から開く)。
   @Observable
   final class DiagnosticsModel {
     /// Flutter 版が UserDefaults に置いている設定のキー(Swift 版も同じキーで読む)。

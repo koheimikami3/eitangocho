@@ -22,6 +22,9 @@
         Button(String(localized: .navRegistration)) { shell.selectView(.registration) }
           .keyboardShortcut("n", modifiers: .command)
       }
+      #if DEBUG
+        CommandMenu(Text(verbatim: "Debug")) { DiagnosticsWindow.MenuItem() }
+      #endif
       CommandGroup(replacing: .textEditing) {
         Button(String(localized: .search)) { shell.focusSearch() }
           .keyboardShortcut("f", modifiers: .command)

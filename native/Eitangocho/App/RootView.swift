@@ -38,12 +38,40 @@ struct RootView: View {
     case .failed(let failure):
       StartupFailureView(failure: failure, model: model)
     case .ready(let session):
-      #if DEBUG
+      #if os(macOS)
+        MacMainShell(
+          shell: model.shell, settings: model.settings,
+          learningCount: WordListing.learning(session.words.words).count,
+          wordCount: session.words.words.count
+        ) { view in
+          mainContent(view, session: session)
+        }
+      #elseif DEBUG
+        // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
         DiagnosticsView(session: session)
       #else
-        // 本番の画面は Phase 2 以降で作る。
         Text(verbatim: "\(session.importOutcome)")
       #endif
     }
   }
 }
+
+#if os(macOS)
+  extension RootView {
+    /// シェルの中身(表示中の画面)。クイズと設定は Phase 3 で移すまで空にしておく。
+    @ViewBuilder
+    fileprivate func mainContent(_ view: MainView, session: AppModel.Session) -> some View {
+      switch view {
+      case .learning:
+        LearningWordsView(store: session.words, shell: model.shell, settings: model.settings)
+      case .allWords:
+        AllWordsView(store: session.words, shell: model.shell, settings: model.settings)
+      case .registration:
+        WordRegistrationView(
+          shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo)
+      case .quiz, .settings:
+        Color.clear
+      }
+    }
+  }
+#endif

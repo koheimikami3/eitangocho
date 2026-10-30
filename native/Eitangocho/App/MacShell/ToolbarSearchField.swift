@@ -30,6 +30,7 @@
         .foregroundStyle(colors.materialOnSurface)
         .focused($focused)
         .focusEffectDisabled()
+        .fixedSize(horizontal: false, vertical: true)
         .padding(EdgeInsets(top: 0, leading: px(5), bottom: 0, trailing: px(10)))
       }
       // Flutter の入力欄は、入力とヒントの行の高さの大きい方 + 上下の余白 10 の高さになる

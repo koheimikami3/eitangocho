@@ -44,18 +44,25 @@ struct LabeledTextField<Trailing: View, FieldTrailing: View>: View {
     let shape = RoundedRectangle(cornerRadius: px(7))
     let layout = Self.textStyle.lineLayout(for: text.isEmpty ? hintText : text, scale: px)
     let lines = lineLimit?.lowerBound ?? 1
-    return TextField(
-      "", text: $text, prompt: Text(verbatim: hintText).foregroundStyle(colors.textDisabled),
-      axis: lineLimit == nil ? .horizontal : .vertical
-    )
+    let prompt = Text(verbatim: hintText).foregroundStyle(colors.textDisabled)
+    // 1 行の欄に axis 付きの初期化を使うと、欄が枠いっぱいに広がって文字が上に寄るので分ける。
+    return Group {
+      if let lineLimit {
+        TextField("", text: $text, prompt: prompt, axis: .vertical)
+          .lineLimit(lineLimit)
+          .lineSpacing(max(layout.lineSpacing, 0))
+      } else {
+        TextField("", text: $text, prompt: prompt)
+      }
+    }
     .textFieldStyle(.plain)
     .font(Self.textStyle.font(px))
     .foregroundStyle(colors.materialOnSurface)
-    .lineLimit(lineLimit ?? 1...1)
-    .lineSpacing(max(layout.lineSpacing, 0))
     .focusEffectDisabled()
     .modifier(OptionalFocus(focus: focus))
     .onSubmit { onSubmit?() }
+    // 1 行の欄は自分の行の高さに留め、下の枠の中で上下中央に置く。
+    .fixedSize(horizontal: false, vertical: lineLimit == nil)
     .padding(.horizontal, px(10))
     // Flutter の入力欄は、入力とヒントの行の高さの大きい方 + 上下の余白 12 の高さになる
     // (和文を含むと和文の行の高さ)。複数行は下限の行数ぶんを確保し、上から並べる。

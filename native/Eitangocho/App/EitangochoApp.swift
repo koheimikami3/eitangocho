@@ -38,6 +38,12 @@ struct EitangochoApp: App {
       .windowResizability(.contentMinSize)
       .commands { AppCommands(shell: model.shell) }
     #endif
+    #if os(macOS) && DEBUG
+      // Dev ビルドだけの診断画面(引き継ぎ・同期の確認用)。メニューの「Debug」から開く。
+      Window(Text(verbatim: "Diagnostics"), id: DiagnosticsWindow.id) {
+        DiagnosticsWindow(model: model)
+      }
+    #endif
   }
 }
 
