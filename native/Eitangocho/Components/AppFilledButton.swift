@@ -14,6 +14,8 @@ struct AppFilledButton: View {
   var verticalPadding: CGFloat = 9
   var fontSize: CGFloat = 14
   var borderRadius: CGFloat = 8
+  /// 横いっぱいに広げるか(Flutter の Expanded の中に置いたとき)。
+  var expands = false
   let action: () -> Void
 
   @Environment(\.colors) private var colors
@@ -30,6 +32,7 @@ struct AppFilledButton: View {
     .foregroundStyle(.white)
     // ボタン幅がラベル幅より広い場面(全幅ボタン等)でも中央寄せにする。
     .multilineTextAlignment(.center)
+    .frame(maxWidth: expands ? .infinity : nil)
     .padding(.horizontal, px(14))
     .padding(.vertical, px(verticalPadding))
     .background { fill(shape) }

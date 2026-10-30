@@ -6,6 +6,8 @@ struct RootView: View {
 
   var body: some View {
     content
+      .overlay { AppOverlayHost(overlay: model.overlay) }
+      .environment(\.appOverlay, model.overlay)
       .environment(\.colors, model.settings.appearance.colors)
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))

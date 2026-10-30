@@ -23,7 +23,7 @@ struct AppOverlayHost: View {
         Color.clear
           .contentShape(Rectangle())
           .onTapGesture { overlay.closeMenu() }
-        MenuPlacement(anchor: menu.anchor, px: px) {
+        MenuPlacement(anchor: menu.anchor, minWidth: menu.minWidth, px: px) {
           PopupMenuBox(items: menu.items) { overlay.closeMenu() }
         }
       }
@@ -45,9 +45,13 @@ private struct PopupMenuBox: View {
     let shape = RoundedRectangle(cornerRadius: px(8))
     VStack(spacing: 0) {
       ForEach(items) { item in
-        HoverMenuItem(label: item.label, color: item.color, hoverColor: item.hoverColor, checked: item.checked) {
-          close()
-          item.action()
+        if item.isDivider {
+          Rectangle().fill(colors.materialOutlineVariant).frame(height: px(1)).padding(.vertical, px(4))
+        } else {
+          HoverMenuItem(label: item.label, color: item.color, hoverColor: item.hoverColor, checked: item.checked) {
+            close()
+            item.action()
+          }
         }
       }
     }
@@ -66,10 +70,11 @@ private struct PopupMenuBox: View {
 
 /// メニューを anchor に置き、ウィンドウからはみ出すなら内側へ寄せる
 /// (Flutter の _PopupMenuRouteLayout と同じく、ウィンドウの端から 8 空ける)。
-/// 幅は中身の幅を 56 刻みに切り上げ、140 を下限にする(Flutter の IntrinsicWidth(stepWidth: 56)
-/// と constraints の minWidth 140)。
+/// 幅は中身の幅を 56 刻みに切り上げ、minWidth を下限にする(Flutter の IntrinsicWidth(stepWidth: 56)
+/// と constraints の minWidth)。
 private struct MenuPlacement: Layout {
   let anchor: CGPoint
+  let minWidth: CGFloat
   let px: UIScale
 
   func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -80,7 +85,7 @@ private struct MenuPlacement: Layout {
     guard let menu = subviews.first else { return }
     let step = px(56)
     let intrinsic = menu.sizeThatFits(.unspecified).width
-    let width = max(px(140), (intrinsic / step).rounded(.up) * step)
+    let width = max(px(minWidth), (intrinsic / step).rounded(.up) * step)
     let size = menu.sizeThatFits(ProposedViewSize(width: width, height: nil))
     let margin = px(8)
     let x = min(max(anchor.x, bounds.minX + margin), bounds.maxX - size.width - margin)

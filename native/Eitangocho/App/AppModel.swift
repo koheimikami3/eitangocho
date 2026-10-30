@@ -42,6 +42,9 @@ final class AppModel {
   /// 表示中の画面と検索語。メニューからも触るので、DB を開く前から持つ。
   let shell = MainShellModel()
 
+  /// 画面の上に重ねるメニューとダイアログ。
+  let overlay = AppOverlay()
+
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
 
   /// App Group の ID。Bundle ID に `group.` を付けたもの(Debug は .dev 付きで本番と分かれる)。

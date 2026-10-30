@@ -9,17 +9,23 @@ import SwiftUI
 final class AppOverlay {
   struct MenuItem: Identifiable {
     let id = UUID()
-    var label: String
+    /// 区切り線(Flutter の PopupMenuDivider(height: 9))として描くか。
+    var isDivider = false
+    var label = ""
     var color: Color?
     var hoverColor: Color?
     var checked: Bool?
-    var action: () -> Void
+    var action: () -> Void = {}
+
+    static var divider: MenuItem { MenuItem(isDivider: true) }
   }
 
   struct Menu {
     /// メニューの左上を置きたい位置(ウィンドウの左上が原点)。
     var anchor: CGPoint
     var items: [MenuItem]
+    /// 幅の下限(Flutter の showMenu の constraints の minWidth)。
+    var minWidth: CGFloat
   }
 
   struct Dialog: Identifiable {
@@ -32,8 +38,8 @@ final class AppOverlay {
   private(set) var menu: Menu?
   private(set) var dialogs: [Dialog] = []
 
-  func showMenu(at anchor: CGPoint, items: [MenuItem]) {
-    menu = Menu(anchor: anchor, items: items)
+  func showMenu(at anchor: CGPoint, items: [MenuItem], minWidth: CGFloat = 140) {
+    menu = Menu(anchor: anchor, items: items, minWidth: minWidth)
   }
 
   func closeMenu() {

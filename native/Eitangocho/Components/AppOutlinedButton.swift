@@ -12,6 +12,8 @@ struct AppOutlinedButton: View {
   var fontSize: CGFloat = 14
   var fontWeight: AppTextStyle.Weight = .w600
   var borderRadius: CGFloat = 8
+  /// 横いっぱいに広げるか(Flutter の Expanded の中に置いたとき)。
+  var expands = false
   let action: () -> Void
 
   @Environment(\.colors) private var colors
@@ -23,6 +25,7 @@ struct AppOutlinedButton: View {
     AppText(label, style: AppTextStyle(size: fontSize, weight: fontWeight))
       .foregroundStyle(textColor ?? colors.textPrimary)
       .multilineTextAlignment(.center)
+      .frame(maxWidth: expands ? .infinity : nil)
       // 枠線の幅も内側の余白に足す(Flutter の Container は枠線の幅を余白に含める)。
       .padding(.horizontal, px(18 + 1))
       .padding(.vertical, px(verticalPadding + 1))

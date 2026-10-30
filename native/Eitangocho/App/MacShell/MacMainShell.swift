@@ -4,6 +4,7 @@
   /// macOS 版のシェル: サイドバー + ツールバー + 画面の切り替え(Flutter 版の SidebarShell)。
   struct MacMainShell<Content: View>: View {
     let shell: MainShellModel
+    let settings: SettingsStore
     let learningCount: Int
     let wordCount: Int
     @ViewBuilder let content: (MainView) -> Content
@@ -14,7 +15,7 @@
       HStack(spacing: 0) {
         AppSidebar(shell: shell, learningCount: learningCount, wordCount: wordCount)
         VStack(spacing: 0) {
-          MainToolbar(shell: shell)
+          MainToolbar(shell: shell, settings: settings)
           // 各画面を中身の幅に関わらず全幅に広げる。
           content(shell.view)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
