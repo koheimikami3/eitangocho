@@ -127,7 +127,11 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **アイコン**: Flutter 版の `Icons.xxx` は `MaterialIconView` で描く。足すときは
   `tool/material_icon_paths.py` の `ICONS` に名前を足して再実行する
 - **メニューとダイアログ**: 右クリックメニュー・ポップアップメニュー・ダイアログは標準の部品を使わず、
-  `AppOverlay`(`@Environment(\.appOverlay)`)に出す。右クリックは `RightClickArea` で受ける
+  `AppOverlay`(`@Environment(\.appOverlay)`)に出す。右クリックは `RightClickArea` で受ける。
+  一時的な通知(Flutter の SnackBar)も `AppOverlay.showSnackBar` で出す
+- **ライセンス一覧**: SwiftPM はライセンスを集めないので `Features/Settings/Licenses/LicenseCatalog.swift` で
+  手で持つ。Swift パッケージを足したら、その LICENSE を `Eitangocho/Resources/Licenses/` に置き、
+  `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)
 - **String Catalog**: 文言は `Eitangocho/Resources/Localizable.xcstrings` に置き、`Text(.navLearning)` /
   `String(localized: .wordCount(3))` のように生成された記号で引く(キーは ARB と同じ)。
   `tool/arb_to_xcstrings.py` は移行のときに 1 回だけ使ったもので、以後は xcstrings を直接直す
