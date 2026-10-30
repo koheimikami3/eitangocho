@@ -149,7 +149,7 @@ enum AppFonts {
   /// それぞれが 1 つでもあるか。Flutter は主のフォントに無い文字を代替フォントで描き、
   /// 行の高さは実際に使ったフォントの数値で決まる(和文だけの行は Noto だけ、混ざれば両方)。
   static func coverage(_ text: String, family: Family) -> (primary: Bool, fallback: Bool) {
-    let font = CTFontCreateWithName(primaryName(family) as CFString, 12, nil)
+    let font = coverageFont(family)
     var primary = false
     var fallback = false
     for scalar in text.unicodeScalars where !CharacterSet.newlines.contains(scalar) {
@@ -164,5 +164,16 @@ enum AppFonts {
     }
     // 空の文字列も主のフォントの行の高さになる。
     return (primary || !fallback, fallback)
+  }
+
+  private static var coverageFonts: [Family: CTFont] = [:]
+
+  /// coverage で字形の有無を引く主のフォント。AppText を描くたびに引くので作り直さない
+  /// (字形の有無は大きさによらない)。
+  private static func coverageFont(_ family: Family) -> CTFont {
+    if let cached = coverageFonts[family] { return cached }
+    let font = CTFontCreateWithName(primaryName(family) as CFString, 12, nil)
+    coverageFonts[family] = font
+    return font
   }
 }
