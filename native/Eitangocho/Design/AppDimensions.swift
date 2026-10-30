@@ -4,7 +4,7 @@ import CoreGraphics
 ///
 /// 画面には素の値を書き、表示倍率(uiScale)は `@Environment(\.uiScale)` の
 /// `px(_:)` で掛ける。iOS の値は Phase 6 で使う。
-enum AppDimensions {
+nonisolated enum AppDimensions {
   static let sidebarWidth: CGFloat = 212
   static let toolbarHeight: CGFloat = 52
   static let contentPadding: CGFloat = 20

@@ -40,6 +40,37 @@ nonisolated struct AppColors: Equatable, Sendable {
       ]
   }
 
+  /// 地の上に浮かせる面(カード・面のボタン)の影。iOS の AppPalette.elevation と同じ値。
+  ///
+  /// ダークは影が地に溶けるので、白の細い輪郭(raisedOutline)を 1 枚目に敷く。
+  /// ライトは四辺にごく近く回る淡い影と、下に落ちる影の 2 枚。どちらも青みの墨(#101828)で落とす。
+  var elevation: [AppShadow] {
+    isDark
+      ? [
+        AppShadow(color: Color(argb: 0x29FF_FFFF), blurRadius: 0, spread: 0.5),
+        AppShadow(color: Color(argb: 0x5200_0000), blurRadius: 2, y: 1),
+        AppShadow(color: Color(argb: 0x7300_0000), blurRadius: 14, spread: -8, y: 6),
+        AppShadow(color: Color(argb: 0x9900_0000), blurRadius: 28, spread: -22, y: 14),
+      ]
+      : [
+        AppShadow(color: Color(argb: 0x0D10_1828), blurRadius: 3),
+        AppShadow(color: Color(argb: 0x0F10_1828), blurRadius: 8, y: 3),
+      ]
+  }
+
+  /// Flutter の Material の elevation 3(ポップアップメニュー)の影。
+  /// Material は影を elevation から描くので、同じ高さの Material Design の影の値で近づける。
+  var menuShadow: [AppShadow] {
+    [
+      AppShadow(color: Color(argb: 0x3300_0000), blurRadius: 3, spread: -2, y: 3),
+      AppShadow(color: Color(argb: 0x2400_0000), blurRadius: 4, y: 3),
+      AppShadow(color: Color(argb: 0x1F00_0000), blurRadius: 8, y: 1),
+    ]
+  }
+
+  /// ダイアログの後ろに敷く幕(Flutter の showDialog の既定 Colors.black54)。
+  var barrier: Color { Color(argb: 0x8A00_0000) }
+
   // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。
   // ダークは地が暗いぶん濃く敷き、線は文字色と同じ色相で引く(iOS のダークと同じ)。
   var accentSoft: Color { isDark ? Color(argb: 0x3842_9FF0) : Color(argb: 0x1A42_9FF0) }

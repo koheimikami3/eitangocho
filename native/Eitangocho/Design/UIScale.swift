@@ -6,7 +6,7 @@ import SwiftUI
 /// すると AppKit が描く部品(入力欄・メニュー)が拡大されないため、寸法と文字の
 /// 大きさの方に倍率を掛ける。画面では `@Environment(\.uiScale) private var px` を
 /// 置き、`px(14)` のように素の値を包んで書く。
-struct UIScale: Equatable, Sendable {
+nonisolated struct UIScale: Equatable, Sendable {
   var factor: CGFloat
 
   func callAsFunction(_ value: CGFloat) -> CGFloat { value * factor }
