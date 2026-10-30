@@ -91,8 +91,11 @@ native/
 ├── Eitangocho.xcodeproj      # ビルド設定は書かず Configs/ の xcconfig に置く。Eitangocho/ は同期フォルダ
 ├── Configs/                  # Shared / Debug / Release の xcconfig(BUNDLE_ID_SUFFIX・表示名・アイコン)
 ├── Support/                  # OS ごとの entitlements(iCloud コンテナ・App Group)
-├── Eitangocho/               # SwiftUI のアプリ(Diagnostics/ は Dev ビルドだけの診断画面)
-└── Packages/EitangochoCore/  # 画面を持たない部分(EitangochoData = DB / EitangochoSync = 書き出し・同期)
+├── Eitangocho/               # SwiftUI のアプリ(Design/ = トークン・書体、Components/ = 共通部品、
+│                             #  Features/<機能>/ = 画面とモデル、Diagnostics/ = Dev ビルドだけの診断画面)
+├── EitangochoTests/          # アプリのモデルのテスト
+└── Packages/EitangochoCore/  # 画面を持たない部分(EitangochoData = DB / EitangochoSync = 書き出し・同期 /
+                              #  EitangochoWordInfo = 単語情報の取得)
 ```
 
 ```bash
@@ -107,6 +110,34 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
   そのテストも通す
 - Swift 版の Dev ビルドを入れると Flutter 版の Dev ビルドを置き換える(Bundle ID が同じ)。
   Flutter 版を入れ直すと、引き継いだ時点の元ファイルで起動する
+
+### ネイティブ版の UI の書き方
+
+- **トークン**: 配色は `Eitangocho/Design/AppColors.swift`(`@Environment(\.colors)`)、寸法は
+  `AppDimensions.swift`。値は Flutter 版の `lib/constants/` から写したもので、移行期間は両方を揃える。
+  Flutter 版で色を指定していない所は Material 3 の既定色(`materialOnSurface` など)を写してある
+- **表示倍率**: 画面には素の値を書き、`@Environment(\.uiScale) private var px` の `px(14)` で倍率を掛ける。
+  Flutter 版の `Transform.scale` と違い、入力欄など AppKit の部品も同じ倍率で大きくなる
+- **文字の書式**: 文字は `AppText(文字列, style: AppTextStyle(size:weight:height:letterSpacing:))` で組む。
+  Flutter の `TextStyle` と同じ値を書けば、行の高さ・ベースラインが Flutter 版と同じになる
+  (SwiftUI は代替フォントの行の高さを使わないので、和文を含むかで余白を足している)。
+  入力欄など `Text` 以外は `style.font(px)` を使い、高さは `AppTextField.height` で Flutter と揃える
+- **フォント**: `assets/fonts/` を Xcode のファイル参照で同梱し、起動時に `AppFonts.register()` で登録する。
+  可変フォントは太さを wght 軸で指定し、Inter の光学サイズ(opsz)は 14 に止める(CoreText は自動で動かす)
+- **アイコン**: Flutter 版の `Icons.xxx` は `MaterialIconView` で描く。足すときは
+  `tool/material_icon_paths.py` の `ICONS` に名前を足して再実行する
+- **メニューとダイアログ**: 右クリックメニュー・ポップアップメニュー・ダイアログは標準の部品を使わず、
+  `AppOverlay`(`@Environment(\.appOverlay)`)に出す。右クリックは `RightClickArea` で受ける
+- **String Catalog**: 文言は `Eitangocho/Resources/Localizable.xcstrings` に置き、`Text(.navLearning)` /
+  `String(localized: .wordCount(3))` のように生成された記号で引く(キーは ARB と同じ)。
+  `tool/arb_to_xcstrings.py` は移行のときに 1 回だけ使ったもので、以後は xcstrings を直接直す
+- **テストの置き場所**: DB・同期・単語情報は `Packages/EitangochoCore/Tests/`(`swift test`)。
+  アプリのモデル・トークン・文字の書式は `EitangochoTests/`(アプリに読み込ませて動かす。
+  テスト中は引き継ぎも同期も始めない)
+
+```bash
+xcodebuild test -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 'platform=macOS'
+```
 
 ## 技術的な疑問の解決
 
