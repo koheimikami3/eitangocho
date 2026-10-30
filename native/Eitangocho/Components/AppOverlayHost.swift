@@ -15,7 +15,7 @@ struct AppOverlayHost: View {
             .contentShape(Rectangle())
             .onTapGesture { if dialog.dismissible { overlay.dismiss(dialog.id) } }
           dialog.content
-            .onExitCommand { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+            .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
         }
       }
       if let menu = overlay.menu {
@@ -63,7 +63,7 @@ private struct PopupMenuBox: View {
     .focusable()
     .focused($focused)
     .focusEffectDisabled()
-    .onExitCommand(perform: close)
+    .onEscape(perform: close)
     .onAppear { focused = true }
   }
 }
@@ -112,5 +112,17 @@ struct AppDialogSurface<Content: View>: View {
       .onTapGesture {}
       .padding(.horizontal, px(40))
       .padding(.vertical, px(24))
+  }
+}
+
+extension View {
+  /// Esc で閉じる(macOS の exit command。iOS には無いので何もしない)。
+  @ViewBuilder
+  fileprivate func onEscape(perform action: @escaping () -> Void) -> some View {
+    #if os(macOS)
+      onExitCommand(perform: action)
+    #else
+      self
+    #endif
   }
 }
