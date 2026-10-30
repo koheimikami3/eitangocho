@@ -81,8 +81,12 @@ struct WordRegistrationModelTests {
     let model = makeModel()
     fill(model, word: "apple", meaning: "りんご")
     // 登録の連打。1 回目が重複の確認(DB)を待っている間に 2 回目が来る。
+    let resume = holdDatabase(database)
     let first = Task { await model.save() }
+    try await letTasksReachDatabase()
     let second = Task { await model.save() }
+    try await letTasksReachDatabase()
+    resume()
     #expect(await first.value)
     #expect(await second.value == false)
     #expect(try await database.wordDao.getAll().map(\.word) == ["apple"])
@@ -95,8 +99,12 @@ struct WordRegistrationModelTests {
       return Self.fetchedInfo
     }
     model.word = "serendipity"
+    let resume = holdDatabase(database)
     let first = Task { await model.autoFill() }
+    try await letTasksReachDatabase()
     let second = Task { await model.autoFill() }
+    try await letTasksReachDatabase()
+    resume()
     await first.value
     await second.value
     #expect(calls.value == 1)

@@ -155,10 +155,12 @@ struct QuizModelTests {
     let model = try await setupLearned(1)
     model.start(trigger: .tab)
     model.reveal()
+    // 回答を DB への書き込みで待たせている間に別の画面へ移る。
+    let resume = holdDatabase(database)
     let answer = model.handleKey(.rightArrow)
-    // 回答を始めさせ、DB への書き込みで待たせている間に別の画面へ移る。
-    await Task.yield()
+    try await letTasksReachDatabase()
     model.viewChanged(from: .quiz, to: .learning)
+    resume()
     await answer?.value
 
     #expect(model.phase == .empty)
@@ -172,9 +174,11 @@ struct QuizModelTests {
     let model = try await setupLearned(3)
     model.start(trigger: .tab)
     model.reveal()
+    let resume = holdDatabase(database)
     let answer = model.handleKey(.rightArrow)
-    await Task.yield()
+    try await letTasksReachDatabase()
     model.start(trigger: .tab)
+    resume()
     await answer?.value
 
     #expect(model.phase == .active)
