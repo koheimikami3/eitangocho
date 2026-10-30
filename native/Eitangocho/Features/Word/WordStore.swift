@@ -60,7 +60,8 @@ final class WordStore {
     }
   }
 
-  func update(_ word: Word, _ edit: WordEdit) async {
+  /// 編集を保存する。書けなかったら false(編集ダイアログは入力を残して開いたままにする)。
+  func update(_ word: Word, _ edit: WordEdit) async -> Bool {
     await perform { try await dao.updateWord(id: word.id, edit) }
   }
 
@@ -70,11 +71,15 @@ final class WordStore {
     await perform { try await dao.deleteWord(id: word.id) }
   }
 
-  private func perform(_ operation: () async throws -> Void) async {
+  /// 書き込みを行い、できたかを返す。失敗はログに残す。
+  @discardableResult
+  private func perform(_ operation: () async throws -> Void) async -> Bool {
     do {
       try await operation()
+      return true
     } catch {
       Self.logger.error("単語の書き込みに失敗: \(String(describing: error), privacy: .public)")
+      return false
     }
   }
 }

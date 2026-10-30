@@ -120,7 +120,8 @@ struct EditWordDialog: View {
       errorMessage = String(localized: .errorDuplicate(duplicate.word))
       return
     }
-    await store.update(
+    // 書けなかったら閉じない(閉じると入力が失われる。Flutter 版も例外で閉じずに止まる)。
+    let saved = await store.update(
       word,
       WordEdit(
         word: headword,
@@ -132,7 +133,7 @@ struct EditWordDialog: View {
         exampleEn: exampleEn.trimmingCharacters(in: .whitespacesAndNewlines),
         exampleTranslation: exampleTranslation.trimmingCharacters(in: .whitespacesAndNewlines)
       ))
-    dismiss()
+    if saved { dismiss() }
   }
 
   @MainActor
