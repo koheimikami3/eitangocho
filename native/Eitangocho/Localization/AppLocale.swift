@@ -94,11 +94,6 @@ enum AppLocale {
     translationLanguageChoices(Locale.preferredLanguages, current: current)
   }
 
-  /// この端末での訳の言語の既定(設定が未保存のときに使う)。
-  static var deviceDefaultTranslationLanguage: TranslationLanguage {
-    defaultTranslationLanguage(for: Locale.preferredLanguages)
-  }
-
   /// 今の表示言語(Bundle が選んだ .lproj)。書体の和文・繁体字の順を決めるのに使う。
   static var current: Language {
     Bundle.main.preferredLocalizations.first.flatMap(Language.init(rawValue:)) ?? .en
