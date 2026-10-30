@@ -44,16 +44,21 @@ final class AppModel {
   let settings = SettingsStore()
 
   /// 表示中の画面と検索語。メニューからも触るので、DB を開く前から持つ。
-  let shell = MainShellModel()
+  let shell: MainShellModel
 
   /// 画面の上に重ねるメニューとダイアログ。
   let overlay = AppOverlay()
 
   /// 独自イベントの送信口。DB に依存しないので最初に作る(Firebase の初期化もここで行う)。
-  let analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
+  let analytics: AnalyticsLogger
 
   /// ユーザープロパティと screen_view。送った値を起動から終了まで覚えておくため、画面ではなくここで持つ。
   @ObservationIgnored private(set) lazy var analyticsReporter = AnalyticsReporter(analytics)
+
+  init() {
+    analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
+    shell = MainShellModel(analytics: analytics)
+  }
 
   nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
 
@@ -107,13 +112,13 @@ final class AppModel {
     case .success(let (outcome, database)):
       let sync = SyncController(service: SyncService(store: ICloudFileStore(), database: database), database: database)
       sync.onFailure = { [analytics] reason in analytics.logSyncFailed(reason) }
-      let words = WordStore(dao: database.wordDao)
+      let words = WordStore(dao: database.wordDao, analytics: analytics)
       words.start()
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
           wordInfo: makeWordInfoProvider(database),
-          quiz: QuizModel(dao: database.wordDao) { [words] in WordListing.learned(words.words) }))
+          quiz: QuizModel(dao: database.wordDao, analytics: analytics) { [words] in WordListing.learned(words.words) }))
       await sync.start()
     }
   }

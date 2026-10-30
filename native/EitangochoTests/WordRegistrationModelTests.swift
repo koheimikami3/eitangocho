@@ -5,8 +5,7 @@ import Testing
 
 @testable import Eitangocho
 
-/// Flutter 版の word_registration_notifier_test.dart と word_registration_state_test.dart を移したもの
-/// (計測・レビュー依頼は Phase 4 で移す)。
+/// Flutter 版の word_registration_notifier_test.dart と word_registration_state_test.dart を移したもの。
 @MainActor
 struct WordRegistrationModelTests {
   /// 自動入力のテスト用(実際の取得元を呼ばない)。
@@ -26,6 +25,7 @@ struct WordRegistrationModelTests {
     audioUrl: "https://example.com/a.mp3")
 
   private let database: AppDatabase
+  private let analytics = FakeAnalyticsClient()
 
   init() throws {
     database = try AppDatabase.inMemory()
@@ -35,7 +35,8 @@ struct WordRegistrationModelTests {
     language: TranslationLanguage = .ja, _ handler: @escaping @Sendable (String) async throws -> WordInfo? = { _ in nil }
   ) -> WordRegistrationModel {
     WordRegistrationModel(
-      dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), currentLanguage: { language })
+      dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), analytics: AnalyticsLogger(analytics),
+      currentLanguage: { language })
   }
 
   private func fill(_ model: WordRegistrationModel, word: String, meaning: String, ipa: String = "", exampleEn: String = "") {
@@ -320,5 +321,48 @@ struct WordRegistrationModelTests {
     info.ipa = ""
     info.exampleEn = ""
     #expect(await notice(info) == .onlyMeaningFound)
+  }
+
+  // MARK: - 計測
+
+  nonisolated private static let phraseInfo = WordInfo(
+    word: "give up", ipa: "/ɡɪv ʌp/", meaning: "あきらめる", exampleEn: "Never give up.")
+
+  @Test func 自動入力の結果を送る_取得_未収録_失敗() async {
+    let results = Box<[@Sendable () throws -> WordInfo?]>([
+      { Self.phraseInfo }, { nil }, { throw WordInfoError("offline") },
+    ])
+    let model = makeModel { _ in try results.value.removeFirst()() }
+    for word in ["give up", "zzzzz", "apple"] {
+      model.word = word
+      await model.autoFill()
+      model.backToInput()
+    }
+    #expect(
+      analytics.eventsNamed("autofill_result") == [
+        ["result": "success", "notice": "none", "is_phrase": "true"],
+        ["result": "not_found", "is_phrase": "false"],
+        ["result": "fetch_failed", "is_phrase": "false"],
+      ])
+  }
+
+  @Test func 自動入力の値から書き換えた項目を送る_前後の空白は書き換えとみなさない() async {
+    let model = makeModel { _ in Self.phraseInfo }
+    model.word = "give up"
+    await model.autoFill()
+    model.ipa = " /ɡɪv ʌp/ "
+    model.meaning = "諦める"
+    #expect(await model.save())
+    #expect(
+      analytics.eventsNamed("word_registered") == [
+        ["method": "autofill", "edited_meaning": "true", "edited_example": "false", "edited_ipa": "false"]
+      ])
+  }
+
+  @Test func 保存できなかったときは登録を送らない() async {
+    let model = makeModel()
+    fill(model, word: "apple", meaning: "")
+    #expect(await model.save() == false)
+    #expect(analytics.eventsNamed("word_registered").isEmpty)
   }
 }

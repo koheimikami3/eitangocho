@@ -25,6 +25,8 @@ struct RootView: View {
   #if os(macOS)
     /// 発音確認のウィンドウを開く。ページもアプリと同じ拡大率で出す。
     private func openPronunciation(_ word: String) {
+      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
+      model.analytics.logPronunciationOpened(model.shell.view)
       PronunciationWindowController.shared.open(
         url: GoogleTranslateURL.make(word, language: model.settings.translationLanguage), title: word,
         zoom: model.settings.uiScale)
@@ -54,7 +56,7 @@ struct RootView: View {
         shell: model.shell, settings: model.settings,
         learningCount: WordListing.learning(session.words.words).count,
         wordCount: session.words.words.count,
-        onStartQuiz: { session.quiz.start() }
+        onStartQuiz: { session.quiz.start(trigger: .tab) }
       ) { view in
         mainContent(view, session: session)
       }
@@ -79,7 +81,8 @@ struct RootView: View {
         AllWordsView(store: session.words, shell: model.shell, settings: model.settings)
       case .registration:
         WordRegistrationView(
-          shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo)
+          shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
+          analytics: model.analytics)
       case .quiz:
         QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
       case .settings:

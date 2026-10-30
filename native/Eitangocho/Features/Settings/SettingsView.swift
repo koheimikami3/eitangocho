@@ -13,6 +13,7 @@
     @Environment(\.uiScale) private var px
     @Environment(\.openURL) private var openURL
     @Environment(\.appOverlay) private var overlay
+    @Environment(\.analytics) private var analytics
 
     var body: some View {
       // スクロール領域はビューの全幅に広げ、中身だけを左に寄せる。スクロール領域ごと寄せると、
@@ -63,7 +64,10 @@
             SettingsCard {
               // 自分から書きたい人の受け皿。OS のレビュー依頼は年 3 回の上限で出ないことがあるため、
               // 常設の導線を別に置く。
-              SettingsLinkRow(label: String(localized: .writeReview)) { openURL(ReviewConfig.writeReviewURL) }
+              SettingsLinkRow(label: String(localized: .writeReview)) {
+                analytics.logStoreListingOpened()
+                openURL(ReviewConfig.writeReviewURL)
+              }
             }
           }
           SettingsSection(title: String(localized: .sectionInfo)) {

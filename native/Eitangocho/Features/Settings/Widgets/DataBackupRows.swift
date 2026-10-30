@@ -11,6 +11,7 @@
     let service: WordExportService
 
     @Environment(\.appOverlay) private var overlay
+    @Environment(\.analytics) private var analytics
     @State private var busy = false
     @State private var document: WordBackupDocument?
     @State private var showsExporter = false
@@ -30,6 +31,7 @@
         defaultFilename: WordBackup.suggestedFileName()
       ) { result in
         if case .success = result {
+          analytics.logDataExported()
           overlay?.showSnackBar(String(localized: .exportDone))
         }
       }
@@ -64,8 +66,11 @@
     private func present(_ outcome: WordBackup.ImportOutcome) {
       switch outcome {
       case .imported(let result):
+        analytics.logDataImported(succeeded: true)
         overlay?.present { dismiss in ImportResultDialog(result: result, dismiss: dismiss) }
       case .formatError(let error):
+        // 失敗のダイアログを出した回は failed(UTF-8 でないファイルも含む。Flutter 版はそこで例外になり送らない)。
+        analytics.logDataImported(succeeded: false)
         overlay?.present { dismiss in ImportErrorDialog(error: error, dismiss: dismiss) }
       case .failed:
         break

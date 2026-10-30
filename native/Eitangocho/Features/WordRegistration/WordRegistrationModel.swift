@@ -71,11 +71,16 @@ final class WordRegistrationModel {
 
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let wordInfo: any WordInfoProvider
+  @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let currentLanguage: () -> TranslationLanguage
 
-  init(dao: WordDao, wordInfo: any WordInfoProvider, currentLanguage: @escaping () -> TranslationLanguage) {
+  init(
+    dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger,
+    currentLanguage: @escaping () -> TranslationLanguage
+  ) {
     self.dao = dao
     self.wordInfo = wordInfo
+    self.analytics = analytics
     self.currentLanguage = currentLanguage
   }
 
@@ -109,10 +114,13 @@ final class WordRegistrationModel {
     step = .loading
     error = nil
     registeredWord = nil
+    // 句(空白を含む見出し語)は辞書の収録が薄いので、取得率を分けて見る。
+    let isPhrase = headword.contains(" ")
     do {
       guard let info = try await wordInfo.fetch(headword) else {
         notFound = true
         enterForm(with: nil)
+        analytics.logAutofillResult(.notFound, isPhrase: isPhrase)
         return
       }
       // 抽象は翻訳の失敗を返せないため、「英例文はあるのに訳が空」を失敗とみなす
@@ -122,9 +130,11 @@ final class WordRegistrationModel {
       selectedPartsOfSpeech = Set(info.partsOfSpeech)
       translationFailed = info.translationLanguage.translatesExamples && !info.exampleEn.isEmpty && info.exampleTranslation.isEmpty
       enterForm(with: info)
+      analytics.logAutofillResult(.success, isPhrase: isPhrase, notice: notice)
     } catch {
       step = .input
       self.error = .fetchFailed
+      analytics.logAutofillResult(.fetchFailed, isPhrase: isPhrase)
     }
   }
 
@@ -190,6 +200,14 @@ final class WordRegistrationModel {
     } catch {
       return false
     }
+    // 自動入力の値をどの項目で書き換えたか(自動入力の品質の指標)。
+    // フォームには取得値がそのまま入るので、保存値(trim 後)と比べる。
+    let trim = { (value: String) in value.trimmingCharacters(in: .whitespacesAndNewlines) }
+    analytics.logWordRegistered(
+      autoFilled: fetched != nil,
+      editedMeaning: fetched.map { trim($0.meaning) != trimmedMeaning } ?? false,
+      editedExample: fetched.map { trim($0.exampleEn) != trim(exampleEn) } ?? false,
+      editedIpa: fetched.map { trim($0.ipa) != trim(ipa) } ?? false)
     reset()
     registeredWord = headword
     return true

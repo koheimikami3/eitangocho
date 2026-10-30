@@ -11,7 +11,7 @@ enum QuizKey: Sendable {
 /// フラッシュクイズの進行(Flutter 版の QuizPageNotifier と QuizPageState)。
 ///
 /// アプリが生きている間 1 つを持ち続ける。クイズの画面への入口(サイドバー・結果の「続ける」)は
-/// 必ず `start()` を呼ぶので、入るたびに新しい回になる。
+/// 必ず `start(trigger:)` を呼ぶので、入るたびに新しい回になる。
 @Observable
 final class QuizModel {
   /// セッションの局面。
@@ -34,13 +34,15 @@ final class QuizModel {
   @ObservationIgnored private var answering = false
 
   @ObservationIgnored private let dao: WordDao
+  @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let learnedWords: () -> [Word]
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "quiz")
 
   /// `learnedWords` は出題元(学習済みの単語)。始めるたびに読む。
-  init(dao: WordDao, learnedWords: @escaping () -> [Word]) {
+  init(dao: WordDao, analytics: AnalyticsLogger, learnedWords: @escaping () -> [Word]) {
     self.dao = dao
+    self.analytics = analytics
     self.learnedWords = learnedWords
   }
 
@@ -49,10 +51,39 @@ final class QuizModel {
 
   /// 学習済み単語から 1 セッション分を選んで新しい回を始める(選び方は selectQuizQuestions)。
   /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
-  func start() {
+  /// `trigger` は計測用(どこから始めたか)。
+  func start(trigger: QuizTrigger) {
+    // 回の途中でサイドバーのクイズを押し直した場合も、前の回は離脱として数える。
+    abandonIfActive()
     let questions = selectQuizQuestions(learnedWords())
     self.questions = questions
     phase = questions.isEmpty ? .empty : .active
+    index = 0
+    revealed = false
+    okCount = 0
+    forgotWords = []
+    if questions.isEmpty {
+      analytics.logQuizEmptyShown()
+    } else {
+      analytics.logQuizStarted(trigger: trigger, questions: questions)
+    }
+  }
+
+  /// 表示中の画面が変わったとき。回の途中でクイズ以外の画面へ移ったら、離脱として計測する。
+  /// クイズへの入口は必ず `start(trigger:)` を呼ぶので、戻ってきたときは新しい回になる。
+  func viewChanged(from previous: MainView, to next: MainView) {
+    if previous == .quiz && next != .quiz {
+      abandonIfActive()
+    }
+  }
+
+  /// 回の途中なら離脱を送り、状態を初期化する(同じ回を二重に数えない)。
+  /// アプリを終了された回は検知できない。
+  private func abandonIfActive() {
+    guard phase == .active else { return }
+    analytics.logQuizAbandoned(answeredCount: index)
+    phase = .empty
+    questions = []
     index = 0
     revealed = false
     okCount = 0
@@ -118,6 +149,7 @@ final class QuizModel {
     }
     if next >= questions.count {
       phase = .done
+      analytics.logQuizCompleted(okCount: okCount, forgotCount: forgotWords.count)
     }
   }
 }

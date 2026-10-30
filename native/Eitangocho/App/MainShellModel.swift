@@ -33,11 +33,23 @@ final class MainShellModel {
   /// ⌘F で検索欄にフォーカスを当てる合図。値が変わるたびに検索欄が受け取る。
   private(set) var searchFocusRequest = 0
 
+  @ObservationIgnored private let analytics: AnalyticsLogger
+
+  init(analytics: AnalyticsLogger) {
+    self.analytics = analytics
+  }
+
   func selectView(_ view: MainView) {
     self.view = view
   }
 
   func updateSearchQuery(_ query: String) {
+    // 検索を使い始めた(空 → 非空)ときに 1 回だけ送る。打つたびには送らない。
+    // 送るのは画面だけで、検索語そのものは送らない。
+    if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      && !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      analytics.logSearchUsed(view)
+    }
     searchQuery = query
   }
 

@@ -12,10 +12,16 @@ struct WordRegistrationView: View {
   @State private var model: WordRegistrationModel
   @FocusState private var wordFocused: Bool
 
-  init(shell: MainShellModel, settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider) {
+  init(
+    shell: MainShellModel, settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider,
+    analytics: AnalyticsLogger
+  ) {
     self.shell = shell
     self.settings = settings
-    _model = State(initialValue: WordRegistrationModel(dao: dao, wordInfo: wordInfo) { settings.translationLanguage })
+    _model = State(
+      initialValue: WordRegistrationModel(dao: dao, wordInfo: wordInfo, analytics: analytics) {
+        settings.translationLanguage
+      })
   }
 
   var body: some View {

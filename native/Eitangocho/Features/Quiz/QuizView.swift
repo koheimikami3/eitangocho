@@ -31,7 +31,7 @@ struct QuizView: View {
     case .done:
       QuizResultView(
         okCount: quiz.okCount, forgotWords: quiz.forgotWords,
-        onContinue: { quiz.start() }, onToLearning: { shell.selectView(.learning) })
+        onContinue: { quiz.start(trigger: .continued) }, onToLearning: { shell.selectView(.learning) })
     case .active:
       if let word = quiz.current {
         ActiveQuiz(quiz: quiz, word: word, direction: settings.quizDirection)

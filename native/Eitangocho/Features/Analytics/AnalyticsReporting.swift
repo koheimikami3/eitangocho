@@ -13,8 +13,9 @@ struct AnalyticsReporting: ViewModifier {
 
   func body(content: Content) -> some View {
     content
-      .onChange(of: shell.view, initial: true) { _, view in
+      .onChange(of: shell.view, initial: true) { previous, view in
         reporter.reportScreen(view)
+        session.quiz.viewChanged(from: previous, to: view)
       }
       .onChange(of: AnalyticsReporter.settingsProperties(settings), initial: true) { _, properties in
         reporter.reportSettings(properties)

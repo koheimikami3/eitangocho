@@ -15,6 +15,7 @@ struct EditWordDialog: View {
   @Environment(\.colors) private var colors
   @Environment(\.uiScale) private var px
   @Environment(\.appOverlay) private var overlay
+  @Environment(\.analytics) private var analytics
 
   @State private var wordText: String
   @State private var ipa: String
@@ -67,6 +68,8 @@ struct EditWordDialog: View {
       }
       .frame(width: px(AppDimensions.formWidth + Self.horizontalPadding * 2))
     }
+    // 編集は主画面の切り替えではないが、Flutter 版と同じく画面として数える。
+    .onAppear { analytics.logScreenView("word_edit") }
   }
 
   private var fields: some View {
