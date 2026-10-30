@@ -192,8 +192,16 @@ public struct WordDao: Sendable {
   }
 
   /// 編集した内容を書き、updatedAt を進める。
+  ///
+  /// 単語名を変えて同一判定キーが変わったら、元のキーを削除ログに残す(1 トランザクション)。
+  /// 同期では単語の文字列で突き合わせるので、ログが無いとクラウドに残る元の名前が
+  /// 「ローカルに無い単語」として次の同期で戻ってくる(綴りを直すと 2 件になる)。
+  /// 元のキーの単語が他にも残っているとき(古い端末の重複)は、その単語を消さないようログを残さない。
+  /// 新しいキーの削除ログは登録と同じく取り消す。
   public func updateWord(id: Int64, _ edit: WordEdit, now: Date = .now) async throws {
+    let timestamp = DatabaseTimestamp.seconds(now)
     try await writer.write { db in
+      let previous = try String.fetchOne(db, sql: "SELECT word FROM words WHERE id = ?", arguments: [id])
       try db.execute(
         sql: """
           UPDATE words SET word = ?, ipa = ?, japanese = ?, parts_of_speech = ?,
@@ -202,8 +210,20 @@ public struct WordDao: Sendable {
           """,
         arguments: [
           edit.word, edit.ipa, edit.meaning, PartOfSpeech.encodeList(edit.partsOfSpeech),
-          edit.exampleEn, edit.exampleTranslation, DatabaseTimestamp.seconds(now), id,
+          edit.exampleEn, edit.exampleTranslation, timestamp, id,
         ])
+      guard let previous else { return }
+      let oldKey = Self.matchKey(previous)
+      if oldKey != Self.matchKey(edit.word) {
+        let remaining = try Int.fetchOne(
+          db, sql: "SELECT COUNT(*) FROM words WHERE lower(word) = ?", arguments: [oldKey]) ?? 0
+        if remaining == 0 {
+          try db.execute(
+            sql: "INSERT OR REPLACE INTO deleted_words (word, deleted_at) VALUES (?, ?)",
+            arguments: [oldKey, timestamp])
+        }
+      }
+      try Self.clearDeletion(db, word: edit.word)
     }
   }
 

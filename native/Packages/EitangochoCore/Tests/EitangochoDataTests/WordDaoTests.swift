@@ -90,6 +90,49 @@ struct WordDaoTests {
     #expect(word.createdAt == created)
   }
 
+  private func rename(_ id: Int64, to word: String, now: Date) async throws {
+    try await dao.updateWord(
+      id: id, WordEdit(word: word, meaning: "りんご", ipa: "", partsOfSpeech: [], exampleEn: "", exampleTranslation: ""),
+      now: now)
+  }
+
+  @Test("updateWord で単語名のキーが変わったら、元のキーを削除ログに残す")
+  func renameLogsOldKey() async throws {
+    let created = Date(timeIntervalSince1970: 1_700_000_000)
+    let id = try await dao.insertWord(apple(" Aple "), now: created)
+
+    try await rename(id, to: "apple", now: created.addingTimeInterval(60))
+
+    #expect(try await dao.getDeletions() == [DeletedWord(word: "aple", deletedAt: created.addingTimeInterval(60))])
+  }
+
+  @Test("updateWord でキーが変わらない(大文字小文字・前後空白だけ)なら削除ログを残さない")
+  func sameKeyEditLogsNothing() async throws {
+    let id = try await dao.insertWord(apple("apple"))
+    try await rename(id, to: " Apple ", now: .now)
+    #expect(try await dao.getDeletions().isEmpty)
+  }
+
+  @Test("元のキーの単語が他にも残っていれば、その単語を消さないよう削除ログを残さない")
+  func renameKeepsDuplicateOfOldKey() async throws {
+    let id = try await dao.insertWord(apple("aple"))
+    try await dao.insertWord(apple("aple"))
+    try await rename(id, to: "apple", now: .now)
+    #expect(try await dao.getDeletions().isEmpty)
+  }
+
+  @Test("新しいキーの削除ログは、改名で取り消す")
+  func renameClearsDeletionOfNewKey() async throws {
+    let created = Date(timeIntervalSince1970: 1_700_000_000)
+    let deleted = try await dao.insertWord(apple("apple"), now: created)
+    try await dao.deleteWord(id: deleted, now: created)
+    let id = try await dao.insertWord(apple("aple"), now: created)
+
+    try await rename(id, to: "apple", now: created.addingTimeInterval(60))
+
+    #expect(try await dao.getDeletions().map(\.word) == ["aple"])
+  }
+
   @Test("deleteWord で行が消える")
   func deletesRow() async throws {
     let id = try await dao.insertWord(apple())

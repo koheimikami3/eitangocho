@@ -481,6 +481,23 @@ struct WordExportServiceTests {
   }
 
   /// version 1(deletions を持たない旧形式)。後方互換の確認を兼ねる。
+  @Test("単語名を直した後、元の名前が残るクラウドのスナップショットを同期で取り込んでも元の名前は戻らない")
+  func renameIsNotUndoneBySync() async throws {
+    let id = try await insert("aple", meaning: "りんご")
+    let snapshot = try await service.exportJson()
+    try await dao.updateWord(
+      id: id, WordEdit(word: "apple", meaning: "りんご", ipa: "", partsOfSpeech: [], exampleEn: "", exampleTranslation: ""),
+      now: Self.day(1))
+
+    let result = try await service.importJson(snapshot, respectLocalDeletions: true)
+
+    #expect(result.added == 0)
+    #expect(try await dao.getAll().map(\.word) == ["apple"])
+    // 他の端末には削除として伝わる。
+    let deletions = try #require(try object(try await service.exportJson())["deletions"] as? [[String: Any]])
+    #expect(deletions.map { $0["word"] as? String } == ["aple"])
+  }
+
   private func v1(_ words: [[String: Any]]) -> String {
     serialize(["version": 1, "exportedAt": "2026-01-01T00:00:00.000Z", "words": words])
   }
