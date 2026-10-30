@@ -68,6 +68,15 @@ nonisolated struct AppColors: Equatable, Sendable {
     ]
   }
 
+  /// Flutter の Material の elevation 6(スナックバー)の影。menuShadow と同じく Material Design の影の値で近づける。
+  var snackBarShadow: [AppShadow] {
+    [
+      AppShadow(color: Color(argb: 0x3300_0000), blurRadius: 5, spread: -1, y: 3),
+      AppShadow(color: Color(argb: 0x2400_0000), blurRadius: 10, y: 6),
+      AppShadow(color: Color(argb: 0x1F00_0000), blurRadius: 18, y: 1),
+    ]
+  }
+
   /// ダイアログの後ろに敷く幕(Flutter の showDialog の既定 Colors.black54)。
   var barrier: Color { Color(argb: 0x8A00_0000) }
 
@@ -124,6 +133,10 @@ nonisolated struct AppColors: Equatable, Sendable {
 
   /// Flutter 版のスライダーの目盛りの色(Material 3 の onPrimary と onSurfaceVariant。どちらも 38% で描く)。
   var materialOnPrimary: Color { isDark ? Color(argb: 0xFF00_3256) : .white }
+
+  /// Flutter 版のスナックバーの地と文字(Material 3 の inverseSurface と onInverseSurface)。
+  var materialInverseSurface: Color { isDark ? Color(argb: 0xFFE0_E2E8) : Color(argb: 0xFF2D_3135) }
+  var materialOnInverseSurface: Color { isDark ? Color(argb: 0xFF2D_3135) : Color(argb: 0xFFEF_F0F7) }
 
   /// Flutter 版の InkWell のホバーの重ね色(ThemeData.hoverColor)。
   var materialHover: Color { isDark ? Color(argb: 0x0AFF_FFFF) : Color(argb: 0x0A00_0000) }

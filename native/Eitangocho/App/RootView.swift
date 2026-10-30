@@ -1,3 +1,4 @@
+import EitangochoSync
 import SwiftUI
 
 /// 起動の段階に応じて画面を出し分ける。配色と表示倍率はここで設定から配る。
@@ -73,7 +74,8 @@ struct RootView: View {
       case .quiz:
         QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
       case .settings:
-        SettingsView(settings: model.settings)
+        SettingsView(
+          settings: model.settings, sync: session.sync, exportService: WordExportService(database: session.database))
       }
     }
   }

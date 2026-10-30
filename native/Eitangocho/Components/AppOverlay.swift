@@ -35,8 +35,18 @@ final class AppOverlay {
     var content: AnyView
   }
 
+  /// 下端に一時的に出す通知(Flutter の ScaffoldMessenger.showSnackBar)。
+  struct SnackBar: Identifiable, Equatable {
+    let id: UUID
+    var message: String
+  }
+
   private(set) var menu: Menu?
   private(set) var dialogs: [Dialog] = []
+  private(set) var snackBar: SnackBar?
+
+  /// スナックバーを出しておく時間(Flutter の SnackBar の既定と同じ 4 秒)。
+  static let snackBarDuration: Duration = .seconds(4)
 
   func showMenu(at anchor: CGPoint, items: [MenuItem], minWidth: CGFloat = 140) {
     menu = Menu(anchor: anchor, items: items, minWidth: minWidth)
@@ -57,6 +67,17 @@ final class AppOverlay {
 
   func dismiss(_ id: UUID) {
     dialogs.removeAll { $0.id == id }
+  }
+
+  /// スナックバーを出す。出ている間に次を出したら入れ替える(Flutter は順番待ちにするが、
+  /// このアプリで続けて出すのは書き出しを繰り返したときだけなので、新しい方だけを見せる)。
+  func showSnackBar(_ message: String) {
+    let snackBar = SnackBar(id: UUID(), message: message)
+    self.snackBar = snackBar
+    Task { [weak self] in
+      try? await Task.sleep(for: Self.snackBarDuration)
+      if self?.snackBar?.id == snackBar.id { self?.snackBar = nil }
+    }
   }
 }
 

@@ -18,6 +18,16 @@ struct AppOverlayHost: View {
             .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
         }
       }
+      // 下端の全幅に出す(Flutter の SnackBar の既定の fixed)。下から滑り込ませる。
+      VStack(spacing: 0) {
+        Spacer(minLength: 0)
+        if let snackBar = overlay.snackBar {
+          SnackBarView(message: snackBar.message)
+            .id(snackBar.id)
+            .transition(.move(edge: .bottom))
+        }
+      }
+      .animation(.easeOut(duration: 0.25), value: overlay.snackBar)
       if let menu = overlay.menu {
         // メニューの外を押したら閉じる(押したものには届かない。Flutter の showMenu と同じ)。
         Color.clear
@@ -29,6 +39,25 @@ struct AppOverlayHost: View {
       }
     }
     .ignoresSafeArea()
+  }
+}
+
+/// スナックバーの帯(Flutter の Material 3 の SnackBar の既定: inverseSurface の地・
+/// 本文は bodyMedium・左右 24 と上下 14 の余白・高さ 6 の影・角丸なし)。
+private struct SnackBarView: View {
+  let message: String
+
+  @Environment(\.colors) private var colors
+  @Environment(\.uiScale) private var px
+
+  var body: some View {
+    AppText(message, style: AppTextStyle(size: 14, height: 20.0 / 14, letterSpacing: 0.25))
+      .foregroundStyle(colors.materialOnInverseSurface)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, px(24))
+      .padding(.vertical, px(14))
+      .background(colors.materialInverseSurface)
+      .appShadows(colors.snackBarShadow, in: Rectangle(), scale: px.factor)
   }
 }
 

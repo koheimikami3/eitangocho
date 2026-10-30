@@ -1,10 +1,13 @@
 #if os(macOS)
+  import EitangochoSync
   import SwiftUI
 
-  /// macOS 版の設定画面(表示・テーマ・クイズ・訳の言語・サポート・情報)。変更は即保存。
+  /// macOS 版の設定画面(表示・テーマ・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
   /// Flutter 版の SettingsView。
   struct SettingsView: View {
     let settings: SettingsStore
+    let sync: SyncController
+    let exportService: WordExportService
 
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
@@ -47,6 +50,13 @@
           }
           SettingsSection(title: String(localized: .sectionTranslation)) {
             translationLanguages
+          }
+          // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの持ち出しを扱うため 1 枚のカードにまとめる。
+          SettingsSection(title: String(localized: .sectionData)) {
+            SettingsCard {
+              SyncRows(sync: sync)
+              DataBackupRows(service: exportService)
+            }
           }
           SettingsSection(title: String(localized: .sectionSupport)) {
             SettingsCard {
