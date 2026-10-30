@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// 輪郭は Flutter SDK の MaterialIcons フォントから tool/material_icon_paths.py で
 /// 抜き出したもの(MaterialIconPaths.swift)。SF Symbols で代用すると字形が変わるため。
-enum MaterialIcon: Sendable {
+nonisolated enum MaterialIcon: CaseIterable, Sendable {
   case check
   case expandMore
   case search
@@ -35,8 +35,12 @@ struct MaterialIconView: View {
 nonisolated struct MaterialIconShape: Shape {
   let icon: MaterialIcon
 
+  /// 一辺 1 の輪郭。表の行ごとに同じアイコンを描くので、読み取った結果を使い回す。
+  private static let unitPaths = Dictionary(
+    uniqueKeysWithValues: MaterialIcon.allCases.map { ($0, SVGPathParser.path($0.svgPath)) })
+
   func path(in rect: CGRect) -> Path {
-    SVGPathParser.path(icon.svgPath)
+    Self.unitPaths[icon, default: Path()]
       .applying(CGAffineTransform(scaleX: rect.width, y: rect.height))
       .offsetBy(dx: rect.minX, dy: rect.minY)
   }
