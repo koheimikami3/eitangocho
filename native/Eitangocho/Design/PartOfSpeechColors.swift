@@ -30,6 +30,11 @@ nonisolated extension PartOfSpeech {
     }
   }
 
+  /// iOS の配色での品詞バッジ。値は macOS と同じ(Flutter 版も AppPalette.posBadge を両方から引く)。
+  func badgeColors(_ palette: AppPalette) -> (background: Color, foreground: Color) {
+    badgeColors(palette.isDark ? AppColors.dark : AppColors.light)
+  }
+
   /// 表示用ラベル
   var label: LocalizedStringResource {
     switch self {
