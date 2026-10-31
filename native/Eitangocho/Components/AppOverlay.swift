@@ -1,5 +1,9 @@
 import SwiftUI
 
+#if os(iOS)
+  import UIKit
+#endif
+
 /// 画面の上に重ねるポップアップメニューとダイアログ(Flutter 版の showMenu / showDialog)。
 ///
 /// 標準の contextMenu(NSMenu)・alert は見た目が Flutter 版と変わるので使わず、
@@ -71,6 +75,21 @@ final class AppOverlay {
   /// スナックバーを出しておく時間(Flutter の SnackBar の既定と同じ 4 秒)。
   static let snackBarDuration: Duration = .seconds(4)
 
+  /// ダイアログ・シート・押し出す画面を出す前に、下の入力欄からフォーカスを外す(iOS)。
+  ///
+  /// Flutter の showDialog・showModalBottomSheet・Navigator.push は新しいルートにフォーカスを移すので、
+  /// 下の入力欄のキーボードは閉じる。この層は同じ画面に重ねるだけで、SwiftUI はフォーカスを動かさないため、
+  /// 外さないと検索欄にキーボードが出たまま ＋ で登録シートを開いたときに、打った文字が幕の裏の検索欄に入る
+  /// (Flutter は閉じたときに元の入力欄へフォーカスを戻すが、こちらは戻さない)。
+  /// macOS は何もしない(ダイアログの扱いを変えていない)。テストから差し替えるため閉包で持つ。
+  @ObservationIgnored var endEditing: @MainActor () -> Void = AppOverlay.resignFirstResponder
+
+  private static func resignFirstResponder() {
+    #if os(iOS)
+      UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    #endif
+  }
+
   func showMenu(at anchor: CGPoint, items: [MenuItem], minWidth: CGFloat = 140) {
     menu = Menu(anchor: anchor, items: items, minWidth: minWidth)
   }
@@ -84,6 +103,7 @@ final class AppOverlay {
     dismissible: Bool = true, barrier: Color? = nil,
     @ViewBuilder content: (_ dismiss: @escaping () -> Void) -> Content
   ) {
+    endEditing()
     let id = UUID()
     let dismiss: () -> Void = { [weak self] in self?.dismiss(id) }
     dialogs.append(Dialog(id: id, dismissible: dismissible, barrier: barrier, content: AnyView(content(dismiss))))
@@ -92,6 +112,7 @@ final class AppOverlay {
   /// シートを出す。`content` は閉じる関数を受け取る。出ているシートがあれば置き換える。
   func presentSheet<Content: View>(@ViewBuilder content: (_ dismiss: @escaping () -> Void) -> Content) {
     let id = UUID()
+    endEditing()
     let dismiss: () -> Void = { [weak self] in self?.dismissSheet(id) }
     sheetDragOffset = 0
     withAnimation(Self.sheetEnter) {
@@ -113,6 +134,7 @@ final class AppOverlay {
 
   /// 画面を押し出す(MobilePushLayer)。
   func push<Content: View>(@ViewBuilder content: () -> Content) {
+    endEditing()
     withAnimation(Self.pushEnter) {
       pages.append(Page(id: UUID(), content: AnyView(content())))
     }
