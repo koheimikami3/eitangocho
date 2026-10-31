@@ -13,8 +13,8 @@
     let session: AppModel.Session
 
     @Environment(\.palette) private var palette
-    /// タブの中身の下端のセーフエリア(タブバー + ホームインジケータ)。バナーをタブバーのすぐ上に置くのに使う。
-    @State private var tabBarInset: CGFloat = 0
+    /// 選択中のタブの中身の下端(画面の座標)= タブバーの上端。バナーをタブバーのすぐ上に置くのに使う。
+    @State private var tabBarTop: CGFloat?
     /// タブバー上のバナーの帯の高さ(出ていない間は 0)。タブの中身の下余白に足す。
     @State private var bannerHeight: CGFloat = 0
 
@@ -49,11 +49,15 @@
         }
         .tint(palette.accent)
         // バナーはタブを切り替えても読み込み直さないよう、タブごとではなく TabView の上に 1 つだけ重ねる。
-        .overlay(alignment: .bottom) {
-          MobileBannerAd(visible: bannerVisible) { bannerHeight = $0 }
-            .padding(.bottom, tabBarInset)
-            .ignoresSafeArea(.container, edges: .bottom)
-            .ignoresSafeArea(.keyboard)
+        .overlay {
+          // 重ねる側の下端からタブバーの上端までを空ける。TabView の枠が下のセーフエリアを含むか
+          // (iOS 26 以降は含み、iOS 18 は含まない)に左右されないよう、どちらも画面の座標で測る。
+          GeometryReader { geometry in
+            MobileBannerAd(visible: bannerVisible) { bannerHeight = $0 }
+              .padding(.bottom, max(geometry.frame(in: .global).maxY - (tabBarTop ?? .infinity), 0))
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+          }
+          .ignoresSafeArea(.keyboard)
         }
       }
       // iPhone の大きい機種でも Flutter 版と同じくデザインの幅(402pt)に収める。
@@ -103,9 +107,9 @@
       // バナーが重なる分を下の余白にする(Flutter 版はタブバーの高さ + バナーの高さを渡していた)。
       .safeAreaPadding(.bottom, bannerHeight)
       .background(palette.background)
-      // 下余白を足す前のセーフエリア(タブバー + ホームインジケータ)を測る。選択中のタブのものだけを使う。
-      .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.bottom } action: { inset in
-        if view == model.shell.view { tabBarInset = inset }
+      // 中身の枠はタブバーの上端で終わる(下余白は枠を変えない)。選択中のタブのものだけを使う。
+      .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).maxY } action: { maxY in
+        if view == model.shell.view { tabBarTop = maxY }
       }
     }
 
