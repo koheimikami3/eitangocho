@@ -42,13 +42,8 @@
               .frame(maxWidth: .infinity, alignment: .leading)
               .padding(EdgeInsets(top: 14, leading: 18, bottom: 40, trailing: 18))
               // 何も無いところのタップでキーボードを閉じる。複数行の欄は Return を「完了」にしているが、
-              // ほかに閉じる手段が無いと困るため。中身の背面で受けるので、入力欄やボタンのタップは奪わない。
-              // スクロールでは閉じない(下の欄を見に行くたびに閉じないように)。
-              .background {
-                Color.clear
-                  .contentShape(Rectangle())
-                  .onTapGesture { UIApplication.shared.dismissKeyboard() }
-              }
+              // ほかに閉じる手段が無いと困るため。スクロールでは閉じない(下の欄を見に行くたびに閉じないように)。
+              .background { KeyboardDismissTapArea() }
           }
           .scrollDismissesKeyboard(.never)
         } else {
@@ -138,10 +133,28 @@
     }
   }
 
-  extension UIApplication {
-    /// 今の入力欄のフォーカスを外してキーボードを閉じる。
-    func dismissKeyboard() {
-      sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+  /// 押されたらキーボードを閉じる、中身の背面に敷く面。
+  ///
+  /// SwiftUI の onTapGesture を背面に置くと、入力欄の上のタップまで拾ってフォーカスを外してしまう
+  /// (入力欄は SwiftUI の側では押せる物として扱われないため)。UIKit の面に認識器を付ければ、
+  /// 入力欄・ボタンの上のタップはその面に届かないので、何も無いところのタップだけを拾える。
+  private struct KeyboardDismissTapArea: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+      let view = UIView()
+      let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tapped))
+      tap.cancelsTouchesInView = false
+      view.addGestureRecognizer(tap)
+      return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator: NSObject {
+      @objc func tapped(_ recognizer: UITapGestureRecognizer) {
+        recognizer.view?.window?.endEditing(true)
+      }
     }
   }
 #endif

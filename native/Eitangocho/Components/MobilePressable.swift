@@ -44,12 +44,14 @@
     @ViewBuilder let content: (_ pressed: Bool) -> Content
 
     var body: some View {
+      // 中身は Button のラベルに置き、押している状態は環境値で渡す。ButtonStyle に中身の閉包を持たせると、
+      // 親の状態が変わっても makeBody が呼び直されず、中身が古いまま残るため。
       Button {
         action?()
       } label: {
-        EmptyView()
+        PressedContent(content: content)
       }
-      .buttonStyle(PressStyle(style: style, content: content))
+      .buttonStyle(PressStyle(style: style))
       .disabled(action == nil)
     }
   }
@@ -61,17 +63,29 @@
     }
   }
 
-  /// ラベルの代わりに中身を pressed つきで組む ButtonStyle。
-  private struct PressStyle<Content: View>: ButtonStyle {
-    let style: MobilePressStyle
+  extension EnvironmentValues {
+    /// MobilePressable の中身が押されている間か。
+    @Entry fileprivate var mobilePressed = false
+  }
+
+  /// 押している状態を環境値から受け取って中身を組む。
+  private struct PressedContent<Content: View>: View {
     let content: (Bool) -> Content
+    @Environment(\.mobilePressed) private var pressed
+
+    var body: some View { content(pressed) }
+  }
+
+  private struct PressStyle: ButtonStyle {
+    let style: MobilePressStyle
 
     /// デザインの transition(0.09〜0.1s)に合わせる。
     private static var duration: Double { 0.1 }
 
     func makeBody(configuration: Configuration) -> some View {
       let pressed = configuration.isPressed
-      content(pressed)
+      configuration.label
+        .environment(\.mobilePressed, pressed)
         .contentShape(Rectangle())
         .scaleEffect(pressed ? style.scale : 1)
         .opacity(pressed ? style.opacity : 1)

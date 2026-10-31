@@ -85,8 +85,12 @@
         .focused(isFocused)
         .onSubmit { onSubmit?() }
         .padding(.horizontal, 12)
+        // 1 行の欄は行の高さ + 上下の余白の枠の中で上下中央に置く。複数行の欄は下限の行数ぶんを確保し、
+        // その外に上下の余白を付ける(Flutter の InputDecorator と同じ高さ)。
         .frame(
-          minHeight: layout.lineHeight * CGFloat(lineLimit?.lowerBound ?? 1) + Self.verticalPadding * 2,
+          minHeight: lineLimit == nil
+            ? layout.lineHeight + Self.verticalPadding * 2
+            : layout.lineHeight * CGFloat(lineLimit?.lowerBound ?? 1),
           alignment: lineLimit == nil ? .center : .top
         )
         .padding(.vertical, lineLimit == nil ? 0 : Self.verticalPadding)
