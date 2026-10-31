@@ -34,8 +34,8 @@
       let shape = UnevenRoundedRectangle(topLeadingRadius: 18, topTrailingRadius: 18)
       VStack(spacing: 0) {
         MobileSheetHeader(
-          showGrabber: showGrabber, title: title, titleFontSize: titleFontSize, leftLabel: leftLabel,
-          onLeft: onLeft, rightLabel: rightLabel, onRight: onRight)
+          title: title, titleFontSize: titleFontSize, showGrabber: showGrabber, leftLabel: leftLabel, onLeft: onLeft,
+          rightLabel: rightLabel, onRight: onRight)
         if scrollableBody {
           ScrollView {
             content()
@@ -76,14 +76,16 @@
   }
 
   /// シートのヘッダ(つまみ・左の文字のボタン・中央のタイトル・右の主ボタン)。下へ引くと閉じる。
-  private struct MobileSheetHeader: View {
-    let showGrabber: Bool
+  /// MobileSheet を使わない並び替えのシートも、左右のボタンなしでこれを使う(見た目を登録・編集シートに揃える)。
+  struct MobileSheetHeader: View {
     let title: String
-    let titleFontSize: CGFloat
-    let leftLabel: String
-    let onLeft: () -> Void
-    let rightLabel: String?
-    let onRight: (() -> Void)?
+    var titleFontSize: CGFloat = 15
+    var showGrabber = true
+    /// 左上の文字のボタン。nil なら出さない。
+    var leftLabel: String?
+    var onLeft: (() -> Void)?
+    var rightLabel: String?
+    var onRight: (() -> Void)?
 
     @Environment(\.palette) private var palette
 
@@ -95,11 +97,13 @@
           AppText(title, style: AppTextStyle(size: titleFontSize, weight: .w700))
             .foregroundStyle(palette.text)
           HStack(spacing: 0) {
-            MobilePressable(style: .text, action: onLeft) {
-              AppText(leftLabel, style: AppTextStyle(size: 15))
-                .foregroundStyle(palette.accentOnSoft)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 4)
+            if let leftLabel, let onLeft {
+              MobilePressable(style: .text, action: onLeft) {
+                AppText(leftLabel, style: AppTextStyle(size: 15))
+                  .foregroundStyle(palette.accentOnSoft)
+                  .padding(.vertical, 8)
+                  .padding(.horizontal, 4)
+              }
             }
             Spacer(minLength: 0)
             // 確定操作(登録・保存)は文字ではなくピル形の主ボタンにする。
@@ -121,8 +125,8 @@
     }
   }
 
-  /// シート上端のつまみ(下へスワイプで閉じられる合図)。並び替えシートのように MobileSheet を使わないシートでも出す。
-  struct MobileSheetGrabber: View {
+  /// シート上端のつまみ(下へスワイプで閉じられる合図)。
+  private struct MobileSheetGrabber: View {
     @Environment(\.palette) private var palette
 
     var body: some View {
