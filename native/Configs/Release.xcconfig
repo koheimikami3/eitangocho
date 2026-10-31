@@ -1,0 +1,14 @@
+#include "Shared.xcconfig"
+
+// Release はサフィックスなし(本番の Bundle ID・表示名)。空で定義しておかないと
+// $(BUNDLE_ID_SUFFIX) などが未定義のまま展開される。
+BUNDLE_ID_SUFFIX =
+// iOS のホーム画面の名前。全角 6〜7 文字を超えると省略されるため短く保つ。
+APP_DISPLAY_NAME = 英単語帳
+APP_DISPLAY_SUFFIX =
+APP_ICON_NAME = AppIcon
+
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+ENABLE_NS_ASSERTIONS = NO
+SWIFT_COMPILATION_MODE = wholemodule
+VALIDATE_PRODUCT = YES

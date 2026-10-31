@@ -1,0 +1,431 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000036 /* EitangochoWordInfo in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* EitangochoWordInfo */; };
+		A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000038 /* ejdict-hand-utf8.txt */; };
+		A10000000000000000000130 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000030 /* Inter.ttf */; };
+		A10000000000000000000131 /* NotoSansJP.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* NotoSansJP.ttf */; };
+		A10000000000000000000132 /* NotoSansTC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000032 /* NotoSansTC.ttf */; };
+		A10000000000000000000133 /* Andika-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000033 /* Andika-Regular.ttf */; };
+		A10000000000000000000140 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000040 /* Inter-OFL.txt */; };
+		A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000041 /* NotoSansJP-OFL.txt */; };
+		A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000042 /* NotoSansTC-OFL.txt */; };
+		A10000000000000000000143 /* Andika-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000043 /* Andika-OFL.txt */; };
+		A1000000000000000000001E /* EitangochoData in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001D /* EitangochoData */; };
+		A10000000000000000000020 /* EitangochoSync in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001F /* EitangochoSync */; };
+		A10000000000000000000014 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppIcon.icon */; };
+		A10000000000000000000015 /* AppIcon-dev.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* AppIcon-dev.icon */; };
+		A10000000000000000000052 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000051 /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000024 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000010;
+			remoteInfo = Eitangocho;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000038 /* ejdict-hand-utf8.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ejdict-hand-utf8.txt"; path = "../assets/ejdict/ejdict-hand-utf8.txt"; sourceTree = "<group>"; };
+		A10000000000000000000030 /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
+		A10000000000000000000031 /* NotoSansJP.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansJP.ttf; path = ../assets/fonts/NotoSansJP.ttf; sourceTree = "<group>"; };
+		A10000000000000000000032 /* NotoSansTC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansTC.ttf; path = ../assets/fonts/NotoSansTC.ttf; sourceTree = "<group>"; };
+		A10000000000000000000033 /* Andika-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Andika-Regular.ttf; path = ../assets/fonts/Andika-Regular.ttf; sourceTree = "<group>"; };
+		A10000000000000000000040 /* Inter-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Inter-OFL.txt"; path = "../assets/fonts/licenses/Inter-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000041 /* NotoSansJP-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansJP-OFL.txt"; path = "../assets/fonts/licenses/NotoSansJP-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000042 /* NotoSansTC-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansTC-OFL.txt"; path = "../assets/fonts/licenses/NotoSansTC-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000043 /* Andika-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Andika-OFL.txt"; path = "../assets/fonts/licenses/Andika-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000021 /* EitangochoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EitangochoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000022 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		A10000000000000000000004 /* Eitangocho.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eitangocho.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000006 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = AppIcon.icon; path = ../shared/AppIcon.icon; sourceTree = "<group>"; };
+		A10000000000000000000007 /* AppIcon-dev.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = "AppIcon-dev.icon"; path = "../shared/AppIcon-dev.icon"; sourceTree = "<group>"; };
+		A10000000000000000000009 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		A1000000000000000000000A /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		A1000000000000000000000B /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		A1000000000000000000000D /* Eitangocho-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Eitangocho-iOS.entitlements"; sourceTree = "<group>"; };
+		A1000000000000000000000E /* Eitangocho-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Eitangocho-macOS.entitlements"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A10000000000000000000023 /* EitangochoTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = EitangochoTests; sourceTree = "<group>"; };
+		A10000000000000000000005 /* Eitangocho */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Eitangocho; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000012 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000001E /* EitangochoData in Frameworks */,
+				A10000000000000000000020 /* EitangochoSync in Frameworks */,
+				A10000000000000000000036 /* EitangochoWordInfo in Frameworks */,
+				A10000000000000000000052 /* FirebaseAnalytics in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000025 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000005 /* Eitangocho */,
+				A10000000000000000000023 /* EitangochoTests */,
+				A1000000000000000000000F /* Icons */,
+				A10000000000000000000034 /* Fonts */,
+				A10000000000000000000044 /* FontLicenses */,
+				A10000000000000000000039 /* Dictionary */,
+				A10000000000000000000008 /* Configs */,
+				A1000000000000000000000C /* Support */,
+				A10000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000004 /* Eitangocho.app */,
+				A10000000000000000000021 /* EitangochoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000008 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000009 /* Shared.xcconfig */,
+				A1000000000000000000000A /* Debug.xcconfig */,
+				A1000000000000000000000B /* Release.xcconfig */,
+				A10000000000000000000022 /* Tests.xcconfig */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000C /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000000D /* Eitangocho-iOS.entitlements */,
+				A1000000000000000000000E /* Eitangocho-macOS.entitlements */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000F /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000006 /* AppIcon.icon */,
+				A10000000000000000000007 /* AppIcon-dev.icon */,
+			);
+			name = Icons;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000034 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000030 /* Inter.ttf */,
+				A10000000000000000000031 /* NotoSansJP.ttf */,
+				A10000000000000000000032 /* NotoSansTC.ttf */,
+				A10000000000000000000033 /* Andika-Regular.ttf */,
+			);
+			name = Fonts;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000044 /* FontLicenses */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000040 /* Inter-OFL.txt */,
+				A10000000000000000000041 /* NotoSansJP-OFL.txt */,
+				A10000000000000000000042 /* NotoSansTC-OFL.txt */,
+				A10000000000000000000043 /* Andika-OFL.txt */,
+			);
+			name = FontLicenses;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000039 /* Dictionary */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000038 /* ejdict-hand-utf8.txt */,
+			);
+			name = Dictionary;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000010 /* Eitangocho */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000019 /* Build configuration list for PBXNativeTarget "Eitangocho" */;
+			buildPhases = (
+				A10000000000000000000011 /* Sources */,
+				A10000000000000000000012 /* Frameworks */,
+				A10000000000000000000013 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000005 /* Eitangocho */,
+			);
+			name = Eitangocho;
+			packageProductDependencies = (
+				A1000000000000000000001D /* EitangochoData */,
+				A1000000000000000000001F /* EitangochoSync */,
+				A10000000000000000000035 /* EitangochoWordInfo */,
+				A10000000000000000000051 /* FirebaseAnalytics */,
+			);
+			productName = Eitangocho;
+			productReference = A10000000000000000000004 /* Eitangocho.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000026 /* EitangochoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000000000000000000002B /* Build configuration list for PBXNativeTarget "EitangochoTests" */;
+			buildPhases = (
+				A10000000000000000000027 /* Sources */,
+				A10000000000000000000025 /* Frameworks */,
+				A10000000000000000000028 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1000000000000000000002E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000023 /* EitangochoTests */,
+			);
+			name = EitangochoTests;
+			productName = EitangochoTests;
+			productReference = A10000000000000000000021 /* EitangochoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2710;
+				LastUpgradeCheck = 2710;
+				TargetAttributes = {
+					A10000000000000000000010 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					A10000000000000000000026 = {
+						CreatedOnToolsVersion = 27.1;
+						TestTargetID = A10000000000000000000010;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000016 /* Build configuration list for PBXProject "Eitangocho" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ja,
+				"zh-Hant",
+				es,
+				fr,
+			);
+			mainGroup = A10000000000000000000002;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1000000000000000000001C /* XCLocalSwiftPackageReference "Packages/EitangochoCore" */,
+				A10000000000000000000050 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A10000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000010 /* Eitangocho */,
+				A10000000000000000000026 /* EitangochoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000013 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000014 /* AppIcon.icon in Resources */,
+				A10000000000000000000015 /* AppIcon-dev.icon in Resources */,
+				A10000000000000000000130 /* Inter.ttf in Resources */,
+				A10000000000000000000131 /* NotoSansJP.ttf in Resources */,
+				A10000000000000000000132 /* NotoSansTC.ttf in Resources */,
+				A10000000000000000000133 /* Andika-Regular.ttf in Resources */,
+				A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */,
+				A10000000000000000000140 /* Inter-OFL.txt in Resources */,
+				A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */,
+				A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */,
+				A10000000000000000000143 /* Andika-OFL.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000028 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000011 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000027 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1000000000000000000002E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000010 /* Eitangocho */;
+			targetProxy = A10000000000000000000024 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000017 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1000000000000000000000A /* Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		A10000000000000000000018 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1000000000000000000000B /* Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		A1000000000000000000001A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		A1000000000000000000001B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		A10000000000000000000029 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000022 /* Tests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		A1000000000000000000002A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000022 /* Tests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000016 /* Build configuration list for PBXProject "Eitangocho" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000017 /* Debug */,
+				A10000000000000000000018 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000019 /* Build configuration list for PBXNativeTarget "Eitangocho" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000000000000000000001A /* Debug */,
+				A1000000000000000000001B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000000000000000000002B /* Build configuration list for PBXNativeTarget "EitangochoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000029 /* Debug */,
+				A1000000000000000000002A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1000000000000000000001C /* XCLocalSwiftPackageReference "Packages/EitangochoCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/EitangochoCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A10000000000000000000050 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 12.19.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1000000000000000000001D /* EitangochoData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EitangochoData;
+		};
+		A1000000000000000000001F /* EitangochoSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EitangochoSync;
+		};
+		A10000000000000000000035 /* EitangochoWordInfo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EitangochoWordInfo;
+		};
+		A10000000000000000000051 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000050 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A10000000000000000000001 /* Project object */;
+}

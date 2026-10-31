@@ -1,0 +1,47 @@
+{
+  "deletions" : [
+    {
+      "deletedAt" : "2026-10-03T00:00:00.000Z",
+      "word" : "apple"
+    }
+  ],
+  "exportedAt" : "2026-10-29T03:04:05.123Z",
+  "version" : 2,
+  "words" : [
+    {
+      "audioUrl" : "",
+      "correctCount" : 3,
+      "createdAt" : "2026-10-01T00:00:00.000Z",
+      "exampleEn" : "She achieved her goal.",
+      "exampleJa" : "她實現了目標。",
+      "ipa" : "/əˈtʃiːv/",
+      "isLearned" : true,
+      "japanese" : "實現",
+      "lastReviewedAt" : "2026-10-28T09:00:00.000Z",
+      "partsOfSpeech" : [
+        "verb"
+      ],
+      "translationLanguage" : "zh-Hant",
+      "updatedAt" : "2026-10-02T12:30:15.000Z",
+      "word" : "achieve"
+    },
+    {
+      "audioUrl" : "",
+      "correctCount" : 0,
+      "createdAt" : "2026-09-30T23:59:59.000Z",
+      "exampleEn" : "",
+      "exampleJa" : "",
+      "ipa" : "",
+      "isLearned" : false,
+      "japanese" : "〜を使い果たす",
+      "lastReviewedAt" : null,
+      "partsOfSpeech" : [
+        "verb",
+        "other"
+      ],
+      "translationLanguage" : "ja",
+      "updatedAt" : "2026-09-30T23:59:59.000Z",
+      "word" : "run out of"
+    }
+  ]
+}

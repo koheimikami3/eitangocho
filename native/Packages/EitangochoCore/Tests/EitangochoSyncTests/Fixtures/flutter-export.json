@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "exportedAt": "2026-10-29T03:04:05.123456Z",
+  "words": [
+    {
+      "word": "achieve",
+      "japanese": "實現",
+      "ipa": "/əˈtʃiːv/",
+      "partsOfSpeech": [
+        "verb"
+      ],
+      "exampleEn": "She achieved her goal.",
+      "exampleJa": "她實現了目標。",
+      "translationLanguage": "zh-Hant",
+      "audioUrl": "",
+      "isLearned": true,
+      "lastReviewedAt": "2026-10-28T09:00:00.000Z",
+      "correctCount": 3,
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "updatedAt": "2026-10-02T12:30:15.000Z"
+    },
+    {
+      "word": "run out of",
+      "japanese": "〜を使い果たす",
+      "ipa": "",
+      "partsOfSpeech": [
+        "verb",
+        "other"
+      ],
+      "exampleEn": "",
+      "exampleJa": "",
+      "translationLanguage": "ja",
+      "audioUrl": "",
+      "isLearned": false,
+      "lastReviewedAt": null,
+      "correctCount": 0,
+      "createdAt": "2026-09-30T23:59:59.000Z",
+      "updatedAt": "2026-09-30T23:59:59.000Z"
+    }
+  ],
+  "deletions": [
+    {
+      "word": "apple",
+      "deletedAt": "2026-10-03T00:00:00.000Z"
+    }
+  ]
+}

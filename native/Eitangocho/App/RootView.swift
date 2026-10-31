@@ -1,0 +1,99 @@
+import EitangochoSync
+import StoreKit
+import SwiftUI
+
+/// 起動の段階に応じて画面を出し分ける。配色と表示倍率はここで設定から配る。
+struct RootView: View {
+  let model: AppModel
+
+  @Environment(\.requestReview) private var requestReview
+
+  var body: some View {
+    content
+      .overlay { AppOverlayHost(overlay: model.overlay) }
+      .environment(\.appOverlay, model.overlay)
+      .environment(\.analytics, model.analytics)
+      // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
+      .onAppear { model.reviewClient.action = requestReview }
+      .environment(\.colors, model.settings.appearance.colors)
+      #if os(macOS)
+        .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
+        .environment(\.openPronunciation, openPronunciation)
+        .frame(minWidth: WindowAppearance.minimumSize.width, minHeight: WindowAppearance.minimumSize.height)
+        .onChange(of: model.settings.appearance, initial: true) { _, appearance in
+          WindowAppearance.apply(appearance)
+        }
+      #endif
+      .preferredColorScheme(model.settings.appearance == .dark ? .dark : .light)
+  }
+
+  #if os(macOS)
+    /// 発音確認のウィンドウを開く。ページもアプリと同じ拡大率で出す。
+    private func openPronunciation(_ word: String) {
+      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
+      model.analytics.logPronunciationOpened(model.shell.view)
+      PronunciationWindowController.shared.open(
+        url: GoogleTranslateURL.make(word, language: model.settings.translationLanguage), title: word,
+        zoom: model.settings.uiScale)
+    }
+  #endif
+
+  @ViewBuilder
+  private var content: some View {
+    switch model.phase {
+    case .loading:
+      ProgressView()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    case .failed(let failure):
+      StartupFailureView(failure: failure, model: model)
+    case .ready(let session):
+      readyContent(session)
+        .modifier(
+          AnalyticsReporting(reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session))
+    }
+  }
+
+  /// 起動に成功した後の画面。
+  @ViewBuilder
+  private func readyContent(_ session: AppModel.Session) -> some View {
+    #if os(macOS)
+      MacMainShell(
+        shell: model.shell, settings: model.settings,
+        learningCount: WordListing.learning(session.words.words).count,
+        wordCount: session.words.words.count,
+        onStartQuiz: { session.quiz.start(trigger: .tab) }
+      ) { view in
+        mainContent(view, session: session)
+      }
+    #elseif DEBUG
+      // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
+      DiagnosticsView(session: session)
+    #else
+      Text(verbatim: "\(session.importOutcome)")
+    #endif
+  }
+}
+
+#if os(macOS)
+  extension RootView {
+    /// シェルの中身(表示中の画面)。
+    @ViewBuilder
+    fileprivate func mainContent(_ view: MainView, session: AppModel.Session) -> some View {
+      switch view {
+      case .learning:
+        LearningWordsView(store: session.words, shell: model.shell, settings: model.settings)
+      case .allWords:
+        AllWordsView(store: session.words, shell: model.shell, settings: model.settings)
+      case .registration:
+        WordRegistrationView(
+          shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
+          analytics: model.analytics, review: session.review)
+      case .quiz:
+        QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
+      case .settings:
+        SettingsView(
+          settings: model.settings, sync: session.sync, exportService: WordExportService(database: session.database))
+      }
+    }
+  }
+#endif

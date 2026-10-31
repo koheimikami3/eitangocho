@@ -87,11 +87,13 @@
 - **iCloud 同期**: コンテナ上の JSON スナップショット 1 個を「読んでマージ → 全体を
   書き戻す」。競合は単語ごとに `updatedAt` が新しい方を採る(手動インポートと同じ
   `WordExportService`)。削除はトゥームストーン(`deleted_words`、180 日保持)で伝える
-  - `lastReviewedAt` だけは単語の勝敗と切り離して新しい方を採る。クイズの回答は
-    `updatedAt` を動かさないので、そのままだと伝わらず、端末ごとに出題の一巡がずれる
+  - クイズの回答の実績は単語の勝敗と切り離す。クイズの回答は `updatedAt` を動かさないので、
+    そのままだと伝わらず、端末ごとに出題の一巡がずれる。`lastReviewedAt` は新しい方を採る。
+    `correctCount` は Swift 版だけ大きい方を採る(回数は増えるだけなので大きい方がより多くの回答を含み、
+    何度同期しても結果が変わらない)。Flutter 版の `correctCount` は単語の勝敗に従う
   - 削除と更新が同じ時刻なら削除を勝たせる(DateTime が秒精度のため)
   - 自分の削除ログを尊重するのは同期のときだけ。手動インポートはファイルの内容を復元する
-  - 同期する契機: 起動時・有効化時・フォアグラウンド復帰時(最短 60 秒)・ローカル変更後
+  - 同期する契機: 起動時・有効化時・フォアグラウンド復帰時(最短 60 秒。Swift 版の macOS は毎回)・ローカル変更後
     (drift の `tableUpdates`、5 秒デバウンス)・手動。iOS はサスペンドするので、
     フォアグラウンド復帰時の同期が必須
   - クラウド側の変更は監視しない(`NSMetadataQuery` は使わない)
@@ -101,6 +103,24 @@
   - 競合版も取り込んでから、書き戻しの成功後に取り込んだ分だけ片付ける。
     削除ログの保持期間より古い競合版は取り込まない(掃除済みの削除を知らず単語が復活する)
 - 設定値は `shared_preferences` に平文で保存してよい(DeepL キーを含む)
+
+### ネイティブ版(native/)への引き継ぎ
+
+- **同期 JSON の互換は恒久に保つ。** iOS 18 / macOS 15 未満の端末は Swift 版に更新できず、
+  Flutter の最終版のまま同期し続ける。形式のバージョンを上げず、必須のキーを足さない
+- **Flutter 版の DB(`Documents/eitangocho.sqlite`)は開かず、書き換えず、消さない。**
+  ファイルとしてコピーし、復旧・スキーマ更新・検証はコピーの方で行ってから App Group の
+  `Database/` へ移す。元ファイルが残っていれば Flutter 版を入れ直すだけで戻れる
+- **移すのは、WAL のチェックポイント後に接続を閉じ、`-wal` / `-shm` が残っていないことを
+  確かめた本体だけ。** 本体だけを動かすと `-wal` にしか無い書き込みが失われる。
+  Apple の SQLite は WAL を閉じても残す設定が既定なので、移す前の接続だけそれを切る
+- **引き継ぎに失敗したら空の DB で始めない。** 印を書かず失敗の画面を出し、次の起動でやり直す。
+  元ファイルからの引き継ぎ直しは自動では行わない(引き継ぎ後の変更を失うため)
+- **スキーマは drift と互換のまま保つ。** 版は `PRAGMA user_version` で drift の番号を引き継ぎ、
+  GRDB の `DatabaseMigrator` は使わない。日時は UNIX 秒の整数で書く(GRDB の既定の文字列にしない)。
+  Flutter に戻す版が要るときは、drift で App Group の DB を開くだけで済む
+- **設定値は Flutter 版と同じキー・同じ型で `UserDefaults.standard` を読み書きする。**
+  `SharedPreferencesAsync` は接頭辞を付けないので、Bundle ID が同じなら移す処理は要らない
 
 ## プラットフォーム
 
@@ -186,7 +206,10 @@
   プラットフォームはユーザープロパティ `app_platform` で分ける
 - 自動の screen_view は Info.plist で止めている(Flutter は画面が 1 つで意味のある名前が
   出ない)。画面遷移はアプリから送る
-- `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする
+- `firebase_options.dart` と `GoogleService-Info.plist` の値は公開値なのでコミットする。
+  ネイティブ版は `native/Eitangocho/Resources/GoogleService-Info.plist`(Flutter 版の写し)だけを持ち、
+  オプションをコードに書かない。firebase-ios-sdk は Flutter 版がリンクしている版に固定する
+  (同じ SDK で app_instance_id が引き継がれることを確かめるため)
 - `flutterfire configure` は pbxproj を丸ごと書き直して並び順を崩す。再実行したら、
   plist の追加分だけを残して他の差分は戻す
 

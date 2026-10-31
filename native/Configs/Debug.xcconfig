@@ -1,0 +1,20 @@
+#include "Shared.xcconfig"
+
+// Debug ビルドは Bundle ID に ".dev" を付け、表示名・アイコンも本番と分ける。
+// ストア配布版とは別のアプリ(別 DB・別 iCloud コンテナ・別 App Group)になり、
+// 開発中のビルドがインストール済みの本番アプリのデータに触れない。
+// Flutter 版の ios/Flutter/Debug.xcconfig・macos/Runner/Configs/Debug.xcconfig と同じ値。
+BUNDLE_ID_SUFFIX = .dev
+// iOS のホーム画面の名前。xcconfig は値の先頭の空白を捨てるため、iOS は名前を丸ごと持つ。
+APP_DISPLAY_NAME = 英単語帳 dev
+// macOS の .app の名前に付ける接尾辞。
+APP_DISPLAY_SUFFIX = (Dev)
+APP_ICON_NAME = AppIcon-dev
+
+ONLY_ACTIVE_ARCH = YES
+DEBUG_INFORMATION_FORMAT = dwarf
+ENABLE_TESTABILITY = YES
+GCC_OPTIMIZATION_LEVEL = 0
+GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 $(inherited)
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG $(inherited)
