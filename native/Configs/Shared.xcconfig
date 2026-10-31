@@ -36,8 +36,8 @@ EXECUTABLE_NAME = eitangocho
 ASSETCATALOG_COMPILER_APPICON_NAME = $(APP_ICON_NAME)
 
 // バージョンは Flutter 版(pubspec.yaml)の値に合わせてある。更新はリリースの作業で行う。
-MARKETING_VERSION = 2.11.1
-CURRENT_PROJECT_VERSION = 26
+MARKETING_VERSION = 2.12.0
+CURRENT_PROJECT_VERSION = 27
 
 GENERATE_INFOPLIST_FILE = YES
 // 生成の Info.plist に無いキー(Firebase の自動の screen_view を止める)だけを重ねる。
