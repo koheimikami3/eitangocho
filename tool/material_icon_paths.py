@@ -24,7 +24,7 @@ from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
 
 # macOS 版で使うアイコン(Flutter の Icons の名前)。
-ICONS = ["check", "expand_more", "search", "volume_up"]
+ICONS = ["check", "expand_more", "search", "sort", "volume_up"]
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "native" / "Eitangocho" / "Design" / "MaterialIconPaths.swift"
@@ -41,7 +41,7 @@ def codepoints(root: pathlib.Path) -> dict[str, int]:
     source = (root / "packages/flutter/lib/src/material/icons.dart").read_text(encoding="utf-8")
     found = {}
     for name in ICONS:
-        match = re.search(rf"static const IconData {name} = IconData\((0x[0-9a-f]+)", source)
+        match = re.search(rf"static const IconData {name} = IconData\(\s*(0x[0-9a-f]+)", source)
         if not match:
             raise SystemExit(f"{name} が icons.dart に無い")
         found[name] = int(match.group(1), 16)

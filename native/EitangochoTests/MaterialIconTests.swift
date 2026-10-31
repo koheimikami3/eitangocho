@@ -13,7 +13,7 @@ struct MaterialIconTests {
     #expect(abs(bounds.maxY - 20.49) < 0.05)
   }
 
-  @Test(arguments: [MaterialIcon.check, .expandMore, .search, .volumeUp])
+  @Test(arguments: MaterialIcon.allCases)
   func どのアイコンも空でない輪郭になる(icon: MaterialIcon) {
     let bounds = MaterialIconShape(icon: icon).path(in: CGRect(x: 0, y: 0, width: 1, height: 1)).boundingRect
     #expect(bounds.width > 0.3)

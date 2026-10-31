@@ -73,11 +73,8 @@ struct RootView: View {
       ) { view in
         mainContent(view, session: session)
       }
-    #elseif DEBUG
-      // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
-      DiagnosticsView(session: session)
     #else
-      Text(verbatim: "\(session.importOutcome)")
+      MobileTabShell(model: model, session: session)
     #endif
   }
 }

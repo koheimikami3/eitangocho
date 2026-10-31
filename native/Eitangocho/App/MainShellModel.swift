@@ -31,7 +31,12 @@ final class MainShellModel {
   private(set) var searchQuery = ""
 
   /// ⌘F で検索欄にフォーカスを当てる合図。値が変わるたびに検索欄が受け取る。
+  /// iOS はヘッダの 🔍 で検索欄を開いたときにも上げる。
   private(set) var searchFocusRequest = 0
+
+  /// iOS のヘッダに検索欄を開いているか。検索語がある間は開いたままにする
+  /// (閉じると絞り込み中であることが見えなくなるため)。学習中・全単語で共有する。
+  private(set) var isSearchOpen = false
 
   @ObservationIgnored private let analytics: AnalyticsLogger
 
@@ -57,5 +62,22 @@ final class MainShellModel {
   func focusSearch() {
     guard view.hasSearchField else { return }
     searchFocusRequest += 1
+  }
+
+  /// iOS のヘッダの 🔍。検索欄を開いてフォーカスを当てる(開いていればフォーカスだけ)。
+  func openSearch() {
+    isSearchOpen = true
+    searchFocusRequest += 1
+  }
+
+  /// iOS の検索欄の「キャンセル」。検索語を消して閉じる。
+  func cancelSearch() {
+    updateSearchQuery("")
+    isSearchOpen = false
+  }
+
+  /// iOS の検索欄からフォーカスが外れた。何も打たずに離れたなら閉じる(検索語があれば開いたまま)。
+  func searchFocusLost() {
+    if searchQuery.isEmpty { isSearchOpen = false }
   }
 }
