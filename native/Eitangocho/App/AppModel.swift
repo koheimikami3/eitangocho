@@ -66,6 +66,9 @@ final class AppModel {
   /// 課金(iOS だけ。macOS では SDK に触れない)。DB に依存しないので最初に作る。
   let purchase: PurchaseModel
 
+  /// ATT の許可の状態(要求は `tracking` が行う。計測の att_status もここから読む)。
+  let trackingClient: any TrackingClient = SystemTrackingClient()
+
   /// ATT の要求の時機(iOS だけ)。
   let tracking: TrackingAuthorizer
 
@@ -77,14 +80,14 @@ final class AppModel {
     shell = MainShellModel(analytics: analytics)
     #if os(iOS)
       purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
-      tracking = TrackingAuthorizer(client: SystemTrackingClient()) {
+      tracking = TrackingAuthorizer(client: trackingClient) {
         UIApplication.shared.applicationState == .active
       }
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
     #else
       purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
       // macOS には広告が無いので、ATT も聞かない(AdsController が iOS 以外では呼ばない)。
-      tracking = TrackingAuthorizer(client: SystemTrackingClient()) { true }
+      tracking = TrackingAuthorizer(client: trackingClient) { true }
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: NoAdsSDK(), platformSupported: false)
     #endif
   }

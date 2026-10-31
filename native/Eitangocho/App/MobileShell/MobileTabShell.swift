@@ -96,7 +96,7 @@
         case .quiz:
           QuizViewMobile(quiz: session.quiz, shell: model.shell, settings: model.settings)
         case .settings:
-          SettingsViewMobile(session: session, settings: model.settings)
+          SettingsViewMobile(session: session, settings: model.settings, shell: model.shell)
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -73,7 +73,9 @@ struct RootView: View {
     case .ready(let session):
       readyContent(session)
         .modifier(
-          AnalyticsReporting(reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session))
+          AnalyticsReporting(
+            reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session,
+            purchase: model.purchase, trackingClient: model.trackingClient))
     }
   }
 

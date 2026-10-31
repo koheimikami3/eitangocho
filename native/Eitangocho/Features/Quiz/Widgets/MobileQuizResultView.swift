@@ -8,6 +8,8 @@
     let forgotWords: [Word]
     let onContinue: () -> Void
     let onToLearning: () -> Void
+    /// 広告の下の Pro への導線を押したとき。
+    let onOpenPro: () -> Void
 
     @Environment(\.palette) private var palette
 
@@ -23,7 +25,7 @@
           MobileQuizForgotList(words: forgotWords)
         }
         // 上の余白は広告自身が持ち、読み込めなければ高さごと消えて今のレイアウトに戻る(Flutter 版と同じ)。
-        MobileQuizRectangleAd()
+        MobileQuizRectangleAd(onOpenPro: onOpenPro)
         Spacer().frame(height: 16)
         HStack(spacing: 10) {
           MobileFilledButton(label: String(localized: .quizContinue), expands: true, action: onContinue)

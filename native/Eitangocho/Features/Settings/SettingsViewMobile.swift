@@ -15,16 +15,23 @@
   struct SettingsViewMobile: View {
     let session: AppModel.Session
     let settings: SettingsStore
+    let shell: MainShellModel
 
     @Environment(\.openURL) private var openURL
+    @Environment(\.purchase) private var purchase
+    /// 表示の位置。タブが選ばれるたびに先頭へ戻す(下記)。
+    @State private var position = ScrollPosition(edge: .top)
     @Environment(\.appOverlay) private var overlay
     @Environment(\.analytics) private var analytics
 
     var body: some View {
       ScrollView {
         VStack(spacing: 22) {
-          // 6c: Pro の欄(MobileProSection)はここ(いちばん上)に入る。課金を扱えない環境では
-          // 間隔ごと出さない(VStack の spacing なので、欄を置かなければ余白も残らない)。
+          // 課金を扱えない環境(SDK キーが未設定・iOS 以外・初期化の失敗)では欄ごと出さない
+          // (VStack の spacing なので、欄を置かなければ余白も残らない)。
+          if let purchase, purchase.available {
+            MobileProSection(purchase: purchase)
+          }
           display
           MobileSettingsSection(title: String(localized: .sectionQuiz)) {
             ForEach(QuizDirection.allCases, id: \.self) { direction in
@@ -77,6 +84,12 @@
           EdgeInsets(
             top: AppDimensions.mobilePadding, leading: AppDimensions.mobilePadding,
             bottom: AppDimensions.mobilePadding * 2, trailing: AppDimensions.mobilePadding))
+      }
+      // タブが選ばれるたびに先頭から表示する(Flutter 版はタブの切り替えのたびに作り直していた)。
+      // クイズ結果の Pro への導線は、設定のタブに移るだけで先頭の Pro の欄が見えることを前提にしている。
+      .scrollPosition($position)
+      .onChange(of: shell.view) { _, view in
+        if view == .settings { position.scrollTo(edge: .top) }
       }
     }
 

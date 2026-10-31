@@ -32,6 +32,9 @@ final class PurchaseModel {
   private(set) var purchaseFailed = false
   /// 復元行の右端に一時表示する状況。
   private(set) var restoreStatus: RestoreStatus?
+  /// 購入状態が一度でも分かったか(`proUnlockedKnown` が立ったか)。計測の is_pro は分かってから送る
+  /// (それまでは未購入に見えるため)。
+  private(set) var isProUnlockedKnown = false
 
   /// 購入状態(entitlement)が一度でも分かったことを表す合図。
   ///
@@ -77,7 +80,7 @@ final class PurchaseModel {
   private func initialize() async {
     guard client.isAvailable else {
       purchaseLogger.info("課金は無効です(iOS 以外、または SDK キーが未設定)")
-      proUnlockedKnown.fire()
+      markProUnlockedKnown()
       return
     }
 
@@ -86,7 +89,7 @@ final class PurchaseModel {
     } catch {
       purchaseLogger.error("SDK の初期化に失敗しました: \(String(describing: error), privacy: .public)")
       available = false
-      proUnlockedKnown.fire()
+      markProUnlockedKnown()
       return
     }
 
@@ -94,13 +97,18 @@ final class PurchaseModel {
     updates = Task { [weak self] in
       for await unlocked in stream {
         guard let self else { return }
-        proUnlockedKnown.fire()
         purchaseLogger.info("購入状態: \(unlocked ? "Pro" : "未購入", privacy: .public)")
         proUnlocked = unlocked
+        markProUnlockedKnown()
       }
     }
 
     priceText = await client.fetchPriceText()
+  }
+
+  private func markProUnlockedKnown() {
+    isProUnlockedKnown = true
+    proUnlockedKnown.fire()
   }
 
   /// 買い切り商品を購入する。

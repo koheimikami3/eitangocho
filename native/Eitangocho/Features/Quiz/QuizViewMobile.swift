@@ -29,7 +29,8 @@
       case .done:
         MobileQuizResultView(
           okCount: quiz.okCount, forgotWords: quiz.forgotWords,
-          onContinue: { quiz.start(trigger: .continued) }, onToLearning: { shell.selectView(.learning) })
+          onContinue: { quiz.start(trigger: .continued) }, onToLearning: { shell.selectView(.learning) },
+          onOpenPro: { shell.selectView(.settings) })
       case .active:
         if let word = quiz.current {
           MobileActiveQuiz(quiz: quiz, word: word, direction: settings.quizDirection)
