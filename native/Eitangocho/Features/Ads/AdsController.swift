@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 #if os(iOS)
   import GoogleMobileAds
@@ -101,4 +102,9 @@ final class AdsController {
     await sdk.start()
     return true
   }
+}
+
+extension EnvironmentValues {
+  /// 広告を出してよいかの判定(広告の枠が読む)。RootView が配る。
+  @Entry var ads: AdsController?
 }

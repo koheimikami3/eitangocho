@@ -17,6 +17,8 @@ struct RootView: View {
       .overlay { AppOverlayHost(overlay: model.overlay) }
       .environment(\.appOverlay, model.overlay)
       .environment(\.analytics, model.analytics)
+      .environment(\.purchase, model.purchase)
+      .environment(\.ads, model.ads)
       // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
       .onAppear { model.reviewClient.action = requestReview }
       .environment(\.colors, model.settings.appearance.colors)

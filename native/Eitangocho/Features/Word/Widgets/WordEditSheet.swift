@@ -75,6 +75,8 @@
           deleteButton
             .padding(.top, 24)
         }
+      } footer: {
+        MobileSheetBannerAd()
       }
     }
 

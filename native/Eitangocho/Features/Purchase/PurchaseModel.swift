@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 /// 復元の状況(復元行の右端に一時表示する)。文言は表示側が言語に合わせて出す。
 enum RestoreStatus {
@@ -161,4 +162,9 @@ final class PurchaseModel {
       restoreStatus = nil
     }
   }
+}
+
+extension EnvironmentValues {
+  /// 課金の状態(広告の枠・Pro の欄が読む)。RootView が配る。
+  @Entry var purchase: PurchaseModel?
 }

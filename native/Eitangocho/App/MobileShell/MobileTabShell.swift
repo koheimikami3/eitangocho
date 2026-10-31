@@ -13,6 +13,10 @@
     let session: AppModel.Session
 
     @Environment(\.palette) private var palette
+    /// タブの中身の下端のセーフエリア(タブバー + ホームインジケータ)。バナーをタブバーのすぐ上に置くのに使う。
+    @State private var tabBarInset: CGFloat = 0
+    /// タブバー上のバナーの帯の高さ(出ていない間は 0)。タブの中身の下余白に足す。
+    @State private var bannerHeight: CGFloat = 0
 
     var body: some View {
       let shell = model.shell
@@ -44,6 +48,13 @@
           }
         }
         .tint(palette.accent)
+        // バナーはタブを切り替えても読み込み直さないよう、タブごとではなく TabView の上に 1 つだけ重ねる。
+        .overlay(alignment: .bottom) {
+          MobileBannerAd(visible: bannerVisible) { bannerHeight = $0 }
+            .padding(.bottom, tabBarInset)
+            .ignoresSafeArea(.container, edges: .bottom)
+            .ignoresSafeArea(.keyboard)
+        }
       }
       // iPhone の大きい機種でも Flutter 版と同じくデザインの幅(402pt)に収める。
       .frame(maxWidth: AppDimensions.mobileContentMaxWidth)
@@ -63,6 +74,15 @@
         })
     }
 
+    /// タブバー上のバナーを出すか。シート・押して進む画面・ダイアログに覆われている間は出さない
+    /// (Flutter 版は上に画面が積まれたこと(RouteAware の didPushNext)で隠していた。見えていない広告の
+    /// インプレッションを稼がないため)。クイズ結果ではレクタングルに譲る。
+    private var bannerVisible: Bool {
+      let overlay = model.overlay
+      let covered = overlay.sheet != nil || !overlay.pages.isEmpty || !overlay.dialogs.isEmpty
+      return !covered && TabBarBannerVisibility.isVisible(view: model.shell.view, quizPhase: session.quiz.phase)
+    }
+
     @ViewBuilder
     private func tabContent(_ view: MainView) -> some View {
       Group {
@@ -80,7 +100,13 @@
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
+      // バナーが重なる分を下の余白にする(Flutter 版はタブバーの高さ + バナーの高さを渡していた)。
+      .safeAreaPadding(.bottom, bannerHeight)
       .background(palette.background)
+      // 下余白を足す前のセーフエリア(タブバー + ホームインジケータ)を測る。選択中のタブのものだけを使う。
+      .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.bottom } action: { inset in
+        if view == model.shell.view { tabBarInset = inset }
+      }
     }
 
     /// ヘッダの ＋・学習中の空の状態のボタン。登録シートを開く。

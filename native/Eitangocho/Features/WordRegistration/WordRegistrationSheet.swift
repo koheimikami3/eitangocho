@@ -37,6 +37,8 @@
         rightLabel: rightLabel, onRight: { save() }
       ) {
         stepContent
+      } footer: {
+        MobileSheetBannerAd()
       }
     }
 
