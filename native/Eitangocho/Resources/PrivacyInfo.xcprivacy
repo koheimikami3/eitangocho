@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  アプリ本体のプライバシーマニフェスト(iOS は提出に必須。macOS にも同じものが入る)。
+  理由を宣言するのはアプリ自身のコードが使う API だけ。SDK(Firebase・6c の GMA / RevenueCat)の分は各 SDK が自分のマニフェストで持つ。
+  - UserDefaults(CA92.1): 設定値・同期とレビュー依頼の記録。アプリ自身しか読み書きしない(App Group の UserDefaults は使わない)
+  - ファイルの日時(C617.1): Flutter 版の DB の引き継ぎで元ファイルの更新日時を記録し、iCloud のスナップショットと
+    競合版の更新日時を比べる。どれもアプリのコンテナ・App Group・アプリの iCloud コンテナの中のファイル
+  使う API を足したら(ディスクの空き容量・起動からの時間など)、ここに理由を足す。
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
