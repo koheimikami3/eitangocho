@@ -129,14 +129,9 @@ final class AppModel {
         modified=\(source.modifiedAt?.description ?? "-", privacy: .public) \
         sidecars=\(source.sidecars.joined(separator: ","), privacy: .public)
         """)
-      #if os(macOS)
-        // macOS は前面に戻るたびに必ず同期する(ほかの端末の変更を戻ったその場で見られるように)。
-        // 書き戻しが増える分、iCloud の競合版はできやすくなるが、次の同期で取り込んで片付ける。
-        let resumeMinInterval: TimeInterval = 0
-      #else
-        // iOS の間隔は iOS の画面を作るときに決める。
-        let resumeMinInterval: TimeInterval = 60
-      #endif
+      // 前面に戻るたびに必ず同期する(ほかの端末の変更を戻ったその場で見られるように。両 OS とも。
+      // Flutter 版は最短 60 秒おき)。書き戻しが増える分、iCloud の競合版はできやすくなるが、次の同期で取り込んで片付ける。
+      let resumeMinInterval: TimeInterval = 0
       let sync = SyncController(
         service: SyncService(store: ICloudFileStore(), database: database), database: database,
         resumeMinInterval: resumeMinInterval)
