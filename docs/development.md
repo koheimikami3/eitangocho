@@ -152,6 +152,11 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
   シートは `AppOverlay.presentSheet` で出し、枠は `MobileSheet`(中身の高さのシートは `MobileWordSortSheet` を参照)。
   ダイアログは macOS と同じ `AppOverlay.present`(幕の色を渡せる)。Liquid Glass にするのは下のタブバー(標準の `TabView`)と
   ヘッダ右上の 🔍・＋(`MobileHeaderButtons`。iOS 18 は同じ大きさの丸で代える)だけ
+- **iOS の押して進む画面**(設定 → ライセンスなど): 標準の `NavigationStack` は使わず、`AppOverlay.push` で
+  タブバーとヘッダごと覆って右から出す(Flutter 版はルートの Navigator に積むため)。枠は `MobilePushPage`
+  (戻るボタン付きのヘッダ)。左端からの戻るジェスチャは `MobilePushLayer` が持つ
+- **プライバシーマニフェスト**: `Eitangocho/Resources/PrivacyInfo.xcprivacy` には、アプリ自身のコードが使う
+  理由の要る API だけを書く(SDK の分は SDK が持つ)。ディスクの空き容量・起動からの時間などの API を使い始めたら理由を足す
 - **テストの置き場所**: DB・同期・単語情報は `Packages/EitangochoCore/Tests/`(`swift test`)。
   アプリのモデル・トークン・文字の書式は `EitangochoTests/`(アプリに読み込ませて動かす。
   テスト中は引き継ぎも同期も始めない)
