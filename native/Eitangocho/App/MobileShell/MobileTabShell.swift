@@ -1,4 +1,5 @@
 #if os(iOS)
+  import EitangochoData
   import SwiftUI
 
   /// iOS 版のシェル: ヘッダ + 標準の下タブバー(Flutter 版の TabBarShell)。
@@ -66,8 +67,14 @@
     private func tabContent(_ view: MainView) -> some View {
       Group {
         switch view {
-        case .learning, .allWords, .quiz, .registration:
-          // 学習中・全単語は次のコミットで、クイズは Phase 6b で作る。
+        case .learning, .registration:
+          LearningWordsViewMobile(
+            store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit,
+            onRegister: openRegistration)
+        case .allWords:
+          AllWordsViewMobile(store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit)
+        case .quiz:
+          // クイズは Phase 6b で作る。
           Color.clear
         case .settings:
           #if DEBUG
@@ -82,7 +89,10 @@
       .background(palette.background)
     }
 
-    /// ヘッダの ＋。登録シートを開く。
+    /// ヘッダの ＋・学習中の空の状態のボタン。登録シートを開く。
     private func openRegistration() {}
+
+    /// カード・行のタップ。編集シートを開く。
+    private func openEdit(_ word: Word) {}
   }
 #endif
