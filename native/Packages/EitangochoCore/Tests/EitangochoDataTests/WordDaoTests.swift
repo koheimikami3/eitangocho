@@ -113,10 +113,12 @@ struct WordDaoTests {
     #expect(try await dao.getDeletions().isEmpty)
   }
 
-  @Test("元のキーの単語が他にも残っていれば、その単語を消さないよう削除ログを残さない")
-  func renameKeepsDuplicateOfOldKey() async throws {
-    let id = try await dao.insertWord(apple("aple"))
-    try await dao.insertWord(apple("aple"))
+  @Test(
+    "元のキーの単語が他にも残っていれば、その単語を消さないよう削除ログを残さない(同期と同じキーで探す)",
+    arguments: [("aple", "aple"), ("aple", " Aple "), ("éclair", "Éclair")])
+  func renameKeepsDuplicateOfOldKey(renamed: String, remaining: String) async throws {
+    let id = try await dao.insertWord(apple(renamed))
+    try await dao.insertWord(apple(remaining))
     try await rename(id, to: "apple", now: .now)
     #expect(try await dao.getDeletions().isEmpty)
   }

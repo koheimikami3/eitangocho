@@ -215,9 +215,10 @@ public struct WordDao: Sendable {
       guard let previous else { return }
       let oldKey = Self.matchKey(previous)
       if oldKey != Self.matchKey(edit.word) {
-        let remaining = try Int.fetchOne(
-          db, sql: "SELECT COUNT(*) FROM words WHERE lower(word) = ?", arguments: [oldKey]) ?? 0
-        if remaining == 0 {
+        // 同期と同じキー(matchKey)で探す。SQL の lower() は ASCII しか小文字にせず前後の空白も残すので、
+        // それで探すと残っている単語を見落とし、同期でその単語まで消してしまう。
+        let remains = try String.fetchAll(db, sql: "SELECT word FROM words").contains { Self.matchKey($0) == oldKey }
+        if !remains {
           try db.execute(
             sql: "INSERT OR REPLACE INTO deleted_words (word, deleted_at) VALUES (?, ?)",
             arguments: [oldKey, timestamp])

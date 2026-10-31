@@ -498,6 +498,21 @@ struct WordExportServiceTests {
     #expect(deletions.map { $0["word"] as? String } == ["aple"])
   }
 
+  @Test("改名した単語と同じキーの単語が残っていれば、同期の後も消えない")
+  func renameKeepsRemainingDuplicateAfterSync() async throws {
+    let id = try await insert("éclair", meaning: "エクレア")
+    try await insert(" Éclair ", meaning: "エクレア")
+    let snapshot = try await service.exportJson()
+    try await dao.updateWord(
+      id: id, WordEdit(word: "eclair", meaning: "エクレア", ipa: "", partsOfSpeech: [], exampleEn: "", exampleTranslation: ""),
+      now: Self.day(1))
+
+    try await service.importJson(snapshot, respectLocalDeletions: true)
+    try await service.importJson(try await service.exportJson(), respectLocalDeletions: true)
+
+    #expect(Set(try await dao.getAll().map(\.word)) == ["eclair", " Éclair "])
+  }
+
   private func v1(_ words: [[String: Any]]) -> String {
     serialize(["version": 1, "exportedAt": "2026-01-01T00:00:00.000Z", "words": words])
   }
