@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 
 /// 文字の書式。Flutter の `TextStyle(fontSize, fontWeight, height, letterSpacing)` と
@@ -89,6 +90,15 @@ struct AppTextStyle: Hashable, Sendable {
       lineSpacing: (ascent + descent) - (swiftUIAscent + swiftUIDescent),
       lineHeight: ascent + descent
     )
+  }
+
+  /// `text` をこの書式で 1 行に組んだときの幅(字間を含む。Flutter の TextPainter.width と同じく
+  /// 最後の文字の後ろの字間も数える)。入り切るかで段組みを変える部品が使う。
+  func width(of text: String, scale: UIScale, textScale: CGFloat = 1) -> CGFloat {
+    let font = AppFonts.ctFont(family, size: scale(size) * textScale, weight: weight.rawValue)
+    let attributed = NSAttributedString(
+      string: text, attributes: [.font: font, .kern: scale(letterSpacing)])
+    return CGFloat(CTLineGetTypographicBounds(CTLineCreateWithAttributedString(attributed), nil, nil, nil))
   }
 
   /// SwiftUI の Text に足す余白と行間。
