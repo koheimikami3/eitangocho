@@ -74,8 +74,7 @@
         case .allWords:
           AllWordsViewMobile(store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit)
         case .quiz:
-          // クイズは Phase 6b で作る。
-          Color.clear
+          QuizViewMobile(quiz: session.quiz, shell: model.shell, settings: model.settings)
         case .settings:
           #if DEBUG
             // 設定は Phase 6b で作る。それまで Dev ビルドでは引き継ぎ・同期の診断画面を出す。
