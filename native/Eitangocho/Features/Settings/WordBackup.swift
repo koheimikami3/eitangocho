@@ -61,6 +61,22 @@ enum WordBackup {
       return .failed
     }
   }
+
+  /// 読み込みの結果をダイアログで出し、計測を送る(macOS 版・iOS 版の設定画面で共通)。
+  @MainActor
+  static func present(_ outcome: ImportOutcome, overlay: AppOverlay?, analytics: AnalyticsLogger) {
+    switch outcome {
+    case .imported(let result):
+      analytics.logDataImported(succeeded: true)
+      overlay?.present { dismiss in ImportResultDialog(result: result, dismiss: dismiss) }
+    case .formatError(let error):
+      // 失敗のダイアログを出した回は failed(UTF-8 でないファイルも含む。Flutter 版はそこで例外になり送らない)。
+      analytics.logDataImported(succeeded: false)
+      overlay?.present { dismiss in ImportErrorDialog(error: error, dismiss: dismiss) }
+    case .failed:
+      break
+    }
+  }
 }
 
 /// 書き出す JSON(fileExporter に渡す文書)。

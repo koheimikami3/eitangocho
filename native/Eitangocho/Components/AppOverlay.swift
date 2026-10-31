@@ -44,6 +44,13 @@ final class AppOverlay {
     var content: AnyView
   }
 
+  /// 右から押し出して重ねる画面(iOS。Flutter 版の Navigator.push = 設定からライセンスへ)。
+  /// タブバー・ヘッダごと覆う(Flutter 版はルートの Navigator に積むため)。シートとダイアログはこの上に出る。
+  struct Page: Identifiable {
+    let id: UUID
+    var content: AnyView
+  }
+
   /// 下端に一時的に出す通知(Flutter の ScaffoldMessenger.showSnackBar)。
   struct SnackBar: Identifiable, Equatable {
     let id: UUID
@@ -54,6 +61,7 @@ final class AppOverlay {
   private(set) var dialogs: [Dialog] = []
   private(set) var snackBar: SnackBar?
   private(set) var sheet: Sheet?
+  private(set) var pages: [Page] = []
 
   /// シートを下へ引いている量(つまみ・ヘッダのドラッグ。MobileSheetDragHandle が書く)。
   var sheetDragOffset: CGFloat = 0
@@ -102,6 +110,27 @@ final class AppOverlay {
   /// Flutter の BottomSheet の出入り(250 ms で出て 200 ms で引っ込む)。
   static let sheetEnter: Animation = .easeOut(duration: 0.25)
   static let sheetExit: Animation = .easeIn(duration: 0.2)
+
+  /// 画面を押し出す(MobilePushLayer)。
+  func push<Content: View>(@ViewBuilder content: () -> Content) {
+    withAnimation(Self.pushEnter) {
+      pages.append(Page(id: UUID(), content: AnyView(content())))
+    }
+  }
+
+  /// いちばん上の画面を戻す。`animated` が false なら動きを付けずに外す(戻るジェスチャで送り終えたとき)。
+  func pop(animated: Bool = true) {
+    guard !pages.isEmpty else { return }
+    var transaction = Transaction(animation: animated ? Self.pushExit : nil)
+    transaction.disablesAnimations = !animated
+    withTransaction(transaction) {
+      _ = pages.removeLast()
+    }
+  }
+
+  /// Flutter の iOS の画面遷移(CupertinoPageRoute: 500 ms。進むは linearToEaseOut、戻るは easeInToLinear)。
+  static let pushEnter: Animation = .timingCurve(0.35, 0.91, 0.33, 0.97, duration: 0.5)
+  static let pushExit: Animation = .timingCurve(0.67, 0.03, 0.65, 0.09, duration: 0.5)
 
   func dismiss(_ id: UUID) {
     dialogs.removeAll { $0.id == id }

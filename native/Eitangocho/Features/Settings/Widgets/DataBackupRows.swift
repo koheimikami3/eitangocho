@@ -45,7 +45,7 @@
         Task {
           let outcome = await WordBackup.importFile(at: url, into: service)
           busy = false
-          present(outcome)
+          WordBackup.present(outcome, overlay: overlay, analytics: analytics)
         }
       }
     }
@@ -60,20 +60,6 @@
         }
         self.document = document
         showsExporter = true
-      }
-    }
-
-    private func present(_ outcome: WordBackup.ImportOutcome) {
-      switch outcome {
-      case .imported(let result):
-        analytics.logDataImported(succeeded: true)
-        overlay?.present { dismiss in ImportResultDialog(result: result, dismiss: dismiss) }
-      case .formatError(let error):
-        // 失敗のダイアログを出した回は failed(UTF-8 でないファイルも含む。Flutter 版はそこで例外になり送らない)。
-        analytics.logDataImported(succeeded: false)
-        overlay?.present { dismiss in ImportErrorDialog(error: error, dismiss: dismiss) }
-      case .failed:
-        break
       }
     }
   }

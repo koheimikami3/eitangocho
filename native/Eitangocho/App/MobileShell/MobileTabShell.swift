@@ -76,12 +76,7 @@
         case .quiz:
           QuizViewMobile(quiz: session.quiz, shell: model.shell, settings: model.settings)
         case .settings:
-          #if DEBUG
-            // 設定は Phase 6b で作る。それまで Dev ビルドでは引き継ぎ・同期の診断画面を出す。
-            DiagnosticsView(session: session)
-          #else
-            Color.clear
-          #endif
+          SettingsViewMobile(session: session, settings: model.settings)
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
