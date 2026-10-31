@@ -5,6 +5,10 @@ import Foundation
 import Observation
 import OSLog
 
+#if os(iOS)
+  import UIKit
+#endif
+
 /// 起動の流れ(Flutter 版の DB の引き継ぎ → DB を開く → 同期を始める)と、その結果を持つ。
 ///
 /// 引き継ぎに失敗したら空の DB では始めず、失敗の画面を出す
@@ -62,13 +66,26 @@ final class AppModel {
   /// 課金(iOS だけ。macOS では SDK に触れない)。DB に依存しないので最初に作る。
   let purchase: PurchaseModel
 
+  /// ATT の要求の時機(iOS だけ)。
+  let tracking: TrackingAuthorizer
+
+  /// 広告を出してよいか(iOS だけ)。
+  let ads: AdsController
+
   init() {
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
     #if os(iOS)
       purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
+      tracking = TrackingAuthorizer(client: SystemTrackingClient()) {
+        UIApplication.shared.applicationState == .active
+      }
+      ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
     #else
       purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
+      // macOS には広告が無いので、ATT も聞かない(AdsController が iOS 以外では呼ばない)。
+      tracking = TrackingAuthorizer(client: SystemTrackingClient()) { true }
+      ads = AdsController(purchase: purchase, tracking: tracking, sdk: NoAdsSDK(), platformSupported: false)
     #endif
   }
 
@@ -191,6 +208,10 @@ final class AppModel {
 
   /// アプリがアクティブになったとき。
   func appDidBecomeActive() async {
+    #if os(iOS)
+      // ATT のダイアログを出せなかったときの出し直し・アクティブ化待ちの解除(起動の流れとは関係なく行う)。
+      tracking.appDidBecomeActive()
+    #endif
     guard case .ready(let session) = phase else { return }
     await session.sync.appDidBecomeActive()
   }
