@@ -9,7 +9,7 @@
   ///   macOS は外観を独立したセクションに置き、カードの並びは 1 種類のため無い
   /// - 「表示サイズ」(uiScale)を持たない。iOS は OS の文字サイズの設定に委ねる
   ///
-  /// 並びは「表示 → クイズ → 訳の言語 → データ → サポート → 情報」。
+  /// 並びは「表示 → クイズ → 訳の言語 → データ → サポート → (作者の他のアプリ)→ 情報」。
   /// 見た目に関わるものを 1 枚のカードにまとめ、セクションの中はアプリ全体(テーマ)→ 一覧のレイアウト
   /// → 表示する項目(IPA)の順にする。
   struct SettingsViewMobile: View {
@@ -45,6 +45,14 @@
             MobileSettingsLinkRow(label: String(localized: .writeReview)) {
               analytics.logStoreListingOpened()
               openURL(ReviewConfig.writeReviewURL)
+            }
+          }
+          // 紹介先がどちらも日本語だけのアプリなので、日本語の画面でだけ出す(他の言語の利用者に薦めても使えないため)。
+          if AppLocale.current == .ja {
+            MobileSettingsSection(title: String(localized: .sectionAuthorApps)) {
+              ForEach(AuthorApp.all) { app in
+                MobileAuthorAppRow(app: app)
+              }
             }
           }
           MobileSettingsSection(title: String(localized: .sectionInfo)) {
