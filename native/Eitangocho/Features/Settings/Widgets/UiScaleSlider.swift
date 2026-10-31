@@ -12,9 +12,17 @@
 
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
+    /// ドラッグの開始時のトラック(ウィンドウの座標)。離すまでこれを基準に値を決める。
+    @State private var dragTrack: DragTrack?
 
     private static let range = AppDimensions.minUiScale...AppDimensions.maxUiScale
     private static let divisions = Int(((range.upperBound - range.lowerBound) * 10).rounded())
+
+    /// トラックの左端と幅(ウィンドウの座標)。
+    private struct DragTrack {
+      var minX: CGFloat
+      var width: CGFloat
+    }
 
     var body: some View {
       let clamped = min(max(value, Self.range.lowerBound), Self.range.upperBound)
@@ -24,10 +32,17 @@
         GeometryReader { geometry in
           track(width: geometry.size.width, value: clamped)
             .contentShape(Rectangle())
+            // 値を変えると倍率で行の寸法と位置が変わるので、スライダー自身の座標で指の位置を読むと、
+            // 指が止まっていても次のフレームで別の値になり、隣の値と往復し続ける。
+            // ウィンドウの座標で指の位置を読み、トラックの位置と幅は開始時のものに固定して戻りを断つ。
             .gesture(
-              DragGesture(minimumDistance: 0).onChanged { drag in
-                select(at: drag.location.x, width: geometry.size.width, current: clamped)
-              })
+              DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { drag in
+                  let track = dragTrack ?? startTrack(in: geometry.frame(in: .global))
+                  dragTrack = track
+                  select((drag.location.x - track.minX) / track.width, current: clamped)
+                }
+                .onEnded { _ in dragTrack = nil })
         }
         .frame(height: px(26))
         AppText(String(format: "%.1fx", clamped), style: AppTextStyle(size: 12))
@@ -44,9 +59,14 @@
       CGFloat((value - Self.range.lowerBound) / (Self.range.upperBound - Self.range.lowerBound))
     }
 
-    private func select(at x: CGFloat, width: CGFloat, current: Double) {
-      let trackWidth = max(width - thumbRadius * 2, 1)
-      let t = min(max((x - thumbRadius) / trackWidth, 0), 1)
+    /// つまみの動く範囲(両端をつまみの半径だけ内側に寄せた所)。
+    private func startTrack(in frame: CGRect) -> DragTrack {
+      DragTrack(minX: frame.minX + thumbRadius, width: max(frame.width - thumbRadius * 2, 1))
+    }
+
+    /// トラック上の割合(0〜1 の外は端に寄せる)を 0.1 刻みの値にして、変わったときだけ知らせる。
+    private func select(_ fraction: CGFloat, current: Double) {
+      let t = min(max(fraction, 0), 1)
       let step = (Double(t) * Double(Self.divisions)).rounded()
       let selected = Self.range.lowerBound + step / 10
       if abs(selected - current) > 0.001 { onChange(selected) }
