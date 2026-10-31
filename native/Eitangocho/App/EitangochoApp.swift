@@ -7,7 +7,9 @@ struct EitangochoApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   #endif
   @State private var model = AppModel()
-  @Environment(\.scenePhase) private var scenePhase
+  #if os(iOS)
+    @Environment(\.scenePhase) private var scenePhase
+  #endif
 
   /// アプリのモデルのテスト(EitangochoTests)の入れ物として起動されたか。
   /// そのときは Flutter 版の DB の引き継ぎも同期も始めない
@@ -25,17 +27,24 @@ struct EitangochoApp: App {
       } else {
         RootView(model: model)
           .task { await model.start() }
+          #if os(macOS)
+            // macOS の scenePhase はほかのアプリへ切り替えても active のまま(ウィンドウが見えている間は
+            // 変わらない)なので、戻ったことはアプリの前面化の通知で知る(Flutter 版の macOS の onResume と同じ契機)。
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+              Task { await model.appDidBecomeActive() }
+            }
+          #endif
       }
     }
-    .onChange(of: scenePhase) { _, phase in
-      #if os(iOS)
+    #if os(iOS)
+      .onChange(of: scenePhase) { _, phase in
         // App Group の DB のロックを持ったまま中断されないよう、中断の前に DB を止める。
         AppDatabase.setSuspended(phase == .background)
-      #endif
-      // iOS はアプリを終了させずに中断するので、戻ったときの同期が要る。
-      guard phase == .active, !Self.isRunningTests else { return }
-      Task { await model.appDidBecomeActive() }
-    }
+        // iOS はアプリを終了させずに中断するので、戻ったときの同期が要る。
+        guard phase == .active, !Self.isRunningTests else { return }
+        Task { await model.appDidBecomeActive() }
+      }
+    #endif
     #if os(macOS)
       // タイトルバーを透明にし、中身をウィンドウ全面に広げる(Flutter 版の MainFlutterWindow)。
       .windowStyle(.hiddenTitleBar)
