@@ -167,6 +167,10 @@
   を実行する**。Xcode 単体の Archive は、前回生成した xcconfig の古い値を使う。
   macOS は `tool/verify_flutter_version.sh` がずれを検知してビルドを止める
   (書き直しても同じビルドには反映されないので、直さずに止める。ビルド番号は比較しない)
+- **macOS 12〜14 には Flutter の最終版(2.11.1)が残り、以後その OS 向けの版は出せない。**
+  Swift 版は最低 OS が macOS 15 で、App Store は古い OS に更新を出さない(一度入手した人は
+  「互換性のある最後のバージョン」を入れ直せる)。版を上げた Flutter 版を出すと 15 以上にも配られて
+  Swift 版を置き換えるので、古い OS の不具合は Swift 版との同期の互換を保つことでしか守れない
 - iOS の JSON 書き出しは自前の `DocumentExportPlugin.swift` で行う
   (`file_selector_ios` に保存パネルが無いため)。iCloud のネイティブ実装は `shared/` に置き、
   両プロジェクトから参照する
