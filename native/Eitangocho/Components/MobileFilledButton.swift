@@ -26,7 +26,7 @@
           .multilineTextAlignment(.center)
           .frame(maxWidth: expands ? .infinity : nil)
           .padding(padding)
-          .background(shape.fill(LinearGradient(colors: palette.buttonGradient, startPoint: .top, endPoint: .bottom)))
+          .background(shape.fill(palette.buttonFill))
           .appShadows(palette.buttonShadow, in: shape, scale: 1)
       }
     }

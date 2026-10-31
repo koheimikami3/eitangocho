@@ -83,6 +83,9 @@ nonisolated struct AppPalette: Equatable, Sendable {
       : [Color(argb: 0xFF4D_A4F2), Color(argb: 0xFF3F_9CEF)]
   }
 
+  /// 主ボタンの地の塗り(`buttonGradient` を上から下へ引いたもの)。
+  var buttonFill: LinearGradient { LinearGradient(colors: buttonGradient, startPoint: .top, endPoint: .bottom) }
+
   /// 削除ボタンの輪郭(--dangerLine)と押下中の地(--dangerSoft)
   var dangerLine: Color { isDark ? Color(argb: 0x80FF_6B6B) : Color(argb: 0x73C0_3030) }
   var dangerSoft: Color { isDark ? Color(argb: 0x1FFF_6B6B) : Color(argb: 0x12C0_3030) }

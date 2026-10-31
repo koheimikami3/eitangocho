@@ -38,7 +38,7 @@
           }
           MobilePressable(action: onAdd) {
             addIcon
-              .background(Circle().fill(LinearGradient(colors: palette.buttonGradient, startPoint: .top, endPoint: .bottom)))
+              .background(Circle().fill(palette.buttonFill))
               .appShadows(palette.buttonShadow, in: Circle(), scale: 1)
           }
         }

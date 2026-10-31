@@ -95,7 +95,7 @@
         .padding(.vertical, 8)
         .background {
           if filled {
-            shape.fill(LinearGradient(colors: palette.buttonGradient, startPoint: .top, endPoint: .bottom))
+            shape.fill(palette.buttonFill)
           } else {
             shape.fill(palette.proButtonDone)
           }

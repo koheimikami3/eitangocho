@@ -56,7 +56,7 @@
         .foregroundStyle(.white)
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
-        .background(Capsule().fill(LinearGradient(colors: palette.buttonGradient, startPoint: .top, endPoint: .bottom)))
+        .background(Capsule().fill(palette.buttonFill))
         .appShadows(palette.buttonShadow, in: Capsule(), scale: 1)
     }
 
