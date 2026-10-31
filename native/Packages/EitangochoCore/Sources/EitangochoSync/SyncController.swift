@@ -50,8 +50,7 @@ public final class SyncController {
   /// ローカルの変更を検知してから同期するまでの待ち時間。
   /// 連続した編集やクイズの連続回答を 1 回の書き戻しにまとめるために置く。
   private let debounce: Duration
-  /// アクティブ化で同期する最短の間隔。macOS はウィンドウを行き来するたびに
-  /// アクティブになるため、これが無いとフォーカスを移すだけで書き戻しが走る。
+  /// アクティブ化で同期する最短の間隔。0 なら戻るたびに同期する(macOS のアプリはそうしている)。
   private let resumeMinInterval: TimeInterval
   /// 最新のデータを取得できずに見送ってから、再試行するまでの待ち時間。
   private let notReadyRetryDelay: Duration
