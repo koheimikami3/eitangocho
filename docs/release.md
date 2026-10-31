@@ -26,8 +26,8 @@
   `CURRENT_PROJECT_VERSION`(ビルド番号)を書き換える。pbxproj にはバージョンを書いていない。
   pubspec は iOS(Flutter 版)の値なので、macOS だけを出す版では触らない。
   ビルド番号は両方を通した台帳の最大値 + 1 にする(バンプのコミットは上と同じ書式)
-- 提出後、iOS で Xcode がビルド番号を自動で繰り上げた・リジェクトで番号を捨てた、という
-  報告があれば見出しを直す(スキルの 8)。macOS は自動で繰り上がらない
+- 提出後、iOS で Xcode がビルド番号を自動で繰り上げた(Organizer から手で上げた場合)・リジェクトで番号を捨てた、という
+  報告があれば見出しを直す(スキルの 9)。macOS は自動で繰り上がらない
 
 ## 完了時の検証
 
@@ -50,9 +50,8 @@ xcodebuild test -project native/Eitangocho.xcodeproj -scheme Eitangocho -destina
 
 ## Archive 前の手順
 
-**macOS(Swift 版)**: 設定の再生成は要らない。`native/Eitangocho.xcodeproj` のスキーム `Eitangocho` を
-Release で Archive する(行き先は Any Mac)。**手元で Release を Run しない**
-(本番の Bundle ID のまま、この Mac のストア版のデータと本番の iCloud を引き継いでしまう)。
+**macOS(Swift 版)**: 設定の再生成は要らない。**手元で Release を Run しない**
+(本番の Bundle ID のまま、この Mac のストア版のデータと本番の iCloud を引き継いでしまう。Archive は Run しないのでよい)。
 
 **iOS(と、戻す版などで Flutter の macOS を出すとき)**: 出すプラットフォームの分だけ、**macOS → iOS の順で**実行する:
 
@@ -69,6 +68,18 @@ macOS は `tool/verify_flutter_version.sh` がビルド時に xcconfig のずれ
 (書き直しても同じビルドには反映されないため、直さずに止める)。止まったら
 `flutter build macos --config-only` を実行してから Archive し直す。iOS をまだ
 Archive していなければ、続けて `flutter build ios --config-only` も実行する。
+
+## Archive とアップロード
+
+チーム ID は `M5WP527J7Y`(スキルの `ExportOptions.plist` の `TEAM_ID`)。
+
+| 出すもの | プロジェクト | スキーム | 行き先 | 確かめる entitlements |
+|---|---|---|---|---|
+| macOS(Swift 版) | `-project native/Eitangocho.xcodeproj` | `Eitangocho` | `generic/platform=macOS` | `native/Support/Eitangocho-macOS.entitlements`(App Group・iCloud。`icloud-container-environment` は書き出しで `Production` が足される) |
+| iOS(Flutter 版) | `-workspace ios/Runner.xcworkspace` | `Runner` | `generic/platform=iOS` | `ios/Runner/Runner.entitlements` |
+
+- macOS は `lipo -archs` が `x86_64 arm64`(macOS 15 の Intel Mac にも配るため)、`LSMinimumSystemVersion` が 15.0
+- Xcode の自動のビルド番号の繰り上げは使わない(ExportOptions で止めている)。番号は台帳どおりになる
 
 ## タグ本文の補足
 
