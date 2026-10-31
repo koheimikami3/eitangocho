@@ -60,6 +60,42 @@
           }
         }
       }
+    },
+    "NSUserTrackingUsageDescription" : {
+      "comment" : "ATT のダイアログの説明文(iOS だけ)。Flutter 版の ios/Runner/*.lproj/InfoPlist.strings と同じ",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used to show ads in the app that better match your interests."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usa para que los anuncios de la app se ajusten mejor a tus intereses."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisé pour que les publicités de l'app correspondent davantage à vos centres d'intérêt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリ内に表示する広告を、あなたの興味に合ったものにするために使用します。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用於讓 App 內顯示的廣告更符合你的興趣。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

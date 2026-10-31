@@ -142,4 +142,19 @@ struct LicenseCatalogTests {
     #expect(summaries["Firebase"] == "Apache License 2.0")
     #expect(summaries["Tatoeba"] == "CC BY 2.0 FR")
   }
+
+  @Test func iOSだけのパッケージの本文も同梱されている() throws {
+    // テストは macOS で動くので一覧には出ないが、本文は両 OS の成果物に入る(同じリソースのフォルダ)。
+    let items = LicenseCatalog.group(
+      try LicenseCatalog.iOSOnlyPackages.map { name, resource in
+        let url = try #require(Bundle.main.url(forResource: resource, withExtension: "txt"))
+        return LicenseEntry(packages: [name], text: try String(contentsOf: url, encoding: .utf8))
+      })
+    let summaries = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.summary) })
+    #expect(
+      summaries == [
+        "GoogleMobileAds": "Apache License 2.0", "GoogleUserMessagingPlatform": "Apache License 2.0",
+        "RevenueCat": "MIT License",
+      ])
+  }
 }

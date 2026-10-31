@@ -7,6 +7,9 @@ BUNDLE_ID_SUFFIX =
 APP_DISPLAY_NAME = 英単語帳
 APP_DISPLAY_SUFFIX =
 APP_ICON_NAME = AppIcon
+// AdMob に登録した「シンプル英単語帳 - iOS」のアプリ ID(Flutter 版の ios/Flutter/Release.xcconfig と同じ)。
+// GMA SDK はここが不正な値だと初期化時に落ちるため、値を消さないこと。
+GAD_APPLICATION_IDENTIFIER = ca-app-pub-3768273762534884~5341432918
 
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 ENABLE_NS_ASSERTIONS = NO

@@ -50,6 +50,8 @@ INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO
 INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES
 INFOPLIST_KEY_UILaunchScreen_Generation = YES
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait
+// ATT のダイアログの説明文(iOS だけ。各言語の訳は Resources/InfoPlist.xcstrings)。
+INFOPLIST_KEY_NSUserTrackingUsageDescription[sdk=iphone*] = Used to show ads in the app that better match your interests.
 
 SWIFT_VERSION = 6.0
 // アプリ本体は画面のコードが大半なので、既定を MainActor にする

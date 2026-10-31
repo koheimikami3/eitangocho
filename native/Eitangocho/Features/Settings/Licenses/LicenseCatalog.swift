@@ -45,6 +45,24 @@ enum LicenseCatalog {
     ("nanopb", "nanopb-LICENSE"),
   ]
 
+  /// iOS だけにリンクする Swift パッケージ(広告・課金。pbxproj の `platformFilters = (ios)`)。
+  /// macOS の成果物には入らないので、macOS の一覧には出さない。
+  static let iOSOnlyPackages = [
+    // GoogleMobileAds と、それがリンクする同意管理の SDK。
+    ("GoogleMobileAds", "GoogleMobileAds-LICENSE"),
+    ("GoogleUserMessagingPlatform", "GoogleUserMessagingPlatform-LICENSE"),
+    ("RevenueCat", "RevenueCat-LICENSE"),
+  ]
+
+  /// この OS の成果物にリンクされる Swift パッケージ。
+  static var linkedPackages: [(String, String)] {
+    #if os(iOS)
+      packages + iOSOnlyPackages
+    #else
+      packages
+    #endif
+  }
+
   /// 辞書・例文データの出典。CC BY / CC BY-SA は帰属表示が義務(docs/design.md「ライセンス・レビュー」)。
   ///
   /// 見出しは出典名だけにする(どの言語でも通じる固有名)。全文ではなく出典・ライセンス名・原文への
@@ -106,7 +124,7 @@ enum LicenseCatalog {
       else { throw LoadError(resource: resource) }
       return text
     }
-    let bundled = try (fonts + packages).map { name, resource in
+    let bundled = try (fonts + linkedPackages).map { name, resource in
       LicenseEntry(packages: [name], text: try read(resource))
     }
     return group(dataSources + bundled)
