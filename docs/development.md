@@ -142,6 +142,16 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **String Catalog**: 文言は `Eitangocho/Resources/Localizable.xcstrings` に置き、`Text(.navLearning)` /
   `String(localized: .wordCount(3))` のように生成された記号で引く(キーは ARB と同じ)。
   `tool/arb_to_xcstrings.py` は移行のときに 1 回だけ使ったもので、以後は xcstrings を直接直す
+- **iOS の画面**: iOS 専用の画面・部品は Flutter 版と同じく `Mobile` 接頭辞(`MobileWordCard` など)で macOS 版と
+  同じフォルダに置き、ファイル全体を `#if os(iOS)` で囲む。モデルは両 OS で共有する。配色は `@Environment(\.palette)`
+  (`AppPalette`。Flutter 版の `lib/constants/app_palette.dart` の写し)。押したときの見た目は `MobilePressable` の
+  `MobilePressStyle` で付ける
+- **iOS の文字サイズ**: OS の文字サイズは `\.textScale`(`TextScale`。Flutter の engine と同じ表)で配り、
+  `AppText` と `AppTextStyle.font(_:textScale:)` が文字の大きさだけに掛ける(余白・アイコン・字間は変えない。Flutter 版と同じ)
+- **iOS のシートとダイアログ**: 標準の `sheet` / `alert` は使わない(幕の色と iOS 26 の浮いた形・ガラスを変えられないため)。
+  シートは `AppOverlay.presentSheet` で出し、枠は `MobileSheet`(中身の高さのシートは `MobileWordSortSheet` を参照)。
+  ダイアログは macOS と同じ `AppOverlay.present`(幕の色を渡せる)。Liquid Glass にするのは下のタブバー(標準の `TabView`)と
+  ヘッダ右上の 🔍・＋(`MobileHeaderButtons`。iOS 18 は同じ大きさの丸で代える)だけ
 - **テストの置き場所**: DB・同期・単語情報は `Packages/EitangochoCore/Tests/`(`swift test`)。
   アプリのモデル・トークン・文字の書式は `EitangochoTests/`(アプリに読み込ませて動かす。
   テスト中は引き継ぎも同期も始めない)
