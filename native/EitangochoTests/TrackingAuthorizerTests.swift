@@ -75,6 +75,26 @@ final class TrackingAuthorizerTests {
     #expect(client.settled)
   }
 
+  @Test func 要求を終えた直後にアクティブへ戻っても出し直す() async {
+    client.dialogShows = false
+    let authorizer = makeAuthorizer()
+    // 要求が終わってから、要求を待っていた側が再開するまでの間にアクティブ化が届く順序にする
+    // (要求の中で積んだ処理は、待ち手の再開より先に回る)。
+    client.onRequest = { [client] in
+      client.onRequest = {}
+      Task {
+        client.dialogShows = true
+        authorizer.appDidBecomeActive()
+      }
+    }
+
+    await authorizer.ensureRequested()
+    await waitUntil { client.requestCount == 2 }
+
+    #expect(client.requestCount == 2)
+    #expect(client.settled)
+  }
+
   @Test func 回答が済んだらアクティブへ戻っても要求し直さない() async {
     let authorizer = makeAuthorizer()
 

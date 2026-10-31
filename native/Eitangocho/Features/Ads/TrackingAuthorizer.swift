@@ -65,10 +65,14 @@ final class TrackingAuthorizer {
       await inFlight.value
       return
     }
-    let task = Task { await run() }
+    let task = Task {
+      await run()
+      // 待っていた側の再開を待たずに外す(Flutter 版の whenComplete と同じ)。再開までの間に
+      // アクティブへ戻ったとき、実行中とみなして出し直しを見送らないように。
+      inFlight = nil
+    }
     inFlight = task
     await task.value
-    inFlight = nil
   }
 
   /// アプリがアクティブになったときに呼ぶ(iOS の scenePhase が active になったとき)。
