@@ -23,6 +23,7 @@ struct RootView: View {
       #if os(iOS)
         .environment(\.palette, model.settings.appearance.palette)
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
+        .environment(\.openPronunciation, openPronunciation)
       #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
@@ -43,6 +44,19 @@ struct RootView: View {
       PronunciationWindowController.shared.open(
         url: GoogleTranslateURL.make(word, language: model.settings.translationLanguage), title: word,
         zoom: model.settings.uiScale)
+    }
+  #endif
+
+  #if os(iOS)
+    /// 発音確認のシートを開く。
+    private func openPronunciation(_ word: String) {
+      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
+      model.analytics.logPronunciationOpened(model.shell.view)
+      // 開いた時点の訳の言語で引く(シートを開いている間に変わることはない)。
+      let url = GoogleTranslateURL.make(word, language: model.settings.translationLanguage)
+      model.overlay.presentSheet { dismiss in
+        MobilePronunciationSheet(word: word, url: url, dismiss: dismiss)
+      }
     }
   #endif
 
