@@ -22,6 +22,45 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.12.0 (build 27)
+
+macOS のみ(iOS は出していない。iOS は 2.11.1 のまま)。この版から macOS は Swift / SwiftUI で作り直した版
+(`native/`)で、最低 OS が macOS 15 に上がった。macOS 12〜14 には Flutter 版の 2.11.1 が残る。
+利用者から見える変化は、アプリに戻るたびに同期すること(これまでは最短 60 秒おき)と、覚えた回数を
+ほかの端末から取り込むことだけなので、2.3.0・2.8.0 と同じ 1 行にした。
+
+日本語:
+
+```
+今後の機能改善に向けて、アプリ内部の仕組みを整えました。
+```
+
+繁體中文:
+
+```
+為了日後改善功能，調整了 App 的內部架構。
+```
+
+Español:
+
+```
+Mejoramos el funcionamiento interno de la app para futuras mejoras.
+```
+
+Français:
+
+```
+Amélioration du fonctionnement interne de l'app en vue de futures évolutions.
+```
+
+English:
+
+```
+Improved the app's internals for future updates.
+```
+
+---
+
 ## 2.11.1 (iOS build 24 / macOS build 26)
 
 iOS は build 24、macOS は build 26 で出した。macOS は iOS より後に、2.10.0 以来のリリースとして出した
