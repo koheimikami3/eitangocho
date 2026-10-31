@@ -22,14 +22,13 @@ struct RootView: View {
       // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
       .onAppear { model.reviewClient.action = requestReview }
       .environment(\.colors, model.settings.appearance.colors)
+      .environment(\.openPronunciation, openPronunciation)
       #if os(iOS)
         .environment(\.palette, model.settings.appearance.palette)
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
-        .environment(\.openPronunciation, openPronunciation)
       #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
-        .environment(\.openPronunciation, openPronunciation)
         .frame(minWidth: WindowAppearance.minimumSize.width, minHeight: WindowAppearance.minimumSize.height)
         .onChange(of: model.settings.appearance, initial: true) { _, appearance in
           WindowAppearance.apply(appearance)
@@ -38,29 +37,20 @@ struct RootView: View {
       .preferredColorScheme(model.settings.appearance == .dark ? .dark : .light)
   }
 
-  #if os(macOS)
-    /// 発音確認のウィンドウを開く。ページもアプリと同じ拡大率で出す。
-    private func openPronunciation(_ word: String) {
-      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
-      model.analytics.logPronunciationOpened(model.shell.view)
-      PronunciationWindowController.shared.open(
-        url: GoogleTranslateURL.make(word, language: model.settings.translationLanguage), title: word,
-        zoom: model.settings.uiScale)
-    }
-  #endif
-
-  #if os(iOS)
-    /// 発音確認のシートを開く。
-    private func openPronunciation(_ word: String) {
-      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
-      model.analytics.logPronunciationOpened(model.shell.view)
-      // 開いた時点の訳の言語で引く(シートを開いている間に変わることはない)。
-      let url = GoogleTranslateURL.make(word, language: model.settings.translationLanguage)
+  /// 発音確認を開く。macOS は別ウィンドウ(ページもアプリと同じ拡大率で出す)、iOS はシート。
+  private func openPronunciation(_ word: String) {
+    // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
+    model.analytics.logPronunciationOpened(model.shell.view)
+    // 開いた時点の訳の言語で引く(開いている間に変わることはない)。
+    let url = GoogleTranslateURL.make(word, language: model.settings.translationLanguage)
+    #if os(macOS)
+      PronunciationWindowController.shared.open(url: url, title: word, zoom: model.settings.uiScale)
+    #else
       model.overlay.presentSheet { dismiss in
         MobilePronunciationSheet(word: word, url: url, dismiss: dismiss)
       }
-    }
-  #endif
+    #endif
+  }
 
   @ViewBuilder
   private var content: some View {
