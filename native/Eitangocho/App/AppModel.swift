@@ -59,9 +59,17 @@ final class AppModel {
   /// レビュー依頼の実体。依頼の口(`requestReview`)は画面から渡す(RootView)。
   let reviewClient = StoreReviewClient()
 
+  /// 課金(iOS だけ。macOS では SDK に触れない)。DB に依存しないので最初に作る。
+  let purchase: PurchaseModel
+
   init() {
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
+    #if os(iOS)
+      purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
+    #else
+      purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
+    #endif
   }
 
   nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
@@ -76,6 +84,8 @@ final class AppModel {
 
   /// 起動の流れを最初から行う(失敗の画面の「再試行」もこれを呼ぶ)。
   func start() async {
+    // 課金は DB に依存しないので、引き継ぎを待たずに始める(2 回目以降は何もしない)。
+    purchase.start()
     await open { importer in try importer.run() }
   }
 
