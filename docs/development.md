@@ -134,7 +134,8 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
   一時的な通知(Flutter の SnackBar)も `AppOverlay.showSnackBar` で出す
 - **ライセンス一覧**: SwiftPM はライセンスを集めないので `Features/Settings/Licenses/LicenseCatalog.swift` で
   手で持つ。Swift パッケージを足したら、その LICENSE を `Eitangocho/Resources/Licenses/` に置き、
-  `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)
+  `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)。iOS だけにリンクするもの
+  (GMA・RevenueCat)は `iOSOnlyPackages` に足す
 - **計測**: イベントは `Features/Analytics/AnalyticsLogger.swift` の送り口から送る(名前と値は Flutter 版と同じ)。
   モデルには `AnalyticsLogger` を渡し、画面からは `@Environment(\.analytics)` で取る。ユーザープロパティと
   screen_view は `AnalyticsReporting` が状態の変化を拾って送る。Firebase は Release ビルドだけ初期化し、
@@ -155,6 +156,9 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **iOS の押して進む画面**(設定 → ライセンスなど): 標準の `NavigationStack` は使わず、`AppOverlay.push` で
   タブバーとヘッダごと覆って右から出す(Flutter 版はルートの Navigator に積むため)。枠は `MobilePushPage`
   (戻るボタン付きのヘッダ)。左端からの戻るジェスチャは `MobilePushLayer` が持つ
+- **広告と課金(iOS)**: 画面からは `@Environment(\.ads)`(`AdsController`)と `\.purchase`(`PurchaseModel`)で取る。
+  広告の枠は `MobileAdSlot` の上に組み、ユニット ID は `AdUnitIds`(Debug は Google のテスト ID)。
+  Debug ビルドでは商品を取得できないので、Pro の欄は「価格を取得できませんでした」になる(購入の確認は TestFlight)
 - **プライバシーマニフェスト**: `Eitangocho/Resources/PrivacyInfo.xcprivacy` には、アプリ自身のコードが使う
   理由の要る API だけを書く(SDK の分は SDK が持つ)。ディスクの空き容量・起動からの時間などの API を使い始めたら理由を足す
 - **テストの置き場所**: DB・同期・単語情報は `Packages/EitangochoCore/Tests/`(`swift test`)。
