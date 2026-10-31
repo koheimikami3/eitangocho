@@ -115,8 +115,9 @@ public enum WordImportUpdate: Sendable {
   /// (DB 側の表記・作成日時を維持するため)。
   case content(ImportedWord)
 
-  /// クイズの最終出題日時だけを進める(内容はこちらが新しいとき)。
-  case lastReviewedAt(Date)
+  /// クイズの回答の実績(最終出題日時・正解回数)だけを書く(内容はこちらが新しいとき)。
+  /// 値は取り込み側で決めた最終の値で、updatedAt は変えない。
+  case quizProgress(lastReviewedAt: Date?, correctCount: Int)
 }
 
 /// words / deleted_words へのクエリを集約する(画面から DB を直接触らない規約)。
@@ -329,10 +330,10 @@ public struct WordDao: Sendable {
               word.lastReviewedAt.map(DatabaseTimestamp.seconds), word.correctCount,
               DatabaseTimestamp.seconds(word.updatedAt), id,
             ])
-        case .lastReviewedAt(let date):
+        case .quizProgress(let lastReviewedAt, let correctCount):
           try db.execute(
-            sql: "UPDATE words SET last_reviewed_at = ? WHERE id = ?",
-            arguments: [DatabaseTimestamp.seconds(date), id])
+            sql: "UPDATE words SET last_reviewed_at = ?, correct_count = ? WHERE id = ?",
+            arguments: [lastReviewedAt.map(DatabaseTimestamp.seconds), correctCount, id])
         }
       }
       for id in deleteIds {

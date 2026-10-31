@@ -281,6 +281,58 @@ struct WordExportServiceTests {
     #expect(after.lastReviewedAt == Self.day(11))
   }
 
+  // MARK: - correctCount
+
+  /// apple を登録し、day(10) に `count` 回「知っていた」と答えた既存行を返す。
+  private func seedApple(correctCount count: Int) async throws -> Word {
+    let id = try await insert("apple", meaning: "りんご")
+    for _ in 0..<count { try await dao.recordQuizResult(id: id, knew: true, now: Self.day(10)) }
+    return try #require(try await dao.getAll().first)
+  }
+
+  @Test("内容が古いファイルでも、大きい correctCount は取り込む")
+  func takesLargerCorrectCount() async throws {
+    let existing = try await seedApple(correctCount: 1)
+
+    let result = try await service.importJson(
+      v1([entry("apple", "リンゴ", updatedAt: Self.day(-1), lastReviewedAt: Self.day(9), correctCount: 3)]))
+
+    // 回答の実績だけの更新は、内容の更新として数えない。
+    #expect(result.updated == 0)
+    #expect(result.unchanged == 1)
+    let after = try #require(try await dao.getAll().first)
+    #expect(after.correctCount == 3)
+    // lastReviewedAt は新しい方(DB 側)のまま。
+    #expect(after.lastReviewedAt == Self.day(10))
+    #expect(after.meaning == "りんご")
+    #expect(after.updatedAt == existing.updatedAt)
+  }
+
+  @Test("ファイル側の correctCount が小さければ減らさない")
+  func keepsLargerLocalCorrectCount() async throws {
+    _ = try await seedApple(correctCount: 3)
+
+    try await service.importJson(
+      v1([entry("apple", "りんご", updatedAt: Self.day(-1), lastReviewedAt: Self.day(11), correctCount: 1)]))
+
+    let after = try #require(try await dao.getAll().first)
+    #expect(after.correctCount == 3)
+    #expect(after.lastReviewedAt == Self.day(11))
+  }
+
+  @Test("内容がファイル側の勝ちでも、correctCount は減らさない")
+  func neverDecreasesCorrectCount() async throws {
+    _ = try await seedApple(correctCount: 3)
+
+    let result = try await service.importJson(
+      v1([entry("apple", "リンゴ", updatedAt: Self.day(1), correctCount: 1)]))
+
+    #expect(result.updated == 1)
+    let after = try #require(try await dao.getAll().first)
+    #expect(after.meaning == "リンゴ")
+    #expect(after.correctCount == 3)
+  }
+
   // MARK: - 削除ログ
 
   @Test("ローカルの単語より新しい削除ログはその単語を消す")
@@ -529,14 +581,15 @@ struct WordExportServiceTests {
     ["word": word, "deletedAt": ExportDate.format(deletedAt)]
   }
 
-  private func entry(_ word: String, _ meaning: String, updatedAt: Date, lastReviewedAt: Date? = nil)
-    -> [String: Any]
-  {
+  private func entry(
+    _ word: String, _ meaning: String, updatedAt: Date, lastReviewedAt: Date? = nil, correctCount: Int? = nil
+  ) -> [String: Any] {
     var entry: [String: Any] = [
       "word": word, "japanese": meaning,
       "updatedAt": ExportDate.format(updatedAt), "createdAt": ExportDate.format(updatedAt),
     ]
     if let lastReviewedAt { entry["lastReviewedAt"] = ExportDate.format(lastReviewedAt) }
+    if let correctCount { entry["correctCount"] = correctCount }
     return entry
   }
 }

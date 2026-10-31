@@ -292,16 +292,18 @@ struct WordDaoTests {
     #expect(words.contains { $0.word == "banana" })
   }
 
-  @Test("importWords は lastReviewedAt だけの更新では内容も updatedAt も変えない")
-  func importUpdatesOnlyLastReviewedAt() async throws {
+  @Test("importWords は回答の実績だけの更新では内容も updatedAt も変えない")
+  func importUpdatesOnlyQuizProgress() async throws {
     let created = Date(timeIntervalSince1970: 1_700_000_000)
     let id = try await dao.insertWord(apple(), now: created)
     let reviewed = created.addingTimeInterval(100)
 
-    try await dao.importWords(inserts: [], updates: [(id, .lastReviewedAt(reviewed))])
+    try await dao.importWords(
+      inserts: [], updates: [(id, .quizProgress(lastReviewedAt: reviewed, correctCount: 3))])
 
     let word = try #require(try await dao.getAll().first)
     #expect(word.lastReviewedAt == reviewed)
+    #expect(word.correctCount == 3)
     #expect(word.updatedAt == created)
     #expect(word.meaning == "りんご")
   }

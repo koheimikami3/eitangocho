@@ -70,7 +70,8 @@ public struct WordExportService: Sendable {
   /// - 一致なし: 追加(ファイルの createdAt / updatedAt を保つ)
   /// - 一致あり: ファイル側の updatedAt が新しいときだけ上書き(word の表記・
   ///   createdAt は DB 側を保つ)。それ以外は変更なし
-  /// - lastReviewedAt だけは単語の勝敗と切り離し、ファイルと DB の新しい方を採る
+  /// - クイズの回答の実績は単語の勝敗と切り離し、lastReviewedAt はファイルと DB の新しい方、
+  ///   correctCount は大きい方を採る(手動の取り込みでも古いバックアップで回数を減らさない)
   /// - word / japanese の欠落・型の不正・空文字の行は飛ばして続ける
   /// - ファイル内に同じ単語が複数あれば、updatedAt が新しい方だけを採る
   /// - 削除ログは、同じキーの単語がローカルにあり deletedAt がその updatedAt より
@@ -143,7 +144,7 @@ public struct WordExportService: Sendable {
 
     var inserts: [ImportedWord] = []
     var updates: [(id: Int64, update: WordImportUpdate)] = []
-    var reviewedAtUpdates: [(id: Int64, update: WordImportUpdate)] = []
+    var quizProgressUpdates: [(id: Int64, update: WordImportUpdate)] = []
     for (key, plan) in planned.elements {
       // 同じ単語が words と deletions の両方に載っていることがある
       // (別端末で削除された後、さらに別の端末で再登録された場合など)。新しい方を採る。
@@ -153,22 +154,26 @@ public struct WordExportService: Sendable {
         continue
       }
       guard let existing = existingByKey[key] else {
-        inserts.append(plan.imported(lastReviewedAt: plan.entry.lastReviewedAt))
+        inserts.append(
+          plan.imported(lastReviewedAt: plan.entry.lastReviewedAt, correctCount: plan.entry.correctCount))
         continue
       }
+      // クイズの回答は updatedAt を動かさないため、回答の実績は単語の勝敗と切り離して
+      // 両方を合わせた値にする(内容がこちらの勝ちでも、回答はファイル側が新しいことがある)。
+      // - lastReviewedAt は新しい方(端末ごとに出題の一巡がずれないように)
+      // - correctCount は大きい方。回数は増えるだけなので、大きい方がより多くの回答を含む。
+      //   2 台で同じ頃に答えた分は片方の加算が失われうるが、何度同期しても結果が変わらない
+      let lastReviewedAt = Self.later(plan.entry.lastReviewedAt, existing.lastReviewedAt)
+      let correctCount = max(plan.entry.correctCount, existing.correctCount)
       if plan.updatedAt > existing.updatedAt {
         updates.append(
-          (existing.id, .content(plan.imported(
-            lastReviewedAt: Self.later(plan.entry.lastReviewedAt, existing.lastReviewedAt)))))
+          (existing.id, .content(plan.imported(lastReviewedAt: lastReviewedAt, correctCount: correctCount))))
       } else {
-        // 内容はこちらが新しくても、クイズの回答はファイル側が新しいことがある。
-        // 回答は updatedAt を動かさないため、lastReviewedAt だけは単語の勝敗と
-        // 切り離して新しい方を採る(端末ごとに出題の一巡がずれないように)。
-        if let fileReviewedAt = plan.entry.lastReviewedAt,
-          existing.lastReviewedAt.map({ fileReviewedAt > $0 }) ?? true
-        {
-          reviewedAtUpdates.append((existing.id, .lastReviewedAt(fileReviewedAt)))
+        if lastReviewedAt != existing.lastReviewedAt || correctCount != existing.correctCount {
+          quizProgressUpdates.append(
+            (existing.id, .quizProgress(lastReviewedAt: lastReviewedAt, correctCount: correctCount)))
         }
+        // 内容は変えていないので「変更なし」に数える。
         result.unchanged += 1
       }
     }
@@ -188,7 +193,7 @@ public struct WordExportService: Sendable {
 
     try await dao.importWords(
       inserts: inserts,
-      updates: updates + reviewedAtUpdates,
+      updates: updates + quizProgressUpdates,
       deleteIds: deleteIds,
       // ローカルに単語が無い分も含め、ログはすべて取り込む。
       deletions: deletionsByKey.elements.map { DeletedWord(word: $0.key, deletedAt: $0.value) })
@@ -242,13 +247,13 @@ private struct PlannedEntry {
   var updatedAt: Date
   var createdAt: Date
 
-  func imported(lastReviewedAt: Date?) -> ImportedWord {
+  func imported(lastReviewedAt: Date?, correctCount: Int) -> ImportedWord {
     ImportedWord(
       word: word, meaning: meaning, ipa: entry.ipa,
       partsOfSpeech: entry.partsOfSpeech.compactMap(PartOfSpeech.init(rawValue:)),
       exampleEn: entry.exampleEn, exampleTranslation: entry.exampleTranslation,
       translationLanguage: entry.translationLanguage, audioUrl: entry.audioUrl,
-      isLearned: entry.isLearned, lastReviewedAt: lastReviewedAt, correctCount: entry.correctCount,
+      isLearned: entry.isLearned, lastReviewedAt: lastReviewedAt, correctCount: correctCount,
       createdAt: createdAt, updatedAt: updatedAt)
   }
 }
