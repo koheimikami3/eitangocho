@@ -9,6 +9,9 @@
 - iOS(App Store)と macOS(Mac App Store)
 - **バージョンは pubspec の 1 つを両プラットフォームで共有する**が、片方にしか出さない版もある
   (1.1.0・1.4.0・1.5.0・2.0.0 は iOS のみ)。スキルの 2 では、どれに出すかを必ず確認する
+- **Swift 版への移行期間は、macOS を `native/` の Swift 版から出す**(iOS は Phase 6 まで Flutter 版)。
+  リポジトリに pubspec があるのでスキルは `flutter.md` を読むが、macOS の版を出すときは
+  下の「macOS(Swift 版)」の値に従い、Xcode の手順(スキルの `xcode.md`)で進める
 
 ## バージョンとビルド番号
 
@@ -19,6 +22,10 @@
   見出しに書かれた最大値 + 1
 - 見出しが使用済みビルド番号の台帳を兼ねる。書式は `## <version> (build <build>)`、
   iOS と macOS で番号が違えば `## <version> (iOS build <n> / macOS build <m>)`
+- **macOS(Swift 版)**: `native/Configs/Shared.xcconfig` の `MARKETING_VERSION`(版)と
+  `CURRENT_PROJECT_VERSION`(ビルド番号)を書き換える。pbxproj にはバージョンを書いていない。
+  pubspec は iOS(Flutter 版)の値なので、macOS だけを出す版では触らない。
+  ビルド番号は両方を通した台帳の最大値 + 1 にする(バンプのコミットは上と同じ書式)
 - 提出後、iOS で Xcode がビルド番号を自動で繰り上げた・リジェクトで番号を捨てた、という
   報告があれば見出しを直す(スキルの 8)。macOS は自動で繰り上がらない
 
@@ -29,6 +36,13 @@ flutter analyze
 flutter test -r failures-only
 ```
 
+macOS(Swift 版)は `native/` のコードを変えたときに次を実行する:
+
+```
+swift test --package-path native/Packages/EitangochoCore
+xcodebuild test -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 'platform=macOS'
+```
+
 ## リリースノート
 
 - iOS と macOS で入った内容が違えば文面を分け、同じなら共通にする
@@ -36,7 +50,11 @@ flutter test -r failures-only
 
 ## Archive 前の手順
 
-出すプラットフォームの分だけ、**macOS → iOS の順で**実行する:
+**macOS(Swift 版)**: 設定の再生成は要らない。`native/Eitangocho.xcodeproj` のスキーム `Eitangocho` を
+Release で Archive する(行き先は Any Mac)。**手元で Release を Run しない**
+(本番の Bundle ID のまま、この Mac のストア版のデータと本番の iCloud を引き継いでしまう)。
+
+**iOS(と、戻す版などで Flutter の macOS を出すとき)**: 出すプラットフォームの分だけ、**macOS → iOS の順で**実行する:
 
 ```
 flutter build macos --config-only

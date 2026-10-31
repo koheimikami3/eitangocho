@@ -14,17 +14,10 @@
       "syncEnabled", "syncLastSyncedAt",
     ]
 
-    /// 元ファイル(Flutter 版の DB)の今の状態。
-    struct SourceFile {
-      var exists: Bool
-      var size: Int64?
-      var modifiedAt: Date?
-      var sidecars: [String]
-    }
-
     private(set) var words: [Word] = []
     private(set) var inspection: DatabaseInspection?
-    private(set) var source: SourceFile?
+    /// 元ファイル(Flutter 版の DB)の今の状態。
+    private(set) var source: DriftDatabaseImporter.SourceFileState?
     private(set) var errorMessage: String?
 
     let database: AppDatabase
@@ -60,13 +53,7 @@
       } catch {
         errorMessage = String(describing: error)
       }
-      let fileManager = FileManager.default
-      let attributes = try? fileManager.attributesOfItem(atPath: sourceURL.path)
-      source = SourceFile(
-        exists: fileManager.fileExists(atPath: sourceURL.path),
-        size: (attributes?[.size] as? NSNumber)?.int64Value,
-        modifiedAt: attributes?[.modificationDate] as? Date,
-        sidecars: DriftDatabaseImporter.sidecarSuffixes.filter { fileManager.fileExists(atPath: sourceURL.path + $0) })
+      source = DriftDatabaseImporter.sourceFileState(at: sourceURL)
     }
 
     // MARK: - 混在同期を確かめるための操作

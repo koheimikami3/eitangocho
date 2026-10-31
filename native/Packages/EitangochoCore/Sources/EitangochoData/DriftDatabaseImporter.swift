@@ -45,6 +45,27 @@ public struct DriftDatabaseImporter {
   /// SQLite が本体の横に作る付属ファイル。
   public static let sidecarSuffixes = ["-journal", "-wal", "-shm"]
 
+  /// 元ファイル(Flutter 版の DB)の状態。中身は開かず、ファイルの属性だけを見る。
+  public struct SourceFileState: Sendable, Equatable {
+    public var exists: Bool
+    public var size: Int64?
+    public var modifiedAt: Date?
+    /// 本体の横にある付属ファイルの接尾辞(`sidecarSuffixes` の順)。
+    public var sidecars: [String]
+  }
+
+  /// 元ファイルの今の状態を読む。引き継ぎの後も元ファイルが変わっていないことを、
+  /// 診断画面の無い Release ビルドでもログで確かめられるようにする。
+  public static func sourceFileState(at url: URL) -> SourceFileState {
+    let fileManager = FileManager.default
+    let attributes = try? fileManager.attributesOfItem(atPath: url.path)
+    return SourceFileState(
+      exists: fileManager.fileExists(atPath: url.path),
+      size: (attributes?[.size] as? NSNumber)?.int64Value,
+      modifiedAt: attributes?[.modificationDate] as? Date,
+      sidecars: sidecarSuffixes.filter { fileManager.fileExists(atPath: url.path + $0) })
+  }
+
   /// 引き継ぎの記録を置く UserDefaults のキー。
   public static let recordKey = "nativeDatabaseImport"
 
@@ -134,9 +155,9 @@ public struct DriftDatabaseImporter {
     try fileManager.createDirectory(at: workDirectory, withIntermediateDirectories: true)
     defer { try? fileManager.removeItem(at: workDirectory) }
 
-    let attributes = try? fileManager.attributesOfItem(atPath: locations.source.path)
-    let sourceSize = (attributes?[.size] as? NSNumber)?.int64Value
-    let sourceModifiedAt = attributes?[.modificationDate] as? Date
+    let sourceState = Self.sourceFileState(at: locations.source)
+    let sourceSize = sourceState.size
+    let sourceModifiedAt = sourceState.modifiedAt
 
     // 1. 元ファイルと付属ファイルを、ファイルとしてコピーする(元ファイルは開かない)。
     let copy = workDirectory.appendingPathComponent(Self.fileName)

@@ -160,6 +160,21 @@ final class DriftDatabaseImporterTests {
     #expect(version == 3)
   }
 
+  @Test("元ファイルの状態はサイズ・更新日時・付属ファイルを返し、無ければ無いと返す")
+  func readsSourceFileState() throws {
+    #expect(DriftDatabaseImporter.sourceFileState(at: source) == .init(exists: false, sidecars: []))
+
+    try makeSource { db in try DriftSchemaFixtures.createV4(db, userVersion: 7) }
+    try Data().write(to: URL(fileURLWithPath: source.path + "-journal"))
+    let modifiedAt = Date(timeIntervalSince1970: 1_800_000_000)
+    try FileManager.default.setAttributes([.modificationDate: modifiedAt], ofItemAtPath: source.path)
+
+    let state = DriftDatabaseImporter.sourceFileState(at: source)
+
+    let size = try FileManager.default.attributesOfItem(atPath: source.path)[.size] as? NSNumber
+    #expect(state == .init(exists: true, size: size?.int64Value, modifiedAt: modifiedAt, sidecars: ["-journal"]))
+  }
+
   private var readOnly: Configuration {
     var configuration = Configuration()
     configuration.readonly = true

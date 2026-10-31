@@ -65,6 +65,9 @@ final class AppModel {
   }
 
   nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
+  /// 引き継ぎ(DriftDatabaseImporter)と同じ category。元ファイルのログを並べて読めるようにする。
+  nonisolated private static let migrationLogger = Logger(
+    subsystem: "com.kohei.mikami.eitangocho", category: "migration")
 
   /// App Group の ID。Bundle ID に `group.` を付けたもの(Debug は .dev 付きで本番と分かれる)。
   static var appGroupIdentifier: String {
@@ -117,6 +120,15 @@ final class AppModel {
       Self.logger.error("起動に失敗: \(String(describing: failure), privacy: .public)")
       phase = .failed(failure)
     case .success(let (outcome, database)):
+      // 元ファイルは引き継いだ後も変えない決まり。Release ビルドには診断画面が無いので、
+      // 起動のたびに状態を出し、引き継ぎのときのログ(サイズ・日時)と比べられるようにする。
+      let source = DriftDatabaseImporter.sourceFileState(at: locations.source)
+      Self.migrationLogger.info(
+        """
+        元ファイル: exists=\(source.exists) size=\(source.size ?? -1) \
+        modified=\(source.modifiedAt?.description ?? "-", privacy: .public) \
+        sidecars=\(source.sidecars.joined(separator: ","), privacy: .public)
+        """)
       #if os(macOS)
         // macOS は前面に戻るたびに必ず同期する(ほかの端末の変更を戻ったその場で見られるように)。
         // 書き戻しが増える分、iCloud の競合版はできやすくなるが、次の同期で取り込んで片付ける。
