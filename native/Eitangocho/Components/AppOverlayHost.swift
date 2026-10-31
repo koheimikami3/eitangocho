@@ -9,36 +9,43 @@ struct AppOverlayHost: View {
 
   var body: some View {
     ZStack {
-      ForEach(overlay.dialogs) { dialog in
-        ZStack {
-          colors.barrier
+      #if os(iOS)
+        // シートの上にダイアログを重ねる(編集シートの上に削除の確認を出す)。
+        // シートはキーボードを避ける必要があるので、全面に広げる指定を自分で持つ。
+        MobileSheetLayer(overlay: overlay)
+      #endif
+      ZStack {
+        ForEach(overlay.dialogs) { dialog in
+          ZStack {
+            (dialog.barrier ?? colors.barrier)
+              .contentShape(Rectangle())
+              .onTapGesture { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+            dialog.content
+              .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+          }
+        }
+        // 下端の全幅に出す(Flutter の SnackBar の既定の fixed)。下から滑り込ませる。
+        VStack(spacing: 0) {
+          Spacer(minLength: 0)
+          if let snackBar = overlay.snackBar {
+            SnackBarView(message: snackBar.message)
+              .id(snackBar.id)
+              .transition(.move(edge: .bottom))
+          }
+        }
+        .animation(.easeOut(duration: 0.25), value: overlay.snackBar)
+        if let menu = overlay.menu {
+          // メニューの外を押したら閉じる(押したものには届かない。Flutter の showMenu と同じ)。
+          Color.clear
             .contentShape(Rectangle())
-            .onTapGesture { if dialog.dismissible { overlay.dismiss(dialog.id) } }
-          dialog.content
-            .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+            .onTapGesture { overlay.closeMenu() }
+          MenuPlacement(anchor: menu.anchor, minWidth: menu.minWidth, px: px) {
+            PopupMenuBox(items: menu.items) { overlay.closeMenu() }
+          }
         }
       }
-      // 下端の全幅に出す(Flutter の SnackBar の既定の fixed)。下から滑り込ませる。
-      VStack(spacing: 0) {
-        Spacer(minLength: 0)
-        if let snackBar = overlay.snackBar {
-          SnackBarView(message: snackBar.message)
-            .id(snackBar.id)
-            .transition(.move(edge: .bottom))
-        }
-      }
-      .animation(.easeOut(duration: 0.25), value: overlay.snackBar)
-      if let menu = overlay.menu {
-        // メニューの外を押したら閉じる(押したものには届かない。Flutter の showMenu と同じ)。
-        Color.clear
-          .contentShape(Rectangle())
-          .onTapGesture { overlay.closeMenu() }
-        MenuPlacement(anchor: menu.anchor, minWidth: menu.minWidth, px: px) {
-          PopupMenuBox(items: menu.items) { overlay.closeMenu() }
-        }
-      }
+      .ignoresSafeArea()
     }
-    .ignoresSafeArea()
   }
 }
 

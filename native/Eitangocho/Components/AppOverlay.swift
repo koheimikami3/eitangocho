@@ -32,6 +32,15 @@ final class AppOverlay {
     let id: UUID
     /// 外側のクリック・Esc で閉じられるか。
     var dismissible: Bool
+    /// 後ろに敷く幕の色。nil なら Flutter の showDialog の既定(AppColors.barrier)。
+    var barrier: Color?
+    var content: AnyView
+  }
+
+  /// 下から出すシート(iOS。Flutter 版の showModalBottomSheet)。一度に 1 枚だけ出す。
+  /// 標準の sheet は幕の色と iOS 26 の浮いた形・ガラスを変えられないので使わない(MobileSheetLayer)。
+  struct Sheet: Identifiable {
+    let id: UUID
     var content: AnyView
   }
 
@@ -44,6 +53,12 @@ final class AppOverlay {
   private(set) var menu: Menu?
   private(set) var dialogs: [Dialog] = []
   private(set) var snackBar: SnackBar?
+  private(set) var sheet: Sheet?
+
+  /// シートを下へ引いている量(つまみ・ヘッダのドラッグ。MobileSheetDragHandle が書く)。
+  var sheetDragOffset: CGFloat = 0
+  /// 出ているシートの高さ(半分より引いたら閉じる判定に使う。MobileSheetLayer が書く)。
+  var sheetHeight: CGFloat = 0
 
   /// スナックバーを出しておく時間(Flutter の SnackBar の既定と同じ 4 秒)。
   static let snackBarDuration: Duration = .seconds(4)
@@ -58,12 +73,35 @@ final class AppOverlay {
 
   /// ダイアログを出す。`content` は閉じる関数を受け取る。
   func present<Content: View>(
-    dismissible: Bool = true, @ViewBuilder content: (_ dismiss: @escaping () -> Void) -> Content
+    dismissible: Bool = true, barrier: Color? = nil,
+    @ViewBuilder content: (_ dismiss: @escaping () -> Void) -> Content
   ) {
     let id = UUID()
     let dismiss: () -> Void = { [weak self] in self?.dismiss(id) }
-    dialogs.append(Dialog(id: id, dismissible: dismissible, content: AnyView(content(dismiss))))
+    dialogs.append(Dialog(id: id, dismissible: dismissible, barrier: barrier, content: AnyView(content(dismiss))))
   }
+
+  /// シートを出す。`content` は閉じる関数を受け取る。出ているシートがあれば置き換える。
+  func presentSheet<Content: View>(@ViewBuilder content: (_ dismiss: @escaping () -> Void) -> Content) {
+    let id = UUID()
+    let dismiss: () -> Void = { [weak self] in self?.dismissSheet(id) }
+    sheetDragOffset = 0
+    withAnimation(Self.sheetEnter) {
+      sheet = Sheet(id: id, content: AnyView(content(dismiss)))
+    }
+  }
+
+  /// シートを閉じる。`id` を渡したときは、そのシートが出ているときだけ閉じる(閉じた後に古い閉じる関数が呼ばれても次のシートを閉じない)。
+  func dismissSheet(_ id: UUID? = nil) {
+    guard let sheet, id == nil || sheet.id == id else { return }
+    withAnimation(Self.sheetExit) {
+      self.sheet = nil
+    }
+  }
+
+  /// Flutter の BottomSheet の出入り(250 ms で出て 200 ms で引っ込む)。
+  static let sheetEnter: Animation = .easeOut(duration: 0.25)
+  static let sheetExit: Animation = .easeIn(duration: 0.2)
 
   func dismiss(_ id: UUID) {
     dialogs.removeAll { $0.id == id }
