@@ -34,8 +34,8 @@
       Group {
         // Pro を買ったら 3 枠とも即座に消す。次にこの枠が作り直されるまで待っていると、
         // 設定画面から戻るまで買ったはずの広告が残る。
-        if purchase?.proUnlocked != true, let size = loader.loadedSize {
-          decoration(AnyView(MobileBannerView(bannerView: loader.bannerView).frame(width: size.width, height: size.height)))
+        if purchase?.proUnlocked != true, let size = loader.loadedSize, let bannerView = loader.bannerView {
+          decoration(AnyView(MobileBannerView(bannerView: bannerView).frame(width: size.width, height: size.height)))
         } else {
           // 幅を測るためだけの高さ 0 の面(読み込む広告のサイズは幅で決まる)。
           Color.clear.frame(height: 0)
@@ -68,7 +68,10 @@
     /// 読み込めた広告のサイズ。読み込み前・破棄後は nil。
     private(set) var loadedSize: CGSize?
 
-    @ObservationIgnored let bannerView = BannerView()
+    /// 読み込みに使う広告のビュー。広告を出すと決まってから作る。`@State` の初期値は枠の View が作り直される
+    /// たびに評価されるので、ここで作ると捨てるだけのビューを親の描き直しのたびに作り、Pro の人でも
+    /// 広告の SDK に触れることになる。
+    @ObservationIgnored private(set) var bannerView: BannerView?
 
     /// 実行中の読み込み(SDK の初期化待ちを含む)。二重に走らせないために持つ。
     @ObservationIgnored private var loading: Task<Void, Never>?
@@ -109,6 +112,8 @@
         }
         adLogger.info(
           "読み込み開始: \(adSize.size.width)x\(adSize.size.height) / \(adUnitId, privacy: .public)")
+        let bannerView = self.bannerView ?? BannerView()
+        self.bannerView = bannerView
         bannerView.adUnitID = adUnitId
         bannerView.adSize = adSize
         bannerView.delegate = self
@@ -138,7 +143,7 @@
     /// 失敗した読み込みを間隔を空けて試し直す(10 秒 → 20 秒 → 40 秒)。
     private func scheduleRetry() {
       guard retryCount < Self.maxRetries else {
-        adLogger.info("再試行の上限に達したので諦めます(\(self.bannerView.adUnitID ?? "", privacy: .public))")
+        adLogger.info("再試行の上限に達したので諦めます(\(self.bannerView?.adUnitID ?? "", privacy: .public))")
         return
       }
       let delay = 10 * (1 << retryCount)
