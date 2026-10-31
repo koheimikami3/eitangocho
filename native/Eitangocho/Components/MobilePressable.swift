@@ -7,8 +7,6 @@
     case card
     /// 主ボタン・ピル形ボタン。縮んで薄くなる。
     case button
-    /// タブバーの項目(Flutter 版の自前のタブバー。Swift 版は標準のタブバーなので使わない)。
-    case tab
     /// リストの行。形は変えず、地の色だけを呼び出し側が変える。
     case row
     /// シートの「キャンセル」「閉じる」など文字だけのボタン。薄くなるだけ。
@@ -18,7 +16,6 @@
       switch self {
       case .card: 0.972
       case .button: 0.965
-      case .tab: 0.94
       case .row, .text: 1
       }
     }
@@ -27,7 +24,6 @@
       switch self {
       case .card, .row: 1
       case .button: 0.72
-      case .tab: 0.6
       case .text: 0.4
       }
     }
