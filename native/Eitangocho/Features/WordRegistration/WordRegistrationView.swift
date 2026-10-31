@@ -50,21 +50,11 @@ struct WordRegistrationView: View {
   }
 
   private func errorText(_ language: TranslationLanguage) -> String? {
-    guard let error = model.error else { return nil }
-    switch error {
-    case .duplicate(let word): return String(localized: .errorDuplicate(word))
-    case .emptyWord: return String(localized: .errorEmptyWord)
-    case .fetchFailed: return String(localized: .errorFetchFailed)
-    case .requiredFields: return String(localized: .errorRequiredFields(String(localized: language.shortLabel)))
-    }
+    model.error.map { RegistrationMessages.error($0, language: language) }
   }
 
   private func noticeText(_ notice: WordRegistrationModel.Notice, _ language: TranslationLanguage) -> String {
-    switch notice {
-    case .notFound: String(localized: .noticeNotFound)
-    case .meaningNotFound: String(localized: .noticeMeaningNotFound(String(localized: language.shortLabel)))
-    case .onlyMeaningFound: String(localized: .noticeOnlyMeaningFound)
-    }
+    RegistrationMessages.notice(notice, language: language)
   }
 
   @ViewBuilder

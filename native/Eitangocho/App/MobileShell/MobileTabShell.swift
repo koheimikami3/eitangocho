@@ -90,9 +90,24 @@
     }
 
     /// ヘッダの ＋・学習中の空の状態のボタン。登録シートを開く。
-    private func openRegistration() {}
+    private func openRegistration() {
+      // iOS の登録はシートなので主画面の切り替え(AnalyticsReporting)には現れない。
+      // 開いたことをここで送る(macOS の登録の画面と同じ名前)。
+      model.analytics.logScreenView("registration")
+      model.overlay.presentSheet { [model, session] dismiss in
+        WordRegistrationSheet(
+          settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
+          analytics: model.analytics, review: session.review, dismiss: dismiss)
+      }
+    }
 
     /// カード・行のタップ。編集シートを開く。
-    private func openEdit(_ word: Word) {}
+    private func openEdit(_ word: Word) {
+      model.analytics.logScreenView("word_edit")
+      model.overlay.presentSheet { [model, session] dismiss in
+        WordEditSheet(
+          word: word, store: session.words, language: model.settings.translationLanguage, dismiss: dismiss)
+      }
+    }
   }
 #endif
