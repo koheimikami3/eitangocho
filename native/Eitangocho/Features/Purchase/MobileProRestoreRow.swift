@@ -12,12 +12,13 @@
 
     var body: some View {
       // 押したときの見た目は変えない(Flutter 版は GestureDetector)。
-      MobilePressable(style: .row, action: purchase.restoring ? nil : { Task { await purchase.restore() } }) {
+      // 購入の実行中も押させない(PurchaseModel.isBusy)。
+      MobilePressable(style: .row, action: purchase.isBusy ? nil : { Task { await purchase.restore() } }) {
         HStack(spacing: 0) {
           AppText(.restorePurchases, style: AppTextStyle(size: 13))
             // デザインはここに --accText を当てている。その対応色が accentOnSoft で、13pt の文字でも
             // 4.5:1 を満たす(accent のままだとカード地に対して足りない)。
-            .foregroundStyle(purchase.restoring ? palette.textAlpha(40) : palette.accentOnSoft)
+            .foregroundStyle(purchase.isBusy ? palette.textAlpha(40) : palette.accentOnSoft)
             .frame(maxWidth: .infinity, alignment: .leading)
           if let status = purchase.restoreStatus {
             AppText(Self.label(status), style: AppTextStyle(size: 11))

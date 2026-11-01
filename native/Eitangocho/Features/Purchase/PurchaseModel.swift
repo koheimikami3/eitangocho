@@ -28,6 +28,9 @@ final class PurchaseModel {
   private(set) var purchasing = false
   /// 復元処理の実行中か。
   private(set) var restoring = false
+  /// 購入か復元のどちらかを実行中か。2 つは同時に走らせない(遅れて返った復元の「購入履歴なし」が、
+  /// 先に成立した購入の Pro を取り消すため)。
+  var isBusy: Bool { purchasing || restoring }
   /// 購入に失敗した(購入行に一時表示する)。
   private(set) var purchaseFailed = false
   /// 復元行の右端に一時表示する状況。
@@ -116,7 +119,7 @@ final class PurchaseModel {
   /// 価格が取れていないときは何もしない(商品が引けていない = 購入もできない)。
   func buy() async {
     await waitUntilInitialized()
-    guard available, !purchasing, !proUnlocked, priceText != nil else { return }
+    guard available, !isBusy, !proUnlocked, priceText != nil else { return }
 
     purchasing = true
     purchaseFailed = false
@@ -144,7 +147,7 @@ final class PurchaseModel {
   /// 関わらず実行できる。結果は復元の判断そのもの(RevenueCat が返す entitlement)で上書きする。
   func restore() async {
     await waitUntilInitialized()
-    guard available, !restoring else { return }
+    guard available, !isBusy else { return }
 
     restoring = true
     restoreStatus = .checking

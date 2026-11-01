@@ -125,6 +125,37 @@ final class PurchaseModelTests {
     #expect(model.proUnlocked)
   }
 
+  @Test func 復元の実行中は購入しない() async {
+    // 遅れて返った復元の「購入履歴なし」が、先に成立した購入の Pro を取り消さないように。
+    let gate = OneShotSignal()
+    client.restoreGate = gate
+    let model = await initialized()
+
+    let restoring = Task { await model.restore() }
+    await waitUntil { model.restoring }
+    await model.buy()
+    gate.fire()
+    await restoring.value
+
+    #expect(client.purchaseCount == 0)
+    #expect(model.restoreStatus == .notFound)
+  }
+
+  @Test func 購入の実行中は復元しない() async {
+    let gate = OneShotSignal()
+    client.purchaseGate = gate
+    let model = await initialized()
+
+    let buying = Task { await model.buy() }
+    await waitUntil { model.purchasing }
+    await model.restore()
+    gate.fire()
+    await buying.value
+
+    #expect(client.restoreCount == 0)
+    #expect(model.proUnlocked)
+  }
+
   @Test func 復元に成功するとProになる() async {
     client.restoreResult = true
     let model = await initialized()
