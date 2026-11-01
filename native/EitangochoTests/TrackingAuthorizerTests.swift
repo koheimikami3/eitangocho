@@ -9,12 +9,15 @@ import Testing
 final class TrackingAuthorizerTests {
   private let client = FakeTrackingClient()
   private var active = true
+  /// Pro になったか(`shouldRequest` の反対)。
+  private var pro = false
 
   /// 待ち時間は本番の値のままだとテストが止まるので縮める。`activationTimeout` は「待ちきれずに諦める」
   /// 経路を見るときだけ短くする(既定を短くすると、他のテストが復帰を待てずに偶然通ってしまう)。
   private func makeAuthorizer(activationTimeout: Duration = .seconds(5)) -> TrackingAuthorizer {
     TrackingAuthorizer(
-      client: client, isActive: { [unowned self] in active }, activationDelay: .zero,
+      client: client, isActive: { [unowned self] in active }, shouldRequest: { [unowned self] in !pro },
+      activationDelay: .zero,
       activationTimeout: activationTimeout)
   }
 
@@ -93,6 +96,33 @@ final class TrackingAuthorizerTests {
 
     #expect(client.requestCount == 2)
     #expect(client.settled)
+  }
+
+  @Test func アクティブ化を待つ間にProになったら要求しない() async {
+    active = false
+    let authorizer = makeAuthorizer()
+
+    let requested = Task { await authorizer.ensureRequested() }
+    await waitUntil { authorizer.isAwaitingActivation }
+    pro = true
+    await becomeActive(authorizer)
+    await requested.value
+
+    #expect(client.requestCount == 0)
+  }
+
+  @Test func 出し直しを待つ間にProになったらアクティブへ戻っても要求しない() async {
+    client.dialogShows = false
+    let authorizer = makeAuthorizer()
+
+    await authorizer.ensureRequested()
+    #expect(client.requestCount == 1)
+
+    pro = true
+    client.dialogShows = true
+    await becomeActive(authorizer)
+
+    #expect(client.requestCount == 1)
   }
 
   @Test func 回答が済んだらアクティブへ戻っても要求し直さない() async {

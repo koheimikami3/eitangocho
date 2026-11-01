@@ -79,15 +79,16 @@ final class AppModel {
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
     #if os(iOS)
-      purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
-      tracking = TrackingAuthorizer(client: trackingClient) {
-        UIApplication.shared.applicationState == .active
-      }
+      let purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
+      self.purchase = purchase
+      tracking = TrackingAuthorizer(
+        client: trackingClient, isActive: { UIApplication.shared.applicationState == .active },
+        shouldRequest: { !purchase.proUnlocked })
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
     #else
       purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
       // macOS には広告が無いので、ATT も聞かない(AdsController が iOS 以外では呼ばない)。
-      tracking = TrackingAuthorizer(client: trackingClient) { true }
+      tracking = TrackingAuthorizer(client: trackingClient, isActive: { true })
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: NoAdsSDK(), platformSupported: false)
     #endif
   }
