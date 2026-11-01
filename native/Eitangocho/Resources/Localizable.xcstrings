@@ -5930,31 +5930,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "English Vocab is supported by ads. If you choose [Allow] on the next screen, you’ll see ads that better match your interests."
+            "value" : "English Vocab is supported by ads.\n\nIf you choose [Allow] on the next screen, you’ll see ads that better match your interests."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vocab Inglés se mantiene gracias a los anuncios. Si eliges [Permitir] en la siguiente pantalla, verás anuncios más acordes con tus intereses."
+            "value" : "Vocab Inglés se mantiene gracias a los anuncios.\n\nSi eliges [Permitir] en la siguiente pantalla, verás anuncios más acordes con tus intereses."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vocab Anglais est financé par la publicité. Si vous choisissez [Autoriser] sur l’écran suivant, vous verrez des publicités plus proches de vos centres d’intérêt."
+            "value" : "Vocab Anglais est financé par la publicité.\n\nSi vous choisissez [Autoriser] sur l’écran suivant, vous verrez des publicités plus proches de vos centres d’intérêt."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "シンプル英単語帳は、広告の収益で運営しています。次の画面で［許可］を選ぶと、興味・関心に合った広告が表示されるようになります。"
+            "value" : "シンプル英単語帳は、広告の収益で運営しています。\n\n次の画面で［許可］を選ぶと、興味・関心に合った広告が表示されるようになります。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "英文單字本仰賴廣告收益營運。在下一個畫面選擇［允許］後，就會顯示更符合你興趣的廣告。"
+            "value" : "英文單字本仰賴廣告收益營運。\n\n在下一個畫面選擇［允許］後，就會顯示更符合你興趣的廣告。"
           }
         }
       }
