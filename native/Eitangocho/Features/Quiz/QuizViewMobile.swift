@@ -41,7 +41,7 @@
       case .done:
         // インタースティシャルを出している間は、結果の画面(とそのレクタングル)を作らない。
         if interstitial?.isHoldingResult == true {
-          Color.clear
+          MobileQuizAdNotice()
         } else {
           MobileQuizResultView(
             okCount: quiz.okCount, forgotWords: quiz.forgotWords,
@@ -65,6 +65,20 @@
       Task {
         if knew { await quiz.answerKnew() } else { await quiz.answerForgot() }
         if holding { await interstitial?.present(roundFinished: quiz.phase == .done) }
+      }
+    }
+  }
+
+  /// 解き終えてからインタースティシャルが出るまでの案内。空の画面のまま急に広告が出ると、
+  /// 押したものが効かなかったように見えるため、回るインジケーターと一言を出しておく。
+  private struct MobileQuizAdNotice: View {
+    @Environment(\.palette) private var palette
+
+    var body: some View {
+      VStack(spacing: 14) {
+        CircularProgress(color: palette.accent, size: 28, lineWidth: 3, trackColor: palette.borderAlpha(10))
+        AppText(.quizShowingAd, style: AppTextStyle(size: 14))
+          .foregroundStyle(palette.textAlpha(50))
       }
     }
   }

@@ -3704,6 +3704,42 @@
         }
       }
     },
+    "quizShowingAd" : {
+      "comment" : "クイズを解き終えて、インタースティシャルが出るまでの間に出す案内(iOS)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Showing an ad"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrando un anuncio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichage d’une publicité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "広告を表示します"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即將顯示廣告"
+          }
+        }
+      }
+    },
     "quizSummary" : {
       "extractionState" : "manual",
       "localizations" : {
