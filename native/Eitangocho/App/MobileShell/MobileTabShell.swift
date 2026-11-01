@@ -16,6 +16,7 @@
     @Environment(\.ads) private var ads
     @Environment(\.purchase) private var purchase
     @Environment(\.sheetBannerPreloader) private var sheetBannerPreloader
+    @Environment(\.registrationRectanglePreloader) private var registrationRectanglePreloader
     /// 選択中のタブの中身の下端(画面の座標)= タブバーの上端。バナーをタブバーのすぐ上に置くのに使う。
     @State private var tabBarTop: CGFloat?
     /// タブバー上のバナーの帯の高さ(出ていない間は 0)。タブの中身の下余白に足す。
@@ -67,11 +68,12 @@
       .frame(maxWidth: AppDimensions.mobileContentMaxWidth)
       .frame(maxWidth: .infinity)
       .background(palette.background)
-      // 一覧の画面にいる間に、登録・編集シートの下端のバナーを読み込んでおく。シートは画面の幅いっぱいに
-      // 出るので、幅の上限を掛ける前の幅(= 画面の幅)を渡す。
+      // 一覧の画面にいる間に、登録・編集シートの広告を読み込んでおく。シートは画面の幅いっぱいに
+      // 出るので、幅の上限を掛ける前の幅(= 画面の幅)を渡す(レクタングルは幅に関わらず同じ大きさ)。
       .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
         guard let ads, let purchase else { return }
         sheetBannerPreloader?.prepare(width: width, ads: ads, purchase: purchase)
+        registrationRectanglePreloader?.prepare(width: width, ads: ads, purchase: purchase)
       }
     }
 

@@ -39,17 +39,23 @@
       ) {
         stepContent
       } footer: {
-        MobileSheetBannerAd()
+        // 単語の入力・読み込み中は中身の下のレクタングルに譲り、フォームでだけ下端のバナーを出す。
+        if isForm { MobileSheetBannerAd() }
       }
     }
 
-    @ViewBuilder
     private var stepContent: some View {
       let language = settings.translationLanguage
-      switch model.step {
-      case .input: inputStep(language)
-      case .loading: loadingStep
-      case .form: formStep(language)
+      return VStack(spacing: 0) {
+        switch model.step {
+        case .input: inputStep(language)
+        case .loading: loadingStep
+        case .form: formStep(language)
+        }
+        // 入力から読み込み中へ進んでも読み込み直さないよう、段階の切り替えの外に 1 つだけ置く。
+        if model.step != .form {
+          MobileRegistrationRectangleAd()
+        }
       }
     }
 

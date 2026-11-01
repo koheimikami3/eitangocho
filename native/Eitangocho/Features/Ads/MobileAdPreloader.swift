@@ -3,7 +3,7 @@
   import GoogleMobileAds
   import SwiftUI
 
-  /// 広告を、それを出す画面を開く前に読み込んでおく(シートの下端のバナー・クイズ結果のレクタングル)。
+  /// 広告を、それを出す画面を開く前に読み込んでおく(シートの下端のバナー・登録シートとクイズ結果のレクタングル)。
   ///
   /// 画面を開いてから読み込むと 1〜2 秒遅れて出て、周りの部品へ伸ばした指の先に広告が来る。
   /// 手前の画面(一覧・出題中)にいる間に 1 枚読み込んでおき、画面を開いたらそれを渡して、次の 1 枚を
@@ -56,6 +56,8 @@
   extension EnvironmentValues {
     /// シートの下端のバナーの先読み。RootView が配る。
     @Entry var sheetBannerPreloader: MobileAdPreloader?
+    /// 登録シートの入力の段階のレクタングルの先読み。RootView が配る。
+    @Entry var registrationRectanglePreloader: MobileAdPreloader?
     /// クイズ結果のレクタングルの先読み。RootView が配る。
     @Entry var quizRectanglePreloader: MobileAdPreloader?
   }

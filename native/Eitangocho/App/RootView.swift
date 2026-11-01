@@ -13,6 +13,9 @@ struct RootView: View {
     /// シートの下端のバナーの先読み。シートは重ね層(AppOverlayHost)に出るので、タブの殻ではなくここで持つ。
     @State private var sheetBannerPreloader = MobileAdPreloader(
       adUnitId: AdUnitIds.sheetBanner, resolveSize: MobileSheetBannerAd.adSize(sheetWidth:))
+    /// 登録シートの入力の段階のレクタングルの先読み(シートのバナーと同じく、ここで持つ)。
+    @State private var registrationRectanglePreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.registrationRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
     /// クイズ結果のレクタングルの先読み。「続ける」で回をまたいでも使い回すので、クイズの画面より長く持つ。
     @State private var quizRectanglePreloader = MobileAdPreloader(
       adUnitId: AdUnitIds.quizRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
@@ -33,6 +36,7 @@ struct RootView: View {
         .environment(\.palette, model.settings.appearance.palette)
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
         .environment(\.sheetBannerPreloader, sheetBannerPreloader)
+        .environment(\.registrationRectanglePreloader, registrationRectanglePreloader)
         .environment(\.quizRectanglePreloader, quizRectanglePreloader)
       #endif
       #if os(macOS)
