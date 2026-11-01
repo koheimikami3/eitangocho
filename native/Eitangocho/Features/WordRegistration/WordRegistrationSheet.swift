@@ -21,7 +21,9 @@
       self.settings = settings
       self.dismiss = dismiss
       _model = State(
-        initialValue: WordRegistrationModel(dao: dao, wordInfo: wordInfo, analytics: analytics, review: review) {
+        initialValue: WordRegistrationModel(
+          dao: dao, wordInfo: wordInfo, analytics: analytics, review: review, resetsAfterSave: false
+        ) {
           settings.translationLanguage
         })
     }
