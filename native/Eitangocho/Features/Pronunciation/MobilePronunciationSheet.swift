@@ -28,13 +28,12 @@
     let url: URL
 
     @Environment(\.palette) private var palette
-    @State private var isLoading = true
-    @State private var hasError = false
+    @State private var load = PronunciationPageLoad()
     /// 引き直すたびに上げて、WebView に読み込み直させる。
     @State private var reloadCount = 0
 
     var body: some View {
-      if hasError {
+      if load.hasError {
         VStack(spacing: 16) {
           AppText(.pageLoadFailed, style: AppTextStyle(size: 13, height: 1.6))
             .foregroundStyle(palette.textAlpha(60))
@@ -50,9 +49,9 @@
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
-        WebView(url: url, reloadCount: reloadCount, isLoading: $isLoading, hasError: $hasError)
+        WebView(url: url, reloadCount: reloadCount, load: $load)
           .overlay {
-            if isLoading {
+            if load.isLoading {
               // 読み込み中は白紙が見えるため、面の色で覆ってインジケータを出す。
               palette.surface
                 .overlay { CircularProgress(color: palette.accent) }
@@ -62,8 +61,7 @@
     }
 
     private func reload() {
-      hasError = false
-      isLoading = true
+      load.reload()
       reloadCount += 1
     }
   }
@@ -71,10 +69,9 @@
   private struct WebView: UIViewRepresentable {
     let url: URL
     let reloadCount: Int
-    @Binding var isLoading: Bool
-    @Binding var hasError: Bool
+    @Binding var load: PronunciationPageLoad
 
-    func makeCoordinator() -> Coordinator { Coordinator(isLoading: $isLoading, hasError: $hasError) }
+    func makeCoordinator() -> Coordinator { Coordinator(load: $load) }
 
     func makeUIView(context: Context) -> WKWebView {
       // Google 翻訳は JavaScript 無しでは発音ボタンも訳文も出ない(WKWebView の既定で有効)。
@@ -92,46 +89,29 @@
     }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
-      @Binding var isLoading: Bool
-      @Binding var hasError: Bool
+      @Binding var load: PronunciationPageLoad
       var loadedCount = 0
-      /// 一度でも読み込みが終わったか。終わった後の失敗でページを捨てないための判定。
-      private var hasRendered = false
 
-      init(isLoading: Binding<Bool>, hasError: Binding<Bool>) {
-        _isLoading = isLoading
-        _hasError = hasError
+      init(load: Binding<PronunciationPageLoad>) {
+        _load = load
       }
 
       func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        isLoading = true
-        hasError = false
+        load.started()
       }
 
       func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        hasRendered = true
-        isLoading = false
-        hasError = false
+        load.finished()
       }
 
       func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
-        failed(error)
+        load.failed(error)
       }
 
       func webView(
         _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error
       ) {
-        failed(error)
-      }
-
-      private func failed(_ error: any Error) {
-        // 読み込みの中断(NSURLErrorCancelled)は、遷移が差し替わるたびに通知される(Google 翻訳のリダイレクトでも来る)。
-        // 「読み込めなかった」ではないのでエラーにしない。
-        if (error as NSError).code == NSURLErrorCancelled { return }
-        // 表示できているのに、後から来た失敗(広告・計測の読み込み)で白紙に戻さない。
-        if hasRendered { return }
-        isLoading = false
-        hasError = true
+        load.failed(error)
       }
     }
   }
