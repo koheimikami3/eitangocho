@@ -33,7 +33,8 @@
       // 右上の「登録」はフォームのときだけ出す(MobileSheet はラベルがあるときだけボタンを出す)。
       let rightLabel: String? = isForm ? String(localized: .registerShort) : nil
       MobileSheet(
-        title: String(localized: .navRegistration), leftLabel: leftLabel, onLeft: leftAction(isForm),
+        title: String(localized: .navRegistration), leftLabel: leftLabel, leftIcon: isForm ? .back : .close,
+        onLeft: leftAction(isForm),
         rightLabel: rightLabel, onRight: { save() }
       ) {
         stepContent

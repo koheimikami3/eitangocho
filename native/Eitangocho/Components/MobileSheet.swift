@@ -10,7 +10,10 @@
     let title: String
     /// ヘッダのタイトルの文字サイズ。発音シートは単語そのものを見出しに出すため大きくする。
     var titleFontSize: CGFloat = 15
+    /// 左上の丸いボタンの読み上げの名前(「キャンセル」「戻る」など)。
     let leftLabel: String
+    /// 左上の丸いボタンの絵柄(閉じる ✕ / 戻る ‹)。
+    var leftIcon: MobileSheetLeftIcon = .close
     let onLeft: () -> Void
     /// 右上のアクション(保存など)。nil なら出さない。
     var rightLabel: String?
@@ -34,8 +37,8 @@
       let shape = UnevenRoundedRectangle(topLeadingRadius: 18, topTrailingRadius: 18)
       VStack(spacing: 0) {
         MobileSheetHeader(
-          title: title, titleFontSize: titleFontSize, showGrabber: showGrabber, leftLabel: leftLabel, onLeft: onLeft,
-          rightLabel: rightLabel, onRight: onRight)
+          title: title, titleFontSize: titleFontSize, showGrabber: showGrabber, leftLabel: leftLabel,
+          leftIcon: leftIcon, onLeft: onLeft, rightLabel: rightLabel, onRight: onRight)
         if scrollableBody {
           ScrollView {
             content()
@@ -64,25 +67,44 @@
 
   extension MobileSheet where Footer == EmptyView {
     init(
-      title: String, titleFontSize: CGFloat = 15, leftLabel: String, onLeft: @escaping () -> Void,
-      rightLabel: String? = nil, onRight: (() -> Void)? = nil, scrollableBody: Bool = true, showGrabber: Bool = true,
-      @ViewBuilder content: @escaping () -> Content
+      title: String, titleFontSize: CGFloat = 15, leftLabel: String, leftIcon: MobileSheetLeftIcon = .close,
+      onLeft: @escaping () -> Void, rightLabel: String? = nil, onRight: (() -> Void)? = nil,
+      scrollableBody: Bool = true, showGrabber: Bool = true, @ViewBuilder content: @escaping () -> Content
     ) {
       self.init(
-        title: title, titleFontSize: titleFontSize, leftLabel: leftLabel, onLeft: onLeft, rightLabel: rightLabel,
-        onRight: onRight, scrollableBody: scrollableBody, showGrabber: showGrabber, content: content,
-        footer: { EmptyView() })
+        title: title, titleFontSize: titleFontSize, leftLabel: leftLabel, leftIcon: leftIcon, onLeft: onLeft,
+        rightLabel: rightLabel, onRight: onRight, scrollableBody: scrollableBody, showGrabber: showGrabber,
+        content: content, footer: { EmptyView() })
     }
   }
 
-  /// シートのヘッダ(つまみ・左の文字のボタン・中央のタイトル・右の主ボタン)。下へ引くと閉じる。
+  /// シート左上の丸いボタンの絵柄。
+  enum MobileSheetLeftIcon {
+    /// シートを閉じる(キャンセル・閉じる)。
+    case close
+    /// シートの中で前の段階へ戻る(登録シートのフォーム → 単語の入力)。閉じると誤解されないよう ✕ にしない。
+    case back
+
+    var systemName: String {
+      switch self {
+      case .close: "xmark"
+      case .back: "chevron.left"
+      }
+    }
+  }
+
+  /// シートのヘッダ(つまみ・左の丸いボタン・中央のタイトル・右の主ボタン)。下へ引くと閉じる。
   /// MobileSheet を使わない並び替えのシートも、左右のボタンなしでこれを使う(見た目を登録・編集シートに揃える)。
+  ///
+  /// 左右のボタンは、ヘッダ右上の 🔍・＋ と同じ Liquid Glass にする(2026-11-01 のユーザーの要望。
+  /// Flutter 版は左が文字のボタン、右がピル形の主ボタン)。iOS 18 の代わりの見た目も 🔍・＋ と同じ。
   struct MobileSheetHeader: View {
     let title: String
     var titleFontSize: CGFloat = 15
     var showGrabber = true
-    /// 左上の文字のボタン。nil なら出さない。
+    /// 左上の丸いボタンの読み上げの名前。nil ならボタンを出さない。
     var leftLabel: String?
+    var leftIcon: MobileSheetLeftIcon = .close
     var onLeft: (() -> Void)?
     var rightLabel: String?
     var onRight: (() -> Void)?
@@ -98,30 +120,36 @@
             .foregroundStyle(palette.text)
           HStack(spacing: 0) {
             if let leftLabel, let onLeft {
-              MobilePressable(style: .text, action: onLeft) {
-                AppText(leftLabel, style: AppTextStyle(size: 15))
-                  .foregroundStyle(palette.accentOnSoft)
-                  .padding(.vertical, 8)
-                  .padding(.horizontal, 4)
-              }
+              MobileGlassCircleButton(systemName: leftIcon.systemName, accessibilityLabel: leftLabel, action: onLeft)
             }
             Spacer(minLength: 0)
-            // 確定操作(登録・保存)は文字ではなくピル形の主ボタンにする。
+            // 確定操作(登録・保存)は、何が起きるかが分かるよう ✓ の丸にせず文字のまま主ボタンにする。
             if let rightLabel, let onRight {
-              MobileFilledButton(
-                label: rightLabel, fontSize: 14, weight: .w700,
-                padding: EdgeInsets(top: 7, leading: 16, bottom: 7, trailing: 16), cornerRadius: 99, action: onRight)
+              MobileGlassCapsuleButton(label: rightLabel, action: onRight)
             }
           }
         }
         .padding(.horizontal, 16)
-        .frame(height: showGrabber ? 46 : 50)
+        .frame(height: rowHeight)
+        // つまみの無いシート(発音)は、丸いボタンがシートの上端に付かないよう上を空ける。
+        .padding(.top, !showGrabber && hasButtons ? 6 : 0)
       }
       .frame(maxWidth: .infinity)
       .overlay(alignment: .bottom) {
         Rectangle().fill(palette.borderAlpha(6)).frame(height: 1)
       }
       .mobileSheetDragHandle()
+    }
+  }
+
+  extension MobileSheetHeader {
+    private var hasButtons: Bool { leftLabel != nil || rightLabel != nil }
+
+    /// タイトルの行の高さ。丸いボタン(44pt)があるときは上下に 6pt ずつ空ける。
+    /// ボタンの無い並び替えのシートは Flutter 版の高さのまま。
+    private var rowHeight: CGFloat {
+      if hasButtons { return MobileGlassCircleButton.diameter + 12 }
+      return showGrabber ? 46 : 50
     }
   }
 
