@@ -45,8 +45,10 @@
         }
         if view == .allWords {
           // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
+          // 右上の 🔍・＋ は 44pt の丸で、Flutter 版の「＋ 登録」の文字のボタンより背が高い。
+          // 4pt だと並び替えのボタンと上下に接して見えるので、検索欄が閉じているときは 12pt 空ける。
           sortRow
-            .padding(.top, shell.isSearchOpen ? 0 : 4)
+            .padding(.top, shell.isSearchOpen ? 0 : 12)
             .padding(.bottom, 10)
         } else if !(showSearchAndAdd && shell.isSearchOpen) {
           Spacer().frame(height: 8)
