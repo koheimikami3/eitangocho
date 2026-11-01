@@ -28,8 +28,12 @@
     @State private var loader = MobileAdLoader()
 
     /// デザインの余白(padding:8px 12px)。高さの計算にも使う。
-    private static let verticalPadding: CGFloat = 8
+    private static let topPadding: CGFloat = 8
     private static let horizontalPadding: CGFloat = 12
+    /// 広告の下の余白はデザインより広く取り、広告をタブから離す。押せる部品のすぐ隣に広告を置くと
+    /// 誤タップ(無効なクリック)を招くため。透明な隙間にすると一覧が透けて帯が浮くので、帯の白のまま
+    /// 広げる(2026-11-01 のユーザーの判断)。
+    private static let bottomPadding: CGFloat = 16
 
     var body: some View {
       Group {
@@ -40,13 +44,14 @@
             resolveSize: { .currentOrientationAnchoredAdaptive(width: $0.rounded(.down)) },
             horizontalInset: Self.horizontalPadding,
             onHeightChange: { height in
-              onHeightChange(height.map { $0 + Self.verticalPadding * 2 } ?? 0)
+              onHeightChange(height.map { $0 + Self.topPadding + Self.bottomPadding } ?? 0)
             },
             loader: loader
           ) { adView in
             let shape = Rectangle()
             adView
-              .padding(.vertical, Self.verticalPadding)
+              .padding(.top, Self.topPadding)
+              .padding(.bottom, Self.bottomPadding)
               .padding(.horizontal, Self.horizontalPadding)
               .frame(maxWidth: .infinity)
               .background(palette.surface)
