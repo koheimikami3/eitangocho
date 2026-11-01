@@ -12,10 +12,18 @@ final class TrackingAuthorizerTests {
 
   /// 待ち時間は本番の値のままだとテストが止まるので縮める。`activationTimeout` は「待ちきれずに諦める」
   /// 経路を見るときだけ短くする(既定を短くすると、他のテストが復帰を待てずに偶然通ってしまう)。
+  /// ATT の前の案内を出した回数と、出したときにもう要求していたか。
+  private var explainCount = 0
+  private var requestedBeforeExplain = false
+
   private func makeAuthorizer(activationTimeout: Duration = .seconds(5)) -> TrackingAuthorizer {
     TrackingAuthorizer(
       client: client, isActive: { [unowned self] in active }, activationDelay: .zero,
-      activationTimeout: activationTimeout)
+      activationTimeout: activationTimeout,
+      explain: { [unowned self] in
+        explainCount += 1
+        if client.requestCount > 0 { requestedBeforeExplain = true }
+      })
   }
 
   /// 非アクティブから戻る。
@@ -32,6 +40,37 @@ final class TrackingAuthorizerTests {
     await authorizer.ensureRequested()
 
     #expect(client.requestCount == 0)
+  }
+
+  @Test func 要求の前に案内を出す() async {
+    let authorizer = makeAuthorizer()
+
+    await authorizer.ensureRequested()
+
+    #expect(explainCount == 1)
+    #expect(!requestedBeforeExplain)
+    #expect(client.requestCount == 1)
+  }
+
+  @Test func 回答済みなら案内も出さない() async {
+    client.settled = true
+    let authorizer = makeAuthorizer()
+
+    await authorizer.ensureRequested()
+
+    #expect(explainCount == 0)
+  }
+
+  @Test func ダイアログを出し直すときは案内を繰り返さない() async {
+    client.dialogShows = false
+    let authorizer = makeAuthorizer()
+    await authorizer.ensureRequested()
+
+    client.dialogShows = true
+    await becomeActive(authorizer)
+    await waitUntil { client.requestCount == 2 }
+
+    #expect(explainCount == 1)
   }
 
   @Test func アプリがアクティブになるまで要求しない() async {

@@ -25,6 +25,16 @@ final class TrackingAuthorizer {
   /// ここで諦めて要求し、それでも出なければ次にアクティブへ戻ったときに出し直される。
   private let activationTimeout: Duration
 
+  /// ATT のダイアログの直前に出す案内(アプリのダイアログ)。閉じられるまで待つ。
+  ///
+  /// 何を許可するのかを先に伝えると許可されやすく、許可された分はパーソナライズ広告になって単価が上がる
+  /// (2026-11-01 のユーザーの要望)。出すのは 1 回の起動で 1 回だけ(ダイアログが出せずに出し直すときは
+  /// 案内を繰り返さない)。
+  private let explain: () async -> Void
+
+  /// 案内を出したか。
+  private var explained = false
+
   /// 許可の状態が確定したか(= もうダイアログを出す必要がないか)。
   private var settled = false
 
@@ -47,12 +57,13 @@ final class TrackingAuthorizer {
   /// (`ReviewPrompter.promptDelay` と同じ)。
   init(
     client: any TrackingClient, isActive: @escaping () -> Bool, activationDelay: Duration = .milliseconds(500),
-    activationTimeout: Duration = .seconds(10)
+    activationTimeout: Duration = .seconds(10), explain: @escaping () async -> Void = {}
   ) {
     self.client = client
     self.isActive = isActive
     self.activationDelay = activationDelay
     self.activationTimeout = activationTimeout
+    self.explain = explain
   }
 
   /// 必要なら ATT のダイアログを出す。確定するか、出せないと分かるまで待つ。
@@ -92,6 +103,11 @@ final class TrackingAuthorizer {
     }
 
     await waitUntilActive()
+
+    if !explained {
+      explained = true
+      await explain()
+    }
 
     settled = await client.request()
     retryOnActivation = !settled

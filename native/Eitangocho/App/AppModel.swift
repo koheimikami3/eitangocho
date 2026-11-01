@@ -55,7 +55,7 @@ final class AppModel {
   let shell: MainShellModel
 
   /// 画面の上に重ねるメニューとダイアログ。
-  let overlay = AppOverlay()
+  let overlay: AppOverlay
 
   /// 独自イベントの送信口。DB に依存しないので最初に作る(Firebase の初期化もここで行う)。
   let analytics: AnalyticsLogger
@@ -84,13 +84,15 @@ final class AppModel {
   #endif
 
   init() {
+    let overlay = AppOverlay()
+    self.overlay = overlay
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
     #if os(iOS)
       purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
-      tracking = TrackingAuthorizer(client: trackingClient) {
-        UIApplication.shared.applicationState == .active
-      }
+      tracking = TrackingAuthorizer(
+        client: trackingClient, isActive: { UIApplication.shared.applicationState == .active },
+        explain: { await MobileTrackingPromptDialog.show(overlay: overlay) })
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
     #else
       purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
