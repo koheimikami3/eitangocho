@@ -62,11 +62,14 @@
               .lineSpacing(max(layout.lineSpacing, 0))
               // 複数行の欄(訳・例文)も Return キーは「完了」にする。入力するのは 1 文・1 行の内容で、
               // 改行は一覧の表示を崩すだけで要らない。SwiftUI の縦に伸びる欄は Return で改行が入るので、
-              // 入った改行を取り除いてキーボードを閉じる(Flutter 版の TextInputAction.done と同じ動き)。
+              // Return で入った改行だけを取り除いてキーボードを閉じる(Flutter 版の TextInputAction.done と同じ動き)。
+              // 貼り付けた文や、同期で届いた訳・例文にもとからある改行は残す(ReturnKeyInput)。
               .submitLabel(.done)
-              .onChange(of: text) { _, newValue in
-                guard newValue.contains("\n") else { return }
-                text = newValue.replacingOccurrences(of: "\n", with: "")
+              .onChange(of: text) { oldValue, newValue in
+                guard isFocused.wrappedValue,
+                  let submitted = ReturnKeyInput.removingReturn(old: oldValue, new: newValue)
+                else { return }
+                text = submitted
                 isFocused.wrappedValue = false
                 onSubmit?()
               }
