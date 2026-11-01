@@ -6,14 +6,11 @@
   /// タブバーのすぐ上に常設するアンカー型アダプティブバナー(Flutter 版の MobileBannerAd)。
   ///
   /// Flutter 版はタブバーと一体の帯(地・ぼかし・影を共有)だったが、タブバーが標準の TabView
-  /// (iOS 26 以降は Liquid Glass)になって一体にできないため、タブバーとは別にする。左右に余白を取った
-  /// カード(`MobileAdCard`。クイズ結果のレクタングルと同じ見た目)に載せ、タブバーとの間も空ける。
-  /// 押せる部品のすぐ隣に広告を置くと誤タップ(無効なクリック)を招くため(2026-11-01 のユーザーの判断。
-  /// それまでは全幅の帯だった)。
+  /// (iOS 26 以降は Liquid Glass)になって一体にできないため、タブバーとは別の全幅の帯にする
+  /// (面の色の地・上端に影。Phase 6 の案 A)。
   ///
-  /// 固定の 320x50 ではなく、カードの内側の幅に合わせたサイズを Google に決めさせる(縮めても
-  /// アダプティブのままにする)。高さは読み込みが終わるまで分からないため、確定したら `onHeightChange` で
-  /// カードとタブバーとの間を足した高さを返し、シェルがコンテンツの下余白に足す。
+  /// 固定の 320x50 ではなく端末幅に合わせたサイズを Google に決めさせる。高さは読み込みが終わるまで
+  /// 分からないため、確定したら `onHeightChange` で帯の高さを返し、シェルがコンテンツの下余白に足す。
   ///
   /// 隠す条件(`visible` が false のとき・キーボードが出ている間)では枠ごと外す。キーボードの間は
   /// タブバーごとキーボードの下に隠れるので、見えない広告のインプレッションを避ける。外しても広告は
@@ -25,16 +22,14 @@
     /// 帯の高さ(広告 + 上下の余白)。出ていない間は 0。
     let onHeightChange: (CGFloat) -> Void
 
+    @Environment(\.palette) private var palette
     @State private var keyboardShown = false
     /// 表示する広告。隠している間も持ち続ける。
     @State private var loader = MobileAdLoader()
 
-    /// 広告とカードの縁の間。
-    private static let cardInset: CGFloat = 6
-    /// 画面の左右の端とカードの間。
-    private static let horizontalMargin: CGFloat = 16
-    /// カードとタブバーの間。
-    private static let tabBarGap: CGFloat = 8
+    /// デザインの余白(padding:8px 12px)。高さの計算にも使う。
+    private static let verticalPadding: CGFloat = 8
+    private static let horizontalPadding: CGFloat = 12
 
     var body: some View {
       Group {
@@ -43,15 +38,19 @@
             adUnitId: AdUnitIds.tabBarBanner,
             // 常設のこの枠だけ通常サイズのアンカー型アダプティブにする(大型は常に居座るには大きすぎる)。
             resolveSize: { .currentOrientationAnchoredAdaptive(width: $0.rounded(.down)) },
-            horizontalInset: Self.horizontalMargin + Self.cardInset,
+            horizontalInset: Self.horizontalPadding,
             onHeightChange: { height in
-              onHeightChange(height.map { $0 + Self.cardInset * 2 + Self.tabBarGap } ?? 0)
+              onHeightChange(height.map { $0 + Self.verticalPadding * 2 } ?? 0)
             },
             loader: loader
           ) { adView in
-            MobileAdCard(adView: adView, inset: Self.cardInset)
-              .padding(.horizontal, Self.horizontalMargin)
-              .padding(.bottom, Self.tabBarGap)
+            let shape = Rectangle()
+            adView
+              .padding(.vertical, Self.verticalPadding)
+              .padding(.horizontal, Self.horizontalPadding)
+              .frame(maxWidth: .infinity)
+              .background(palette.surface)
+              .appShadows(palette.bottomBarShadow, in: shape, scale: 1)
           }
         } else {
           // 消えている間は下余白も返す。

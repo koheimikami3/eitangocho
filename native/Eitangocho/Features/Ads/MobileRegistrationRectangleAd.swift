@@ -40,7 +40,7 @@
         adUnitId: AdUnitIds.registrationRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:), loader: loader,
         reservesSpace: true
       ) { adView in
-        MobileAdCard(adView: adView)
+        MobileRectangleAdCard(adView: adView)
           .padding(.top, Self.topPadding)
       }
     }
