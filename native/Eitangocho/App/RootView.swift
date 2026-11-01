@@ -10,6 +10,9 @@ struct RootView: View {
   #if os(iOS)
     /// OS の文字サイズ。Flutter 版と同じ倍率に直して配る(TextScale)。
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// シートの下端のバナーの先読み。シートは重ね層(AppOverlayHost)に出るので、タブの殻ではなくここで持つ。
+    @State private var sheetBannerPreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.sheetBanner, resolveSize: MobileSheetBannerAd.adSize(sheetWidth:))
   #endif
 
   var body: some View {
@@ -26,6 +29,7 @@ struct RootView: View {
       #if os(iOS)
         .environment(\.palette, model.settings.appearance.palette)
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
+        .environment(\.sheetBannerPreloader, sheetBannerPreloader)
       #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))

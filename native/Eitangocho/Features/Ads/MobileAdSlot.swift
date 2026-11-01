@@ -7,10 +7,13 @@
   ///
   /// 3 つの枠(タブバー上・シート内・クイズ結果)で共通するのはここまでで、見た目と置き場所は
   /// `decoration` に任せる。読み込めるまでは、また広告ユニット ID が未設定のときは何も描かない
-  /// (先に空の枠を置くと、広告が付かない端末に意味の無い帯が残るため)。
+  /// (先に空の枠を置くと、広告が付かない端末に意味の無い帯が残るため)。ただし `reservesSpace` の枠は、
+  /// 読み込みを始めた時点で広告の大きさの空の枠を出す(読み込みが終わってから割り込むと、周りの部品が
+  /// 動いて誤タップを招くため)。
   ///
   /// この枠を画面から外せば広告も破棄される(読み込みの状態は `@State` に持つ)。シートに覆われている
-  /// 間や、キーボードで隠れる間の消し方は、呼び出し側がそれで表現する。
+  /// 間の消し方は、呼び出し側がそれで表現する。外しても広告を捨てたくない枠(キーボードで隠れる間の
+  /// シートのバナー)は、呼び出し側が持つ `MobileAdLoader` を `loader` に渡す。
   struct MobileAdSlot<Decoration: View>: View {
     /// AdMob の広告ユニット ID。空なら何もしない。
     let adUnitId: String
@@ -22,20 +25,29 @@
     /// 表示中の広告の高さの変化。読み込み前・破棄後は nil。枠の高さぶんレイアウトを空けたい側
     /// (タブバー上のバナー)が使う。
     var onHeightChange: (CGFloat?) -> Void = { _ in }
+    /// 呼び出し側が持つ読み込み(先読みした広告・枠を外しても捨てない広告)。nil ならこの枠が自分で持つ。
+    var loader: MobileAdLoader?
+    /// 読み込みを始めた時点で、広告の大きさの空の枠を出しておくか。
+    var reservesSpace = false
     /// 読み込めた広告の描画。渡す広告はサイズ確定済みで、背景・境界線・余白は呼び出し側が被せる。
     @ViewBuilder let decoration: (AnyView) -> Decoration
 
     @Environment(\.ads) private var ads
     @Environment(\.purchase) private var purchase
-    @State private var loader = MobileAdLoader()
+    @State private var ownLoader = MobileAdLoader()
     @State private var availableWidth: CGFloat?
 
+    private var activeLoader: MobileAdLoader { loader ?? ownLoader }
+
     var body: some View {
+      let active = activeLoader
       Group {
         // Pro を買ったら 3 枠とも即座に消す。次にこの枠が作り直されるまで待っていると、
         // 設定画面から戻るまで買ったはずの広告が残る。
-        if purchase?.proUnlocked != true, let size = loader.loadedSize, let bannerView = loader.bannerView {
+        if purchase?.proUnlocked != true, let size = active.loadedSize, let bannerView = active.bannerView {
           decoration(AnyView(MobileBannerView(bannerView: bannerView).frame(width: size.width, height: size.height)))
+        } else if reservesSpace, purchase?.proUnlocked != true, let size = active.requestedSize {
+          decoration(AnyView(Color.clear.frame(width: size.width, height: size.height)))
         } else {
           // 幅を測るためだけの高さ 0 の面(読み込む広告のサイズは幅で決まる)。
           Color.clear.frame(height: 0)
@@ -50,12 +62,13 @@
         guard let availableWidth, let ads, let purchase else { return }
         let resolveSize = resolveSize
         let adWidth = availableWidth - horizontalInset * 2
-        loader.load(adUnitId: adUnitId, size: { resolveSize(adWidth) }, ads: ads, purchase: purchase)
+        // 渡された読み込みが済んでいる(または読み込み中の)ときは何もしない(`load` が見る)。
+        active.load(adUnitId: adUnitId, size: { resolveSize(adWidth) }, ads: ads, purchase: purchase)
       }
       .onChange(of: purchase?.proUnlocked == true) { _, unlocked in
-        if unlocked { loader.discard() }
+        if unlocked { active.discard() }
       }
-      .onChange(of: purchase?.proUnlocked == true ? nil : loader.loadedSize?.height, initial: true) { _, height in
+      .onChange(of: purchase?.proUnlocked == true ? nil : active.loadedSize?.height, initial: true) { _, height in
         onHeightChange(height)
       }
       .onDisappear { onHeightChange(nil) }
@@ -68,6 +81,10 @@
     /// 読み込めた広告のサイズ。読み込み前・破棄後は nil。
     private(set) var loadedSize: CGSize?
 
+    /// 要求中の広告のサイズ。読み込みを始めたときに決まり、再試行を諦めたとき・破棄したときに nil に戻る
+    /// (`reservesSpace` の枠が、読み込みの間に空けておく大きさ)。
+    private(set) var requestedSize: CGSize?
+
     /// 読み込みに使う広告のビュー。広告を出すと決まってから作る。`@State` の初期値は枠の View が作り直される
     /// たびに評価されるので、ここで作ると捨てるだけのビューを親の描き直しのたびに作り、Pro の人でも
     /// 広告の SDK に触れることになる。
@@ -75,6 +92,10 @@
 
     /// 実行中の読み込み(SDK の初期化待ちを含む)。二重に走らせないために持つ。
     @ObservationIgnored private var loading: Task<Void, Never>?
+
+    /// SDK に広告を要求して、結果を待っている間。先読みした広告を枠が受け取ったとき、
+    /// 応答待ちの間にもう 1 回要求しないために持つ(`loading` は SDK に渡した時点で外れる)。
+    @ObservationIgnored private var requesting = false
 
     /// 読み込み失敗後の再試行。通信断は一時的なことが多いのに、1 回失敗したきりだと次に画面が
     /// 作り直されるまでずっと空のままになる。
@@ -91,7 +112,7 @@
       reload = { [weak self] in
         self?.load(adUnitId: adUnitId, size: size, ads: ads, purchase: purchase)
       }
-      guard loadedSize == nil, loading == nil else { return }
+      guard loadedSize == nil, loading == nil, !requesting else { return }
       guard !adUnitId.isEmpty else {
         adLogger.info("広告ユニット ID が空のためこの枠は出しません")
         return
@@ -99,6 +120,9 @@
       // Pro を買った後に作られた枠は、そもそも広告を要求しない。AdsController は一度 true を返すと
       // その値を保つため、購入後の判定はここで行う。
       guard !purchase.proUnlocked else { return }
+      // 再試行を待っている間に読み込み直すことになったら(先読みした広告を枠が受け取ったときなど)、
+      // 待っている方は取り消す。両方が走ると同じ枠に 2 回要求を投げる。
+      retry?.cancel()
       loading = Task { [weak self] in
         let enabled = await ads.isEnabled()
         guard let self else { return }
@@ -112,6 +136,8 @@
         }
         adLogger.info(
           "読み込み開始: \(adSize.size.width)x\(adSize.size.height) / \(adUnitId, privacy: .public)")
+        requestedSize = adSize.size
+        requesting = true
         let bannerView = self.bannerView ?? BannerView()
         self.bannerView = bannerView
         bannerView.adUnitID = adUnitId
@@ -126,10 +152,12 @@
     func discard() {
       retry?.cancel()
       loadedSize = nil
+      requestedSize = nil
     }
 
     func bannerViewDidReceiveAd(_ bannerView: BannerView) {
       adLogger.info("読み込み成功: \(bannerView.adUnitID ?? "", privacy: .public)")
+      requesting = false
       retryCount = 0
       loadedSize = bannerView.adSize.size
     }
@@ -137,6 +165,7 @@
     /// 在庫切れ・通信断など。通信断は一時的なことが多いので数回試す。
     func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: any Error) {
       adLogger.info("読み込み失敗: \(error.localizedDescription, privacy: .public)")
+      requesting = false
       scheduleRetry()
     }
 
@@ -144,6 +173,7 @@
     private func scheduleRetry() {
       guard retryCount < Self.maxRetries else {
         adLogger.info("再試行の上限に達したので諦めます(\(self.bannerView?.adUnitID ?? "", privacy: .public))")
+        requestedSize = nil
         return
       }
       let delay = 10 * (1 << retryCount)
