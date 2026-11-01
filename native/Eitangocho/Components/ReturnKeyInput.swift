@@ -7,11 +7,12 @@ import Foundation
 /// (自動修正が単語を直しながら改行を入れることがあるため、改行だけの挿入に限らない)。
 /// 改行を含む文の貼り付けと、もとから改行を含む文の編集は入力どおりに残す(Flutter 版の TextInputAction.done と同じ)。
 nonisolated enum ReturnKeyInput {
-  /// `new` が `old` に Return を押した結果なら、Return が無かったときの文字を返す。そうでなければ nil。
+  /// `new` が `old` に Return を押した結果なら、入った改行だけを取り除いた文字を返す。そうでなければ nil。
   ///
-  /// - 改行だけが入ったとき(選択していた文字を改行で置き換えたときも)は、押す前の `old` に戻す
-  ///   (Flutter 版の「完了」は文字を変えないので、選択していた文字も消さない)
-  /// - 自動修正が単語を直しながら改行を入れたとき(文字数が減る直しも)は、直した単語を残して改行だけを取り除く
+  /// 前後の文字だけでは「選択して Return」と「改行で終わる文の貼り付け」・「自動修正と Return」を区別できない。
+  /// 押す前の `old` に戻すと貼り付けた文や自動修正を巻き戻してしまうので、常に改行だけを取り除く
+  /// (選択して Return を押したときは、選択していた文字が消える)。改行で終わる文を選択して Return を押したときは
+  /// 改行が残る(どちらも滅多に起きないので、入力欄を作り替えてまでは直さない)。
   static func removingReturn(old: String, new: String) -> String? {
     let oldChars = Array(old)
     let newChars = Array(new)
@@ -22,7 +23,6 @@ nonisolated enum ReturnKeyInput {
     let insertedEnd = newChars.count - sharedSuffix
     let inserted = newChars[prefix..<insertedEnd]
     guard inserted.last == "\n", inserted.count(where: { $0 == "\n" }) == 1 else { return nil }
-    if inserted.count == 1 { return old }
     var result = newChars
     result.remove(at: insertedEnd - 1)
     return String(result)
