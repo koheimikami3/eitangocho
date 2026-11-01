@@ -3,11 +3,11 @@
 
   /// iOS 版の押し出した画面のヘッダ(戻るボタン + 中央のタイトル。Flutter 版の MobilePushHeader)。
   ///
-  /// 戻るは押せる「文字」なので、面の青(`accent`)ではなく濃い方の `accentOnSoft` を使う
-  /// (1.6.0 の刷新案 A で設定画面の青を 2 値に統一)。
+  /// 戻るは Flutter 版の「‹ 設定」の文字をやめ、ヘッダ右上の 🔍 と同じ丸いガラスのボタンにする
+  /// (2026-11-01 のユーザーの要望。iOS 26 の標準の戻るボタンと同じく ‹ だけを出す)。
   struct MobilePushHeader: View {
     let title: String
-    /// 戻り先の画面名(iOS の慣習どおり「‹ 設定」のように出す)。
+    /// 戻り先の画面名(戻るボタンの読み上げに使う)。
     let backLabel: String
 
     @Environment(\.palette) private var palette
@@ -19,18 +19,13 @@
         AppText(title, style: AppTextStyle(size: 16, weight: .w600))
           .foregroundStyle(palette.text)
           .frame(maxWidth: .infinity)
-        HStack(spacing: 2) {
-          AppText("‹", style: AppTextStyle(size: 20, height: 1))
-          AppText(backLabel, style: AppTextStyle(size: 16))
-        }
-        .foregroundStyle(palette.accentOnSoft)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .contentShape(Rectangle())
-        .onTapGesture { overlay?.pop() }
+        MobileGlassCircleButton(systemName: "chevron.left", accessibilityLabel: backLabel) { overlay?.pop() }
       }
-      .frame(minHeight: 44)
-      .padding(EdgeInsets(top: 0, leading: 8, bottom: 8, trailing: 8))
+      .frame(minHeight: MobileGlassCircleButton.diameter)
+      // 左右の余白はタブのヘッダ(MobileHeader)と同じにし、丸いボタンの位置を揃える。
+      .padding(
+        EdgeInsets(
+          top: 0, leading: AppDimensions.mobilePadding, bottom: 8, trailing: AppDimensions.mobilePadding))
       .background {
         Rectangle()
           .fill(palette.surface)
