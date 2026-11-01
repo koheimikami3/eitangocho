@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 
 /// 文字の書式。Flutter の `TextStyle(fontSize, fontWeight, height, letterSpacing)` と
@@ -49,8 +50,9 @@ struct AppTextStyle: Hashable, Sendable {
   }
 
   /// 倍率を掛けた SwiftUI のフォント(入力欄など AppText を使えない所で使う)。
-  func font(_ scale: UIScale) -> Font {
-    Font(AppFonts.ctFont(family, size: scale(size), weight: weight.rawValue))
+  /// `textScale` は iOS の文字サイズの倍率(`\.textScale`)。文字の大きさにだけ掛ける。
+  func font(_ scale: UIScale, textScale: CGFloat = 1) -> Font {
+    Font(AppFonts.ctFont(family, size: scale(size) * textScale, weight: weight.rawValue))
   }
 
   /// `text` をこの書式で 1 行に組んだときの、Flutter と同じ行の寸法。
@@ -60,8 +62,10 @@ struct AppTextStyle: Hashable, Sendable {
   /// leadingDistribution が even のため)。代替フォントが混ざる行は、上下それぞれの最大を取るので
   /// `size * height` より少し高くなる。SwiftUI は代替フォントが入っても主のフォントの数値だけで
   /// 行を組むので、その差を上下の余白と行間で埋める(LineLayout)。
-  func lineLayout(for text: String, scale: UIScale) -> LineLayout {
-    let size = scale(self.size)
+  /// `textScale`(iOS の文字サイズの倍率)は Flutter の TextScaler と同じく文字の大きさにだけ掛かる。
+  /// 行の高さは大きさとの比(height)なので一緒に伸び、字間は伸びない。
+  func lineLayout(for text: String, scale: UIScale, textScale: CGFloat = 1) -> LineLayout {
+    let size = scale(self.size) * textScale
     let primary = AppFonts.verticalMetrics(postScriptName: AppFonts.primaryName(family))
     let coverage = AppFonts.coverage(text, family: family)
     var fonts: [AppFonts.VerticalMetrics] = []
@@ -88,6 +92,15 @@ struct AppTextStyle: Hashable, Sendable {
     )
   }
 
+  /// `text` をこの書式で 1 行に組んだときの幅(字間を含む。Flutter の TextPainter.width と同じく
+  /// 最後の文字の後ろの字間も数える)。入り切るかで段組みを変える部品が使う。
+  func width(of text: String, scale: UIScale, textScale: CGFloat = 1) -> CGFloat {
+    let font = AppFonts.ctFont(family, size: scale(size) * textScale, weight: weight.rawValue)
+    let attributed = NSAttributedString(
+      string: text, attributes: [.font: font, .kern: scale(letterSpacing)])
+    return CGFloat(CTLineGetTypographicBounds(CTLineCreateWithAttributedString(attributed), nil, nil, nil))
+  }
+
   /// SwiftUI の Text に足す余白と行間。
   struct LineLayout: Equatable {
     /// 1 行目の上に足す量(負なら詰める)
@@ -109,6 +122,7 @@ struct AppText: View {
   private let content: String
   private let style: AppTextStyle
   @Environment(\.uiScale) private var px
+  @Environment(\.textScale) private var textScale
 
   init(_ content: String, style: AppTextStyle) {
     self.content = content
@@ -120,9 +134,9 @@ struct AppText: View {
   }
 
   var body: some View {
-    let layout = style.lineLayout(for: content, scale: px)
+    let layout = style.lineLayout(for: content, scale: px, textScale: textScale)
     Text(verbatim: content)
-      .font(style.font(px))
+      .font(style.font(px, textScale: textScale))
       .tracking(px(style.letterSpacing))
       // SwiftUI の lineSpacing は負の値を無視する。Flutter の height がフォントの既定より
       // 小さい複数行の文字だけは、行が Flutter より少し広くなる(1 行なら上下の余白で合う)。

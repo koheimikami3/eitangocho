@@ -56,6 +56,17 @@ final class AnalyticsReporter {
     setProperty("sync_enabled", boolValue(enabled))
   }
 
+  /// Pro を購入済みか(iOS だけ)。購入状態が分かってから呼ぶ(それまでは未購入に見えるため)。
+  func reportPro(_ unlocked: Bool) {
+    setProperty("is_pro", boolValue(unlocked))
+  }
+
+  /// トラッキング許可の状態(iOS だけ。TrackingClient.statusName の値)。許可は ATT のダイアログか
+  /// 設定アプリでしか変わらず、どちらもアプリがアクティブに戻るのを挟むので、アクティブになるたびに呼ぶ。
+  func reportTrackingStatus(_ status: String) {
+    setProperty("att_status", status)
+  }
+
   func reportScreen(_ view: MainView) {
     logger.logScreenView(screenName(view))
   }

@@ -43,6 +43,39 @@ struct LicenseCatalogTests {
     #expect(LicenseCatalog.detectLicenseName("") == nil)
   }
 
+  // MARK: - paragraphs
+
+  @Test func 段落の中の改行は空白でつなぎ空行で段落を切る() {
+    let text = "Copyright (c) 2004 SIL\nwith Reserved Font Names.\n\nThis Font Software is licensed\nunder the OFL.\n"
+    #expect(
+      LicenseCatalog.paragraphs(of: text) == [
+        "Copyright (c) 2004 SIL with Reserved Font Names.", "This Font Software is licensed under the OFL.",
+      ])
+  }
+
+  @Test func 前の行より字下げが深い行から新しい段落にする() {
+    let text = "Conditions:\n  1. First item\n     continues here.\n  2. Second item\n"
+    // 字下げの分の空白は段落に含めない。浅くなった行は前の段落に続く(Flutter 版と同じ)。
+    #expect(
+      LicenseCatalog.paragraphs(of: text) == [
+        "Conditions:", "1. First item", "continues here. 2. Second item",
+      ])
+  }
+
+  @Test func CRLFと改ページも段落の区切りとして扱う() {
+    #expect(LicenseCatalog.paragraphs(of: "a\r\n\r\nb\u{0C}c") == ["a\r", "b", "c"])
+  }
+
+  @Test func 段落の中に残ったCRは空白にする() {
+    let items = LicenseCatalog.group([LicenseEntry(packages: ["x"], text: "one\r\ntwo\r\n\r\nthree\r\n")])
+    #expect(items.first?.texts == ["one  two\n\nthree"])
+  }
+
+  @Test func まとめるときは段落を空行で区切る() {
+    let items = LicenseCatalog.group([LicenseEntry(packages: ["x"], text: "line one\nline two\n\nnext\n")])
+    #expect(items.first?.texts == ["line one line two\n\nnext"])
+  }
+
   // MARK: - group
 
   @Test func パッケージ単位にまとめ名前順に並べる() {
@@ -108,5 +141,20 @@ struct LicenseCatalogTests {
     #expect(summaries["GRDB.swift"] == "MIT License")
     #expect(summaries["Firebase"] == "Apache License 2.0")
     #expect(summaries["Tatoeba"] == "CC BY 2.0 FR")
+  }
+
+  @Test func iOSだけのパッケージの本文も同梱されている() throws {
+    // テストは macOS で動くので一覧には出ないが、本文は両 OS の成果物に入る(同じリソースのフォルダ)。
+    let items = LicenseCatalog.group(
+      try LicenseCatalog.iOSOnlyPackages.map { name, resource in
+        let url = try #require(Bundle.main.url(forResource: resource, withExtension: "txt"))
+        return LicenseEntry(packages: [name], text: try String(contentsOf: url, encoding: .utf8))
+      })
+    let summaries = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.summary) })
+    #expect(
+      summaries == [
+        "GoogleMobileAds": "Apache License 2.0", "GoogleUserMessagingPlatform": "Apache License 2.0",
+        "RevenueCat": "MIT License",
+      ])
   }
 }

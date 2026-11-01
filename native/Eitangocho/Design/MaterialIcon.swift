@@ -8,6 +8,7 @@ nonisolated enum MaterialIcon: CaseIterable, Sendable {
   case check
   case expandMore
   case search
+  case sort
   case volumeUp
 }
 

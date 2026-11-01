@@ -72,7 +72,7 @@
           }
           SettingsSection(title: String(localized: .sectionInfo)) {
             SettingsCard {
-              SettingsValueRow(label: String(localized: .version), value: Self.appVersion)
+              SettingsValueRow(label: String(localized: .version), value: AppVersion.display)
               SettingsLinkRow(label: String(localized: .licenses)) {
                 overlay?.present { dismiss in LicenseDialog(dismiss: dismiss) }
               }
@@ -103,8 +103,5 @@
           .padding(.horizontal, px(AppDimensions.mobileCardRadius))
       }
     }
-
-    /// 表示用のアプリのバージョン(`2.11.1` の形)。バンドルから取る(定数で持つと上げ忘れる)。
-    private static let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
   }
 #endif

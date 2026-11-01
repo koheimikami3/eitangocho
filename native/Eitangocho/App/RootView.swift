@@ -7,18 +7,41 @@ struct RootView: View {
   let model: AppModel
 
   @Environment(\.requestReview) private var requestReview
+  #if os(iOS)
+    /// OS の文字サイズ。Flutter 版と同じ倍率に直して配る(TextScale)。
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// シートの下端のバナーの先読み。シートは重ね層(AppOverlayHost)に出るので、タブの殻ではなくここで持つ。
+    @State private var sheetBannerPreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.sheetBanner, resolveSize: MobileSheetBannerAd.adSize(sheetWidth:))
+    /// 登録シートの入力の段階のレクタングルの先読み(シートのバナーと同じく、ここで持つ)。
+    @State private var registrationRectanglePreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.registrationRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
+    /// クイズ結果のレクタングルの先読み。「続ける」で回をまたいでも使い回すので、クイズの画面より長く持つ。
+    @State private var quizRectanglePreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.quizRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
+  #endif
 
   var body: some View {
     content
       .overlay { AppOverlayHost(overlay: model.overlay) }
       .environment(\.appOverlay, model.overlay)
       .environment(\.analytics, model.analytics)
+      .environment(\.purchase, model.purchase)
+      .environment(\.ads, model.ads)
       // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
       .onAppear { model.reviewClient.action = requestReview }
       .environment(\.colors, model.settings.appearance.colors)
+      .environment(\.openPronunciation, openPronunciation)
+      #if os(iOS)
+        .environment(\.palette, model.settings.appearance.palette)
+        .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
+        .environment(\.sheetBannerPreloader, sheetBannerPreloader)
+        .environment(\.registrationRectanglePreloader, registrationRectanglePreloader)
+        .environment(\.quizRectanglePreloader, quizRectanglePreloader)
+        .environment(\.quizInterstitial, model.quizInterstitial)
+      #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))
-        .environment(\.openPronunciation, openPronunciation)
         .frame(minWidth: WindowAppearance.minimumSize.width, minHeight: WindowAppearance.minimumSize.height)
         .onChange(of: model.settings.appearance, initial: true) { _, appearance in
           WindowAppearance.apply(appearance)
@@ -27,16 +50,20 @@ struct RootView: View {
       .preferredColorScheme(model.settings.appearance == .dark ? .dark : .light)
   }
 
-  #if os(macOS)
-    /// 発音確認のウィンドウを開く。ページもアプリと同じ拡大率で出す。
-    private func openPronunciation(_ word: String) {
-      // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
-      model.analytics.logPronunciationOpened(model.shell.view)
-      PronunciationWindowController.shared.open(
-        url: GoogleTranslateURL.make(word, language: model.settings.translationLanguage), title: word,
-        zoom: model.settings.uiScale)
-    }
-  #endif
+  /// 発音確認を開く。macOS は別ウィンドウ(ページもアプリと同じ拡大率で出す)、iOS はシート。
+  private func openPronunciation(_ word: String) {
+    // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
+    model.analytics.logPronunciationOpened(model.shell.view)
+    // 開いた時点の訳の言語で引く(開いている間に変わることはない)。
+    let url = GoogleTranslateURL.make(word, language: model.settings.translationLanguage)
+    #if os(macOS)
+      PronunciationWindowController.shared.open(url: url, title: word, zoom: model.settings.uiScale)
+    #else
+      model.overlay.presentSheet { dismiss in
+        MobilePronunciationSheet(word: word, url: url, dismiss: dismiss)
+      }
+    #endif
+  }
 
   @ViewBuilder
   private var content: some View {
@@ -49,7 +76,9 @@ struct RootView: View {
     case .ready(let session):
       readyContent(session)
         .modifier(
-          AnalyticsReporting(reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session))
+          AnalyticsReporting(
+            reporter: model.analyticsReporter, shell: model.shell, settings: model.settings, session: session,
+            purchase: model.purchase, trackingClient: model.trackingClient))
     }
   }
 
@@ -65,11 +94,8 @@ struct RootView: View {
       ) { view in
         mainContent(view, session: session)
       }
-    #elseif DEBUG
-      // iOS の画面は Phase 6 で作る。それまでは Dev ビルドで診断画面を出す。
-      DiagnosticsView(session: session)
     #else
-      Text(verbatim: "\(session.importOutcome)")
+      MobileTabShell(model: model, session: session)
     #endif
   }
 }

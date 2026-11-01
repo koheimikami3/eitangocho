@@ -17,6 +17,9 @@ enum AppAppearance: String, CaseIterable, Sendable {
   }
 
   var colors: AppColors { self == .dark ? .dark : .light }
+
+  /// iOS の配色。
+  var palette: AppPalette { self == .dark ? .dark : .light }
 }
 
 /// 学習中カードの並び。iOS 版のみの設定(macOS 版は独自のカードの格子を持つ)。

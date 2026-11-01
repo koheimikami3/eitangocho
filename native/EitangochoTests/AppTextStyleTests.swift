@@ -67,6 +67,22 @@ struct AppTextStyleTests {
     #expect(style.letterSpacing == 0.25)
   }
 
+  @Test(arguments: [
+    (DynamicTypeSize.xSmall, 14.0), (.large, 17), (.xLarge, 19), (.xxxLarge, 23), (.accessibility1, 28),
+    (.accessibility5, 53),
+  ])
+  func 文字サイズの倍率はFlutterのengineと同じ表で決まる(size: DynamicTypeSize, body: CGFloat) {
+    #expect(abs(TextScale.factor(for: size) - body / 17) < 0.0001)
+  }
+
+  @Test func 文字サイズの倍率は行の高さにも掛かる() {
+    let style = AppTextStyle(size: 20)
+    let base = style.lineLayout(for: "Hello", scale: .none)
+    let scaled = style.lineLayout(for: "Hello", scale: .none, textScale: 1.5)
+    // Flutter の TextScaler と同じく、行の高さ(大きさとの比)は大きさと一緒に伸びる。
+    #expect(abs(scaled.lineHeight - base.lineHeight * 1.5) < 0.001)
+  }
+
   @Test func 同梱フォントが登録されていて名前で引ける() {
     for name in ["Inter-Regular", "NotoSansJP-Thin", "NotoSansTC-Thin", "Andika"] {
       let font = CTFontCreateWithName(name as CFString, 12, nil)

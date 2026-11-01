@@ -21,20 +21,24 @@ final class ReviewPrompter {
   private let analytics: AnalyticsLogger
   private let defaults: UserDefaults
   private let promptDelay: Duration
+  private let skipsQuizPrompt: () -> Bool
   private let now: () -> Date
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "review")
 
   /// `promptDelay` は既定値が本番の値で、テストからだけ縮める。
+  /// `skipsQuizPrompt` が true を返す完了では、クイズでの依頼を見送る(iOS はインタースティシャルを出した回)。
   init(
     client: any ReviewClient, dao: WordDao, analytics: AnalyticsLogger, defaults: UserDefaults = .standard,
-    promptDelay: Duration = ReviewConfig.promptDelay, now: @escaping () -> Date = { .now }
+    promptDelay: Duration = ReviewConfig.promptDelay, skipsQuizPrompt: @escaping () -> Bool = { false },
+    now: @escaping () -> Date = { .now }
   ) {
     self.client = client
     self.dao = dao
     self.analytics = analytics
     self.defaults = defaults
     self.promptDelay = promptDelay
+    self.skipsQuizPrompt = skipsQuizPrompt
     self.now = now
   }
 
@@ -44,6 +48,12 @@ final class ReviewPrompter {
     // 完了回数は「達成の総量」を表す指標として使うため、成績や他の条件を満たさない回も含めて数える。
     let completions = defaults.integer(forKey: Self.quizCompletedCountKey) + 1
     defaults.set(completions, forKey: Self.quizCompletedCountKey)
+    // 広告の直後に評価を求めると、気分を損ねたまま低評価を付けられやすい(2026-11-01 のユーザーの判断)。
+    // 完了回数には数えたうえで、この回は見送り、次に条件を満たした回で出す。
+    if skipsQuizPrompt() {
+      log("インタースティシャルを出した回のため見送ります")
+      return
+    }
     do {
       guard try await shouldRequest(okCount: okCount, total: total, completions: completions) else { return }
       await request("累計クイズ完了 \(completions) 回", trigger: .quiz)

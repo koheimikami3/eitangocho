@@ -19,7 +19,7 @@ public struct SyncFailure: Sendable, Equatable {
 /// iCloud 同期の有効 / 無効・実行状態を持ち、いつ同期するかを決める
 /// (Flutter 版の SyncNotifier の移植)。同期そのものは SyncService が行う。
 ///
-/// 同期する契機: 起動時(start)/ アクティブ化(最短 60 秒おき)/ ローカルの変更
+/// 同期する契機: 起動時(start)/ アクティブ化(既定は最短 60 秒おき。アプリは毎回にしている)/ ローカルの変更
 /// (5 秒まとめる)/ 設定画面の「今すぐ同期」。最新のデータを取得できずに
 /// 見送ったときは、加えて 1 回だけ再試行する。
 @MainActor @Observable

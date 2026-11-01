@@ -10,9 +10,24 @@ struct AnalyticsReporting: ViewModifier {
   let shell: MainShellModel
   let settings: SettingsStore
   let session: AppModel.Session
+  let purchase: PurchaseModel
+  let trackingClient: any TrackingClient
+
+  @Environment(\.scenePhase) private var scenePhase
 
   func body(content: Content) -> some View {
     content
+      #if os(iOS)
+        // 購入状態は RevenueCat から届くまで未購入に見えるので、分かってから送る(Flutter 版と同じ)。
+        .onChange(of: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil, initial: true) { _, unlocked in
+          if let unlocked { reporter.reportPro(unlocked) }
+        }
+        // トラッキング許可は起動時とアクティブに戻るたびに読む。状態を読むだけで、ダイアログは出さない
+        // (出すのは TrackingAuthorizer)。
+        .onChange(of: scenePhase, initial: true) { _, phase in
+          if phase == .active { reporter.reportTrackingStatus(trackingClient.statusName()) }
+        }
+      #endif
       .onChange(of: shell.view, initial: true) { previous, view in
         reporter.reportScreen(view)
         session.quiz.viewChanged(from: previous, to: view)

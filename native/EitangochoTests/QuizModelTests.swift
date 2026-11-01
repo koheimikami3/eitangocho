@@ -73,6 +73,122 @@ struct QuizModelTests {
     #expect(model.forgotWords.map(\.id) == [target.id])
   }
 
+  // MARK: - 回をタブの切り替えをまたいで保つ(iOS)
+
+  /// 今ある単語を差し替えられる入れ物(戻ってきたときに読む `currentWords` の元)。
+  private final class WordsBox {
+    var words: [Word] = []
+  }
+
+  /// 学習済み単語を n 件入れ、回を保つモデルを返す。
+  private func setupKeepingRound(_ count: Int) async throws -> (QuizModel, WordsBox) {
+    for i in 0..<count {
+      let id = try await database.wordDao.insertWord(NewWord(word: "word\(i)", meaning: "訳\(i)"))
+      try await database.wordDao.setLearned(id: id, true)
+    }
+    let box = WordsBox()
+    box.words = try await database.wordDao.getAll()
+    let model = QuizModel(
+      dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
+      keepsRoundAcrossViews: true, currentWords: { box.words }
+    ) { WordListing.learned(box.words) }
+    return (model, box)
+  }
+
+  @Test func 回を保つときはタブを移って戻っても続きから出題し離脱にしない() async throws {
+    let (model, _) = try await setupKeepingRound(3)
+    model.enterFromTab()
+    model.viewChanged(from: .learning, to: .quiz)
+    await model.answerKnew()
+    model.reveal()
+
+    model.viewChanged(from: .quiz, to: .learning)
+    model.enterFromTab()
+    model.viewChanged(from: .learning, to: .quiz)
+
+    #expect(model.phase == .active)
+    #expect(model.index == 1)
+    #expect(model.okCount == 1)
+    #expect(model.revealed, "出題中の単語が変わっていなければ開示の状態も保つ")
+    #expect(analytics.eventsNamed("quiz_abandoned").isEmpty)
+    #expect(analytics.eventsNamed("quiz_started").count == 1)
+  }
+
+  @Test func 回を保つときは選んでいるタブを押し直してもやり直さない() async throws {
+    let (model, _) = try await setupKeepingRound(3)
+    model.enterFromTab()
+    await model.answerKnew()
+    model.enterFromTab()
+    #expect(model.index == 1)
+    #expect(analytics.eventsNamed("quiz_started").count == 1)
+  }
+
+  @Test func 回を保つときは結果の画面のままでタブから入ってもやり直さない() async throws {
+    let (model, _) = try await setupKeepingRound(1)
+    model.enterFromTab()
+    await model.answerKnew()
+    model.enterFromTab()
+    #expect(model.phase == .done)
+    #expect(model.okCount == 1)
+  }
+
+  @Test func 回を保つときも学習済みが無かった後はタブから入ると始める() async throws {
+    let (model, box) = try await setupKeepingRound(0)
+    model.enterFromTab()
+    #expect(model.phase == .empty)
+
+    let id = try await database.wordDao.insertWord(NewWord(word: "new", meaning: "新"))
+    try await database.wordDao.setLearned(id: id, true)
+    box.words = try await database.wordDao.getAll()
+    model.enterFromTab()
+    #expect(model.phase == .active)
+  }
+
+  @Test func 回を保つときは離れている間の削除を残りの出題から外し編集を反映する() async throws {
+    let (model, box) = try await setupKeepingRound(3)
+    model.enterFromTab()
+    await model.answerKnew()
+    let answered = model.questions[0]
+    let deleted = model.questions[1]
+    let edited = model.questions[2]
+    model.reveal()
+
+    try await database.wordDao.deleteWord(id: deleted.id)
+    box.words = box.words.filter { $0.id != deleted.id }.map { word in
+      var word = word
+      if word.id == edited.id { word.meaning = "直した訳" }
+      return word
+    }
+    model.enterFromTab()
+
+    #expect(model.questions.map(\.id) == [answered.id, edited.id])
+    #expect(model.current?.meaning == "直した訳")
+    #expect(!model.revealed, "出題中の単語が消えたら次の単語は開示前から")
+  }
+
+  @Test func 回を保つときに残りがすべて消えたらそこまでで回を終える() async throws {
+    let (model, box) = try await setupKeepingRound(2)
+    model.enterFromTab()
+    await model.answerKnew()
+    let remaining = model.questions[1]
+    box.words = box.words.filter { $0.id != remaining.id }
+
+    model.enterFromTab()
+
+    #expect(model.phase == .done)
+    #expect(model.okCount == 1)
+    #expect(analytics.eventsNamed("quiz_completed").count == 1)
+  }
+
+  @Test func 回を保たないときはタブから入るたびに始め直す() async throws {
+    let model = try await setupLearned(3)
+    model.enterFromTab()
+    await model.answerKnew()
+    model.enterFromTab()
+    #expect(model.index == 0)
+    #expect(analytics.eventsNamed("quiz_started").count == 2)
+  }
+
   @Test func revealでrevealedがtrueになる() async throws {
     let model = try await setupLearned(1)
     model.start(trigger: .tab)

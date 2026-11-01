@@ -32,11 +32,13 @@ struct WordRegistrationModelTests {
   }
 
   private func makeModel(
-    language: TranslationLanguage = .ja, _ handler: @escaping @Sendable (String) async throws -> WordInfo? = { _ in nil }
+    language: TranslationLanguage = .ja, resetsAfterSave: Bool = true,
+    _ handler: @escaping @Sendable (String) async throws -> WordInfo? = { _ in nil }
   ) -> WordRegistrationModel {
     WordRegistrationModel(
       dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), analytics: AnalyticsLogger(analytics),
-      review: disabledReviewPrompter(dao: database.wordDao), currentLanguage: { language })
+      review: disabledReviewPrompter(dao: database.wordDao), resetsAfterSave: resetsAfterSave,
+      currentLanguage: { language })
   }
 
   private func fill(_ model: WordRegistrationModel, word: String, meaning: String, ipa: String = "", exampleEn: String = "") {
@@ -75,6 +77,18 @@ struct WordRegistrationModelTests {
     #expect(model.step == .input)
     #expect(model.word.isEmpty)
     #expect(model.registeredWord == "apple")
+  }
+
+  @Test func 戻さない設定では保存してもフォームのまま() async throws {
+    let model = makeModel(resetsAfterSave: false)
+    model.word = "apple"
+    model.skipToManual()
+    model.meaning = "りんご"
+    #expect(await model.save())
+    #expect(try await database.wordDao.getAll().map(\.word) == ["apple"])
+    #expect(model.step == .form)
+    #expect(model.word == "apple")
+    #expect(model.registeredWord == nil)
   }
 
   @Test func 保存の途中に重ねて押しても1件だけ登録する() async throws {

@@ -63,4 +63,23 @@ final class AnalyticsReporterTests {
     reporter.reportScreen(.allWords)
     #expect(client.eventsNamed("screen_view") == [["screen_name": "learning"], ["screen_name": "all_words"]])
   }
+
+  @Test func 購入状態とトラッキング許可を値が変わったときだけ送る() {
+    // iOS だけで送るもの(画面側が OS で分ける)。名前と値は Flutter 版と同じ。
+    let (reporter, _) = start(wordCount: 0)
+    reporter.reportPro(false)
+    reporter.reportTrackingStatus("not_determined")
+    #expect(client.userProperties["is_pro"] == "false")
+    #expect(client.userProperties["att_status"] == "not_determined")
+
+    let before = client.userPropertyCalls
+    reporter.reportPro(false)
+    reporter.reportTrackingStatus("not_determined")
+    #expect(client.userPropertyCalls == before)
+
+    reporter.reportPro(true)
+    reporter.reportTrackingStatus("authorized")
+    #expect(client.userProperties["is_pro"] == "true")
+    #expect(client.userProperties["att_status"] == "authorized")
+  }
 }

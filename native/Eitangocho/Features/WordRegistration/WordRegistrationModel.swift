@@ -78,15 +78,19 @@ final class WordRegistrationModel {
   @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let review: ReviewPrompter
   @ObservationIgnored private let currentLanguage: () -> TranslationLanguage
+  /// 保存できたら最初のステップへ戻すか。macOS は登録の画面に留まって続けて登録するので戻す。
+  /// iOS は保存したらシートを閉じるので戻さない(戻すと、閉じていくシートに入力の画面と広告が出る)。
+  @ObservationIgnored private let resetsAfterSave: Bool
 
   init(
     dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger, review: ReviewPrompter,
-    currentLanguage: @escaping () -> TranslationLanguage
+    resetsAfterSave: Bool = true, currentLanguage: @escaping () -> TranslationLanguage
   ) {
     self.dao = dao
     self.wordInfo = wordInfo
     self.analytics = analytics
     self.review = review
+    self.resetsAfterSave = resetsAfterSave
     self.currentLanguage = currentLanguage
   }
 
@@ -172,8 +176,7 @@ final class WordRegistrationModel {
     error = nil
   }
 
-  /// 保存する。保存できたら最初のステップへ戻す(macOS は登録後も登録の画面に留まり、
-  /// 続けて次の単語を登録できるようにするため)。
+  /// 保存する。保存できたら、`resetsAfterSave` のときは最初のステップへ戻す。
   @discardableResult
   func save() async -> Bool {
     guard !busy else { return false }
@@ -223,8 +226,10 @@ final class WordRegistrationModel {
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。依頼は
     // ReviewConfig.promptDelay だけ待ってから出る。成否は登録に関係しないので待たない。
     Task { [review] in await review.onWordRegistered() }
-    reset()
-    registeredWord = headword
+    if resetsAfterSave {
+      reset()
+      registeredWord = headword
+    }
     return true
   }
 

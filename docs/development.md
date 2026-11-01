@@ -134,7 +134,8 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
   一時的な通知(Flutter の SnackBar)も `AppOverlay.showSnackBar` で出す
 - **ライセンス一覧**: SwiftPM はライセンスを集めないので `Features/Settings/Licenses/LicenseCatalog.swift` で
   手で持つ。Swift パッケージを足したら、その LICENSE を `Eitangocho/Resources/Licenses/` に置き、
-  `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)
+  `LicenseCatalog.packages` に足す(`LicenseCatalogTests` の一覧も直す)。iOS だけにリンクするもの
+  (GMA・RevenueCat)は `iOSOnlyPackages` に足す
 - **計測**: イベントは `Features/Analytics/AnalyticsLogger.swift` の送り口から送る(名前と値は Flutter 版と同じ)。
   モデルには `AnalyticsLogger` を渡し、画面からは `@Environment(\.analytics)` で取る。ユーザープロパティと
   screen_view は `AnalyticsReporting` が状態の変化を拾って送る。Firebase は Release ビルドだけ初期化し、
@@ -142,6 +143,26 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **String Catalog**: 文言は `Eitangocho/Resources/Localizable.xcstrings` に置き、`Text(.navLearning)` /
   `String(localized: .wordCount(3))` のように生成された記号で引く(キーは ARB と同じ)。
   `tool/arb_to_xcstrings.py` は移行のときに 1 回だけ使ったもので、以後は xcstrings を直接直す
+- **iOS の画面**: iOS 専用の画面・部品は Flutter 版と同じく `Mobile` 接頭辞(`MobileWordCard` など)で macOS 版と
+  同じフォルダに置き、ファイル全体を `#if os(iOS)` で囲む。モデルは両 OS で共有する。配色は `@Environment(\.palette)`
+  (`AppPalette`。Flutter 版の `lib/constants/app_palette.dart` の写し)。押したときの見た目は `MobilePressable` の
+  `MobilePressStyle` で付ける
+- **iOS の文字サイズ**: OS の文字サイズは `\.textScale`(`TextScale`。Flutter の engine と同じ表)で配り、
+  `AppText` と `AppTextStyle.font(_:textScale:)` が文字の大きさだけに掛ける(余白・アイコン・字間は変えない。Flutter 版と同じ)
+- **iOS のシートとダイアログ**: 標準の `sheet` / `alert` は使わない(幕の色と iOS 26 の浮いた形・ガラスを変えられないため)。
+  シートは `AppOverlay.presentSheet` で出し、枠は `MobileSheet`(中身の高さのシートは `MobileWordSortSheet` を参照)。
+  ダイアログは macOS と同じ `AppOverlay.present`(幕の色を渡せる)。Liquid Glass にするのは下のタブバー(標準の `TabView`)と
+  ヘッダ右上の 🔍・＋(`MobileHeaderButtons`)、押して進む画面の戻る(`MobilePushHeader`)、シートの左右のボタン
+  (`MobileSheetHeader`)だけ。
+  丸いボタンは `MobileGlassCircleButton`(iOS 18 は同じ大きさの丸で代える)
+- **iOS の押して進む画面**(設定 → ライセンスなど): 標準の `NavigationStack` は使わず、`AppOverlay.push` で
+  タブバーとヘッダごと覆って右から出す(Flutter 版はルートの Navigator に積むため)。枠は `MobilePushPage`
+  (戻るボタン付きのヘッダ)。左端からの戻るジェスチャは `MobilePushLayer` が持つ
+- **広告と課金(iOS)**: 画面からは `@Environment(\.ads)`(`AdsController`)と `\.purchase`(`PurchaseModel`)で取る。
+  広告の枠は `MobileAdSlot` の上に組み、ユニット ID は `AdUnitIds`(Debug は Google のテスト ID)。
+  Debug ビルドでは商品を取得できないので、Pro の欄は「価格を取得できませんでした」になる(購入の確認は TestFlight)
+- **プライバシーマニフェスト**: `Eitangocho/Resources/PrivacyInfo.xcprivacy` には、アプリ自身のコードが使う
+  理由の要る API だけを書く(SDK の分は SDK が持つ)。ディスクの空き容量・起動からの時間などの API を使い始めたら理由を足す
 - **テストの置き場所**: DB・同期・単語情報は `Packages/EitangochoCore/Tests/`(`swift test`)。
   アプリのモデル・トークン・文字の書式は `EitangochoTests/`(アプリに読み込ませて動かす。
   テスト中は引き継ぎも同期も始めない)

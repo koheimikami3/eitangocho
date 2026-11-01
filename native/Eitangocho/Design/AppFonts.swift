@@ -58,6 +58,10 @@ enum AppFonts {
       : [japaneseName, traditionalChineseName]
   }
 
+  /// 漢字・かなの字面の下端がベースラインより下に出る量(文字の大きさに対する比)。
+  /// Noto Sans JP / TC の字面の枠の下端(OS/2 typo の -120 / 1000。Flutter 版の AppFonts.cjkEmBoxDescent)。
+  static let cjkEmBoxDescent: CGFloat = 0.12
+
   /// 画面の文字が漢字・かなになる表示言語か(日本語・繁体字)。
   static func isCjk(_ language: AppLocale.Language) -> Bool {
     language == .ja || language == .zhHant

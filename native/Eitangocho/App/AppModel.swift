@@ -5,6 +5,10 @@ import Foundation
 import Observation
 import OSLog
 
+#if os(iOS)
+  import UIKit
+#endif
+
 /// 起動の流れ(Flutter 版の DB の引き継ぎ → DB を開く → 同期を始める)と、その結果を持つ。
 ///
 /// 引き継ぎに失敗したら空の DB では始めず、失敗の画面を出す
@@ -41,6 +45,9 @@ final class AppModel {
 
   private(set) var phase: Phase = .loading
 
+  /// 起動の流れを進めている間か(`start` を重ねて走らせないため)。
+  @ObservationIgnored private var isStarting = false
+
   /// 設定。DB に依存しないので、起動の流れより先に読む(配色・倍率を最初の画面から効かせるため)。
   let settings = SettingsStore()
 
@@ -48,7 +55,7 @@ final class AppModel {
   let shell: MainShellModel
 
   /// 画面の上に重ねるメニューとダイアログ。
-  let overlay = AppOverlay()
+  let overlay: AppOverlay
 
   /// 独自イベントの送信口。DB に依存しないので最初に作る(Firebase の初期化もここで行う)。
   let analytics: AnalyticsLogger
@@ -59,9 +66,40 @@ final class AppModel {
   /// レビュー依頼の実体。依頼の口(`requestReview`)は画面から渡す(RootView)。
   let reviewClient = StoreReviewClient()
 
+  /// 課金(iOS だけ。macOS では SDK に触れない)。DB に依存しないので最初に作る。
+  let purchase: PurchaseModel
+
+  /// ATT の許可の状態(要求は `tracking` が行う。計測の att_status もここから読む)。
+  let trackingClient: any TrackingClient = SystemTrackingClient()
+
+  /// ATT の要求の時機(iOS だけ)。
+  let tracking: TrackingAuthorizer
+
+  /// 広告を出してよいか(iOS だけ)。
+  let ads: AdsController
+
+  #if os(iOS)
+    /// クイズを解き終えたときのインタースティシャル。出した回はレビュー依頼を見送るので、ここで持つ。
+    let quizInterstitial = QuizInterstitialAd()
+  #endif
+
   init() {
+    let overlay = AppOverlay()
+    self.overlay = overlay
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
+    #if os(iOS)
+      purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
+      tracking = TrackingAuthorizer(
+        client: trackingClient, isActive: { UIApplication.shared.applicationState == .active },
+        explain: { await MobileTrackingPromptDialog.show(overlay: overlay) })
+      ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
+    #else
+      purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
+      // macOS には広告が無いので、ATT も聞かない(AdsController が iOS 以外では呼ばない)。
+      tracking = TrackingAuthorizer(client: trackingClient) { true }
+      ads = AdsController(purchase: purchase, tracking: tracking, sdk: NoAdsSDK(), platformSupported: false)
+    #endif
   }
 
   nonisolated private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "startup")
@@ -74,8 +112,18 @@ final class AppModel {
     "group." + (Bundle.main.bundleIdentifier ?? "com.kohei.mikami.eitangocho")
   }
 
-  /// 起動の流れを最初から行う(失敗の画面の「再試行」もこれを呼ぶ)。
+  /// 起動の流れを最初から行う(失敗の画面の「再試行」もこれを呼ぶ)。起動済み・起動中なら何もしない。
+  ///
+  /// 画面の `.task` から呼ぶが、iOS で全画面の広告(インタースティシャル)のように全画面で出るものが
+  /// 上に出て閉じると、根の画面が一度消えて `.task` がもう一度走る。そのたびに DB を開き直して
+  /// セッションを作り直すと、途中のクイズなど画面の状態がすべて消えるため、ここで止める。
   func start() async {
+    if case .ready = phase { return }
+    guard !isStarting else { return }
+    isStarting = true
+    defer { isStarting = false }
+    // 課金は DB に依存しないので、引き継ぎを待たずに始める(2 回目以降は何もしない)。
+    purchase.start()
     await open { importer in try importer.run() }
   }
 
@@ -129,26 +177,33 @@ final class AppModel {
         modified=\(source.modifiedAt?.description ?? "-", privacy: .public) \
         sidecars=\(source.sidecars.joined(separator: ","), privacy: .public)
         """)
-      #if os(macOS)
-        // macOS は前面に戻るたびに必ず同期する(ほかの端末の変更を戻ったその場で見られるように)。
-        // 書き戻しが増える分、iCloud の競合版はできやすくなるが、次の同期で取り込んで片付ける。
-        let resumeMinInterval: TimeInterval = 0
-      #else
-        // iOS の間隔は iOS の画面を作るときに決める。
-        let resumeMinInterval: TimeInterval = 60
-      #endif
+      // 前面に戻るたびに必ず同期する(ほかの端末の変更を戻ったその場で見られるように。両 OS とも。
+      // Flutter 版は最短 60 秒おき)。書き戻しが増える分、iCloud の競合版はできやすくなるが、次の同期で取り込んで片付ける。
+      let resumeMinInterval: TimeInterval = 0
       let sync = SyncController(
         service: SyncService(store: ICloudFileStore(), database: database), database: database,
         resumeMinInterval: resumeMinInterval)
       sync.onFailure = { [analytics] reason in analytics.logSyncFailed(reason) }
       let words = WordStore(dao: database.wordDao, analytics: analytics)
       words.start()
-      let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
+      #if os(iOS)
+        let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics) {
+          [quizInterstitial] in quizInterstitial.isHoldingResult
+        }
+        // iOS は回をタブの切り替えをまたいで保つ(解き終えたときのインタースティシャルを避けられないように)。
+        let keepsQuizRound = true
+      #else
+        let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
+        let keepsQuizRound = false
+      #endif
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
           wordInfo: makeWordInfoProvider(database),
-          quiz: QuizModel(dao: database.wordDao, analytics: analytics, review: review) { [words] in
+          quiz: QuizModel(
+            dao: database.wordDao, analytics: analytics, review: review, keepsRoundAcrossViews: keepsQuizRound,
+            currentWords: { [words] in words.words }
+          ) { [words] in
             WordListing.learned(words.words)
           },
           review: review))
@@ -186,6 +241,10 @@ final class AppModel {
 
   /// アプリがアクティブになったとき。
   func appDidBecomeActive() async {
+    #if os(iOS)
+      // ATT のダイアログを出せなかったときの出し直し・アクティブ化待ちの解除(起動の流れとは関係なく行う)。
+      tracking.appDidBecomeActive()
+    #endif
     guard case .ready(let session) = phase else { return }
     await session.sync.appDidBecomeActive()
   }

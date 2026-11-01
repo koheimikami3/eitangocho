@@ -9,16 +9,35 @@ struct AppOverlayHost: View {
 
   var body: some View {
     ZStack {
-      ForEach(overlay.dialogs) { dialog in
-        ZStack {
-          colors.barrier
+      #if os(iOS)
+        // 押し出した画面の上にシート、その上にダイアログを重ねる(編集シートの上に削除の確認を出す)。
+        MobilePushLayer(overlay: overlay)
+        // シートはキーボードを避ける必要があるので、全面に広げる指定を自分で持つ。
+        MobileSheetLayer(overlay: overlay)
+      #endif
+      ZStack {
+        ForEach(overlay.dialogs) { dialog in
+          ZStack {
+            (dialog.barrier ?? colors.barrier)
+              .contentShape(Rectangle())
+              .onTapGesture { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+            dialog.content
+              .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+          }
+        }
+        if let menu = overlay.menu {
+          // メニューの外を押したら閉じる(押したものには届かない。Flutter の showMenu と同じ)。
+          Color.clear
             .contentShape(Rectangle())
-            .onTapGesture { if dialog.dismissible { overlay.dismiss(dialog.id) } }
-          dialog.content
-            .onEscape { if dialog.dismissible { overlay.dismiss(dialog.id) } }
+            .onTapGesture { overlay.closeMenu() }
+          MenuPlacement(anchor: menu.anchor, minWidth: menu.minWidth, px: px) {
+            PopupMenuBox(items: menu.items) { overlay.closeMenu() }
+          }
         }
       }
+      .ignoresSafeArea()
       // 下端の全幅に出す(Flutter の SnackBar の既定の fixed)。下から滑り込ませる。
+      // 文字は下のセーフエリア(ホームインジケータ)の上に置き、地だけを画面の下端まで伸ばす(Flutter の SnackBar の SafeArea)。
       VStack(spacing: 0) {
         Spacer(minLength: 0)
         if let snackBar = overlay.snackBar {
@@ -27,18 +46,9 @@ struct AppOverlayHost: View {
             .transition(.move(edge: .bottom))
         }
       }
+      .ignoresSafeArea(.keyboard)
       .animation(.easeOut(duration: 0.25), value: overlay.snackBar)
-      if let menu = overlay.menu {
-        // メニューの外を押したら閉じる(押したものには届かない。Flutter の showMenu と同じ)。
-        Color.clear
-          .contentShape(Rectangle())
-          .onTapGesture { overlay.closeMenu() }
-        MenuPlacement(anchor: menu.anchor, minWidth: menu.minWidth, px: px) {
-          PopupMenuBox(items: menu.items) { overlay.closeMenu() }
-        }
-      }
     }
-    .ignoresSafeArea()
   }
 }
 
@@ -56,8 +66,12 @@ private struct SnackBarView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.horizontal, px(24))
       .padding(.vertical, px(14))
-      .background(colors.materialInverseSurface)
-      .appShadows(colors.snackBarShadow, in: Rectangle(), scale: px.factor)
+      .background {
+        Rectangle()
+          .fill(colors.materialInverseSurface)
+          .appShadows(colors.snackBarShadow, in: Rectangle(), scale: px.factor)
+          .ignoresSafeArea(edges: .bottom)
+      }
   }
 }
 

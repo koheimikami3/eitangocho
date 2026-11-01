@@ -49,8 +49,10 @@ struct ImportDialogFrame<Content: View>: View {
         Spacer().frame(height: px(16))
         AppFilledButton(label: String(localized: .close), action: dismiss)
       }
-      .frame(width: px(380), alignment: .leading)
+      // 幅 380 は上限。iPhone のように画面が狭いときは、Flutter の Dialog と同じく縁から 40 空けて縮む。
+      .frame(maxWidth: .infinity, alignment: .leading)
       .padding(px(24))
+      .frame(maxWidth: px(380 + 24 * 2))
     }
   }
 }

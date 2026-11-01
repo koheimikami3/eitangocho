@@ -45,6 +45,24 @@ enum LicenseCatalog {
     ("nanopb", "nanopb-LICENSE"),
   ]
 
+  /// iOS だけにリンクする Swift パッケージ(広告・課金。pbxproj の `platformFilters = (ios)`)。
+  /// macOS の成果物には入らないので、macOS の一覧には出さない。
+  static let iOSOnlyPackages = [
+    // GoogleMobileAds と、それがリンクする同意管理の SDK。
+    ("GoogleMobileAds", "GoogleMobileAds-LICENSE"),
+    ("GoogleUserMessagingPlatform", "GoogleUserMessagingPlatform-LICENSE"),
+    ("RevenueCat", "RevenueCat-LICENSE"),
+  ]
+
+  /// この OS の成果物にリンクされる Swift パッケージ。
+  static var linkedPackages: [(String, String)] {
+    #if os(iOS)
+      packages + iOSOnlyPackages
+    #else
+      packages
+    #endif
+  }
+
   /// 辞書・例文データの出典。CC BY / CC BY-SA は帰属表示が義務(docs/design.md「ライセンス・レビュー」)。
   ///
   /// 見出しは出典名だけにする(どの言語でも通じる固有名)。全文ではなく出典・ライセンス名・原文への
@@ -106,7 +124,7 @@ enum LicenseCatalog {
       else { throw LoadError(resource: resource) }
       return text
     }
-    let bundled = try (fonts + packages).map { name, resource in
+    let bundled = try (fonts + linkedPackages).map { name, resource in
       LicenseEntry(packages: [name], text: try read(resource))
     }
     return group(dataSources + bundled)
@@ -137,7 +155,12 @@ enum LicenseCatalog {
     var names: [String] = []
     var texts: [String: [String]] = [:]
     for entry in entries {
-      let text = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
+      // Flutter 版と同じく、段落に組み直して空行 1 つで区切る(段落の中の改行は空白になる)。
+      // CRLF の本文(Andika)は段落の中に \r が残る。Flutter はそれを空白として描くが、SwiftUI は改行にするので空白に置き換える。
+      let text = paragraphs(of: entry.text)
+        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\r", with: " ") }
+        .joined(separator: "\n\n")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
       guard !text.isEmpty else { continue }
       for name in entry.packages {
         if texts[name] == nil { names.append(name) }
@@ -147,6 +170,83 @@ enum LicenseCatalog {
     return names
       .map { name in LicenseItem(name: name, summary: summary(of: texts[name]!), texts: texts[name]!) }
       .sorted { $0.name.lowercased() < $1.name.lowercased() }
+  }
+
+  /// ライセンスの本文を段落に分ける(Flutter の LicenseEntryWithLineBreaks.paragraphs の写し)。
+  ///
+  /// 段落の中の改行は空白でつなぐ。空行・改ページで段落を切り、前の行より字下げが深い行からも新しい段落にする
+  /// (箇条書きの各項目を別の段落にするため)。字下げの深さは Flutter 版も表示に使わないので捨てる。
+  /// 文字は Dart の文字列と同じく 1 文字ずつ見る(Swift の Character は \r\n を 1 文字にまとめるため、Unicode スカラーで見る)。
+  static func paragraphs(of text: String) -> [String] {
+    let scalars = Array(text.unicodeScalars)
+    func substring(_ start: Int, _ end: Int) -> String {
+      var view = String.UnicodeScalarView()
+      view.append(contentsOf: scalars[start..<end])
+      return String(view)
+    }
+    var lineStart = 0
+    var position = 0
+    var lastLineIndent = 0
+    var currentLineIndent = 0
+    var inParagraph = false
+    var lines: [String] = []
+    var result: [String] = []
+    func flush() {
+      result.append(lines.joined(separator: " "))
+      lines.removeAll()
+    }
+    while position < scalars.count {
+      let char = scalars[position]
+      if !inParagraph {
+        switch char {
+        case " ":
+          lineStart = position + 1
+          currentLineIndent += 1
+        case "\t":
+          lineStart = position + 1
+          currentLineIndent += 8
+        case "\r", "\n", "\u{0C}":
+          if !lines.isEmpty { flush() }
+          if char == "\r" && position < scalars.count - 1 && scalars[position + 1] == "\n" {
+            position += 1
+          }
+          lastLineIndent = 0
+          currentLineIndent = 0
+          lineStart = position + 1
+        default:
+          // LGPL 2.1 の「[this is a / single paragraph]」を 1 段落にするための、Flutter 版の決め打ち。
+          if char == "[" { currentLineIndent += 1 }
+          if !lines.isEmpty && currentLineIndent > lastLineIndent { flush() }
+          inParagraph = true
+        }
+      } else {
+        switch char {
+        case "\n":
+          lines.append(substring(lineStart, position))
+          lastLineIndent = currentLineIndent
+          currentLineIndent = 0
+          lineStart = position + 1
+          inParagraph = false
+        case "\u{0C}":
+          lines.append(substring(lineStart, position))
+          flush()
+          lastLineIndent = 0
+          currentLineIndent = 0
+          lineStart = position + 1
+          inParagraph = false
+        default:
+          break
+        }
+      }
+      position += 1
+    }
+    if inParagraph {
+      lines.append(substring(lineStart, position))
+      flush()
+    } else if !lines.isEmpty {
+      flush()
+    }
+    return result
   }
 
   /// 判別できた種別が 1 つに定まればその名前。判別できない本文が 1 つでも混ざれば nil。

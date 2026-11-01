@@ -4,11 +4,17 @@ import SwiftUI
 /// (CSS の repeat(auto-fill, minmax(260px, 1fr)) 相当。Flutter 版の LearningWordsView の LayoutBuilder)。
 /// カードの高さはそろえず、行ごとに上に揃える(Flutter の Wrap と同じ)。
 struct CardGrid: Layout {
-  var minWidth: CGFloat
+  var minWidth: CGFloat = 0
   var gap: CGFloat
+  /// 列数を決めて並べるとき(iOS の 1 列 / 2 列の設定)。nil なら幅と minWidth から決める(macOS)。
+  var columns: Int?
+
+  private func columnCount(_ width: CGFloat) -> Int {
+    columns ?? max(Int(((width + gap) / (minWidth + gap)).rounded(.down)), 1)
+  }
 
   private func cardWidth(_ width: CGFloat) -> CGFloat {
-    let columns = max(Int(((width + gap) / (minWidth + gap)).rounded(.down)), 1)
+    let columns = columnCount(width)
     return (width - gap * CGFloat(columns - 1)) / CGFloat(columns)
   }
 
@@ -36,7 +42,7 @@ struct CardGrid: Layout {
 
   private func rows(_ subviews: Subviews, width: CGFloat) -> [Row] {
     let card = cardWidth(width)
-    let columns = max(Int(((width + gap) / (minWidth + gap)).rounded(.down)), 1)
+    let columns = columnCount(width)
     var result: [Row] = []
     var y: CGFloat = 0
     for start in stride(from: 0, to: subviews.count, by: columns) {

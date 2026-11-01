@@ -30,6 +30,11 @@ extension TranslationLanguage {
     usesDefinition ? .fieldDefinition : .fieldMeaning(String(localized: shortLabel))
   }
 
+  /// iOS のカードの「訳を表示」(言語名を付けない短い形)。
+  var showMeaningShortLabel: LocalizedStringResource {
+    usesDefinition ? .showDefinition : .showMeaning
+  }
+
   /// カードの「訳を表示」ボタンの文言。
   var showMeaningLabel: LocalizedStringResource {
     usesDefinition ? .showDefinition : .showMeaningWithLanguage(String(localized: shortLabel))
