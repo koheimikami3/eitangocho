@@ -22,6 +22,50 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.13.0 (build 28)
+
+iOS のみ(macOS は出していない。macOS は 2.12.0 のまま)。この版から iOS も Swift / SwiftUI で作り直した版
+(`native/`)で、最低 OS が iOS 18 に上がった。iOS 15〜17 には Flutter 版の 2.11.1 が残る。
+内部の変化は 2.12.0 の macOS と同じ(アプリに戻るたびに同期・覚えた回数をほかの端末から取り込む)。
+「一部の画面」は、バナー広告をタブバーと別の帯に置いたことと、iOS 18 の検索・登録のボタンを丸いボタンにしたこと。
+
+日本語:
+
+```
+今後の機能改善に向けて、アプリ内部の仕組みを整えました。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+為了日後改善功能，調整了 App 的內部架構。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+Mejoramos el funcionamiento interno de la app para futuras mejoras.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+Amélioration du fonctionnement interne de l'app en vue de futures évolutions.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Improved the app's internals for future updates.
+Improved the design of some screens for readability.
+```
+
+---
+
 ## 2.12.0 (build 27)
 
 macOS のみ(iOS は出していない。iOS は 2.11.1 のまま)。この版から macOS は Swift / SwiftUI で作り直した版
