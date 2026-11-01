@@ -13,6 +13,9 @@ struct RootView: View {
     /// シートの下端のバナーの先読み。シートは重ね層(AppOverlayHost)に出るので、タブの殻ではなくここで持つ。
     @State private var sheetBannerPreloader = MobileAdPreloader(
       adUnitId: AdUnitIds.sheetBanner, resolveSize: MobileSheetBannerAd.adSize(sheetWidth:))
+    /// クイズ結果のレクタングルの先読み。「続ける」で回をまたいでも使い回すので、クイズの画面より長く持つ。
+    @State private var quizRectanglePreloader = MobileAdPreloader(
+      adUnitId: AdUnitIds.quizRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
   #endif
 
   var body: some View {
@@ -30,6 +33,7 @@ struct RootView: View {
         .environment(\.palette, model.settings.appearance.palette)
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
         .environment(\.sheetBannerPreloader, sheetBannerPreloader)
+        .environment(\.quizRectanglePreloader, quizRectanglePreloader)
       #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))

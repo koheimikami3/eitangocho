@@ -71,7 +71,7 @@
       // 出るので、幅の上限を掛ける前の幅(= 画面の幅)を渡す。
       .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width in
         guard let ads, let purchase else { return }
-        sheetBannerPreloader?.prepare(sheetWidth: width, ads: ads, purchase: purchase)
+        sheetBannerPreloader?.prepare(width: width, ads: ads, purchase: purchase)
       }
     }
 

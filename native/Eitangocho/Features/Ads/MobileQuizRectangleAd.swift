@@ -12,14 +12,38 @@
   ///
   /// 広告の下には Pro への導線(`MobileProLink`)を添える。装飾の中に置くので、広告が出ていないとき・
   /// Pro を購入済みのときは導線も出ない。
+  ///
+  /// 結果を開いてから読み込むと遅れて出て、下の「続ける」などのボタンを押し下げるので、出題中に
+  /// 先読みしておいたもの(`MobileAdPreloader`)を受け取って出す。
   struct MobileQuizRectangleAd: View {
     /// Pro への導線を押したとき(設定のタブへ移る)。
     let onOpenPro: () -> Void
 
     @Environment(\.palette) private var palette
+    @Environment(\.quizRectanglePreloader) private var preloader
+
+    /// この結果の画面で出す広告。開いたときに先読みから受け取る。
+    @State private var loader: MobileAdLoader?
+
+    /// 要求する広告サイズ(幅に関わらず 300x250)。先読みも同じものを使う。
+    nonisolated static func adSize(width: CGFloat) -> AdSize? { AdSizeMediumRectangle }
 
     var body: some View {
-      MobileAdSlot(adUnitId: AdUnitIds.quizRectangle, resolveSize: { _ in AdSizeMediumRectangle }) { adView in
+      Group {
+        if let loader {
+          slot(loader)
+        } else {
+          // 中身の無い Group には onAppear が届かないので、高さ 0 の面を置く。
+          Color.clear.frame(height: 0)
+        }
+      }
+      .onAppear {
+        if loader == nil { loader = preloader?.take() ?? MobileAdLoader() }
+      }
+    }
+
+    private func slot(_ loader: MobileAdLoader) -> some View {
+      MobileAdSlot(adUnitId: AdUnitIds.quizRectangle, resolveSize: Self.adSize(width:), loader: loader) { adView in
         let shape = RoundedRectangle(cornerRadius: AppDimensions.mobileCardRadius)
         // 上の余白はここで持つ。広告が無いときに空白だけが残らないよう、呼び出し側(クイズ結果)には
         // 隙間を持たせない。

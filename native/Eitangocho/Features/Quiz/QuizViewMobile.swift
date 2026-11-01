@@ -10,6 +10,10 @@
     let shell: MainShellModel
     let settings: SettingsStore
 
+    @Environment(\.ads) private var ads
+    @Environment(\.purchase) private var purchase
+    @Environment(\.quizRectanglePreloader) private var rectanglePreloader
+
     var body: some View {
       // 縦中央に置き、答えの表示で背が伸びたときはスクロールにする。
       GeometryReader { geometry in
@@ -18,6 +22,11 @@
             .frame(maxWidth: .infinity, minHeight: max(geometry.size.height - 40, 0))
             .padding(20)
         }
+      }
+      // 答えている間に、結果の画面のレクタングルを読み込んでおく(幅に関わらず同じ大きさなので幅は使わない)。
+      .onChange(of: quiz.phase == .active, initial: true) { _, active in
+        guard active, let ads, let purchase else { return }
+        rectanglePreloader?.prepare(width: 0, ads: ads, purchase: purchase)
       }
     }
 
