@@ -45,6 +45,9 @@ final class AppModel {
 
   private(set) var phase: Phase = .loading
 
+  /// 起動の流れを進めている間か(`start` を重ねて走らせないため)。
+  @ObservationIgnored private var isStarting = false
+
   /// 設定。DB に依存しないので、起動の流れより先に読む(配色・倍率を最初の画面から効かせるため)。
   let settings = SettingsStore()
 
@@ -102,8 +105,16 @@ final class AppModel {
     "group." + (Bundle.main.bundleIdentifier ?? "com.kohei.mikami.eitangocho")
   }
 
-  /// 起動の流れを最初から行う(失敗の画面の「再試行」もこれを呼ぶ)。
+  /// 起動の流れを最初から行う(失敗の画面の「再試行」もこれを呼ぶ)。起動済み・起動中なら何もしない。
+  ///
+  /// 画面の `.task` から呼ぶが、iOS で全画面の広告(インタースティシャル)のように全画面で出るものが
+  /// 上に出て閉じると、根の画面が一度消えて `.task` がもう一度走る。そのたびに DB を開き直して
+  /// セッションを作り直すと、途中のクイズなど画面の状態がすべて消えるため、ここで止める。
   func start() async {
+    if case .ready = phase { return }
+    guard !isStarting else { return }
+    isStarting = true
+    defer { isStarting = false }
     // 課金は DB に依存しないので、引き継ぎを待たずに始める(2 回目以降は何もしない)。
     purchase.start()
     await open { importer in try importer.run() }
