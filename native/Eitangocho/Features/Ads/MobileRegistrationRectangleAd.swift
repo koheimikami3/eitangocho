@@ -12,7 +12,6 @@
   /// 広告の大きさの枠を空けておく。キーボードが出ている間は隠す(そのままだとキーボードのすぐ上に
   /// 広告がはみ出す)が、捨てずにキーボードを閉じたらその場で出し直す。
   struct MobileRegistrationRectangleAd: View {
-    @Environment(\.palette) private var palette
     @Environment(\.mobileSheetLayout) private var layout
     @Environment(\.registrationRectanglePreloader) private var preloader
 
@@ -41,11 +40,7 @@
         adUnitId: AdUnitIds.registrationRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:), loader: loader,
         reservesSpace: true
       ) { adView in
-        let shape = RoundedRectangle(cornerRadius: AppDimensions.mobileCardRadius)
-        adView
-          .background(palette.surface)
-          .clipShape(shape)
-          .appShadows(palette.elevation, in: shape, scale: 1)
+        MobileRectangleAdCard(adView: adView)
           .padding(.top, Self.topPadding)
       }
     }
