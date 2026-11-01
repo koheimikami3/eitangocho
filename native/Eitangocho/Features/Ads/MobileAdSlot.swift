@@ -197,13 +197,23 @@
     }
   }
 
-  /// 読み込み済みの BannerView をそのまま SwiftUI に置く。
+  /// 読み込み済みの BannerView を、広告の大きさに固定した入れ物ごと SwiftUI に置く。
+  ///
+  /// BannerView を直に置くと、画面に載せたときに SwiftUI が大きさを付け直し、SDK がそれを受けて
+  /// 広告を取り直す(実測: 画面に載った直後に 2 回目の読み込み成功が届き、先読みした広告が捨てられていた。
+  /// 取り直しが「Invalid ad width or height」で失敗すると、枠だけ残って中身が白くなる)。
+  /// SwiftUI に大きさを付けさせるのは入れ物だけにし、BannerView の大きさは変えない。
   private struct MobileBannerView: UIViewRepresentable {
     let bannerView: BannerView
 
-    func makeUIView(context: Context) -> BannerView { bannerView }
+    func makeUIView(context: Context) -> UIView {
+      let container = UIView()
+      bannerView.frame = CGRect(origin: .zero, size: bannerView.adSize.size)
+      container.addSubview(bannerView)
+      return container
+    }
 
-    func updateUIView(_ uiView: BannerView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {}
   }
 
   extension AdSize {
