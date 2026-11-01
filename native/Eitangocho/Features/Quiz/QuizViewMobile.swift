@@ -13,6 +13,7 @@
     @Environment(\.ads) private var ads
     @Environment(\.purchase) private var purchase
     @Environment(\.quizRectanglePreloader) private var rectanglePreloader
+    @Environment(\.quizInterstitial) private var interstitial
 
     var body: some View {
       // 縦中央に置き、答えの表示で背が伸びたときはスクロールにする。
@@ -23,10 +24,12 @@
             .padding(20)
         }
       }
-      // 答えている間に、結果の画面のレクタングルを読み込んでおく(幅に関わらず同じ大きさなので幅は使わない)。
+      // 答えている間に、結果の画面のレクタングルとインタースティシャルを読み込んでおく
+      // (レクタングルは幅に関わらず同じ大きさなので幅は使わない)。
       .onChange(of: quiz.phase == .active, initial: true) { _, active in
         guard active, let ads, let purchase else { return }
         rectanglePreloader?.prepare(width: 0, ads: ads, purchase: purchase)
+        interstitial?.prepare(ads: ads, purchase: purchase)
       }
     }
 
@@ -36,14 +39,32 @@
       case .empty:
         MobileQuizEmptyState { shell.selectView(.learning) }
       case .done:
-        MobileQuizResultView(
-          okCount: quiz.okCount, forgotWords: quiz.forgotWords,
-          onContinue: { quiz.start(trigger: .continued) }, onToLearning: { shell.selectView(.learning) },
-          onOpenPro: { shell.selectView(.settings) })
+        // インタースティシャルを出している間は、結果の画面(とそのレクタングル)を作らない。
+        if interstitial?.isHoldingResult == true {
+          Color.clear
+        } else {
+          MobileQuizResultView(
+            okCount: quiz.okCount, forgotWords: quiz.forgotWords,
+            onContinue: { quiz.start(trigger: .continued) }, onToLearning: { shell.selectView(.learning) },
+            onOpenPro: { shell.selectView(.settings) })
+        }
       case .active:
         if let word = quiz.current {
-          MobileActiveQuiz(quiz: quiz, word: word, direction: settings.quizDirection)
+          MobileActiveQuiz(quiz: quiz, word: word, direction: settings.quizDirection, onAnswer: answer)
         }
+      }
+    }
+
+    /// 回答する。最後の問題なら、出せるインタースティシャルがあるときは結果の画面を待たせてから答え、
+    /// 回が終わったら広告を出す(閉じると結果の画面になる)。
+    private func answer(knew: Bool) {
+      var holding = false
+      if quiz.isOnLastQuestion, let interstitial, let purchase {
+        holding = interstitial.holdResultIfReady(purchase: purchase)
+      }
+      Task {
+        if knew { await quiz.answerKnew() } else { await quiz.answerForgot() }
+        if holding { await interstitial?.present(roundFinished: quiz.phase == .done) }
       }
     }
   }
@@ -53,6 +74,8 @@
     let quiz: QuizModel
     let word: Word
     let direction: QuizDirection
+    /// 回答(true = 覚えている)。最後の問題でインタースティシャルを挟むため、親が受け持つ。
+    let onAnswer: (Bool) -> Void
 
     @Environment(\.palette) private var palette
 
@@ -77,10 +100,10 @@
           VStack(spacing: 10) {
             HStack(spacing: 10) {
               MobileQuizSecondaryButton(label: String(localized: .quizForgot), color: palette.danger) {
-                Task { await quiz.answerForgot() }
+                onAnswer(false)
               }
               MobileFilledButton(label: String(localized: .quizRemembered), expands: true) {
-                Task { await quiz.answerKnew() }
+                onAnswer(true)
               }
             }
             AppText(.quizForgotHint, style: AppTextStyle(size: 11))

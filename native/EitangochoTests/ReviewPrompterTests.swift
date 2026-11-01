@@ -65,6 +65,21 @@ final class ReviewPrompterTests {
     #expect(analytics.eventsNamed("review_requested") == [["trigger": "quiz"]])
   }
 
+  @Test func 見送る回は依頼せず完了回数には数え次に条件を満たした回で依頼する() async throws {
+    try await seedWords(20)
+    var skips = true
+    let prompter = ReviewPrompter(
+      client: client, dao: database.wordDao, analytics: AnalyticsLogger(analytics), defaults: defaults,
+      promptDelay: .zero, skipsQuizPrompt: { skips })
+
+    await completeGoodSessions(prompter, 3)
+    #expect(client.requestCount == 0, "広告を出した回は 3 回目でも見送る")
+
+    skips = false
+    await completeGoodSessions(prompter, 1)
+    #expect(client.requestCount == 1)
+  }
+
   @Test func 出題数が少ないセッションでは依頼しない() async throws {
     try await seedWords(20)
     let prompter = makePrompter()

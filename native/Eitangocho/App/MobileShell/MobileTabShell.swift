@@ -77,14 +77,15 @@
       }
     }
 
-    /// タブの選択。クイズのタブは押すたびに出題をやり直す(Flutter 版と同じく、遷移の前にシャッフルし直す)。
+    /// タブの選択。クイズのタブは、回が無いときだけ出題を始め、途中の回・結果はそのまま見せる
+    /// (`QuizModel.enterFromTab`。Flutter 版は押すたびにやり直していた)。
     /// 登録はタブではない(シートで開く)ので、万一その状態になっても学習中を返す。
     private var selection: Binding<MainView> {
       let shell = model.shell
       return Binding(
         get: { shell.view == .registration ? .learning : shell.view },
         set: { view in
-          if view == .quiz { session.quiz.start(trigger: .tab) }
+          if view == .quiz { session.quiz.enterFromTab() }
           shell.selectView(view)
         })
     }

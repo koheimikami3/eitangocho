@@ -38,6 +38,7 @@ struct RootView: View {
         .environment(\.sheetBannerPreloader, sheetBannerPreloader)
         .environment(\.registrationRectanglePreloader, registrationRectanglePreloader)
         .environment(\.quizRectanglePreloader, quizRectanglePreloader)
+        .environment(\.quizInterstitial, model.quizInterstitial)
       #endif
       #if os(macOS)
         .environment(\.uiScale, UIScale(factor: model.settings.uiScale))

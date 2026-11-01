@@ -10,8 +10,12 @@ enum QuizKey: Sendable {
 
 /// フラッシュクイズの進行(Flutter 版の QuizPageNotifier と QuizPageState)。
 ///
-/// アプリが生きている間 1 つを持ち続ける。クイズの画面への入口(サイドバー・結果の「続ける」)は
-/// 必ず `start(trigger:)` を呼ぶので、入るたびに新しい回になる。
+/// アプリが生きている間 1 つを持ち続ける。macOS はクイズの画面への入口(サイドバー・結果の「続ける」)で
+/// 必ず `start(trigger:)` を呼ぶので、入るたびに新しい回になる(Flutter 版と同じ)。
+///
+/// iOS は回をタブの切り替えをまたいで保つ(`keepsRoundAcrossViews`。2026-11-01 のユーザーの判断)。
+/// 解き終えたときに出すインタースティシャルを、タブを移ってやり直すことで避けられないようにするため。
+/// タブから入ったときは `enterFromTab()` で、回が無いときだけ始める。
 @Observable
 final class QuizModel {
   /// セッションの局面。
@@ -22,7 +26,8 @@ final class QuizModel {
   private(set) var phase: Phase = .empty
 
   /// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)のスナップショット。
-  /// セッション中の学習済みの変更・編集・削除は進行に影響させない。
+  /// セッション中の学習済みの変更は進行に影響させない。回をタブの切り替えをまたいで保つときだけ、
+  /// 戻ってきたときに残りの出題へ削除・編集を反映する(`enterFromTab()`)。
   private(set) var questions: [Word] = []
   private(set) var index = 0
   private(set) var revealed = false
@@ -41,19 +46,31 @@ final class QuizModel {
   @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let review: ReviewPrompter
   @ObservationIgnored private let learnedWords: () -> [Word]
+  @ObservationIgnored private let keepsRoundAcrossViews: Bool
+  @ObservationIgnored private let currentWords: () -> [Word]
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "quiz")
 
   /// `learnedWords` は出題元(学習済みの単語)。始めるたびに読む。
-  init(dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, learnedWords: @escaping () -> [Word]) {
+  /// `keepsRoundAcrossViews` はタブを移っても回を保つか(iOS)。保つときは、戻ってきたときに
+  /// `currentWords`(今ある単語すべて)を読んで残りの出題に削除・編集を反映する。
+  init(
+    dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, keepsRoundAcrossViews: Bool = false,
+    currentWords: @escaping () -> [Word] = { [] }, learnedWords: @escaping () -> [Word]
+  ) {
     self.dao = dao
     self.analytics = analytics
     self.review = review
+    self.keepsRoundAcrossViews = keepsRoundAcrossViews
+    self.currentWords = currentWords
     self.learnedWords = learnedWords
   }
 
   /// 出題中の単語。
   var current: Word? { phase == .active ? questions[index] : nil }
+
+  /// 出題中が回の最後の問題か(答えると結果になる)。
+  var isOnLastQuestion: Bool { phase == .active && index + 1 >= questions.count }
 
   /// 学習済み単語から 1 セッション分を選んで新しい回を始める(選び方は selectQuizQuestions)。
   /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
@@ -70,11 +87,49 @@ final class QuizModel {
     }
   }
 
+  /// クイズのタブから入ったとき(iOS。選んでいるタブを押し直したときも)。
+  ///
+  /// 回を保つときは、回が無いときだけ始める。途中の回は続きから(離れている間の削除・編集を反映して)、
+  /// 結果は結果のまま見せ、押し直してもやり直さない(やり直せるとインタースティシャルを避けられるため)。
+  /// 保たないときは毎回始め直す。
+  func enterFromTab() {
+    guard keepsRoundAcrossViews else {
+      start(trigger: .tab)
+      return
+    }
+    switch phase {
+    case .empty: start(trigger: .tab)
+    case .active: refreshRemainingQuestions()
+    case .done: break
+    }
+  }
+
   /// 表示中の画面が変わったとき。回の途中でクイズ以外の画面へ移ったら、離脱として計測する。
-  /// クイズへの入口は必ず `start(trigger:)` を呼ぶので、戻ってきたときは新しい回になる。
+  /// macOS はクイズへの入口で必ず `start(trigger:)` を呼ぶので、戻ってきたときは新しい回になる。
+  /// 回を保つとき(iOS)は、移っても回は続いているので離脱にしない。
   func viewChanged(from previous: MainView, to next: MainView) {
+    guard !keepsRoundAcrossViews else { return }
     if previous == .quiz && next != .quiz {
       abandonIfActive()
+    }
+  }
+
+  /// 離れている間に削除された単語を残りの出題から外し、編集された単語は今の内容にする。
+  /// 答え済みの単語(結果の「忘れていた単語」に出るもの)はそのまま残す。
+  private func refreshRemainingQuestions() {
+    let latest = Dictionary(currentWords().map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+    let currentID = questions[index].id
+    let remaining = questions[index...].compactMap { latest[$0.id] }
+    questions = Array(questions[..<index]) + remaining
+    // 出題中の単語が消えたら、次の単語は開示前から見せる。
+    if remaining.first?.id != currentID { revealed = false }
+    guard remaining.isEmpty else { return }
+    // 残りがすべて消えた。1 問も答えていなければ始め直し、答えていればそこまでで回を終える。
+    if index == 0 {
+      resetSession([], phase: .empty)
+      start(trigger: .tab)
+    } else {
+      finish()
     }
   }
 
@@ -158,12 +213,17 @@ final class QuizModel {
       forgotWords.append(word)
     }
     if next >= questions.count {
-      phase = .done
-      analytics.logQuizCompleted(okCount: okCount, forgotCount: forgotWords.count)
-      // 最後まで終えた直後がクイズでのレビュー依頼の契機(条件は ReviewPrompter が判定し、
-      // 満たさなければ何も起きない)。依頼の成否はクイズの進行に関係しないので待たない。
-      let (okCount, total) = (okCount, questions.count)
-      Task { await review.onQuizCompleted(okCount: okCount, total: total) }
+      finish()
     }
+  }
+
+  /// 回を終えて結果にする。
+  private func finish() {
+    phase = .done
+    analytics.logQuizCompleted(okCount: okCount, forgotCount: forgotWords.count)
+    // 最後まで終えた直後がクイズでのレビュー依頼の契機(条件は ReviewPrompter が判定し、
+    // 満たさなければ何も起きない)。依頼の成否はクイズの進行に関係しないので待たない。
+    let (okCount, total) = (okCount, questions.count)
+    Task { await review.onQuizCompleted(okCount: okCount, total: total) }
   }
 }

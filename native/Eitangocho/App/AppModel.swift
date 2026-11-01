@@ -78,6 +78,11 @@ final class AppModel {
   /// 広告を出してよいか(iOS だけ)。
   let ads: AdsController
 
+  #if os(iOS)
+    /// クイズを解き終えたときのインタースティシャル。出した回はレビュー依頼を見送るので、ここで持つ。
+    let quizInterstitial = QuizInterstitialAd()
+  #endif
+
   init() {
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
@@ -179,12 +184,24 @@ final class AppModel {
       sync.onFailure = { [analytics] reason in analytics.logSyncFailed(reason) }
       let words = WordStore(dao: database.wordDao, analytics: analytics)
       words.start()
-      let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
+      #if os(iOS)
+        let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics) {
+          [quizInterstitial] in quizInterstitial.isHoldingResult
+        }
+        // iOS は回をタブの切り替えをまたいで保つ(解き終えたときのインタースティシャルを避けられないように)。
+        let keepsQuizRound = true
+      #else
+        let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
+        let keepsQuizRound = false
+      #endif
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
           wordInfo: makeWordInfoProvider(database),
-          quiz: QuizModel(dao: database.wordDao, analytics: analytics, review: review) { [words] in
+          quiz: QuizModel(
+            dao: database.wordDao, analytics: analytics, review: review, keepsRoundAcrossViews: keepsQuizRound,
+            currentWords: { [words] in words.words }
+          ) { [words] in
             WordListing.learned(words.words)
           },
           review: review))
