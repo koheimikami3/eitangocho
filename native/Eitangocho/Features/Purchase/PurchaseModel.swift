@@ -122,7 +122,7 @@ final class PurchaseModel {
     guard available, !isBusy, !proUnlocked, priceText != nil else { return }
 
     purchasing = true
-    purchaseFailed = false
+    clearMessage()
     analytics.logProPurchase(.tapped)
     let outcome = await client.purchase()
 
@@ -150,6 +150,7 @@ final class PurchaseModel {
     guard available, !isBusy else { return }
 
     restoring = true
+    clearMessage()
     restoreStatus = .checking
     do {
       let unlocked = try await client.restore()
@@ -161,6 +162,14 @@ final class PurchaseModel {
     }
     restoring = false
     scheduleMessageClear()
+  }
+
+  /// 前の結果のメッセージをすぐに消す。新しい購入・復元を始めるときに呼ぶ
+  /// (前の結果の消去を待たせたままだと、次の復元の「確認中」をそれが消してしまう)。
+  private func clearMessage() {
+    messageClear?.cancel()
+    purchaseFailed = false
+    restoreStatus = nil
   }
 
   /// 一時表示のメッセージを消す。

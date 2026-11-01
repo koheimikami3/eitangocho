@@ -156,6 +156,26 @@ final class PurchaseModelTests {
     #expect(model.proUnlocked)
   }
 
+  @Test func 続けて復元しても前の結果の消去が次の確認中を消さない() async {
+    let model = makeModel(messageDuration: .milliseconds(100))
+    model.start()
+    await model.waitUntilInitialized()
+    await model.restore()
+    #expect(model.restoreStatus == .notFound)
+
+    // 結果が消える前に 2 回目を始め、その応答を待たせる。
+    let gate = OneShotSignal()
+    client.restoreGate = gate
+    let second = Task { await model.restore() }
+    await waitUntil { client.restoreCount == 2 }
+    try? await Task.sleep(for: .milliseconds(200))
+
+    #expect(model.restoring)
+    #expect(model.restoreStatus == .checking)
+    gate.fire()
+    await second.value
+  }
+
   @Test func 復元に成功するとProになる() async {
     client.restoreResult = true
     let model = await initialized()
