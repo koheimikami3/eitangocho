@@ -19,6 +19,10 @@ final class TrackingAuthorizer {
   ///
   /// アクティブ化の直後はシステムのオーバーレイ(インストール直後の UI や TestFlight のシート)が
   /// 消え切っていないことがあり、そこに重ねると ATT はやはり黙って出ないまま返る。ひと呼吸置いてから要求する。
+  ///
+  /// 案内(`explain`)を出す回は待たない。案内はアプリのダイアログなのでオーバーレイと重なっても困らず、
+  /// 利用者が案内を閉じられた時点でオーバーレイはもう消えている。待つと学習中の画面を開いてから
+  /// 案内が出るまでが延びるだけになる(2026-11-01 のユーザーの判断)。
   private let activationDelay: Duration
 
   /// アクティブになるのを待つ上限。アクティブ化の知らせが来ない環境で永久に止まらないための保険。
@@ -104,7 +108,11 @@ final class TrackingAuthorizer {
 
     await waitUntilActive()
 
-    if !explained {
+    if explained {
+      if activationDelay > .zero {
+        try? await Task.sleep(for: activationDelay)
+      }
+    } else {
       explained = true
       await explain()
     }
@@ -125,9 +133,6 @@ final class TrackingAuthorizer {
         adLogger.info("アクティブ化を待ちきれませんでした。そのまま要求します")
       }
       awaitingActivation = nil
-    }
-    if activationDelay > .zero {
-      try? await Task.sleep(for: activationDelay)
     }
   }
 }
