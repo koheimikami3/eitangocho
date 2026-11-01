@@ -152,7 +152,8 @@ xcodebuild -project native/Eitangocho.xcodeproj -scheme Eitangocho -destination 
 - **iOS のシートとダイアログ**: 標準の `sheet` / `alert` は使わない(幕の色と iOS 26 の浮いた形・ガラスを変えられないため)。
   シートは `AppOverlay.presentSheet` で出し、枠は `MobileSheet`(中身の高さのシートは `MobileWordSortSheet` を参照)。
   ダイアログは macOS と同じ `AppOverlay.present`(幕の色を渡せる)。Liquid Glass にするのは下のタブバー(標準の `TabView`)と
-  ヘッダ右上の 🔍・＋(`MobileHeaderButtons`)、押して進む画面の戻る(`MobilePushHeader`)だけ。
+  ヘッダ右上の 🔍・＋(`MobileHeaderButtons`)、押して進む画面の戻る(`MobilePushHeader`)、シートの左右のボタン
+  (`MobileSheetHeader`)だけ。
   丸いボタンは `MobileGlassCircleButton`(iOS 18 は同じ大きさの丸で代える)
 - **iOS の押して進む画面**(設定 → ライセンスなど): 標準の `NavigationStack` は使わず、`AppOverlay.push` で
   タブバーとヘッダごと覆って右から出す(Flutter 版はルートの Navigator に積むため)。枠は `MobilePushPage`
