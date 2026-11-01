@@ -12,8 +12,10 @@
   /// 固定の 320x50 ではなく端末幅に合わせたサイズを Google に決めさせる。高さは読み込みが終わるまで
   /// 分からないため、確定したら `onHeightChange` で帯の高さを返し、シェルがコンテンツの下余白に足す。
   ///
-  /// 隠す条件(`visible` が false のとき・キーボードが出ている間)では枠ごと外す(広告も破棄する)。
-  /// キーボードの間はタブバーごとキーボードの下に隠れるので、見えない広告のインプレッションを避ける。
+  /// 隠す条件(`visible` が false のとき・キーボードが出ている間)では枠ごと外す。キーボードの間は
+  /// タブバーごとキーボードの下に隠れるので、見えない広告のインプレッションを避ける。外しても広告は
+  /// 捨てずに持ち(`loader`)、隠す条件が解けたらその場で出し直す。捨てて読み込み直すと、シートを閉じる
+  /// たびに 0.5〜1 秒バナーが無くなり、出た瞬間に一覧の下端が持ち上がるため。
   struct MobileBannerAd: View {
     /// シートや押して進む画面に覆われていない・クイズ結果でない(TabBarBannerVisibility)か。
     let visible: Bool
@@ -22,6 +24,8 @@
 
     @Environment(\.palette) private var palette
     @State private var keyboardShown = false
+    /// 表示する広告。隠している間も持ち続ける。
+    @State private var loader = MobileAdLoader()
 
     /// デザインの余白(padding:8px 12px)。高さの計算にも使う。
     private static let verticalPadding: CGFloat = 8
@@ -37,7 +41,8 @@
             horizontalInset: Self.horizontalPadding,
             onHeightChange: { height in
               onHeightChange(height.map { $0 + Self.verticalPadding * 2 } ?? 0)
-            }
+            },
+            loader: loader
           ) { adView in
             let shape = Rectangle()
             adView
