@@ -10,10 +10,6 @@ final class FakeTrackingClient: TrackingClient {
   var dialogShows = true
   /// `statusName` が返す状態。
   var status = "not_determined"
-  /// `request` の中(結果を返す前)に呼ぶ。要求の最中に起きることを差し込む。
-  var onRequest: () -> Void = {}
-  /// 要求を途中で止めておくための関門。ダイアログが出ている間に起きることを見たいテストだけ使う。
-  var requestGate: OneShotSignal?
 
   private(set) var isSettledCount = 0
   private(set) var requestCount = 0
@@ -25,8 +21,6 @@ final class FakeTrackingClient: TrackingClient {
 
   func request() async -> Bool {
     requestCount += 1
-    await requestGate?.wait()
-    onRequest()
     if dialogShows { settled = true }
     return settled
   }

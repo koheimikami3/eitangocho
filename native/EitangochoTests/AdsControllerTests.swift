@@ -47,23 +47,6 @@ final class AdsControllerTests {
     #expect(tracking.requestCount == 0)
   }
 
-  @Test func ATTを待つ間にProになったらSDKを初期化しない() async {
-    client.initialProUnlocked = false
-    let gate = OneShotSignal()
-    tracking.requestGate = gate
-    let (controller, purchase) = makeController()
-
-    let enabled = Task { await controller.isEnabled() }
-    await waitUntil { tracking.requestCount == 1 }
-    // ダイアログが出ている間に、別の端末での購入が届いた。
-    client.emitProUnlocked(true)
-    await waitUntil { purchase.proUnlocked }
-    gate.fire()
-
-    #expect(await enabled.value == false)
-    #expect(sdk.startCount == 0)
-  }
-
   @Test func 未購入ならATTを聞いてからSDKを初期化し以後は同じ値を返す() async {
     client.initialProUnlocked = false
     let (controller, _) = makeController()

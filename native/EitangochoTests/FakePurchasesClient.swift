@@ -21,8 +21,6 @@ final class FakePurchasesClient: PurchasesClient {
   /// 購入を途中で止めておくための関門。App Store のダイアログが出ている間(= 処理中の表示)を
   /// 再現したいテストだけ使う。
   var purchaseGate: OneShotSignal?
-  /// 復元を途中で止めておくための関門。購入と復元が重なったときの挙動を見たいテストだけ使う。
-  var restoreGate: OneShotSignal?
   /// 初期化を途中で止めておくための関門。購入状態がまだ確定していない間の挙動を見たいテストだけ使う。
   var configureGate: OneShotSignal?
 
@@ -65,7 +63,6 @@ final class FakePurchasesClient: PurchasesClient {
 
   func restore() async throws -> Bool {
     restoreCount += 1
-    await restoreGate?.wait()
     if let restoreError { throw restoreError }
     return restoreResult
   }

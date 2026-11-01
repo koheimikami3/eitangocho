@@ -99,11 +99,6 @@ final class AdsController {
     // ATT はアプリがアクティブになるまで要求されない(TrackingAuthorizer が待つ)。ダイアログを
     // 出せなかった場合もここは戻り、非パーソナライズ広告として初期化へ進む。出し直しは向こうが引き受ける。
     await tracking.ensureRequested()
-    // ATT を待つ間に買った・復元した人もいるので、初期化の前にもう一度見る。
-    if purchase.proUnlocked {
-      adLogger.info("Pro を購入済みのため広告を出しません")
-      return false
-    }
     await sdk.start()
     return true
   }

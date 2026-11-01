@@ -37,8 +37,8 @@
         Spacer().frame(width: 8)
         MobileProPurchaseButton(
           done: done, purchasing: purchase.purchasing,
-          // 価格が引けていない = 商品を取得できていないので押させない。復元の実行中も押させない(PurchaseModel.isBusy)。
-          action: purchase.priceText == nil || purchase.restoring ? nil : { Task { await purchase.buy() } })
+          // 価格が引けていない = 商品を取得できていないので押させない。
+          action: purchase.priceText == nil ? nil : { Task { await purchase.buy() } })
       }
       .multilineTextAlignment(.leading)
       .padding(.horizontal, 14)

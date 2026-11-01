@@ -14,9 +14,6 @@ final class TrackingAuthorizer {
   private let client: any TrackingClient
   /// アプリが今アクティブか(iOS は `UIApplication.applicationState == .active`)。
   private let isActive: () -> Bool
-  /// 今ダイアログを出してよいか(Pro になっていないか)。Pro の人には聞かないので、要求の直前と出し直しの前に見る
-  /// (`AdsController` が入口で見るだけだと、アクティブ化を待つ間・出し直しを待つ間に Pro になった人にも聞いてしまう)。
-  private let shouldRequest: () -> Bool
 
   /// アクティブになってから要求するまでの待ち時間。
   ///
@@ -49,12 +46,11 @@ final class TrackingAuthorizer {
   /// `activationDelay` と `activationTimeout` は既定値が本番の値で、テストからだけ縮める
   /// (`ReviewPrompter.promptDelay` と同じ)。
   init(
-    client: any TrackingClient, isActive: @escaping () -> Bool, shouldRequest: @escaping () -> Bool = { true },
-    activationDelay: Duration = .milliseconds(500), activationTimeout: Duration = .seconds(10)
+    client: any TrackingClient, isActive: @escaping () -> Bool, activationDelay: Duration = .milliseconds(500),
+    activationTimeout: Duration = .seconds(10)
   ) {
     self.client = client
     self.isActive = isActive
-    self.shouldRequest = shouldRequest
     self.activationDelay = activationDelay
     self.activationTimeout = activationTimeout
   }
@@ -69,14 +65,10 @@ final class TrackingAuthorizer {
       await inFlight.value
       return
     }
-    let task = Task {
-      await run()
-      // 待っていた側の再開を待たずに外す(Flutter 版の whenComplete と同じ)。再開までの間に
-      // アクティブへ戻ったとき、実行中とみなして出し直しを見送らないように。
-      inFlight = nil
-    }
+    let task = Task { await run() }
     inFlight = task
     await task.value
+    inFlight = nil
   }
 
   /// アプリがアクティブになったときに呼ぶ(iOS の scenePhase が active になったとき)。
@@ -86,7 +78,7 @@ final class TrackingAuthorizer {
       awaitingActivation.fire()
       return
     }
-    guard !settled, retryOnActivation, inFlight == nil, shouldRequest() else { return }
+    guard !settled, retryOnActivation, inFlight == nil else { return }
     adLogger.info("アクティブに戻ったので ATT を要求し直します")
     Task { await ensureRequested() }
   }
@@ -101,10 +93,6 @@ final class TrackingAuthorizer {
 
     await waitUntilActive()
 
-    guard shouldRequest() else {
-      adLogger.info("Pro を購入済みのため ATT を要求しません")
-      return
-    }
     settled = await client.request()
     retryOnActivation = !settled
     adLogger.info(
