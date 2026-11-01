@@ -20,6 +20,17 @@ struct ReturnKeyInputTests {
     #expect(ReturnKeyInput.removingReturn(old: "I dont", new: "I don't\n") == "I don't")
   }
 
+  @Test func 文字を選択してReturnを押したら選択していた文字ごと押す前に戻す() {
+    // 末尾の "le" を選択して Return。
+    #expect(ReturnKeyInput.removingReturn(old: "apple", new: "app\n") == "apple")
+    // 全文を選択して Return。
+    #expect(ReturnKeyInput.removingReturn(old: "apple", new: "\n") == "apple")
+  }
+
+  @Test func 自動修正が文字を減らしながら改行を入れてもReturnとみなす() {
+    #expect(ReturnKeyInput.removingReturn(old: "helllo", new: "hello\n") == "hello")
+  }
+
   @Test func 改行を含む文の貼り付けはそのまま残す() {
     #expect(ReturnKeyInput.removingReturn(old: "", new: "first sentence.\nSecond sentence.") == nil)
     #expect(ReturnKeyInput.removingReturn(old: "x", new: "xa\nb\nc") == nil)
