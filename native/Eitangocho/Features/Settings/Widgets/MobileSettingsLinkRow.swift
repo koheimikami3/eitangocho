@@ -28,7 +28,7 @@
             Spacer().frame(width: 8)
           }
           if let valueColor {
-            Circle().fill(valueColor).frame(width: 18, height: 18)
+            Circle().fill(valueColor).frame(width: 22, height: 22)
             Spacer().frame(width: 8)
           }
           AppText("›", style: AppTextStyle(size: 16, height: 1))

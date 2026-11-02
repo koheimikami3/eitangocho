@@ -16,11 +16,8 @@
           VStack(alignment: .leading, spacing: 8) {
             content()
           }
-          // 上だけ広めに空け、ヘッダとカードがくっついて見えないようにする。
-          .padding(
-            EdgeInsets(
-              top: 24, leading: AppDimensions.mobilePadding, bottom: AppDimensions.mobilePadding,
-              trailing: AppDimensions.mobilePadding))
+          // 上も設定のトップ・学習中の画面と同じ 16 にし、画面を進んでもカードの位置がずれないようにする。
+          .padding(AppDimensions.mobilePadding)
         }
       }
     }
