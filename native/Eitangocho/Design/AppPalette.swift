@@ -98,9 +98,6 @@ nonisolated struct AppPalette: Equatable, Sendable {
   /// 未チェックのチェックボックス・ラジオの枠線。ライトは青みの墨 rgba(18,22,32,0.38)。
   var checkOffBorder: Color { isDark ? borderAlpha(45) : Color(argb: 0xFF12_1620).opacity(0.38) }
 
-  /// OFF のトグルの地。
-  var toggleOff: Color { isDark ? borderAlpha(22) : borderAlpha(18) }
-
   // MARK: - 立体案の影(デザインの box-shadow をそのまま移したもの)
 
   /// 地の上に浮かせる面(カード・設定のセクション・クイズカード)の影(--elev)。
