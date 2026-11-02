@@ -1559,7 +1559,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "追加 %lld 件"
+            "value" : "追加 %lld件"
           }
         },
         "zh-Hant" : {
@@ -1839,7 +1839,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スキップ %lld 件"
+            "value" : "スキップ %lld件"
           }
         },
         "zh-Hant" : {
@@ -1874,7 +1874,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "変更なし %lld 件"
+            "value" : "変更なし %lld件"
           }
         },
         "zh-Hant" : {
@@ -1909,7 +1909,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新 %lld 件"
+            "value" : "更新 %lld件"
           }
         },
         "zh-Hant" : {
@@ -3304,7 +3304,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "テーマカラーを %lld 色から選べる"
+            "value" : "テーマカラーを%lld色から選べる"
           }
         },
         "zh-Hant" : {
