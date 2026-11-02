@@ -22,6 +22,54 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.14.0 (build 29)
+
+iOS のみ(macOS は出していない。macOS は 2.12.0 のまま)。「設定画面のレイアウト」は、選ぶ項目を次の画面へ移したこと・
+Pro の欄の作り直し・OS のトグル。「細かな不具合」は最終同期の時刻が 2 行に折り返す件と、同期の失敗で内部のエラー文が出ていた件。
+外観の「端末の設定と同じ」の追加(新しく入れた人はこれが既定)と、計測の更新は掲載していない。
+
+日本語:
+
+```
+Pro 版でテーマカラーを8色から選べるようにしました。ぜひご購入をご検討ください。
+設定画面のレイアウトを整理しました。
+細かな不具合を修正しました。
+```
+
+繁體中文:
+
+```
+Pro 版可從 8 種主題色中選擇，歡迎考慮購買。
+整理了設定畫面的版面配置。
+修正了一些小問題。
+```
+
+Español:
+
+```
+Con la Versión Pro, ahora puedes elegir entre 8 colores de tema. ¡Anímate a comprarla!
+Reorganizamos la pantalla de ajustes.
+Corregimos pequeños errores.
+```
+
+Français:
+
+```
+Avec la Version Pro, choisissez parmi 8 couleurs de thème. N'hésitez pas à l'acheter !
+Réorganisation de l'écran Réglages.
+Correction de petits bugs.
+```
+
+English:
+
+```
+Pro now lets you choose from 8 theme colors. Consider purchasing it!
+Reorganized the Settings screen.
+Fixed minor bugs.
+```
+
+---
+
 ## 2.13.0 (build 28)
 
 iOS のみ(macOS は出していない。macOS は 2.12.0 のまま)。この版から iOS も Swift / SwiftUI で作り直した版
