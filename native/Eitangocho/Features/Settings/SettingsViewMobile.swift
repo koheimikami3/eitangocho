@@ -94,9 +94,9 @@
           label: String(localized: .appearanceMode), value: String(localized: settings.appearance.label)
         ) { overlay?.push { AppearanceViewMobile(settings: settings) } }
         // 値は画面に出ている色(未購入ならブルー)。保存した色ではない。
-        MobileSettingsLinkRow(
-          label: String(localized: .themeColor), value: String(localized: palette.theme.label)
-        ) { overlay?.push { ThemeColorViewMobile(settings: settings) } }
+        MobileSettingsLinkRow(label: String(localized: .themeColor), valueColor: palette.accent) {
+          overlay?.push { ThemeColorViewMobile(settings: settings) }
+        }
         MobileSettingsLinkRow(
           label: String(localized: .cardLayout), value: String(localized: settings.cardLayout.label)
         ) { overlay?.push { CardLayoutViewMobile(settings: settings) } }

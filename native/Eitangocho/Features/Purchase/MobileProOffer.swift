@@ -6,8 +6,12 @@
   /// 「開発者へのコーヒーの差し入れ」ではなく「Pro 版」を主役にし、手に入るものをチェック付きで並べる
   /// (2.14.0 でテーマカラーが加わり、広告を消すだけの買い物ではなくなったため)。差し入れの温かさは薄字の一言にだけ残す。
   /// 購入ボタンは幅いっぱいで下に置く(箇条書きに行の幅を使わせ、仏語などの長い訳でも折り返しにくくするため)。
+  ///
+  /// テーマカラーの鍵の案内(MobileThemeColorLockedDialog)でも同じ中身を出す。そのときは `onClose` を渡し、
+  /// 一番下の「購入を復元」を「閉じる」に替える(復元は設定画面の Pro の欄からできる)。
   struct MobileProOffer: View {
     let purchase: PurchaseModel
+    var onClose: (() -> Void)?
 
     @Environment(\.palette) private var palette
 
@@ -31,7 +35,11 @@
           priceText: purchase.priceText, purchasing: purchase.purchasing,
           // 価格が引けていない = 商品を取得できていないので押させない。
           action: purchase.priceText == nil ? nil : { Task { await purchase.buy() } })
-        MobileProRestoreLink(purchase: purchase)
+        if let onClose {
+          MobileProCloseLink(action: onClose)
+        } else {
+          MobileProRestoreLink(purchase: purchase)
+        }
       }
       .multilineTextAlignment(.leading)
       .padding(EdgeInsets(top: 14, leading: 14, bottom: 2, trailing: 14))
@@ -119,6 +127,22 @@
           }
         }
         .appShadows(filled ? palette.buttonShadow : [], in: shape, scale: 1)
+      }
+    }
+  }
+
+  /// ダイアログで「購入を復元」の代わりに置く「閉じる」(見た目は購入を復元と揃える)。
+  private struct MobileProCloseLink: View {
+    let action: () -> Void
+
+    @Environment(\.palette) private var palette
+
+    var body: some View {
+      MobilePressable(style: .text, action: action) {
+        AppText(.close, style: AppTextStyle(size: 13))
+          .foregroundStyle(palette.accentOnSoft)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 10)
       }
     }
   }

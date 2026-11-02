@@ -6446,41 +6446,6 @@
         }
       }
     },
-    "themeColorProCaption" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colors other than Blue are available with Pro."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los colores distintos del azul están disponibles con la versión Pro."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les couleurs autres que le bleu sont disponibles avec la version Pro."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ブルー以外の色は、Pro 版で選べるようになります。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "藍色以外的顏色，可在 Pro 版中選擇。"
-          }
-        }
-      }
-    },
     "themeColorPurple" : {
       "extractionState" : "manual",
       "localizations" : {
