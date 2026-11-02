@@ -353,6 +353,41 @@
         }
       }
     },
+    "buyOneTime" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy once for %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago único de %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat unique à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切り %@ で購入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以 %@ 一次買斷"
+          }
+        }
+      }
+    },
     "cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2895,41 +2930,6 @@
         }
       }
     },
-    "oneTimePrice" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One-time purchase %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pago único %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Achat unique %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "買い切り %@"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一次買斷 %@"
-          }
-        }
-      }
-    },
     "pageLoadFailed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3175,144 +3175,177 @@
         }
       }
     },
-    "proCoffeeLink" : {
-      "comment" : "☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ",
+    "proCoffeeNote" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buy me a coffee to remove ads ☕"
+            "value" : "For the price of a coffee, you keep development going ☕"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invítame un café y adiós anuncios ☕"
+            "value" : "Por lo que cuesta un café, me animas a seguir desarrollando ☕"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offrez-moi un café pour retirer les pubs ☕"
+            "value" : "Pour le prix d’un café, vous encouragez le développement ☕"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "コーヒー1杯の差し入れで広告が消えます ☕"
+            "value" : "コーヒー1杯分で開発の励みになります ☕"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請我喝杯咖啡即可移除廣告 ☕"
+            "value" : "一杯咖啡的價格，就是對開發的莫大鼓勵 ☕"
           }
         }
       }
     },
-    "proCoffeeReward" : {
+    "proFeatureMore" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ads go away as a thank-you"
+            "value" : "More features coming"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Como agradecimiento, quitamos los anuncios"
+            "value" : "Más funciones en camino"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En remerciement, les pubs disparaissent"
+            "value" : "D’autres fonctions à venir"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お礼に広告を非表示にします"
+            "value" : "今後も機能を追加予定"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "作為謝禮，將移除廣告"
+            "value" : "未來將陸續新增功能"
           }
         }
       }
     },
-    "proCoffeeThanks" : {
+    "proFeatureNoAds" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thank you!"
+            "value" : "No ads"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Gracias!"
+            "value" : "Sin anuncios"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Merci !"
+            "value" : "Sans publicité"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ありがとうございます!"
+            "value" : "広告を非表示"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "謝謝你！"
+            "value" : "隱藏廣告"
           }
         }
       }
     },
-    "proCoffeeTitle" : {
-      "comment" : "☕ の前はノーブレークスペース(U+00A0)。☕ だけが次の行に送られないようにするため。他の言語も同じ",
+    "proFeatureThemeColors" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buy the developer a coffee ☕"
+            "value" : "Choose from %lld theme colors"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invítale un café al desarrollador ☕"
+            "value" : "Elige entre %lld colores de tema"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offrez un café au développeur ☕"
+            "value" : "Choisissez parmi %lld couleurs de thème"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "開発者にコーヒーを1杯差し入れ ☕"
+            "value" : "テーマカラーを %lld 色から選べる"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請開發者喝杯咖啡 ☕"
+            "value" : "可從 %lld 種主題色中選擇"
+          }
+        }
+      }
+    },
+    "proLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove ads with Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quita los anuncios con Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirez les pubs avec Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 版で広告を消せます"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升級 Pro 版即可移除廣告"
           }
         }
       }
@@ -3383,6 +3416,111 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "用 Google 翻譯確認發音"
+          }
+        }
+      }
+    },
+    "proPurchasedThanks" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you for your purchase"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gracias por tu compra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merci pour votre achat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ご購入いただきありがとうございます"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "感謝您的購買"
+          }
+        }
+      }
+    },
+    "proPurchasedTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 版"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 版"
+          }
+        }
+      }
+    },
+    "proUpgradeTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejora a Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez à Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 版にアップグレード"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升級為 Pro 版"
           }
         }
       }
