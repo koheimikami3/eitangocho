@@ -168,6 +168,11 @@ final class AppModel {
       Self.logger.error("起動に失敗: \(String(describing: failure), privacy: .public)")
       phase = .failed(failure)
     case .success(let (outcome, database)):
+      // 新規インストールだと分かるのはここ(引き継ぎの結果)だけなので、外観の既定もここで決める。
+      // 最初の画面(読み込み中)はライトで出るが、DB を開くまでの一瞬で、しかも最初の起動の 1 回だけ。
+      if case .performed(let record) = outcome, record.kind == .freshInstall {
+        settings.adoptSystemAppearanceForNewInstall()
+      }
       // 元ファイルは引き継いだ後も変えない決まり。Release ビルドには診断画面が無いので、
       // 起動のたびに状態を出し、引き継ぎのときのログ(サイズ・日時)と比べられるようにする。
       let source = DriftDatabaseImporter.sourceFileState(at: locations.source)

@@ -8,9 +8,14 @@ import SwiftUI
 /// 立体案は輪郭を枠線ではなく影で出す: 地の上の面は `elevation` で浮かせ、入力欄などは
 /// `wellShadow`(内側の影。描画は MobileWell)で沈める。
 ///
+/// アクセント系のトークン(accent・accentSoft・accentOnSoft・accentLine・buttonGradient・buttonShadow)は
+/// テーマカラー(`theme`)から作る。
+///
 /// 画面からは `@Environment(\.palette) private var palette` で引く。
 nonisolated struct AppPalette: Equatable, Sendable {
   let isDark: Bool
+  /// テーマカラー。未購入の人にはブルーを渡す(決めるのは RootView)。
+  var theme: ThemeColor = .free
 
   static let light = AppPalette(isDark: false)
   static let dark = AppPalette(isDark: true)
@@ -54,21 +59,21 @@ nonisolated struct AppPalette: Equatable, Sendable {
 
   // MARK: - アクセント
 
-  /// アクセント色はライト / ダーク共通(アイコンと同色)。
-  var accent: Color { Color(argb: 0xFF42_9FF0) }
+  /// アクセント色。ブルーはライト / ダーク共通(アイコンと同色)で、グラファイトだけダークで明るくする。
+  var accent: Color { opaque(isDark ? tones.accentDark : tones.accent) }
 
-  /// 発音ボタンの淡い地(--acc-soft)。ダークは地が暗いぶん濃く敷く。
+  /// 発音ボタンの淡い地(--acc-soft)。ダークは地が暗いぶん濃く敷く(22%。ライトは 12%)。
   /// ライトは macOS の AppColors.accentSoft(10%)とは別に持つ(刷新案 A で iOS だけ 12% に上げた)。
-  var accentSoft: Color { isDark ? Color(argb: 0x3842_9FF0) : Color(argb: 0x1F42_9FF0) }
+  var accentSoft: Color { isDark ? withAlpha(0x38, tones.accentDark) : withAlpha(0x1F, tones.accent) }
 
-  /// 白地・淡い青地に置く青文字・アイコン色(--acc-text)。押せる「文字」はすべてこの色にする。
+  /// 白地・淡いアクセントの地に置く文字・アイコン色(--acc-text)。押せる「文字」はすべてこの色にする。
   ///
-  /// ライトの #1B78C2 は accentSoft の上で 4.14:1 と 4.5:1 に届かないが、
+  /// ブルーのライトの #1B78C2 は accentSoft の上で 4.14:1 と 4.5:1 に届かないが、
   /// 刷新案 A で accent と同じ色相に揃えるデザイン判断として採用した(白地の上では 4.65:1)。
-  var accentOnSoft: Color { isDark ? Color(argb: 0xFF7E_C2FF) : Color(argb: 0xFF1B_78C2) }
+  var accentOnSoft: Color { opaque(isDark ? tones.onSoftDark : tones.onSoftLight) }
 
   /// 発音ボタンの枠線(--acc-line)。ダークは文字色と同じ色相で引く。
-  var accentLine: Color { isDark ? Color(argb: 0x737E_C2FF) : Color(argb: 0x6B42_9FF0) }
+  var accentLine: Color { isDark ? withAlpha(0x73, tones.onSoftDark) : withAlpha(0x6B, tones.accent) }
 
   /// 購入済みで押せなくなった購入ボタンの地。
   var proButtonDone: Color { isDark ? Color(argb: 0x1FFF_FFFF) : Color(argb: 0xFFEC_ECEF) }
@@ -78,9 +83,8 @@ nonisolated struct AppPalette: Equatable, Sendable {
 
   /// 主ボタンの地(--btnGrad。上 → 下)。上から下へわずかに暗くして膨らみを出す。
   var buttonGradient: [Color] {
-    isDark
-      ? [Color(argb: 0xFF44_9DF0), Color(argb: 0xFF37_95E9)]
-      : [Color(argb: 0xFF4D_A4F2), Color(argb: 0xFF3F_9CEF)]
+    let (top, bottom) = isDark ? tones.gradientDark : tones.gradientLight
+    return [opaque(top), opaque(bottom)]
   }
 
   /// 主ボタンの地の塗り(`buttonGradient` を上から下へ引いたもの)。
@@ -162,7 +166,8 @@ nonisolated struct AppPalette: Equatable, Sendable {
       ? [AppShadow(color: Color(argb: 0x5900_0000), blurRadius: 2, y: 1)]
       : [
         AppShadow(color: Color(argb: 0x0D10_1828), blurRadius: 1, y: 1),
-        AppShadow(color: Color(argb: 0x3D26_78C8), blurRadius: 4, spread: -3, y: 1),
+        // 2 枚目はアクセントの色みを帯びた影(ブルーの元の値は #2678C8。淡い地の文字色で代える)。
+        AppShadow(color: withAlpha(0x3D, tones.onSoftLight), blurRadius: 4, spread: -3, y: 1),
       ]
   }
 
@@ -176,12 +181,20 @@ nonisolated struct AppPalette: Equatable, Sendable {
   /// ボーダー・区切り線の不透明度つき色(デザインの `--b10` 等)。本文系と同じ導出だが、意味が違うので呼び分ける。
   func borderAlpha(_ percent: Int) -> Color { alpha(percent) }
 
+  private var tones: ThemeColor.Tones { theme.tones }
+
+  /// 0xRRGGBB の不透明な色。
+  private func opaque(_ rgb: UInt32) -> Color { Color(argb: 0xFF00_0000 | rgb) }
+
+  /// 0xRRGGBB に不透明度(0x00〜0xFF)を付けた色。
+  private func withAlpha(_ alpha: UInt32, _ rgb: UInt32) -> Color { Color(argb: alpha << 24 | rgb) }
+
   private func alpha(_ percent: Int) -> Color {
     (isDark ? Color.white : Color.black).opacity(Double(percent) / 100)
   }
 }
 
 extension EnvironmentValues {
-  /// 今の iOS の配色。ルートで設定の appearance から決めて配る。
+  /// 今の iOS の配色。ルートで設定の appearance・テーマカラーから決めて配る。
   @Entry var palette: AppPalette = .light
 }

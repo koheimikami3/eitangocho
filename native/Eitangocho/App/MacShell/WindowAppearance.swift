@@ -1,14 +1,19 @@
 #if os(macOS)
   import AppKit
 
-  /// アプリの外観(ライト / ダーク)を AppKit が描く部分にも伝える。
+  /// アプリの外観(システムの設定と同じ / ライト / ダーク)を AppKit が描く部分にも伝える。
   ///
   /// SwiftUI が描く部分は配色の環境値で切り替わるが、信号機ボタン・ファイル選択パネル・
   /// 発音確認のウィンドウ枠などは NSApp.appearance に従う。設定はアプリ全体の外観なので、
   /// ウィンドウ単位ではなく NSApp に当てる。
   enum WindowAppearance {
     static func apply(_ appearance: AppAppearance) {
-      NSApp.appearance = NSAppearance(named: appearance == .dark ? .darkAqua : .aqua)
+      switch appearance {
+      // nil は OS の設定に従う。
+      case .system: NSApp.appearance = nil
+      case .light: NSApp.appearance = NSAppearance(named: .aqua)
+      case .dark: NSApp.appearance = NSAppearance(named: .darkAqua)
+      }
     }
 
     /// 初期のウィンドウの大きさ。画面(visibleFrame)比で決める。固定の値だと
