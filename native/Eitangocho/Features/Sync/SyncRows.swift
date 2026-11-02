@@ -50,6 +50,10 @@
         // 右端の状態はバージョンの行(SettingsValueRow)と同じ体裁。
         AppText(status, style: SettingsRowStyle.label)
           .foregroundStyle(colors.textTertiary)
+          // 状態の幅を先に確定させて 1 行に収め、残りをラベルに渡す。優先度がないと HStack が
+          // 幅を等分して提案し、ラベルの余白を残したまま日時の途中で折り返してしまう。
+          .lineLimit(1)
+          .layoutPriority(1)
         if syncing {
           CircularProgress(color: colors.accent, size: 14, lineWidth: 2)
             .padding(.leading, px(8))

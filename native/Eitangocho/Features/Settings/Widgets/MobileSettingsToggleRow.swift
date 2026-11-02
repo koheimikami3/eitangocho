@@ -1,7 +1,10 @@
 #if os(iOS)
   import SwiftUI
 
-  /// iOS 版の設定のトグルの行(ラベル + iOS 風のスイッチ 50×30。Flutter 版の MobileSettingsToggleRow)。行全体がタップ領域。
+  /// iOS 版の設定のトグルの行(ラベル + OS のスイッチ)。行全体がタップ領域。
+  ///
+  /// スイッチは自前で描かず OS の `Toggle` を使う。OS の版に合った形(iOS 26 の横長の形など)と
+  /// ドラッグでの切り替え・読み上げでのオン / オフが、そのまま手に入るため。
   struct MobileSettingsToggleRow: View {
     let label: String
     let value: Bool
@@ -14,22 +17,14 @@
         AppText(label, style: AppTextStyle(size: 14))
           .foregroundStyle(palette.text)
           .frame(maxWidth: .infinity, alignment: .leading)
-        Capsule()
-          .fill(value ? palette.accent : palette.toggleOff)
-          .frame(width: 50, height: 30)
-          .overlay(alignment: value ? .trailing : .leading) {
-            Circle()
-              .fill(.white)
-              .frame(width: 24, height: 24)
-              .appShadows([AppShadow(color: Color(argb: 0x4000_0000), blurRadius: 3, y: 1)], in: Circle(), scale: 1)
-              .padding(.horizontal, 3)
-          }
-          // Flutter 版の AnimatedContainer / AnimatedAlign(150 ms・直線)。
-          .animation(.linear(duration: 0.15), value: value)
+        Toggle(label, isOn: Binding(get: { value }, set: onChanged))
+          .labelsHidden()
+          .tint(palette.accent)
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 12)
       .contentShape(Rectangle())
+      // スイッチ以外(ラベルや余白)を押しても切り替える。スイッチ自身のタップはスイッチが受けるので二重にはならない。
       .onTapGesture { onChanged(!value) }
     }
   }

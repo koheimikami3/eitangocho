@@ -22,6 +22,14 @@ struct AnalyticsReporting: ViewModifier {
         .onChange(of: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil, initial: true) { _, unlocked in
           if let unlocked { reporter.reportPro(unlocked) }
         }
+        // テーマカラーは画面に出ている色を送る(未購入ならブルー)。購入状態が分かるまでは決まらないので待つ。
+        .onChange(
+          of: purchase.isProUnlockedKnown
+            ? ThemeColor.displayed(selected: settings.themeColor, proUnlocked: purchase.proUnlocked) : nil,
+          initial: true
+        ) { _, color in
+          if let color { reporter.reportThemeColor(color) }
+        }
         // トラッキング許可は起動時とアクティブに戻るたびに読む。状態を読むだけで、ダイアログは出さない
         // (出すのは TrackingAuthorizer)。
         .onChange(of: scenePhase, initial: true) { _, phase in

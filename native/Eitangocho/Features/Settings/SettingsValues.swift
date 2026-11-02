@@ -1,25 +1,43 @@
 import EitangochoData
 import Foundation
+import SwiftUI
 
 /// アプリの外観(配色)。iOS・macOS 共通の設定。
 ///
-/// OS の設定に追従する選択肢は用意しない(デザイン上もライト / ダークの 2 択)。
-/// rawValue は UserDefaults に保存する名前で、Flutter 版の enum の name と同じ。
+/// rawValue は UserDefaults に保存する名前で、light / dark は Flutter 版の enum の name と同じ。
+/// `system`(OS の設定に追従)は 2.14.0 で足した。既定にするのは新規インストールだけで、既存の利用者は
+/// 保存した値が無くてもライトのまま(SettingsStore.adoptSystemAppearanceForNewInstall)。
 enum AppAppearance: String, CaseIterable, Sendable {
+  case system
   case light
   case dark
 
   var label: LocalizedStringResource {
     switch self {
+    // iOS は「端末」、macOS は「システム」と呼び分ける(OS の設定アプリの呼び名に合わせる)。
+    #if os(iOS)
+      case .system: .appearanceSystemDevice
+    #else
+      case .system: .appearanceSystem
+    #endif
     case .light: .appearanceLight
     case .dark: .appearanceDark
     }
   }
 
-  var colors: AppColors { self == .dark ? .dark : .light }
+  /// 画面に指定する配色。`system` は nil(OS の設定に任せる)。
+  var colorScheme: ColorScheme? {
+    switch self {
+    case .system: nil
+    case .light: .light
+    case .dark: .dark
+    }
+  }
 
-  /// iOS の配色。
-  var palette: AppPalette { self == .dark ? .dark : .light }
+  /// ダークで描くか。`system` は OS の今の配色(`systemScheme`)に従う。
+  func isDark(system systemScheme: ColorScheme) -> Bool {
+    (colorScheme ?? systemScheme) == .dark
+  }
 }
 
 /// 学習中カードの並び。iOS 版のみの設定(macOS 版は独自のカードの格子を持つ)。

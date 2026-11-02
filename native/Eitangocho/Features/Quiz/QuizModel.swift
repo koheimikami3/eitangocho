@@ -38,8 +38,8 @@ final class QuizModel {
   /// 二重に答えないよう、書き終えて次の問題に進むまで次の回答を受け付けない。
   @ObservationIgnored private var answering = false
 
-  /// 回ごとに変わる番号。回答の書き込み中に離脱・始め直しで回が変わったとき、
-  /// 書き終えた回答で別の回を進めない(離脱した回を完了と数えない)ために持つ。
+  /// 回ごとに変わる番号。回答の書き込み中に画面の移動・始め直しで回が変わったとき、
+  /// 書き終えた回答で別の回を進めない(捨てた回を完了と数えない)ために持つ。
   @ObservationIgnored private var session = 0
 
   @ObservationIgnored private let dao: WordDao
@@ -76,8 +76,6 @@ final class QuizModel {
   /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
   /// `trigger` は計測用(どこから始めたか)。
   func start(trigger: QuizTrigger) {
-    // 回の途中でサイドバーのクイズを押し直した場合も、前の回は離脱として数える。
-    abandonIfActive()
     let questions = selectQuizQuestions(learnedWords())
     resetSession(questions, phase: questions.isEmpty ? .empty : .active)
     if questions.isEmpty {
@@ -104,13 +102,14 @@ final class QuizModel {
     }
   }
 
-  /// 表示中の画面が変わったとき。回の途中でクイズ以外の画面へ移ったら、離脱として計測する。
+  /// 表示中の画面が変わったとき。回の途中でクイズ以外の画面へ移ったら、その回を捨てる
+  /// (書き込み中だった回答が、離れた後に回を進めて完了と数えないように)。
   /// macOS はクイズへの入口で必ず `start(trigger:)` を呼ぶので、戻ってきたときは新しい回になる。
-  /// 回を保つとき(iOS)は、移っても回は続いているので離脱にしない。
+  /// 回を保つとき(iOS)は、移っても回は続いているので何もしない。
   func viewChanged(from previous: MainView, to next: MainView) {
     guard !keepsRoundAcrossViews else { return }
-    if previous == .quiz && next != .quiz {
-      abandonIfActive()
+    if previous == .quiz && next != .quiz && phase == .active {
+      resetSession([], phase: .empty)
     }
   }
 
@@ -131,14 +130,6 @@ final class QuizModel {
     } else {
       finish()
     }
-  }
-
-  /// 回の途中なら離脱を送り、状態を初期化する(同じ回を二重に数えない)。
-  /// アプリを終了された回は検知できない。
-  private func abandonIfActive() {
-    guard phase == .active else { return }
-    analytics.logQuizAbandoned(answeredCount: index)
-    resetSession([], phase: .empty)
   }
 
   /// 回の状態を最初に戻し、`questions` を出題にする。

@@ -2,7 +2,7 @@
   import EitangochoSync
   import SwiftUI
 
-  /// macOS 版の設定画面(表示・テーマ・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
+  /// macOS 版の設定画面(表示・外観・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
   /// Flutter 版の SettingsView。
   struct SettingsView: View {
     let settings: SettingsStore
@@ -29,9 +29,9 @@
               UiScaleSlider(value: settings.uiScale) { settings.setUiScale($0) }
             }
           }
-          // iOS は「表示」の中に小見出しで置くが、macOS のカードには小見出しの部品が無いため、
-          // クイズの出題方向と同じく独立したセクションのラジオの行にする。
-          SettingsSection(title: String(localized: .theme)) {
+          // iOS は次の階層の画面に分けるが、macOS は横幅に余裕があるので、クイズの出題方向と同じく
+          // 独立したセクションにラジオの行を並べる。テーマカラーは課金の無い macOS には置かない。
+          SettingsSection(title: String(localized: .sectionAppearance)) {
             SettingsCard {
               ForEach(AppAppearance.allCases, id: \.self) { appearance in
                 SettingsRadioRow(

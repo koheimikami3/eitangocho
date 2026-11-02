@@ -94,10 +94,6 @@ struct AnalyticsLogger {
     log("quiz_completed", ["ok_count": okCount, "forgot_count": forgotCount])
   }
 
-  func logQuizAbandoned(answeredCount: Int) {
-    log("quiz_abandoned", ["answered_count": answeredCount])
-  }
-
   /// 同期の失敗。OS が返す説明(SyncFailure.detail)はパスが混ざりうるので送らない。
   func logSyncFailed(_ reason: CloudFailureReason) {
     log("sync_failed", ["reason": syncFailureValue(reason)])
@@ -120,9 +116,16 @@ struct AnalyticsLogger {
     log("store_listing_opened")
   }
 
-  /// Pro の購入(iOS だけ。Phase 6 で呼ぶ)。
-  func logProPurchase(_ stage: ProPurchaseStage) {
-    log("pro_purchase", ["stage": stage.rawValue])
+  /// Pro の購入(iOS だけ)。`source` は購入を始めた場所で、テーマカラーの案内から買われているかを見る
+  /// (2.14.0 のねらいの、色で Pro を増やせたかの判断用)。
+  func logProPurchase(_ stage: ProPurchaseStage, source: ProPurchaseSource) {
+    log("pro_purchase", ["stage": stage.rawValue, "source": snakeCase(source.rawValue)])
+  }
+
+  /// 未購入の人が鍵付きのテーマカラーを押した(iOS だけ)。pro_purchase の source と並べて、
+  /// 押す人が少ない(色が購入の動機になっていない)のか、押しても買われない(案内や価格の問題)のかを分ける。
+  func logThemeColorLockedTapped() {
+    log("theme_color_locked_tapped")
   }
 
   /// クイズ結果の広告の下にある Pro への導線を押した(iOS だけ。Phase 6 で呼ぶ)。導線を残すか外すかの

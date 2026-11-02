@@ -22,6 +22,14 @@ enum ProPurchaseStage: String, Sendable {
   case tapped, success, cancelled, failed
 }
 
+/// Pro の購入を始めた場所(pro_purchase の source)。
+enum ProPurchaseSource: String, Sendable {
+  /// 設定画面の Pro の欄。
+  case settings
+  /// テーマカラーの鍵の案内(MobileThemeColorLockedDialog)。
+  case themeColor
+}
+
 /// レビュー依頼を出した契機(review_requested の trigger)。
 enum ReviewTrigger: String, Sendable {
   /// クイズを最後まで終えた直後。

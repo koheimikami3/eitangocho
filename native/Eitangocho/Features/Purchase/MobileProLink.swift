@@ -21,7 +21,7 @@
       } content: {
         // 末尾の › もリンクの印。前はノーブレークスペースにして、› だけが次の行に送られないようにする。
         // 押せることは末尾の › で示す。青字のリンクにすると広告の下で目立ちすぎるため、本文と同じ色にする。
-        AppText(String(localized: .proCoffeeLink) + "\u{00a0}›", style: AppTextStyle(size: 13))
+        AppText(String(localized: .proLink) + "\u{00a0}›", style: AppTextStyle(size: 13))
           .foregroundStyle(palette.text)
           .multilineTextAlignment(.center)
           // 文字だけでは押しにくいので、上下に余白を足してタップ領域を広げる。

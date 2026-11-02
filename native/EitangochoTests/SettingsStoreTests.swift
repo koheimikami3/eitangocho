@@ -97,6 +97,28 @@ final class SettingsStoreTests {
     #expect(makeStore().appearance == .dark)
   }
 
+  @Test func 新規インストールでは外観の既定をシステムと同じにする() {
+    let store = makeStore()
+    store.adoptSystemAppearanceForNewInstall()
+    #expect(store.appearance == .system)
+    #expect(makeStore().appearance == .system)
+  }
+
+  @Test func 外観を保存済みなら新規インストールの既定で上書きしない() {
+    let store = makeStore()
+    store.setAppearance(.dark)
+    store.adoptSystemAppearanceForNewInstall()
+    #expect(store.appearance == .dark)
+  }
+
+  @Test func テーマカラーの既定はブルーでsetThemeColorで切り替わり永続化される() {
+    let store = makeStore()
+    #expect(store.themeColor == .blue)
+    store.setThemeColor(.teal)
+    #expect(store.themeColor == .teal)
+    #expect(makeStore().themeColor == .teal)
+  }
+
   @Test func Flutter版が保存した値を同じキーと型で読める() {
     // SharedPreferencesAsync は UserDefaults に素のキー名と素の型で書く。
     defaults.set("jaToEn", forKey: "quizDirection")

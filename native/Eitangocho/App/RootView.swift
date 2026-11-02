@@ -7,6 +7,8 @@ struct RootView: View {
   let model: AppModel
 
   @Environment(\.requestReview) private var requestReview
+  /// OS の今の配色。外観が「端末の設定と同じ」のときに使う(ライト / ダークを指定している間は見ない)。
+  @Environment(\.colorScheme) private var systemColorScheme
   #if os(iOS)
     /// OS の文字サイズ。Flutter 版と同じ倍率に直して配る(TextScale)。
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -30,10 +32,10 @@ struct RootView: View {
       .environment(\.ads, model.ads)
       // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
       .onAppear { model.reviewClient.action = requestReview }
-      .environment(\.colors, model.settings.appearance.colors)
+      .environment(\.colors, isDark ? .dark : .light)
       .environment(\.openPronunciation, openPronunciation)
       #if os(iOS)
-        .environment(\.palette, model.settings.appearance.palette)
+        .environment(\.palette, AppPalette(isDark: isDark, theme: themeColor))
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
         .environment(\.sheetBannerPreloader, sheetBannerPreloader)
         .environment(\.registrationRectanglePreloader, registrationRectanglePreloader)
@@ -47,7 +49,16 @@ struct RootView: View {
           WindowAppearance.apply(appearance)
         }
       #endif
-      .preferredColorScheme(model.settings.appearance == .dark ? .dark : .light)
+      .preferredColorScheme(model.settings.appearance.colorScheme)
+  }
+
+  private var isDark: Bool { model.settings.appearance.isDark(system: systemColorScheme) }
+
+  /// 画面に使うテーマカラー(決め方は ThemeColor.displayed)。
+  private var themeColor: ThemeColor {
+    let purchase = model.purchase
+    return ThemeColor.displayed(
+      selected: model.settings.themeColor, proUnlocked: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil)
   }
 
   /// 発音確認を開く。macOS は別ウィンドウ(ページもアプリと同じ拡大率で出す)、iOS はシート。

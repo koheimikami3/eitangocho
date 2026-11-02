@@ -61,6 +61,12 @@ final class AnalyticsReporter {
     setProperty("is_pro", boolValue(unlocked))
   }
 
+  /// 画面に出ているテーマカラー(iOS だけ。ThemeColor の rawValue)。購入状態が分かってから呼ぶ。
+  /// Pro の人がどの色を選んでいるかを `is_pro` と並べて見て、色を外す・足す判断に使う。
+  func reportThemeColor(_ color: ThemeColor) {
+    setProperty("theme_color", color.rawValue)
+  }
+
   /// トラッキング許可の状態(iOS だけ。TrackingClient.statusName の値)。許可は ATT のダイアログか
   /// 設定アプリでしか変わらず、どちらもアプリがアクティブに戻るのを挟むので、アクティブになるたびに呼ぶ。
   func reportTrackingStatus(_ status: String) {

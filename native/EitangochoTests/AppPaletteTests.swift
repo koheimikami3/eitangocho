@@ -22,8 +22,26 @@ struct AppPaletteTests {
     #expect(hex(AppPalette.dark.text) == [0xF5, 0xF5, 0xF7])
   }
 
-  @Test func アクセント色はライトとダークで共通() {
+  @Test func ブルーのアクセント色はライトとダークで共通() {
     #expect(AppPalette.dark.accent == AppPalette.light.accent)
+  }
+
+  @Test func ブルーのアクセント系の値は2_13_0までと同じ() {
+    let light = AppPalette.light
+    let dark = AppPalette.dark
+    #expect(hex(light.accent) == [0x42, 0x9F, 0xF0])
+    #expect(hex(light.accentOnSoft) == [0x1B, 0x78, 0xC2])
+    #expect(hex(dark.accentOnSoft) == [0x7E, 0xC2, 0xFF])
+    #expect(light.buttonGradient.map(hex) == [[0x4D, 0xA4, 0xF2], [0x3F, 0x9C, 0xEF]])
+    #expect(dark.buttonGradient.map(hex) == [[0x44, 0x9D, 0xF0], [0x37, 0x95, 0xE9]])
+  }
+
+  @Test func グラファイトだけダークでアクセントを明るくする() {
+    for theme in ThemeColor.allCases {
+      let light = AppPalette(isDark: false, theme: theme)
+      let dark = AppPalette(isDark: true, theme: theme)
+      #expect((light.accent != dark.accent) == (theme == .graphite), "\(theme)")
+    }
   }
 
   @Test func textAlphaとborderAlphaはライトが黒ベースでダークが白ベース() {
@@ -55,19 +73,29 @@ struct AppPaletteTests {
     }
   }
 
-  @Test func 発音ボタンの文字とアイコンはダークの淡い地に対して4_5対1以上ある() {
+  @Test(arguments: ThemeColor.allCases)
+  func 発音ボタンの文字とアイコンはダークの淡い地に対して4_5対1以上ある(theme: ThemeColor) {
     // iOS のライトは刷新案 A のデザイン判断で #1B78C2(4.14:1)を採用しており例外とする(AppPalette.accentOnSoft 参照)。
-    let dark = AppPalette.dark
+    let dark = AppPalette(isDark: true, theme: theme)
     #expect(ColorContrast.ratio(dark.accentOnSoft, dark.accentSoft, dark.surface) >= 4.5)
   }
 
-  @Test(arguments: [AppPalette.light, AppPalette.dark])
-  func 購入を復元などカード地に直接載る青文字は4_5対1以上ある(palette: AppPalette) {
+  @Test(arguments: ThemeColor.allCases, [false, true])
+  func 購入を復元などカード地に直接載るアクセントの文字は4_5対1以上ある(theme: ThemeColor, isDark: Bool) {
+    let palette = AppPalette(isDark: isDark, theme: theme)
     #expect(ColorContrast.ratio(palette.accentOnSoft, palette.surface, palette.surface) >= 4.5)
   }
 
-  @Test func 外観の設定から対応するパレットを返す() {
-    #expect(AppAppearance.light.palette == .light)
-    #expect(AppAppearance.dark.palette == .dark)
+  @Test func 外観がライトとダークならOSの配色に関わらずその配色で描く() {
+    for system in [ColorScheme.light, .dark] {
+      #expect(!AppAppearance.light.isDark(system: system))
+      #expect(AppAppearance.dark.isDark(system: system))
+    }
+  }
+
+  @Test func 外観がシステムと同じならOSの配色に従う() {
+    #expect(!AppAppearance.system.isDark(system: .light))
+    #expect(AppAppearance.system.isDark(system: .dark))
+    #expect(AppAppearance.system.colorScheme == nil)
   }
 }

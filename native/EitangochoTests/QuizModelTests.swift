@@ -95,7 +95,7 @@ struct QuizModelTests {
     return (model, box)
   }
 
-  @Test func 回を保つときはタブを移って戻っても続きから出題し離脱にしない() async throws {
+  @Test func 回を保つときはタブを移って戻っても続きから出題する() async throws {
     let (model, _) = try await setupKeepingRound(3)
     model.enterFromTab()
     model.viewChanged(from: .learning, to: .quiz)
@@ -110,7 +110,6 @@ struct QuizModelTests {
     #expect(model.index == 1)
     #expect(model.okCount == 1)
     #expect(model.revealed, "出題中の単語が変わっていなければ開示の状態も保つ")
-    #expect(analytics.eventsNamed("quiz_abandoned").isEmpty)
     #expect(analytics.eventsNamed("quiz_started").count == 1)
   }
 
@@ -280,7 +279,6 @@ struct QuizModelTests {
     await answer?.value
 
     #expect(model.phase == .empty)
-    #expect(analytics.eventsNamed("quiz_abandoned") == [["answered_count": 0]])
     #expect(analytics.eventsNamed("quiz_completed").isEmpty)
     // 答えた記録そのものは残す。
     #expect(try await database.wordDao.getAll().first?.lastReviewedAt != nil)
@@ -313,7 +311,6 @@ struct QuizModelTests {
     // 投入したばかりの単語は一度も答えていない。
     #expect(analytics.eventsNamed("quiz_started") == [["trigger": "continue", "review_gap_bucket": "0_none"]])
     #expect(analytics.eventsNamed("quiz_completed") == [["ok_count": 1, "forgot_count": 1]])
-    #expect(analytics.eventsNamed("quiz_abandoned").isEmpty)
   }
 
   @Test func 学習済みが0件ならquiz_empty_shownだけを送る() async throws {
@@ -321,38 +318,5 @@ struct QuizModelTests {
     model.start(trigger: .tab)
     #expect(analytics.eventsNamed("quiz_empty_shown").count == 1)
     #expect(analytics.eventsNamed("quiz_started").isEmpty)
-  }
-
-  @Test func 回の途中で別の画面へ移ると答えた数を付けて離脱を1回だけ送る() async throws {
-    let model = try await setupLearned(3)
-    model.start(trigger: .tab)
-    model.viewChanged(from: .learning, to: .quiz)
-    await model.answerKnew()
-
-    model.viewChanged(from: .quiz, to: .learning)
-    // 戻ってきて新しい回を始めても、前の回を二重に数えない。
-    model.start(trigger: .tab)
-    model.viewChanged(from: .learning, to: .quiz)
-
-    #expect(analytics.eventsNamed("quiz_abandoned") == [["answered_count": 1]])
-  }
-
-  @Test func 回の途中でクイズを押し直しても離脱として送る() async throws {
-    let model = try await setupLearned(3)
-    model.start(trigger: .tab)
-    model.start(trigger: .tab)
-    #expect(model.phase == .active)
-    #expect(analytics.eventsNamed("quiz_abandoned") == [["answered_count": 0]])
-  }
-
-  @Test func 最後まで答えた回は画面を移っても離脱にしない() async throws {
-    let model = try await setupLearned(1)
-    model.start(trigger: .tab)
-    model.viewChanged(from: .learning, to: .quiz)
-    await model.answerKnew()
-
-    model.viewChanged(from: .quiz, to: .learning)
-
-    #expect(analytics.eventsNamed("quiz_abandoned").isEmpty)
   }
 }
