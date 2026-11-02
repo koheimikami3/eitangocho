@@ -150,9 +150,11 @@ final class AppOverlay {
     }
   }
 
-  /// Flutter の iOS の画面遷移(CupertinoPageRoute: 500 ms。進むは linearToEaseOut、戻るは easeInToLinear)。
+  /// Flutter の iOS の画面遷移(CupertinoPageRoute: 500 ms。進むは linearToEaseOut)。
   static let pushEnter: Animation = .timingCurve(0.35, 0.91, 0.33, 0.97, duration: 0.5)
-  static let pushExit: Animation = .timingCurve(0.67, 0.03, 0.65, 0.09, duration: 0.5)
+  /// 戻るも進むと同じく出だしの速い曲線にする。Flutter の戻る(easeInToLinear)は出だしが遅く、
+  /// 戻るボタンを押してもすぐ戻らないように見えたため(2026-11-02 のユーザーの指摘)。
+  static let pushExit: Animation = pushEnter
 
   func dismiss(_ id: UUID) {
     dialogs.removeAll { $0.id == id }
