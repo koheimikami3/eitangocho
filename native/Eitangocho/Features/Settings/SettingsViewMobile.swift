@@ -4,14 +4,16 @@
 
   /// iOS 版の設定画面。変更は即保存(Flutter 版の SettingsViewMobile)。
   ///
-  /// macOS 版との違いは 2 つ:
-  /// - 「表示」に外観(ライト / ダーク)と学習中カードの並びを持つ。
-  ///   macOS は外観を独立したセクションに置き、カードの並びは 1 種類のため無い
+  /// 選択肢から選ぶ項目(外観モード・テーマカラー・カードの並び・クイズの出題・訳の言語)は次の階層の画面へ移し、
+  /// トップの行の右端に今の値を出す。トグルと操作(同期・書き出し・読み込みなど)は 1 タップのままトップに残す。
+  ///
+  /// macOS 版との違い:
+  /// - 選ぶ項目を次の階層に分ける(macOS は横幅に余裕があるので 1 画面に並べたまま)
+  /// - テーマカラー・学習中カードの並びを持つ(macOS は課金が無く、カードの並びは 1 種類のため無い)
   /// - 「表示サイズ」(uiScale)を持たない。iOS は OS の文字サイズの設定に委ねる
   ///
-  /// 並びは「表示 → クイズ → 訳の言語 → データ → サポート → (作者の他のアプリ)→ 情報」。
-  /// 見た目に関わるものを 1 枚のカードにまとめ、セクションの中はアプリ全体(テーマ)→ 一覧のレイアウト
-  /// → 表示する項目(IPA)の順にする。
+  /// 並びは「(Pro)→ 表示 → 学習 → データ → サポート → (作者の他のアプリ)→ 情報」。
+  /// 「表示」はアプリ全体(外観モード・テーマカラー)→ 一覧のレイアウト → 表示する項目(IPA)の順にする。
   struct SettingsViewMobile: View {
     let session: AppModel.Session
     let settings: SettingsStore
@@ -23,6 +25,7 @@
     @State private var position = ScrollPosition(edge: .top)
     @Environment(\.appOverlay) private var overlay
     @Environment(\.analytics) private var analytics
+    @Environment(\.palette) private var palette
 
     var body: some View {
       ScrollView {
@@ -33,15 +36,7 @@
             MobileProSection(purchase: purchase)
           }
           display
-          MobileSettingsSection(title: String(localized: .sectionQuiz)) {
-            ForEach(QuizDirection.allCases, id: \.self) { direction in
-              MobileSettingsRadioRow(
-                label: String(localized: direction.label(settings.translationLanguage)),
-                selected: settings.quizDirection == direction
-              ) { settings.setQuizDirection(direction) }
-            }
-          }
-          translationLanguages
+          learning
           // iCloud 同期と書き出し / 読み込みは、どちらも単語帳そのものの持ち出しを扱うため 1 枚のカードにまとめる。
           MobileSettingsSection(title: String(localized: .sectionData)) {
             MobileSyncRows(sync: session.sync)
@@ -95,39 +90,31 @@
 
     private var display: some View {
       MobileSettingsSection(title: String(localized: .sectionDisplay)) {
-        MobileSettingsSubheader(label: String(localized: .theme))
-        ForEach(AppAppearance.allCases, id: \.self) { appearance in
-          MobileSettingsRadioRow(
-            label: String(localized: appearance.label), selected: settings.appearance == appearance
-          ) { settings.setAppearance(appearance) }
-        }
-        MobileSettingsSubheader(label: String(localized: .cardLayout))
-        ForEach(LearningCardLayout.allCases, id: \.self) { layout in
-          MobileSettingsRadioRow(
-            label: String(localized: layout.label), selected: settings.cardLayout == layout,
-            action: { settings.setCardLayout(layout) }
-          ) {
-            MobileCardLayoutPreview(layout: layout)
-          }
-        }
+        MobileSettingsLinkRow(
+          label: String(localized: .appearanceMode), value: String(localized: settings.appearance.label)
+        ) { overlay?.push { AppearanceViewMobile(settings: settings) } }
+        // 値は画面に出ている色(未購入ならブルー)。保存した色ではない。
+        MobileSettingsLinkRow(
+          label: String(localized: .themeColor), value: String(localized: palette.theme.label)
+        ) { overlay?.push { ThemeColorViewMobile(settings: settings) } }
+        MobileSettingsLinkRow(
+          label: String(localized: .cardLayout), value: String(localized: settings.cardLayout.label)
+        ) { overlay?.push { CardLayoutViewMobile(settings: settings) } }
         MobileSettingsToggleRow(label: String(localized: .showIpa), value: settings.showIpa) {
           settings.setShowIpa($0)
         }
       }
     }
 
-    private var translationLanguages: some View {
-      VStack(alignment: .leading, spacing: 8) {
-        MobileSettingsSection(title: String(localized: .sectionTranslation)) {
-          ForEach(
-            AppLocale.deviceTranslationLanguageChoices(current: settings.translationLanguage), id: \.self
-          ) { language in
-            MobileSettingsRadioRow(
-              label: String(localized: language.label), selected: settings.translationLanguage == language
-            ) { settings.setTranslationLanguage(language) }
-          }
-        }
-        MobileSettingsCaption(text: String(localized: .translationLanguageCaption))
+    private var learning: some View {
+      MobileSettingsSection(title: String(localized: .sectionLearning)) {
+        MobileSettingsLinkRow(
+          label: String(localized: .quizDirection),
+          value: String(localized: settings.quizDirection.label(settings.translationLanguage))
+        ) { overlay?.push { QuizDirectionViewMobile(settings: settings) } }
+        MobileSettingsLinkRow(
+          label: String(localized: .sectionTranslation), value: String(localized: settings.translationLanguage.label)
+        ) { overlay?.push { TranslationLanguageViewMobile(settings: settings) } }
       }
     }
   }

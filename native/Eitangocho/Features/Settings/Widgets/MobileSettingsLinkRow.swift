@@ -2,8 +2,11 @@
   import SwiftUI
 
   /// iOS 版の設定の行(ラベル + 右端のシェブロン。押すと別の画面へ進む・処理を始める。Flutter 版の MobileSettingsLinkRow)。
+  ///
+  /// 選ぶ項目の行は、シェブロンの手前に今の値を出す(開かなくても今の設定が分かるように)。
   struct MobileSettingsLinkRow: View {
     let label: String
+    var value: String?
     let action: () -> Void
 
     @Environment(\.palette) private var palette
@@ -13,7 +16,15 @@
         HStack(spacing: 0) {
           AppText(label, style: AppTextStyle(size: 14))
             .foregroundStyle(palette.text)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            // 値より先にラベルの幅を確定させ、値の方を省く(ラベルを折り返させない)。
+            .layoutPriority(1)
+          Spacer(minLength: 12)
+          if let value {
+            AppText(value, style: AppTextStyle(size: 13))
+              .foregroundStyle(palette.textAlpha(40))
+              .lineLimit(1)
+            Spacer().frame(width: 8)
+          }
           AppText("›", style: AppTextStyle(size: 16, height: 1))
             .foregroundStyle(palette.textAlpha(30))
         }
