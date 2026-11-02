@@ -16,7 +16,7 @@
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 4)
 
     var body: some View {
-      let unlocked = ThemeColor.unlocksAllForTrial || (purchase?.proUnlocked ?? false)
+      let unlocked = (purchase?.proUnlocked ?? false)
       MobileSettingsSubpage(title: String(localized: .themeColor)) {
         MobileSettingsSection(title: nil) {
           LazyVGrid(columns: Self.columns, spacing: 16) {
