@@ -17,11 +17,15 @@ nonisolated enum ThemeColor: String, CaseIterable, Sendable {
   /// 未購入でも選べる色(アプリの元からの色)。
   static let free: ThemeColor = .blue
 
+  /// 一時的に、未購入でも全色を選べるようにする(実機で全色の色味を確かめるため)。提出前に消す。
+  static let unlocksAllForTrial = true
+
   /// 画面に使う色。Pro でなければブルーにする(選んだ色は設定に残したまま)。
   ///
   /// `proUnlocked` が nil(購入状態がまだ分からない)の間は選んだ色のままにする。
   /// Pro の人の起動のたびに、一瞬ブルーに戻って見えないように。
   static func displayed(selected: ThemeColor, proUnlocked: Bool?) -> ThemeColor {
+    if unlocksAllForTrial { return selected }
     return proUnlocked == false ? free : selected
   }
 
