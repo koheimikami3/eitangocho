@@ -13,13 +13,8 @@
 
     var body: some View {
       VStack(alignment: .leading, spacing: 0) {
-        HStack(spacing: 6) {
-          Image(systemName: "star.fill")
-            .font(.system(size: 15))
-            .foregroundStyle(palette.accent)
-          AppText(.proUpgradeTitle, style: AppTextStyle(size: 15, weight: .w700))
-            .foregroundStyle(palette.text)
-        }
+        AppText(.proUpgradeTitle, style: AppTextStyle(size: 14))
+          .foregroundStyle(palette.text)
         Spacer().frame(height: 8)
         VStack(alignment: .leading, spacing: 4) {
           MobileProFeatureRow(label: String(localized: .proFeatureNoAds), upcoming: false)
