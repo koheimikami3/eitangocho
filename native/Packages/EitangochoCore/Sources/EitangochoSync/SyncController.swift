@@ -24,6 +24,8 @@ public struct SyncFailure: Sendable, Equatable {
 /// 見送ったときは、加えて 1 回だけ再試行する。
 @MainActor @Observable
 public final class SyncController {
+  private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "sync")
+
   /// 設定値のキー。Flutter 版と同じ名前・同じ型で読み書きする(UserDefaults を共有する)。
   static let enabledKey = "syncEnabled"
   /// 最後に成功した同期の日時(epoch ミリ秒の整数)。
@@ -143,12 +145,19 @@ public final class SyncController {
     } catch let error as CloudError {
       fail(SyncFailure(reason: error.reason, detail: error.detail))
       if error.reason == .notCurrent { scheduleRetry() }
+    } catch let error as DatabaseError where error.isInterruptionError {
+      // バックグラウンドへの移行で DB を止めた(AppDatabase.setSuspended)ために書き込めなかっただけで、
+      // 同期の失敗ではない。画面にも出さず、戻ったときの同期(appDidBecomeActive)に任せる。
+      Self.logger.info("DB の停止で同期を中断: \(String(describing: error), privacy: .public)")
     } catch {
       fail(SyncFailure(reason: .failed, detail: String(describing: error)))
     }
   }
 
   private func fail(_ failure: SyncFailure) {
+    // 補足(OS の説明・SQLite のエラーなど)は画面に出さないので、調べられるようログに残す。
+    Self.logger.error(
+      "同期に失敗: \(failure.reason.rawValue, privacy: .public) \(failure.detail ?? "", privacy: .public)")
     self.failure = failure
     onFailure(failure.reason)
   }

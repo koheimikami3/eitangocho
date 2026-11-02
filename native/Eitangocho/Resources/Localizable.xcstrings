@@ -5716,31 +5716,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sync failed: %@"
+            "value" : "Sync failed. Please try again later."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error al sincronizar: %@"
+            "value" : "No se pudo sincronizar. Inténtalo de nuevo más tarde."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Échec de la synchronisation : %@"
+            "value" : "La synchronisation a échoué. Réessayez plus tard."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "同期に失敗しました: %@"
+            "value" : "同期に失敗しました。時間をおいてもう一度お試しください。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "同步失敗：%@"
+            "value" : "同步失敗，請稍後再試。"
           }
         }
       }
