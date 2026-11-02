@@ -12,12 +12,15 @@ enum SyncStatusText {
   }
 
   /// 同期の失敗を伝える文。
+  ///
+  /// 想定外の失敗(failed)でも、補足(SyncFailure.detail)は出さない。中身は SQLite のエラーコードなど
+  /// 利用者には意味の通らない文なので、ログ(SyncController)と Dev ビルドの診断画面でだけ見る。
   static func failure(_ failure: SyncFailure) -> String {
     switch failure.reason {
     case .noICloud: String(localized: .syncErrorNoICloud)
     case .notCurrent: String(localized: .syncErrorNotCurrent)
     case .unsupportedPlatform: String(localized: .syncErrorUnsupported)
-    case .failed: String(localized: .syncErrorFailed(failure.detail ?? ""))
+    case .failed: String(localized: .syncErrorFailed)
     }
   }
 
