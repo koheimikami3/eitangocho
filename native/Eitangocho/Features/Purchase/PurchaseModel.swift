@@ -114,26 +114,27 @@ final class PurchaseModel {
   /// 買い切り商品を購入する。
   ///
   /// 価格が取れていないときは何もしない(商品が引けていない = 購入もできない)。
-  func buy() async {
+  /// `source` は計測用(どこから購入を始めたか)。
+  func buy(source: ProPurchaseSource) async {
     await waitUntilInitialized()
     guard available, !purchasing, !proUnlocked, priceText != nil else { return }
 
     purchasing = true
     purchaseFailed = false
-    analytics.logProPurchase(.tapped)
+    analytics.logProPurchase(.tapped, source: source)
     let outcome = await client.purchase()
 
     purchasing = false
     switch outcome {
     case .purchased:
       proUnlocked = true
-      analytics.logProPurchase(.success)
+      analytics.logProPurchase(.success, source: source)
     case .cancelled:
       // ダイアログを閉じただけなので何も出さない。
-      analytics.logProPurchase(.cancelled)
+      analytics.logProPurchase(.cancelled, source: source)
     case .failed:
       purchaseFailed = true
-      analytics.logProPurchase(.failed)
+      analytics.logProPurchase(.failed, source: source)
       scheduleMessageClear()
     }
   }

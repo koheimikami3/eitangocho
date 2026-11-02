@@ -14,7 +14,7 @@
         if purchase.proUnlocked {
           MobileProPurchasedRow()
         } else {
-          MobileProOffer(purchase: purchase)
+          MobileProOffer(purchase: purchase, source: .settings)
         }
       }
     }

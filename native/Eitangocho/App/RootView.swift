@@ -54,12 +54,11 @@ struct RootView: View {
 
   private var isDark: Bool { model.settings.appearance.isDark(system: systemColorScheme) }
 
-  /// 画面に使うテーマカラー。Pro でなければブルーにする(選んだ色は設定に残したまま)。
-  ///
-  /// 購入状態が分かるまでは選んだ色のままにする。Pro の人の起動のたびに、一瞬ブルーに戻って見えないように。
+  /// 画面に使うテーマカラー(決め方は ThemeColor.displayed)。
   private var themeColor: ThemeColor {
     let purchase = model.purchase
-    return purchase.isProUnlockedKnown && !purchase.proUnlocked ? .free : model.settings.themeColor
+    return ThemeColor.displayed(
+      selected: model.settings.themeColor, proUnlocked: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil)
   }
 
   /// 発音確認を開く。macOS は別ウィンドウ(ページもアプリと同じ拡大率で出す)、iOS はシート。

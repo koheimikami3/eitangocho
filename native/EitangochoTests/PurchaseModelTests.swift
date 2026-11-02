@@ -39,7 +39,7 @@ final class PurchaseModelTests {
     #expect(!model.available)
     #expect(client.configureCount == 0)
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(client.purchaseCount == 0)
   }
@@ -61,7 +61,7 @@ final class PurchaseModelTests {
   @Test func 購入に成功するとProになる() async {
     let model = await initialized()
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(model.proUnlocked)
     #expect(!model.purchasing)
@@ -72,7 +72,7 @@ final class PurchaseModelTests {
     client.purchaseOutcome = .cancelled
     let model = await initialized()
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(!model.proUnlocked)
     #expect(!model.purchaseFailed)
@@ -82,7 +82,7 @@ final class PurchaseModelTests {
     client.purchaseOutcome = .failed
     let model = await initialized()
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(model.purchaseFailed)
 
@@ -95,7 +95,7 @@ final class PurchaseModelTests {
     client.priceText = nil
     let model = await initialized()
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(client.purchaseCount == 0)
   }
@@ -104,7 +104,7 @@ final class PurchaseModelTests {
     client.initialProUnlocked = true
     let model = await initialized()
 
-    await model.buy()
+    await model.buy(source: .settings)
 
     #expect(client.purchaseCount == 0)
   }
@@ -115,9 +115,9 @@ final class PurchaseModelTests {
     client.purchaseGate = gate
     let model = await initialized()
 
-    let first = Task { await model.buy() }
+    let first = Task { await model.buy(source: .settings) }
     await waitUntil { model.purchasing }
-    await model.buy()
+    await model.buy(source: .settings)
     gate.fire()
     await first.value
 
@@ -213,17 +213,18 @@ final class PurchaseModelTests {
 
   // MARK: - 計測
 
-  @Test func 購入ボタンを押したこととその結果を送る() async {
+  @Test func 購入ボタンを押したこととその結果を始めた場所と一緒に送る() async {
     let model = await initialized()
-    await model.buy()
+    await model.buy(source: .settings)
     client = FakePurchasesClient()
     client.purchaseOutcome = .cancelled
     let cancelled = await initialized()
-    await cancelled.buy()
+    await cancelled.buy(source: .themeColor)
 
     #expect(
       analytics.eventsNamed("pro_purchase") == [
-        ["stage": "tapped"], ["stage": "success"], ["stage": "tapped"], ["stage": "cancelled"],
+        ["stage": "tapped", "source": "settings"], ["stage": "success", "source": "settings"],
+        ["stage": "tapped", "source": "theme_color"], ["stage": "cancelled", "source": "theme_color"],
       ])
   }
 }

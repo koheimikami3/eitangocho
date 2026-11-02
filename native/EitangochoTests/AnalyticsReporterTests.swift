@@ -64,6 +64,17 @@ final class AnalyticsReporterTests {
     #expect(client.eventsNamed("screen_view") == [["screen_name": "learning"], ["screen_name": "all_words"]])
   }
 
+  @Test func テーマカラーを色の名前で値が変わったときだけ送る() {
+    // iOS だけで送るもの(画面側が OS で分ける)。
+    let (reporter, _) = start(wordCount: 0)
+    reporter.reportThemeColor(.graphite)
+    #expect(client.userProperties["theme_color"] == "graphite")
+
+    let before = client.userPropertyCalls
+    reporter.reportThemeColor(.graphite)
+    #expect(client.userPropertyCalls == before)
+  }
+
   @Test func 購入状態とトラッキング許可を値が変わったときだけ送る() {
     // iOS だけで送るもの(画面側が OS で分ける)。名前と値は Flutter 版と同じ。
     let (reporter, _) = start(wordCount: 0)

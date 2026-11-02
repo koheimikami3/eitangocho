@@ -9,8 +9,10 @@
   ///
   /// テーマカラーの鍵の案内(MobileThemeColorLockedDialog)でも同じ中身を出す。そのときは `onClose` を渡し、
   /// 一番下の「購入を復元」を「閉じる」に替える(復元は設定画面の Pro の欄からできる)。
+  /// `source` は計測用(どこに出した欄から購入を始めたか)。
   struct MobileProOffer: View {
     let purchase: PurchaseModel
+    let source: ProPurchaseSource
     var onClose: (() -> Void)?
 
     @Environment(\.palette) private var palette
@@ -34,7 +36,7 @@
         MobileProPurchaseButton(
           priceText: purchase.priceText, purchasing: purchase.purchasing,
           // 価格が引けていない = 商品を取得できていないので押させない。
-          action: purchase.priceText == nil ? nil : { Task { await purchase.buy() } })
+          action: purchase.priceText == nil ? nil : { Task { await purchase.buy(source: source) } })
         if let onClose {
           MobileProCloseLink(action: onClose)
         } else {

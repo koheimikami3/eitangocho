@@ -17,6 +17,14 @@ nonisolated enum ThemeColor: String, CaseIterable, Sendable {
   /// 未購入でも選べる色(アプリの元からの色)。
   static let free: ThemeColor = .blue
 
+  /// 画面に使う色。Pro でなければブルーにする(選んだ色は設定に残したまま)。
+  ///
+  /// `proUnlocked` が nil(購入状態がまだ分からない)の間は選んだ色のままにする。
+  /// Pro の人の起動のたびに、一瞬ブルーに戻って見えないように。
+  static func displayed(selected: ThemeColor, proUnlocked: Bool?) -> ThemeColor {
+    return proUnlocked == false ? free : selected
+  }
+
   /// 色の値。AppPalette のアクセント系のトークンはすべてここから作る。
   ///
   /// ブルーは 2.13.0 までのアプリの値そのまま。ほかの色は、淡い地(アクセント 12%)に載せる文字が 4.5:1 前後に

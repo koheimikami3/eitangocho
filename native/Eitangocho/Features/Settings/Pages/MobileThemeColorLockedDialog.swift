@@ -12,7 +12,7 @@
 
     var body: some View {
       AppDialogSurface(cornerRadius: 14) {
-        MobileProOffer(purchase: purchase, onClose: dismiss)
+        MobileProOffer(purchase: purchase, source: .themeColor, onClose: dismiss)
           // Pro の欄の余白(上 14・左右 14・下は「閉じる」の 10 + 2)はカードの中の詰めた値なので、ダイアログでは
           // 足して上 24・左右 22・下 18 にする(削除の確認と ATT の案内の間くらい)。
           .padding(EdgeInsets(top: 10, leading: 8, bottom: 6, trailing: 8))

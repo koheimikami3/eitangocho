@@ -11,11 +11,12 @@
     @Environment(\.palette) private var palette
     @Environment(\.purchase) private var purchase
     @Environment(\.appOverlay) private var overlay
+    @Environment(\.analytics) private var analytics
 
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 4)
 
     var body: some View {
-      let unlocked = purchase?.proUnlocked ?? false
+      let unlocked = (purchase?.proUnlocked ?? false)
       MobileSettingsSubpage(title: String(localized: .themeColor)) {
         MobileSettingsSection(title: nil) {
           LazyVGrid(columns: Self.columns, spacing: 16) {
@@ -24,6 +25,7 @@
               // 選択中の印は今の画面の色(palette.theme)で出す。未購入なら保存した色ではなくブルーに付く。
               ThemeColorSwatch(color: color, selected: palette.theme == color, locked: locked) {
                 if locked {
+                  analytics.logThemeColorLockedTapped()
                   if let purchase { MobileThemeColorLockedDialog.present(purchase: purchase, overlay: overlay) }
                 } else {
                   settings.setThemeColor(color)
