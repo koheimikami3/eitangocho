@@ -1,0 +1,110 @@
+# 事前生成辞書の試作に使う 100 語。
+# 追加したい語は該当する区分の末尾に足す(重複は collector の前に取り除くこと)。
+
+# 易しめの語(中学〜英検準 2 級)60
+happy
+water
+school
+friend
+family
+house
+book
+music
+teacher
+morning
+eat
+drink
+write
+read
+sleep
+walk
+talk
+buy
+sell
+open
+close
+begin
+finish
+carry
+choose
+forget
+remember
+believe
+borrow
+lend
+travel
+visit
+wait
+worry
+beautiful
+busy
+cheap
+expensive
+careful
+dangerous
+different
+difficult
+easy
+famous
+favorite
+healthy
+hungry
+important
+interesting
+quiet
+ready
+strange
+tired
+always
+often
+sometimes
+already
+together
+weather
+because
+
+# 多義語(先頭の語義がずれやすい)20
+issue
+fair
+charge
+bank
+bear
+match
+present
+spring
+light
+kind
+mean
+case
+interest
+order
+point
+figure
+record
+last
+cover
+account
+
+# 句動詞 10
+give up
+look after
+put off
+run out of
+take off
+turn down
+come across
+get along with
+look forward to
+carry out
+
+# 英検 2 級〜準 1 級 10
+negligible
+diligent
+gradual
+versatile
+neighbor
+obtain
+sustainable
+reluctant
+inevitable
+ambiguous
