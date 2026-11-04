@@ -4,7 +4,7 @@
 
   /// iOS 版の設定画面。変更は即保存(Flutter 版の SettingsViewMobile)。
   ///
-  /// 選択肢から選ぶ項目(外観モード・テーマカラー・カードの並び・クイズの出題・訳の言語)は次の階層の画面へ移し、
+  /// 選択肢から選ぶ項目(外観モード・テーマカラー・カードの並び・クイズの出題・発音・訳の言語)は次の階層の画面へ移し、
   /// トップの行の右端に今の値を出す。トグルと操作(同期・書き出し・読み込みなど)は 1 タップのままトップに残す。
   ///
   /// macOS 版との違い:
@@ -112,6 +112,9 @@
           label: String(localized: .quizDirection),
           value: String(localized: settings.quizDirection.label(settings.translationLanguage))
         ) { overlay?.push { QuizDirectionViewMobile(settings: settings) } }
+        MobileSettingsLinkRow(
+          label: String(localized: .pronunciationMethod), value: String(localized: settings.pronunciationMethod.label)
+        ) { overlay?.push { PronunciationMethodViewMobile(settings: settings) } }
         MobileSettingsLinkRow(
           label: String(localized: .sectionTranslation), value: String(localized: settings.translationLanguage.label)
         ) { overlay?.push { TranslationLanguageViewMobile(settings: settings) } }

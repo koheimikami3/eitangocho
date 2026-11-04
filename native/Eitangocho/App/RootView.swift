@@ -22,6 +22,8 @@ struct RootView: View {
     @State private var quizRectanglePreloader = MobileAdPreloader(
       adUnitId: AdUnitIds.quizRectangle, resolveSize: MobileQuizRectangleAd.adSize(width:))
   #endif
+  /// 端末の読み上げ。読み上げ中に解放されると止まるので、発音ボタンより長く生きるここで持つ。
+  @State private var speaker = PronunciationSpeaker()
 
   var body: some View {
     content
@@ -34,6 +36,7 @@ struct RootView: View {
       .onAppear { model.reviewClient.action = requestReview }
       .environment(\.colors, isDark ? .dark : .light)
       .environment(\.openPronunciation, openPronunciation)
+      .environment(\.pronunciationMethod, model.settings.pronunciationMethod)
       #if os(iOS)
         .environment(\.palette, AppPalette(isDark: isDark, theme: themeColor))
         .environment(\.textScale, TextScale.factor(for: dynamicTypeSize))
@@ -61,10 +64,15 @@ struct RootView: View {
       selected: model.settings.themeColor, proUnlocked: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil)
   }
 
-  /// 発音確認を開く。macOS は別ウィンドウ(ページもアプリと同じ拡大率で出す)、iOS はシート。
+  /// 発音を確かめる。設定に応じて端末の読み上げで流すか、Google 翻訳を開く
+  /// (macOS は別ウィンドウ・ページもアプリと同じ拡大率で出す、iOS はシート)。
   private func openPronunciation(_ word: String) {
     // ボタンは主画面(学習中・全単語・クイズ)にしか無いので、今の主画面がそのまま押された場所になる。
     model.analytics.logPronunciationOpened(model.shell.view)
+    if model.settings.pronunciationMethod == .deviceSpeech {
+      speaker.speak(word)
+      return
+    }
     // 開いた時点の訳の言語で引く(開いている間に変わることはない)。
     let url = GoogleTranslateURL.make(word, language: model.settings.translationLanguage)
     #if os(macOS)
