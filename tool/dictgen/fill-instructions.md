@@ -10,15 +10,24 @@
 
 ## 扱う項目
 
-言語ごとに次の 3 つ。IPA と品詞は扱わない(出力にも含めない)。
+語ごとの品詞の欄と、言語ごとの次の 3 つ。IPA は扱わない(出力にも含めない)。
 
+- `partsOfSpeech`: 品詞の配列。言語別には持たず語ごとに 1 欄で、名詞と動詞の両方の意味があれば両方入れる
+  (入力では `ja` と `zhHant` に同じ値が入っている)
 - `meaning`: 単語の訳
 - `exampleEn`: 英例文
 - `exampleTranslation`: 例文の訳
 
 ## 判断の基準
 
-### 訳(`meaning`)
+### 品詞(`partsOfSpeech`)
+
+- 値は `noun` / `verb` / `adjective` / `adverb` / `other` の配列。前置詞・接続詞・代名詞・間投詞などは `other`
+- **訳(日本語の `meaning`)に出てくる意味の品詞だけを付ける**。訳の先頭の意味の品詞を最初にする
+  (例: `happy` は訳が「うれしい,幸せな / 満足した」なので `["adjective"]`。`give up` は `["verb"]`)
+- 入力には Wiktionary の珍しい用法の品詞まで入っている(`happy` の noun・verb、`easy` の 5 品詞など)。
+  訳に無い品詞は外す。句動詞は `verb`
+- 空のときは埋める
 
 共通の決まり:
 
@@ -82,7 +91,8 @@
 `llm_filled` のときも `reason` に何を根拠に埋めたかを 1 文で書く。そのまま使ったときは `before` と `reason` を省く。
 
 例文の入力の出どころは `exampleSource`、訳の出どころは `meaningSource` にある。
-例文の訳の出どころは、例文と同じ値を使う。
+例文の訳の出どころは、例文と同じ値を使う。品詞の入力は `ja.partsOfSpeech` で、出どころは常に `kaikki`。
+入力と同じ配列(並びも同じ)のまま使ったときだけ `kaikki` とし、`llm_revised` の `before` には入力の配列をそのまま入れる。
 
 ## 出力
 
@@ -93,6 +103,10 @@
 [
   {
     "word": "issue",
+    "partsOfSpeech": {
+      "value": ["noun", "verb"],
+      "source": "kaikki"
+    },
     "ja": {
       "meaning": {
         "value": "問題,問題点 / 発行 / (雑誌などの)号 / …を発行する,出す",
