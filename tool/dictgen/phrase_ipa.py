@@ -34,6 +34,8 @@ PARTICLES = {
 }
 # 句の中でいつも前置詞として働く語(強勢を置かない)
 PREPOSITIONS = {"for", "with", "to", "of", "into", "after"}
+# 複合語・熟語(join_words)の中で強勢を置かない冠詞・接続詞。PARTICLES と同じく米音の強形
+FUNCTION_WORDS = {"a": "eɪ", "an": "æn", "the": "ði", "and": "ænd", "or": "ɔɹ"}
 # 副詞にも前置詞にもなる不変化詞(in・on など)のうち、主な意味で前置詞として働く 2 語の句。
 # 目的語の後ろに回せない(count on it は言えても count it on とは言わない)ものを、辞書の最初の意味で選んだ。
 # ここに無い句は副詞として扱い、不変化詞に強勢を置く
@@ -137,6 +139,26 @@ def compose(phrase, word_ipa):
     for i, word in enumerate(rest):
         ipa = PARTICLES[word]
         parts.append(primary(ipa) if i == last_adverb else unstressed(ipa))
+    return "/" + " ".join(parts) + "/"
+
+
+def join_words(phrase, word_ipa):
+    """複合語・熟語(bus stop・brand-new)の IPA を返す。構成する語の IPA が 1 つでも無ければ空文字。
+
+    複合語の強勢は前に来る語(bus stop)も後ろに来る語(central heating)もあり、決まりでは決められない。
+    推測の強勢を入れないよう、各語の IPA をそれぞれの強勢のまま空白でつなぐ(ハイフンも語の区切りとして扱う)。
+    ただし前置詞・冠詞・接続詞(face to face の to)は句の中で強く読まないので、強勢の印を付けない
+    (ipa-dict は 1 音節の語にも強勢の印を付けている)。
+    """
+    parts = []
+    for word in re.split(r"[ -]", phrase):
+        if word in PREPOSITIONS or word in FUNCTION_WORDS:
+            parts.append(unstressed(FUNCTION_WORDS.get(word) or PARTICLES[word]))
+            continue
+        ipa = word_ipa(word)
+        if not ipa:
+            return ""
+        parts.append(clean(ipa))
     return "/" + " ".join(parts) + "/"
 
 
