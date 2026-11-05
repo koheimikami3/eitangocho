@@ -22,6 +22,55 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.15.0 (build 30)
+
+iOS・macOS 共通(両方 build 30)。macOS は 2.11.1 以来のリリースで、この版から macOS も Swift / SwiftUI で
+作り直した版(`native/`)になり、最低 OS が macOS 15 に上がった(macOS 12〜14 には Flutter 版の 2.11.1 が残る)。
+2.12.0 の「アプリ内部の仕組み」の 1 行は載せていない。「自動入力」は同梱した辞書(よく使う単語・句動詞)による改善、
+「細かな不具合」は品詞の並びの固定など。計測の追加と、Pro のお礼の文言の変更は掲載していない。
+
+日本語:
+
+```
+英単語と句動詞の自動入力を改善しました。
+過去形などで入力しても、原形で自動入力するようにしました。
+細かな不具合を修正しました。
+```
+
+繁體中文:
+
+```
+改善了英文單字與片語動詞的自動填入。
+輸入過去式等變化形時，也會以原形自動填入。
+修正了一些小問題。
+```
+
+Español:
+
+```
+Mejoramos el autocompletado de palabras y verbos frasales.
+Si escribes una forma conjugada (como el pasado), ahora se completa con la forma base.
+Corregimos pequeños errores.
+```
+
+Français:
+
+```
+Amélioration du remplissage automatique des mots et verbes à particule.
+Les formes conjuguées (passé, etc.) sont désormais remplies avec la forme de base.
+Correction de petits bugs.
+```
+
+English:
+
+```
+Improved autofill for words and phrasal verbs.
+Inflected forms such as the past tense are now filled in as the base form.
+Fixed minor bugs.
+```
+
+---
+
 ## 2.14.0 (build 29)
 
 iOS のみ(macOS は出していない。macOS は 2.12.0 のまま)。「設定画面のレイアウト」は、選ぶ項目を次の画面へ移したこと・
@@ -115,6 +164,9 @@ Improved the design of some screens for readability.
 ---
 
 ## 2.12.0 (build 27)
+
+**審査中のまま進まず取り下げ、macOS には出していない(build 27 は使用済み)。macOS は 2.15.0 で出した。**
+以下は提出時の記録。
 
 macOS のみ(iOS は出していない。iOS は 2.11.1 のまま)。この版から macOS は Swift / SwiftUI で作り直した版
 (`native/`)で、最低 OS が macOS 15 に上がった。macOS 12〜14 には Flutter 版の 2.11.1 が残る。
