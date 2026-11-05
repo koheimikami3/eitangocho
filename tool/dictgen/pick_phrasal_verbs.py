@@ -42,6 +42,14 @@ PARTICLES = set(
 # 頻度で落ちない不適切な語だけを除く。slang は chill out にも付くので除かない(珍しい俗語は順位で落ちる)
 EXCLUDED_TAGS = {"vulgar", "offensive", "derogatory", "archaic", "obsolete"}
 TOP_N = 1000
+# 上の表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
+# 上位 TOP_N を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
+MANUAL_EXCLUDED = {
+    "bite in",  # すべての意味が dated
+    "feel up",  # 性的にさわる意味だけ
+    "sex in",  # ギャングの性的な入会儀式の意味だけ
+    "shit on",  # 表示の無い意味が文字どおりの 1 つだけで、残りは vulgar
+}
 # 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
 REQUEST_INTERVAL = 0.5
 # 活用形を OR でつないだ検索は 1 回 4 秒ほどかかるので、Tatoeba には 3 本同時に問い合わせる。
@@ -205,11 +213,12 @@ def main():
     print(f"kaikki に無い {len(not_found)} / 表示で除いた {len(excluded)} / 残り {len(usable)}")
     if missing:
         sys.exit(f"取れなかった句が {len(missing)} ある。もう一度実行すると続きから進む")
-    picked = sorted(usable, key=lambda p: (-freq[p]["count"], p))[:TOP_N]
+    picked = [p for p in sorted(usable, key=lambda p: (-freq[p]["count"], p))[:TOP_N] if p not in MANUAL_EXCLUDED]
     header = f"""# 句動詞 {len(picked)} 語。使われる頻度の高い順。
 # 範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 {TOP_N} のもの。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
 #   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に {", ".join(sorted(EXCLUDED_TAGS))} のどれかが付くもの。
+#   個別に除いた句: {", ".join(sorted(MANUAL_EXCLUDED))}(表示では落ちなかった性的・卑俗・古い意味だけの句)。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
