@@ -19,6 +19,7 @@ out/ は gitignore なので、コミットする正本は書き出した側。�
 import json
 import re
 import sys
+from difflib import SequenceMatcher
 from pathlib import Path
 
 from phrase_ipa import compose, join_words, load_ipa_dict
@@ -29,6 +30,8 @@ SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs"]
 LANGS = ("ja", "zhHant")
 # pick_cefrj.py が kaikki から残した綴り違いの行き先(IPA を埋めるのに使う)
 ALT_OF = ROOT / "out/cefrj-pick/kaikki.jsonl"
+# alt_of の行き先を綴り違いとみなす似ている度合い(jewellery → jewelry は 0.89、are → our は 0.33)
+ALT_OF_MIN_SIMILARITY = 0.7
 DEST = ROOT.parent.parent / "native/Packages/EitangochoCore/Sources/EitangochoWordInfo/Resources/prebuilt-dictionary.json"
 # アプリの PrebuiltDictionary が読める形の版。形を変えたら上げ、アプリ側も合わせる
 VERSION = 1
@@ -84,7 +87,8 @@ def phonemic(ipa):
 def fill_missing_ipa(words):
     """kaikki に IPA が無い語を埋め、埋めた数を返す。句の組み立ては kaikki の値で埋まった単語を先に使う。
 
-    - 単語: 綴り違いの行き先(alt_of)→ ipa-dict → 英綴りを米綴りに直して ipa-dict の順。
+    - 単語: ipa-dict → 英綴りを米綴りに直して ipa-dict → 綴り違いの行き先(alt_of)の順。
+      alt_of には方言・誤記・略語の行き先(are → our)も混ざるので最後に回し、綴りが似た行き先だけを使う。
       派生語(impolitely)・つながった複合語(toothache)は組み立てない(強勢が推測になるため空のまま)
     - 句動詞: phrase_ipa.compose。それ以外の空白・ハイフン入りの語は phrase_ipa.join_words
       (ハイフン入りは先に 1 語として探す。e-book のように ipa-dict に 1 語で載る語があるため)
@@ -95,12 +99,12 @@ def fill_missing_ipa(words):
     word_ipa = lambda w: kaikki.get(w) or ipa_dict.get(w, "")
 
     def single(word):
-        for target in alt_of.get(word, []):
-            if ipa := word_ipa(target):
-                return ipa if ipa.startswith("/") else f"/{ipa}/"
         for spelling in [word, *us_spellings(word)]:
             if spelling in ipa_dict:
                 return f"/{ipa_dict[spelling]}/"
+        for target in alt_of.get(word, []):
+            if SequenceMatcher(None, word, target).ratio() >= ALT_OF_MIN_SIMILARITY and (ipa := word_ipa(target)):
+                return ipa if ipa.startswith("/") else f"/{ipa}/"
         return ""
 
     filled = 0
