@@ -233,6 +233,7 @@ final class AppModel {
     let session = URLSession(configuration: .default)
     let settings = settings
     return DictionaryWordInfoProvider(
+      prebuiltDictionary: .bundled,
       kaikkiClient: KaikkiClient(session: session),
       tatoebaClient: TatoebaClient(session: session),
       deeplClient: DeeplClient(session: session),

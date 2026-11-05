@@ -68,6 +68,20 @@ enum LicenseCatalog {
   /// 見出しは出典名だけにする(どの言語でも通じる固有名)。全文ではなく出典・ライセンス名・原文への
   /// リンクを載せる(CC のライセンス表示要件はこれで満たせる)。本文は Flutter 版と同じ。
   static let dataSources: [LicenseEntry] = [
+    // 同梱の事前生成辞書。Wiktionary の内容を改変して含むので、継承条項に従い CC BY-SA 4.0 で配る。
+    LicenseEntry(
+      packages: ["Eitangocho Dictionary"],
+      text: """
+        This app bundles a dictionary of frequent English words and phrasal verbs (pronunciations, \
+        parts of speech, meanings and example sentences with translations) prepared for this app. \
+        It is adapted from Wiktionary (via kaikki.org), Tatoeba and EJDict-hand, and is licensed under \
+        the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+
+        https://creativecommons.org/licenses/by-sa/4.0/
+        https://en.wiktionary.org/
+        https://tatoeba.org/
+        https://github.com/kujirahand/EJDict
+        """),
     LicenseEntry(
       packages: ["Wiktionary / kaikki.org"],
       text: """

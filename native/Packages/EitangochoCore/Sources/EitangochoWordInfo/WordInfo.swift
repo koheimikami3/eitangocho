@@ -63,7 +63,7 @@ public struct WordInfoError: Error, Sendable, CustomStringConvertible {
 }
 
 /// 単語情報の自動取得を抽象化する(将来 LLM 実装への差し替えを可能にするため)。
-/// 実装は DictionaryWordInfoProvider(kaikki + Tatoeba + EJDict)。
+/// 実装は DictionaryWordInfoProvider(事前生成辞書 + kaikki + Tatoeba + EJDict)。
 public protocol WordInfoProvider: Sendable {
   /// 辞書に未収録の場合は nil を返す。ネットワーク等の失敗は WordInfoError を投げる。
   func fetch(_ word: String) async throws -> WordInfo?

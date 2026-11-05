@@ -1,13 +1,15 @@
 import EitangochoData
 import Foundation
 
-/// WordInfoProvider の辞書ベース実装(kaikki + Tatoeba + EJDict + DeepL)。
+/// WordInfoProvider の辞書ベース実装(事前生成辞書 + kaikki + Tatoeba + EJDict + DeepL)。
 ///
-/// 訳は訳の言語(TranslationLanguage)で取得する。日本語は同梱の EJDict を
-/// 優先し、それ以外の言語は kaikki の訳語だけを使う(同梱できる辞書が無い)。
+/// 訳は訳の言語(TranslationLanguage)で取得する。日本語と繁体字では同梱の
+/// 事前生成辞書を最優先し、載っている語は通信せずにその値だけを返す。
+/// 載っていない語は、日本語なら同梱の EJDict、それ以外の言語は kaikki の訳語を使う。
 /// 英語の語義は kaikki の語義の文から採る。
 /// 依存はすべて init で受け取り、テストで差し替えられるようにする。
 public struct DictionaryWordInfoProvider: WordInfoProvider {
+  private let prebuiltDictionary: PrebuiltDictionary
   private let kaikkiClient: KaikkiClient
   private let tatoebaClient: TatoebaClient
   private let deeplClient: DeeplClient
@@ -22,6 +24,7 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
   private let getTranslationLanguage: @Sendable () async -> TranslationLanguage
 
   public init(
+    prebuiltDictionary: PrebuiltDictionary,
     kaikkiClient: KaikkiClient,
     tatoebaClient: TatoebaClient,
     deeplClient: DeeplClient,
@@ -31,6 +34,7 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     getDeeplApiKey: @escaping @Sendable () async -> String,
     getTranslationLanguage: @escaping @Sendable () async -> TranslationLanguage
   ) {
+    self.prebuiltDictionary = prebuiltDictionary
     self.kaikkiClient = kaikkiClient
     self.tatoebaClient = tatoebaClient
     self.deeplClient = deeplClient
@@ -58,6 +62,12 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
   public func fetch(_ word: String) async throws -> WordInfo? {
     let normalized = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     let language = await getTranslationLanguage()
+
+    // 0. 事前生成辞書に載っていれば、その値だけで返す。訳・例文・例文の訳を検査済みの値で
+    //    揃えて作ってあり、取得経路で引き直すと質が下がるうえ通信が要るため。
+    if let entry = await prebuiltDictionary.lookup(normalized, language: language) {
+      return Self.wordInfo(normalized, entry, language: language)
+    }
 
     // 1. kaikki: キャッシュ優先、miss なら取得し成功時のみ保存。
     //    取得に失敗しても例外にせず、EJDict の訳だけで登録を続けられるようにする
@@ -120,6 +130,19 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       }
     }
     return info
+  }
+
+  /// 事前生成辞書の値を WordInfo にする。
+  static func wordInfo(_ word: String, _ entry: PrebuiltEntry, language: TranslationLanguage) -> WordInfo {
+    WordInfo(
+      word: word,
+      ipa: entry.ipa,
+      partsOfSpeech: entry.partsOfSpeech,
+      meaning: entry.meaning,
+      exampleEn: entry.exampleEn,
+      exampleTranslation: entry.exampleTranslation,
+      translationLanguage: language
+    )
   }
 
   /// kaikki のエントリ(1 件 = 1 品詞)を WordInfo に畳み込む。
