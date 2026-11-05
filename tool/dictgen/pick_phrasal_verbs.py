@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """句動詞の単語リスト(words/phrasal-verbs.txt・words/phrasal-verbs-2.txt)を作る。
 
-範囲: Wiktionary の句動詞のうち、差別語・古語の表示がなく、使われる頻度が上位のもの。範囲の違いは LISTS の定義を見る。
+範囲: Wiktionary の句動詞のうち、差別語・古語の表示がなく、使われる頻度が高いもの。範囲の違いは LISTS の定義を見る。
 「NGSL の動詞に限る」「例文がある」のような代わりの目安では普通の句(cheer up など)まで落ちたため、
-頻度の順位で切る。見出しは原形で、活用形は頻度を数えるのにだけ使う。
+頻度で切る。見出しは原形で、活用形は頻度を数えるのにだけ使う。
 
 使い方(tool/dictgen で):
     python3 pick_phrasal_verbs.py <作業ディレクトリ> [--list-only] [--list <LISTS の名前>]
@@ -15,7 +15,7 @@
 3. kaikki で verb の項目を引き、活用形と意味ごとのタグを取る(kaikki.jsonl に書き足す)。
    すべての意味に除くタグのどれかが付くもの・verb の項目が無いものは除く
 4. Tatoeba で原形と活用形を含む英文をまとめて数える(freq.jsonl に書き足す)
-5. 件数の多い順に上位 top_n を採り、ほかの単語リストにある句を除いて words/<名前>.txt へ書く
+5. 件数の多い順に top_n・min_count の範囲を採り、ほかの単語リストにある句を除いて words/<名前>.txt へ書く
 
 3 と 4 は別のサイトなので、kaikki を別スレッドで引きながら、引けた句から順に数える(Tatoeba は TATOEBA_WORKERS 本同時)。
 どちらも止まっても続きから進む。--list-only を付けると 2 までで止め、候補の数だけ出す。
@@ -44,7 +44,7 @@ PARTICLES = set(
 # 頻度で落ちない不適切な語だけを除く。slang は chill out にも付くので除かない(珍しい俗語は順位で落ちる)
 EXCLUDED_TAGS = {"vulgar", "offensive", "derogatory", "archaic", "obsolete"}
 # 表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
-# 上位 top_n を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
+# 範囲を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
 MANUAL_EXCLUDED = {
     "bite in",  # すべての意味が dated
     "sex in",  # ギャングの性的な入会儀式の意味だけ
@@ -59,6 +59,7 @@ MANUAL_EXCLUDED_VULGAR = {
 LISTS = {
     "phrasal-verbs": {
         "top_n": 1000,
+        "min_count": 0,
         "allow_vulgar": False,
         "title": "句動詞",
         "scope": "卑語・差別語・古語の表示がなく、使われる頻度が上位 1000 のもの",
@@ -66,10 +67,12 @@ LISTS = {
         "manual_note": "表示では落ちなかった性的・卑俗・古い意味だけの句",
     },
     "phrasal-verbs-2": {
-        "top_n": 2000,
+        # 同じ文数の句を辞書順で切らないよう、順位ではなく文数で区切る
+        "top_n": None,
+        "min_count": 4,
         "allow_vulgar": True,
         "title": "句動詞の続き",
-        "scope": "差別語・古語の表示がなく(卑語は除かない)、使われる頻度が上位 2000 のもののうち、ほかの単語リストに無いもの",
+        "scope": "差別語・古語の表示がなく(卑語は除かない)、Tatoeba で 4 文以上のもののうち、ほかの単語リストに無いもの",
         "manual_excluded": MANUAL_EXCLUDED,
         "manual_note": "表示では落ちなかった性的・古い意味だけの句",
     },
@@ -255,7 +258,7 @@ def main():
     # 順位はほかのリストにある句も含めて付ける(既存のリストを足してもこのリストの範囲が動かないように)
     listed = listed_words(output) | config["manual_excluded"]
     ranked = sorted(usable, key=lambda p: (-freq[p]["count"], p))[:config["top_n"]]
-    picked = [p for p in ranked if p not in listed]
+    picked = [p for p in ranked if freq[p]["count"] >= config["min_count"] and p not in listed]
     excluded_tags = EXCLUDED_TAGS - {"vulgar"} if allow_vulgar else EXCLUDED_TAGS
     header = f"""# {config["title"]} {len(picked)} 語。使われる頻度の高い順。
 # 範囲: Wiktionary の句動詞のうち、{config["scope"]}。
