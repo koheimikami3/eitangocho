@@ -32,25 +32,23 @@ HALFWIDTH_PUNCT = re.compile(r"[,?!;:]")
 
 
 def check_source(word, where, item, input_value, input_source, problems):
-    """出どころと before / reason の整合を確かめる。"""
+    """出どころが入力の値と合っているかを確かめる。"""
     source = item.get("source")
+    if set(item) - {"value", "source"}:
+        problems.append(f"{word} {where}: value と source 以外のキー {sorted(set(item) - {'value', 'source'})}")
     if source in KEPT_SOURCES:
         if item.get("value") != input_value:
             problems.append(f"{word} {where}: 「{source}」(そのまま)なのに入力と値が違う")
         if source != input_source:
             problems.append(f"{word} {where}: 出どころが入力({input_source})と違う「{source}」")
     elif source == "llm_revised":
-        if item.get("before") != input_value:
-            problems.append(f"{word} {where}: before が入力の値と違う")
-        if not item.get("reason"):
-            problems.append(f"{word} {where}: reason が無い")
         if not input_value:
             problems.append(f"{word} {where}: 入力が空なのに llm_revised(llm_filled のはず)")
+        elif item.get("value") == input_value:
+            problems.append(f"{word} {where}: 入力と同じ値なのに llm_revised(入力の出どころのはず)")
     elif source == "llm_filled":
         if input_value:
             problems.append(f"{word} {where}: 入力が空でないのに llm_filled")
-        if not item.get("reason"):
-            problems.append(f"{word} {where}: reason が無い")
     else:
         problems.append(f"{word} {where}: 不明な出どころ「{source}」")
 
@@ -65,7 +63,7 @@ def check_word(inp, out, problems):
     if not isinstance(pos, dict) or not isinstance(pos.get("value"), list):
         problems.append(f"{word} 品詞: 形が違う")
     else:
-        values = pos["value"]
+        values = pos.get("value")
         if not values:
             problems.append(f"{word} 品詞: 空")
         if not set(values) <= POS:

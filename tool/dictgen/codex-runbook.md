@@ -3,26 +3,32 @@
 英単語帳アプリに同梱する辞書データを、単語リストから作る。収集 → 生成 → 検査を、
 最後まで続けて行う。作業ディレクトリは `tool/dictgen`(以下のパスはここからの相対パス)。
 
-- 単語リスト: `words/ngsl-1.2.txt`(2,809 語)
-- 出力先: `out/ngsl/`(`input-001.json` 〜 `input-057.json` と、それぞれの `output-NNN.json`)
+依頼文で、使う単語リストの名前(以下 `<名前>`。例: `ngsl-1.2` なら `words/ngsl-1.2.txt`)と出力先の名前
+(以下 `<出力>`。例: `ngsl`)を指定する。
+
+- 単語リスト: `words/<名前>.txt`
+- 出力先: `out/<出力>/`(50 語ごとの `input-001.json`, `input-002.json`, … と、それぞれの `output-NNN.json`)
+
+**途中で止まらない**: 何ファイルか終わった区切りで、報告や確認のために止まらない。途中経過の報告は要らない。
+「4. 終わったら報告する」の条件がそろうまで、ユーザーの返事を待たずに続ける。
 
 ## 1. 収集(裏で走らせる)
 
 ```bash
-swift run -c release dictgen-collect words/ngsl-1.2.txt out/ngsl > out/ngsl-collect.log 2>&1
+swift run -c release dictgen-collect words/<名前>.txt out/<出力> > out/<出力>-collect.log 2>&1
 ```
 
 - **通信が必要**(kaikki.org と api.tatoeba.org に問い合わせる)。通信を許可して実行する
-- 全部で約 3 時間かかる。50 語ごとに `input-NNN.json` が 1 つずつできる。終わるのを待たず、
+- 1 語あたり約 4 秒かかる(1,000 語で約 1 時間強)。50 語ごとに `input-NNN.json` が 1 つずつできる。終わるのを待たず、
   裏で走らせたまま次の生成に進んでよい
 - 途中で止まったり失敗したりしたら、同じコマンドをもう一度実行する。できているファイルは飛ばして続きから集める
-- 進み具合は `out/ngsl-collect.log` で分かる。最後に `done:` の行が出たら終わり
+- 進み具合は `out/<出力>-collect.log` で分かる。最後に `done:` の行が出たら終わり
 
 ## 2. 生成
 
-`out/ngsl/` の `input-NNN.json` のうち、対応する `output-NNN.json` が無いものを番号の小さい順に処理する。
+`out/<出力>/` の `input-NNN.json` のうち、対応する `output-NNN.json` が無いものを番号の小さい順に処理する。
 
-- 1 ファイルずつ、`fill-instructions.md` の指示に従って処理し、結果を `out/ngsl/output-NNN.json` に書く
+- 1 ファイルずつ、`fill-instructions.md` の指示に従って処理し、結果を `out/<出力>/output-NNN.json` に書く
   (`input-007.json` なら `output-007.json`)。中身は指示の「出力」のとおり JSON の配列だけにする
 - **訳・例文・品詞は、自分で入力を読んで判断して書く**。プログラムやスクリプトで機械的に作らない
 - 収集がまだ続いていて、処理できる input が無くなったら、少し待ってから次の input を探す
@@ -30,7 +36,7 @@ swift run -c release dictgen-collect words/ngsl-1.2.txt out/ngsl > out/ngsl-coll
 ## 3. 検査
 
 ```bash
-python3 validate.py out/ngsl
+python3 validate.py out/<出力>
 ```
 
 - 形式と、機械的に確かめられる決まりを全ファイル分確かめる。「問題あり」のファイルは、
@@ -40,7 +46,7 @@ python3 validate.py out/ngsl
 
 ## 4. 終わったら報告する
 
-収集のログに `done:` が出て、57 個の input すべてに output ができ、検査を最後に一度回したら終わり。
+収集のログに `done:` が出て、すべての input に output ができ、検査を最後に一度回したら終わり。
 次を報告する。
 
 - 合格・問題ありのファイル数と、残った問題の一覧(検査の出力をそのまま貼ってよい)
@@ -50,5 +56,5 @@ python3 validate.py out/ngsl
 ## してはいけないこと
 
 - `input-NNN.json`、`fill-instructions.md`、`words/`、`validate.py`、`Sources/` を変えない
-- `out/ngsl/cache.sqlite` を消さない(収集のやり直しに使う)
+- `out/<出力>/cache.sqlite` を消さない(収集のやり直しに使う)
 - git のコミット・プッシュをしない

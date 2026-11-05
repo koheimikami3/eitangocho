@@ -40,6 +40,9 @@
 - 古語・まれな意味・専門的すぎる意味・性的な俗語・差別語は外す。**易しい語でも同じ**で、
   学習者がその語で覚えない意味は入れない(例: `school` の「(魚の)群れ」、`house` の「議院」、
   `finish` の「表面處理」、`weather` の「風化する」、`buy` の「買収する」)
+- 特に**訳の末尾**に、辞書にあるからと珍しい意味を足さない。末尾に足すか迷ったら入れない
+  (例: `magazine` の「弾倉」、`cheek` の「尻の片側」、`tree` の「樹形図」、`module` の「宇宙船の区画」、
+  `tournament` の「馬上試合」、`host` の「宿主」、`swim` の「目が回る」、`meal` の「粗びき粉」)
 - 訳語は語にする。説明的な句にしない(例: `bank` の動詞は「把錢存入銀行」ではなく「存錢」)
 - 日本語と繁体字で、先頭の意味をそろえる(例文は 1 つを共有するため)
 - 空のときは埋める
@@ -87,13 +90,11 @@
 - `llm_filled`: 入力が空だったので埋めた
 - `llm_revised`: その言語の入力の値を直した。並べ替えや削っただけでも、もう一方の言語の入力の例文を使った場合も `llm_revised` にする
 
-`llm_revised` のときは、`before` にその言語の入力の値をそのまま入れ、`reason` に直した理由を日本語で 1 文で書く
-(例: 「3 語で短すぎるため書き直した」「表記の記号を落とし、よく使う『問題』を先頭にして 4 語義に絞った」)。
-`llm_filled` のときも `reason` に何を根拠に埋めたかを 1 文で書く。そのまま使ったときは `before` と `reason` を省く。
+直す前の値や直した理由は書かない(直す前の値は入力ファイルにあり、比べれば分かるため)。各項目は `value` と `source` だけにする。
 
 例文の入力の出どころは `exampleSource`、訳の出どころは `meaningSource` にある。
 例文の訳の出どころは、例文と同じ値を使う。品詞の入力は `ja.partsOfSpeech` で、出どころは常に `kaikki`。
-入力と同じ配列(並びも同じ)のまま使ったときだけ `kaikki` とし、`llm_revised` の `before` には入力の配列をそのまま入れる。
+入力と同じ配列(並びも同じ)のまま使ったときだけ `kaikki` とする。
 
 ## 出力
 
@@ -109,39 +110,14 @@
       "source": "kaikki"
     },
     "ja": {
-      "meaning": {
-        "value": "問題,問題点 / 発行 / (雑誌などの)号 / …を発行する,出す",
-        "source": "llm_revised",
-        "before": "〈U〉(印刷物などの)『発行』;…",
-        "reason": "表記の記号を落とし、よく使う『問題』を先頭にして 4 語義に絞った"
-      },
-      "exampleEn": {
-        "value": "We need to talk about this issue before we decide.",
-        "source": "llm_revised",
-        "before": "This issue is difficult to resolve.",
-        "reason": "6 語で短く、場面が分かりにくいため書き直した"
-      },
-      "exampleTranslation": {
-        "value": "決める前に、この問題について話し合う必要がある。",
-        "source": "llm_revised",
-        "before": "この問題は解くのが難しい。",
-        "reason": "英例文を書き直したため訳も書き直した"
-      }
+      "meaning": { "value": "問題,問題点 / 発行 / (雑誌などの)号 / …を発行する,出す", "source": "llm_revised" },
+      "exampleEn": { "value": "We need to talk about this issue before we decide.", "source": "llm_revised" },
+      "exampleTranslation": { "value": "決める前に、この問題について話し合う必要がある。", "source": "llm_revised" }
     },
     "zhHant": {
-      "meaning": { "value": "問題 / 議題 / 發行 / 期", "source": "llm_revised", "before": "問題", "reason": "主な意味の『議題』『發行』『期』を足した" },
-      "exampleEn": {
-        "value": "We need to talk about this issue before we decide.",
-        "source": "llm_revised",
-        "before": "We have important issues to discuss.",
-        "reason": "日本語と同じ英例文にそろえた"
-      },
-      "exampleTranslation": {
-        "value": "做決定之前，我們需要討論這個問題。",
-        "source": "llm_revised",
-        "before": "我們有些重要的事要談。",
-        "reason": "英例文を書き直したため訳も書き直した"
-      }
+      "meaning": { "value": "問題 / 議題 / 發行 / 期", "source": "llm_revised" },
+      "exampleEn": { "value": "We need to talk about this issue before we decide.", "source": "llm_revised" },
+      "exampleTranslation": { "value": "做決定之前，我們需要討論這個問題。", "source": "llm_revised" }
     }
   }
 ]
