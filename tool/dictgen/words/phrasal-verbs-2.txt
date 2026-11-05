@@ -1,8 +1,8 @@
-# 句動詞の続き 499 語。使われる頻度の高い順。
+# 句動詞の続き 501 語。使われる頻度の高い順。
 # 範囲: Wiktionary の句動詞のうち、差別語・古語の表示がなく(卑語は除かない)、使われる頻度が上位 1500 のもののうち、ほかの単語リストに無いもの。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
 #   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に archaic, derogatory, obsolete, offensive のどれかが付くもの。
-#   個別に除いた句: bite in, feel up, sex in, shit on(表示では落ちなかった性的・卑俗・古い意味だけの句)。
+#   個別に除いた句: bite in, sex in(表示では落ちなかった性的・古い意味だけの句)。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
@@ -11,10 +11,12 @@
 # 作り方: tool/dictgen/pick_phrasal_verbs.py
 fuck up
 piss off
+shit on
 fuck off
 fuck with
 shit out
 fuck about
+feel up
 see over
 slap on
 sober up

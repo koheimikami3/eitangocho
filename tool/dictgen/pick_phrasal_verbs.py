@@ -43,6 +43,17 @@ PARTICLES = set(
 )
 # 頻度で落ちない不適切な語だけを除く。slang は chill out にも付くので除かない(珍しい俗語は順位で落ちる)
 EXCLUDED_TAGS = {"vulgar", "offensive", "derogatory", "archaic", "obsolete"}
+# 表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
+# 上位 top_n を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
+MANUAL_EXCLUDED = {
+    "bite in",  # すべての意味が dated
+    "sex in",  # ギャングの性的な入会儀式の意味だけ
+}
+# 同じく空欄になったが、卑語を除かないリストには入れる句
+MANUAL_EXCLUDED_VULGAR = {
+    "feel up",  # 性的にさわる意味だけ
+    "shit on",  # 表示の無い意味が文字どおりの 1 つだけで、残りは vulgar
+}
 # phrasal-verbs は生成済みなので範囲を変えない。phrasal-verbs-2 はその続きで、
 # ドラマなどで出て意味を調べたい語のために卑語を除かない(順位は卑語を含めて付け直す)
 LISTS = {
@@ -51,21 +62,17 @@ LISTS = {
         "allow_vulgar": False,
         "title": "句動詞",
         "scope": "卑語・差別語・古語の表示がなく、使われる頻度が上位 1000 のもの",
+        "manual_excluded": MANUAL_EXCLUDED | MANUAL_EXCLUDED_VULGAR,
+        "manual_note": "表示では落ちなかった性的・卑俗・古い意味だけの句",
     },
     "phrasal-verbs-2": {
         "top_n": 1500,
         "allow_vulgar": True,
         "title": "句動詞の続き",
         "scope": "差別語・古語の表示がなく(卑語は除かない)、使われる頻度が上位 1500 のもののうち、ほかの単語リストに無いもの",
+        "manual_excluded": MANUAL_EXCLUDED,
+        "manual_note": "表示では落ちなかった性的・古い意味だけの句",
     },
-}
-# 上の表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
-# 上位 top_n を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
-MANUAL_EXCLUDED = {
-    "bite in",  # すべての意味が dated
-    "feel up",  # 性的にさわる意味だけ
-    "sex in",  # ギャングの性的な入会儀式の意味だけ
-    "shit on",  # 表示の無い意味が文字どおりの 1 つだけで、残りは vulgar
 }
 # 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
 REQUEST_INTERVAL = 0.5
@@ -246,7 +253,7 @@ def main():
     if missing:
         sys.exit(f"取れなかった句が {len(missing)} ある。もう一度実行すると続きから進む")
     # 順位はほかのリストにある句も含めて付ける(既存のリストを足してもこのリストの範囲が動かないように)
-    listed = listed_words(output) | MANUAL_EXCLUDED
+    listed = listed_words(output) | config["manual_excluded"]
     ranked = sorted(usable, key=lambda p: (-freq[p]["count"], p))[:config["top_n"]]
     picked = [p for p in ranked if p not in listed]
     excluded_tags = EXCLUDED_TAGS - {"vulgar"} if allow_vulgar else EXCLUDED_TAGS
@@ -254,7 +261,7 @@ def main():
 # 範囲: Wiktionary の句動詞のうち、{config["scope"]}。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
 #   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に {", ".join(sorted(excluded_tags))} のどれかが付くもの。
-#   個別に除いた句: {", ".join(sorted(MANUAL_EXCLUDED))}(表示では落ちなかった性的・卑俗・古い意味だけの句)。
+#   個別に除いた句: {", ".join(sorted(config["manual_excluded"]))}({config["manual_note"]})。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
