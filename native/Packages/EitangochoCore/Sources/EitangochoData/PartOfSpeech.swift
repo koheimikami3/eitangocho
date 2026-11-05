@@ -41,3 +41,11 @@ extension Set where Element == PartOfSpeech {
       + PartOfSpeech.allCases.filter { contains($0) && !basedOn.contains($0) }
   }
 }
+
+extension Array where Element == PartOfSpeech {
+  /// 表示用に宣言順(登録・編集のチップと同じ 名詞 → 動詞 → …)へ並べ直す。
+  ///
+  /// 保存順は取得元の順(その語の主用法が先頭)のままにしておき、並べ直すのは表示だけにする。
+  /// 保存時に並べても、既存の単語や旧版の端末が同期で書いた順は揃わないため。
+  public var inChipOrder: [PartOfSpeech] { PartOfSpeech.allCases.filter(contains) }
+}

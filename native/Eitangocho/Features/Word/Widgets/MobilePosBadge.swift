@@ -11,7 +11,7 @@
 
     var body: some View {
       FlowLayout(spacing: 4, runSpacing: 4) {
-        ForEach(partsOfSpeech.isEmpty ? [.other] : partsOfSpeech, id: \.self) { pos in
+        ForEach(partsOfSpeech.isEmpty ? [.other] : partsOfSpeech.inChipOrder, id: \.self) { pos in
           let (background, foreground) = pos.badgeColors(palette)
           AppText(pos.label, style: AppTextStyle(size: 10, weight: .w600))
             .foregroundStyle(foreground)

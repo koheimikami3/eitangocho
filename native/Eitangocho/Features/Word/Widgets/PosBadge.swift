@@ -13,7 +13,7 @@ struct PosBadge: View {
 
   var body: some View {
     FlowLayout(spacing: px(4), runSpacing: px(4)) {
-      ForEach(partsOfSpeech.isEmpty ? [.other] : partsOfSpeech, id: \.self) { pos in
+      ForEach(partsOfSpeech.isEmpty ? [.other] : partsOfSpeech.inChipOrder, id: \.self) { pos in
         let (background, foreground) = pos.badgeColors(colors)
         AppText(pos.label, style: AppTextStyle(size: 11, weight: .w600))
           .foregroundStyle(foreground)

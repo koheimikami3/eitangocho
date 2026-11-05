@@ -48,4 +48,9 @@ struct PartOfSpeechTests {
     let selected: Set<PartOfSpeech> = [.adverb, .noun]
     #expect(selected.ordered(basedOn: []) == [.noun, .adverb])
   }
+
+  @Test("表示用の並びは保存順によらず宣言順になる")
+  func chipOrder() {
+    #expect([PartOfSpeech.verb, .noun, .adverb].inChipOrder == [.noun, .verb, .adverb])
+  }
 }

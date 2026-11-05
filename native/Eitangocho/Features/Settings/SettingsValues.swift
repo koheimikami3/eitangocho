@@ -73,6 +73,26 @@ enum QuizDirection: String, CaseIterable, Sendable {
   }
 }
 
+/// 発音ボタンで発音をどう確かめるか。2.15.0 で足した(Flutter 版には無い)。
+///
+/// 既定は Google 翻訳(足す前の動作のまま)。端末の読み上げは通信が要らず、ページを開かずにその場で鳴る。
+enum PronunciationMethod: String, CaseIterable, Sendable {
+  case googleTranslate
+  case deviceSpeech
+
+  var label: LocalizedStringResource {
+    switch self {
+    case .googleTranslate: .pronunciationGoogleTranslate
+    // 外観の「端末 / システムの設定と同じ」と同じく、OS の設定アプリの呼び名に合わせて呼び分ける。
+    #if os(iOS)
+      case .deviceSpeech: .pronunciationDeviceSpeech
+    #else
+      case .deviceSpeech: .pronunciationSystemSpeech
+    #endif
+    }
+  }
+}
+
 /// 全単語一覧の並び順。学習中一覧・クイズ・エクスポートの並びには影響しない。
 ///
 /// 「基準 + 昇順/降順」に分けず 8 通りを平らに持つのは、学習状態のように

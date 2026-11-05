@@ -2,7 +2,7 @@
   import SwiftUI
 
   /// iOS 版の発音確認ボタン(Flutter 版の MobilePronunciationButton)。
-  /// Google 翻訳をアプリ内のシートで開く(開く処理は環境値 `openPronunciation`)。
+  /// 設定に応じて、端末の読み上げで流すか Google 翻訳をアプリ内のシートで開く(押したときの処理は環境値 `openPronunciation`)。
   ///
   /// macOS 版の PronunciationButton と役割は同じだが、ホバー演出とツールチップを持たず、配色を AppPalette から引く。
   struct MobilePronunciationButton: View {
