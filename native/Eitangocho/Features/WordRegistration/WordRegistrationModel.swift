@@ -83,16 +83,21 @@ final class WordRegistrationModel {
   /// 保存できたら最初のステップへ戻すか。macOS は登録の画面に留まって続けて登録するので戻す。
   /// iOS は保存したらシートを閉じるので戻さない(戻すと、閉じていくシートに入力の画面と広告が出る)。
   @ObservationIgnored private let resetsAfterSave: Bool
+  /// 自動入力のインジケータを見せる最短の時間。同梱の辞書に載る語は通信せずすぐ返るため、
+  /// そのままではインジケータが一瞬だけ出て画面が飛んだように見える。
+  @ObservationIgnored private let minimumLoading: Duration
 
   init(
     dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger, review: ReviewPrompter,
-    resetsAfterSave: Bool = true, currentLanguage: @escaping () -> TranslationLanguage
+    resetsAfterSave: Bool = true, minimumLoading: Duration = .milliseconds(500),
+    currentLanguage: @escaping () -> TranslationLanguage
   ) {
     self.dao = dao
     self.wordInfo = wordInfo
     self.analytics = analytics
     self.review = review
     self.resetsAfterSave = resetsAfterSave
+    self.minimumLoading = minimumLoading
     self.currentLanguage = currentLanguage
   }
 
@@ -139,15 +144,12 @@ final class WordRegistrationModel {
     // 句(空白を含む見出し語)は辞書の収録が薄いので、取得率を分けて見る。
     let isPhrase = headword.contains(" ")
     do {
-      guard let info = try await wordInfo.fetch(headword) else {
+      guard let info = try await fetchShowingIndicator(headword) else {
         notFound = true
         enterForm(with: nil)
         analytics.logAutofillResult(.notFound, isPhrase: isPhrase)
         return
       }
-      // 抽象は翻訳の失敗を返せないため、「英例文はあるのに訳が空」を失敗とみなす
-      // (取得成功で空になることは実質ない)。辞書側(kaikki)の例文を採ったときは
-      // 対訳が無いのでここに該当する。例文の訳を持たない言語(英語の語義)では空が正常。
       // 活用形を辞書の原形に寄せたときは、原形で重複を見直す(run が登録済みなら ran で登録させない)。
       // provider は小文字にした見出しを返すので、大文字の入力(Apple)は置き換えに数えない。
       if info.word != headword.lowercased() {
@@ -159,6 +161,9 @@ final class WordRegistrationModel {
       }
       notFound = false
       selectedPartsOfSpeech = Set(info.partsOfSpeech)
+      // 抽象は翻訳の失敗を返せないため、「英例文はあるのに訳が空」を失敗とみなす
+      // (取得成功で空になることは実質ない)。辞書側(kaikki)の例文を採ったときは
+      // 対訳が無いのでここに該当する。例文の訳を持たない言語(英語の語義)では空が正常。
       translationFailed = info.translationLanguage.translatesExamples && !info.exampleEn.isEmpty && info.exampleTranslation.isEmpty
       enterForm(with: info)
       analytics.logAutofillResult(.success, isPhrase: isPhrase, notice: notice)
@@ -171,6 +176,19 @@ final class WordRegistrationModel {
       step = .input
       self.error = .fetchFailed
       analytics.logAutofillResult(.fetchFailed, isPhrase: isPhrase)
+    }
+  }
+
+  /// 単語情報を引く。速く返っても、インジケータを minimumLoading までは出しておく(失敗も同じ)。
+  private func fetchShowingIndicator(_ headword: String) async throws -> WordInfo? {
+    let deadline = ContinuousClock.now + minimumLoading
+    do {
+      let info = try await wordInfo.fetch(headword)
+      try? await Task.sleep(until: deadline, clock: .continuous)
+      return info
+    } catch {
+      try? await Task.sleep(until: deadline, clock: .continuous)
+      throw error
     }
   }
 

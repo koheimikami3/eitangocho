@@ -38,7 +38,8 @@ struct WordRegistrationModelTests {
     WordRegistrationModel(
       dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), analytics: AnalyticsLogger(analytics),
       review: disabledReviewPrompter(dao: database.wordDao), resetsAfterSave: resetsAfterSave,
-      currentLanguage: { language })
+      // インジケータの最短時間はテストでは待たない
+      minimumLoading: .zero, currentLanguage: { language })
   }
 
   private func fill(_ model: WordRegistrationModel, word: String, meaning: String, ipa: String = "", exampleEn: String = "") {
