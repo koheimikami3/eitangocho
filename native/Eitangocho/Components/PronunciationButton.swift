@@ -1,9 +1,8 @@
 import SwiftUI
 
-/// 発音確認ボタン(Flutter 版の PronunciationButton)。押すと設定に応じて、端末の読み上げで流すか
-/// Google 翻訳を別ウィンドウで開く。
+/// 発音確認ボタン(Flutter 版の PronunciationButton)。押すと Google 翻訳を別ウィンドウで開く。
 ///
-/// 押したときの処理は環境値 `openPronunciation` で受け取る(ウィンドウと読み上げを持つのはアプリの側のため)。
+/// 開く処理は環境値 `openPronunciation` で受け取る(ウィンドウを持つのはアプリの側のため)。
 /// 自身がクリックを消費するため、カード・行のクリック(編集)には伝わらない。
 struct PronunciationButton: View {
   /// 置かれる場所ごとの形。
@@ -61,7 +60,6 @@ struct PronunciationButton: View {
   @Environment(\.colors) private var colors
   @Environment(\.uiScale) private var px
   @Environment(\.openPronunciation) private var openPronunciation
-  @Environment(\.pronunciationMethod) private var pronunciationMethod
   @State private var isHovered = false
 
   var body: some View {
@@ -82,11 +80,9 @@ struct PronunciationButton: View {
       .pointerStyle(.link)
     #endif
 
-    // ラベルが無い形は用途が読めないため、説明を出す(「Google 翻訳で確認」は読み上げのときには合わないので出し分ける)。
+    // ラベルが無い形は用途が読めないため、説明を出す。
     if variant.label == nil {
-      let tooltip: LocalizedStringResource =
-        pronunciationMethod == .deviceSpeech ? .listenPronunciation : .pronunciationTooltip
-      button.help(Text(tooltip))
+      button.help(Text(.pronunciationTooltip))
     } else {
       button
     }
@@ -96,6 +92,4 @@ struct PronunciationButton: View {
 extension EnvironmentValues {
   /// 発音確認を開く(単語を受け取る)。アプリのルートで差し込む。
   @Entry var openPronunciation: @MainActor (String) -> Void = { _ in }
-  /// 今の発音の確かめ方(ボタンの説明の出し分け用)。アプリのルートで設定から配る。
-  @Entry var pronunciationMethod: PronunciationMethod = .googleTranslate
 }

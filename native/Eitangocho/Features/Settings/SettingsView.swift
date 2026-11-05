@@ -2,7 +2,7 @@
   import EitangochoSync
   import SwiftUI
 
-  /// macOS 版の設定画面(表示・外観・クイズ・発音・訳の言語・データ・サポート・情報)。変更は即保存。
+  /// macOS 版の設定画面(表示・外観・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
   /// Flutter 版の SettingsView。
   struct SettingsView: View {
     let settings: SettingsStore
@@ -47,15 +47,6 @@
                   label: String(localized: direction.label(settings.translationLanguage)),
                   selected: settings.quizDirection == direction
                 ) { settings.setQuizDirection(direction) }
-              }
-            }
-          }
-          SettingsSection(title: String(localized: .pronunciationMethod)) {
-            SettingsCard {
-              ForEach(PronunciationMethod.allCases, id: \.self) { method in
-                SettingsRadioRow(
-                  label: String(localized: method.label), selected: settings.pronunciationMethod == method
-                ) { settings.setPronunciationMethod(method) }
               }
             }
           }

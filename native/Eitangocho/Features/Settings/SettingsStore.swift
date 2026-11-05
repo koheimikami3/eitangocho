@@ -21,8 +21,6 @@ final class SettingsStore {
     static let translationLanguage = "translationLanguage"
     /// 2.14.0 で足した(Flutter 版には無い)。
     static let themeColor = "themeColor"
-    /// 2.15.0 で足した(Flutter 版には無い)。
-    static let pronunciationMethod = "pronunciationMethod"
   }
 
   private(set) var quizDirection: QuizDirection
@@ -46,9 +44,6 @@ final class SettingsStore {
   /// 全単語一覧の並び順。
   private(set) var wordSortOrder: WordSortOrder
 
-  /// 発音ボタンで発音をどう確かめるか(Google 翻訳 / 端末の読み上げ)。
-  private(set) var pronunciationMethod: PronunciationMethod
-
   /// 訳の言語。未保存のときは端末の言語から決める(保存はしない)。
   private(set) var translationLanguage: TranslationLanguage
 
@@ -69,7 +64,6 @@ final class SettingsStore {
     themeColor = value(Key.themeColor, default: ThemeColor.free)
     cardLayout = value(Key.cardLayout, default: .twoColumns)
     wordSortOrder = value(Key.wordSortOrder, default: .newest)
-    pronunciationMethod = value(Key.pronunciationMethod, default: .googleTranslate)
     // 未保存なら端末の言語から決め、保存はしない。既存の利用者(日本語の
     // 端末)は ja になり、OS のアプリ別の言語設定を変えたときも追従する。
     translationLanguage = value(
@@ -124,11 +118,6 @@ final class SettingsStore {
   func setWordSortOrder(_ order: WordSortOrder) {
     defaults.set(order.rawValue, forKey: Key.wordSortOrder)
     wordSortOrder = order
-  }
-
-  func setPronunciationMethod(_ method: PronunciationMethod) {
-    defaults.set(method.rawValue, forKey: Key.pronunciationMethod)
-    pronunciationMethod = method
   }
 
   func setUiScale(_ value: Double) {
