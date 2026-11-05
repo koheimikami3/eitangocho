@@ -1,27 +1,35 @@
 #!/usr/bin/env python3
 """句動詞の単語リスト(words/phrasal-verbs.txt)を作る。
 
-範囲: NGSL の動詞でできた句動詞のうち、Wiktionary に項目があり、Tatoeba に例文が 1 つ以上あるものすべて。
-語数の目標や「上位○語」の切り方はせず、この範囲に入るものを全部採る(NGSL などと同じく一言で説明できる区切りにするため)。
+範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 TOP_N のもの。
+「NGSL の動詞に限る」「例文がある」のような代わりの目安では普通の句(cheer up など)まで落ちたため、
+頻度の順位で切る。見出しは原形で、活用形は頻度を数えるのにだけ使う。
 
 使い方(tool/dictgen で):
     python3 pick_phrasal_verbs.py <作業ディレクトリ> [--list-only]
 
 1. Wiktionary の Category:English phrasal verbs の全項目を取る(作業ディレクトリの candidates.json にキャッシュ)
-2. 形で絞る: 2〜3 語・英小文字だけ・先頭が NGSL の動詞・2 語目以降がすべて不変化詞か前置詞
-3. Tatoeba で句をそのまま含む英文の件数を数える(counts.jsonl に 1 行ずつ書き足す。止まっても続きから数える)
-4. 件数が 1 件以上のものを、件数の多い順に words/phrasal-verbs.txt へ書く
+2. 形で絞る: 2〜3 語・英小文字だけ・2 語目以降がすべて不変化詞か前置詞
+3. kaikki で verb の項目を引き、活用形と意味ごとのタグを取る(kaikki.jsonl に書き足す)。
+   すべての意味に EXCLUDED_TAGS のどれかが付くもの・verb の項目が無いものは除く
+4. Tatoeba で原形と活用形を含む英文をまとめて数える(freq.jsonl に書き足す)
+5. 件数の多い順に上位 TOP_N を words/phrasal-verbs.txt へ書く
 
---list-only を付けると 2 までで止め、候補の数だけ出す。
+3 と 4 は別のサイトなので、kaikki を別スレッドで引きながら、引けた句から順に数える(Tatoeba は TATOEBA_WORKERS 本同時)。
+どちらも止まっても続きから進む。--list-only を付けると 2 までで止め、候補の数だけ出す。
 """
 
 import glob
 import json
+import queue
 import re
 import sys
+import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -31,8 +39,18 @@ PARTICLES = set(
     "up out off down in on over away back through around about along across by after into "
     "for with to of apart aside ahead forward together".split()
 )
-# Tatoeba への負荷を抑えるための間隔(秒)
-TATOEBA_INTERVAL = 1.0
+# 頻度で落ちない不適切な語だけを除く。slang は chill out にも付くので除かない(珍しい俗語は順位で落ちる)
+EXCLUDED_TAGS = {"vulgar", "offensive", "derogatory", "archaic", "obsolete"}
+TOP_N = 1000
+# 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
+REQUEST_INTERVAL = 0.5
+# 活用形を OR でつないだ検索は 1 回 4 秒ほどかかるので、Tatoeba には 3 本同時に問い合わせる。
+# それでも全体で毎秒 1 回を下回り、原形だけを 1 秒おきに数えていたときより負荷は軽い
+TATOEBA_WORKERS = 3
+
+
+class NotFound(Exception):
+    pass
 
 
 def get_json(url):
@@ -62,18 +80,6 @@ def fetch_candidates(work):
     return titles
 
 
-def ngsl_verbs():
-    """NGSL の生成結果で品詞に verb を持つ語。"""
-    verbs = set()
-    for path in glob.glob(str(ROOT / "out/ngsl/output-*.json")):
-        for word in json.loads(Path(path).read_text(encoding="utf-8")):
-            if "verb" in word["partsOfSpeech"]["value"]:
-                verbs.add(word["word"].lower())
-    if not verbs:
-        sys.exit("out/ngsl/output-*.json が無い(NGSL の生成結果から動詞を読む)")
-    return verbs
-
-
 def listed_words():
     """既存の単語リストにある語(重複を除くため)。"""
     words = set()
@@ -86,21 +92,73 @@ def listed_words():
     return words
 
 
-def matches_shape(title, verbs):
+def matches_shape(title):
     parts = title.split(" ")
     return (2 <= len(parts) <= 3 and all(re.fullmatch(r"[a-z]+", p) for p in parts)
-            and parts[0] in verbs and all(p in PARTICLES for p in parts[1:]))
+            and all(p in PARTICLES for p in parts[1:]))
 
 
-def tatoeba_count(phrase):
-    """句をそのまま含む英文の件数。失敗したら None(書き足さず、次回やり直す)。"""
-    params = {"lang": "eng", "q": f'="{phrase}"', "sort": "relevance", "limit": "1"}
+def kaikki_entry(phrase):
+    """kaikki の verb の項目から、活用形と除くかどうかを返す。通信の失敗は None(次回やり直す)。"""
+    # URL の作り方はアプリの KaikkiApiClient と同じ
+    path = f"/dictionary/English/meaning/{phrase[0]}/{urllib.parse.quote(phrase[:2])}/{urllib.parse.quote(phrase)}.jsonl"
+    request = urllib.request.Request("https://kaikki.org" + path, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            lines = response.read().decode("utf-8").splitlines()
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            print(f"  kaikki 失敗: {phrase}: {e}", file=sys.stderr)
+            return None
+        lines = []
+    except Exception as e:  # 通信失敗は次回の再実行に回す
+        print(f"  kaikki 失敗: {phrase}: {e}", file=sys.stderr)
+        return None
+    entries = [e for e in map(json.loads, filter(None, lines)) if e.get("pos") == "verb"]
+    senses = [s for e in entries for s in e.get("senses", [])]
+    if not senses:
+        return {"phrase": phrase, "found": False, "excluded": False, "forms": []}
+    particles = phrase.split(" ")[1:]
+    forms = sorted({f["form"] for e in entries for f in e.get("forms", [])
+                    if re.fullmatch(r"[a-z]+( [a-z]+)+", f["form"]) and f["form"].split(" ")[1:] == particles}
+                   - {phrase})
+    excluded = all(EXCLUDED_TAGS & set(s.get("tags", [])) for s in senses)
+    return {"phrase": phrase, "found": True, "excluded": excluded, "forms": forms}
+
+
+def tatoeba_count(phrase, forms):
+    """原形と活用形のどれかをそのまま含む英文の件数。失敗したら None(書き足さず、次回やり直す)。"""
+    query = " | ".join(f'="{f}"' for f in [phrase] + forms)
+    params = {"lang": "eng", "q": query, "sort": "relevance", "limit": "1"}
     try:
         data = get_json("https://api.tatoeba.org/unstable/sentences?" + urllib.parse.urlencode(params))
         return data["paging"]["total"]
     except Exception as e:  # 通信失敗・形式の変化は次回の再実行に回す
-        print(f"  失敗: {phrase}: {e}", file=sys.stderr)
+        print(f"  Tatoeba 失敗: {phrase}: {e}", file=sys.stderr)
         return None
+
+
+def load_jsonl(path):
+    if not path.exists():
+        return {}
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    return {row["phrase"]: row for row in rows}
+
+
+def kaikki_worker(phrases, kaikki, path, out_queue):
+    """kaikki を引き、引けた項目を順に out_queue に渡す。最後に None を渡す。"""
+    with path.open("a", encoding="utf-8") as f:
+        for phrase in phrases:
+            if phrase in kaikki:
+                out_queue.put(kaikki[phrase])
+                continue
+            entry = kaikki_entry(phrase)
+            if entry is not None:
+                f.write(json.dumps(entry) + "\n")
+                f.flush()
+                out_queue.put(entry)
+            time.sleep(REQUEST_INTERVAL)
+    out_queue.put(None)
 
 
 def main():
@@ -112,39 +170,47 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
 
     titles = fetch_candidates(work)
-    verbs = ngsl_verbs()
-    listed = listed_words()
-    shaped = sorted({t for t in titles if matches_shape(t, verbs)} - listed)
-    print(f"Wiktionary の項目 {len(titles)} / 形で絞った後 {len(shaped)}")
+    shaped = sorted({t for t in titles if matches_shape(t)} - listed_words())
+    print(f"Wiktionary の項目 {len(titles)} / 形で絞った後 {len(shaped)}", flush=True)
     if "--list-only" in args:
         return
 
-    counts_path = work / "counts.jsonl"
-    counts = {}
-    if counts_path.exists():
-        for line in counts_path.read_text(encoding="utf-8").splitlines():
-            row = json.loads(line)
-            counts[row["phrase"]] = row["count"]
-    todo = [p for p in shaped if p not in counts]
-    with counts_path.open("a", encoding="utf-8") as f:
-        for i, phrase in enumerate(todo, 1):
-            count = tatoeba_count(phrase)
-            if count is not None:
-                counts[phrase] = count
-                f.write(json.dumps({"phrase": phrase, "count": count}) + "\n")
-                f.flush()
-            if i % 100 == 0:
-                print(f"  {i}/{len(todo)}")
-            time.sleep(TATOEBA_INTERVAL)
+    kaikki_path, freq_path = work / "kaikki.jsonl", work / "freq.jsonl"
+    kaikki, freq = load_jsonl(kaikki_path), load_jsonl(freq_path)
+    entries = queue.Queue()
+    threading.Thread(target=kaikki_worker, args=(shaped, kaikki, kaikki_path, entries), daemon=True).start()
+    lock = threading.Lock()
 
-    missing = [p for p in shaped if p not in counts]
+    def count_one(entry):
+        count = tatoeba_count(entry["phrase"], entry["forms"])
+        if count is not None:
+            with lock:
+                freq[entry["phrase"]] = {"phrase": entry["phrase"], "count": count}
+                f.write(json.dumps(freq[entry["phrase"]]) + "\n")
+                f.flush()
+                if len(freq) % 200 == 0:
+                    print(f"  数えた {len(freq)}", flush=True)
+        time.sleep(REQUEST_INTERVAL)
+
+    with freq_path.open("a", encoding="utf-8") as f, ThreadPoolExecutor(TATOEBA_WORKERS) as pool:
+        while (entry := entries.get()) is not None:
+            kaikki[entry["phrase"]] = entry
+            if entry["found"] and not entry["excluded"] and entry["phrase"] not in freq:
+                pool.submit(count_one, entry)
+
+    not_found = [p for p in shaped if p in kaikki and not kaikki[p]["found"]]
+    excluded = [p for p in shaped if p in kaikki and kaikki[p]["excluded"]]
+    usable = [p for p in shaped if p in kaikki and kaikki[p]["found"] and not kaikki[p]["excluded"]]
+    missing = [p for p in shaped if p not in kaikki] + [p for p in usable if p not in freq]
+    print(f"kaikki に無い {len(not_found)} / 表示で除いた {len(excluded)} / 残り {len(usable)}")
     if missing:
-        sys.exit(f"件数を取れなかった句が {len(missing)} ある。もう一度実行すると続きから数える")
-    picked = sorted((p for p in shaped if counts[p] >= 1), key=lambda p: (-counts[p], p))
-    header = f"""# 句動詞 {len(picked)} 語。Tatoeba の例文の件数が多い順。
-# 範囲: NGSL 1.2 の動詞でできた句動詞のうち、Wiktionary に項目があり、Tatoeba に例文が 1 つ以上あるものすべて。
-#   形の条件: 2〜3 語、先頭が NGSL で品詞に動詞を持つ語、2 語目以降がすべて不変化詞か前置詞。
-#   件数は Tatoeba で句を原形のまま含む英文を数えたもので、並べ順と「例文がある」の判定にだけ使った。
+        sys.exit(f"取れなかった句が {len(missing)} ある。もう一度実行すると続きから進む")
+    picked = sorted(usable, key=lambda p: (-freq[p]["count"], p))[:TOP_N]
+    header = f"""# 句動詞 {len(picked)} 語。使われる頻度の高い順。
+# 範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 {TOP_N} のもの。
+#   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
+#   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に {", ".join(sorted(EXCLUDED_TAGS))} のどれかが付くもの。
+#   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
 # ライセンス: Creative Commons Attribution-ShareAlike 4.0 International(CC BY-SA 4.0)
@@ -152,7 +218,7 @@ def main():
 # 作り方: tool/dictgen/pick_phrasal_verbs.py
 """
     (ROOT / "words/phrasal-verbs.txt").write_text(header + "\n".join(picked) + "\n", encoding="utf-8")
-    print(f"例文あり {len(picked)} / 例文なし {len(shaped) - len(picked)} → words/phrasal-verbs.txt")
+    print(f"採った {len(picked)} → words/phrasal-verbs.txt")
 
 
 if __name__ == "__main__":
