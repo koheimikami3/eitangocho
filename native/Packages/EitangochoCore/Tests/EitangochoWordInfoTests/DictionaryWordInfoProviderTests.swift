@@ -48,7 +48,18 @@ private let commuteDefinitionJsonl = """
 private let prebuiltFixture = """
   {"version":1,"words":{"give up":{"ipa":"/ˌɡɪv ˈʌp/","pos":["verb"],"exampleEn":"Don't give up before you try.",\
   "ja":{"meaning":"諦める / …をやめる","exampleTranslation":"やってみる前に諦めないで。"},\
-  "zhHant":{"meaning":"放棄 / 戒掉","exampleTranslation":"試之前別放棄。"}}}}
+  "zhHant":{"meaning":"放棄 / 戒掉","exampleTranslation":"試之前別放棄。"}},\
+  "run":{"ipa":"/ɹʌn/","pos":["verb","noun"],"exampleEn":"I run in the park every morning.",\
+  "ja":{"meaning":"走る / …を経営する","exampleTranslation":"私は毎朝公園を走る。"},\
+  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}}}}
+  """
+
+/// `ran` の実レスポンスから語義の形だけ抜き出したもの。活用形の語義は run と rin(古語)を指し、
+/// 自分の意味(名詞)も混ざる。
+private let ranJsonl = """
+  {"word":"ran","pos":"verb","senses":[{"glosses":["simple past of run"],"tags":["form-of","past"],"form_of":[{"word":"run"}]},{"glosses":["simple past of rin"],"tags":["form-of","past"],"form_of":[{"word":"rin"}]}]}
+  {"word":"ran","pos":"noun","senses":[{"glosses":["Yarns coiled on a spun-yarn winch."],"tags":["uncountable"]}]}
+
   """
 
 /// Tatoeba のヒット 1 件分のレスポンス。
@@ -151,6 +162,36 @@ struct DictionaryWordInfoProviderTests {
   func unreadablePrebuiltDictionary() async throws {
     let provider = makeProvider(prebuilt: .init { Data("broken".utf8) }, kaikki: ok(giveUpJsonl))
     #expect(try await provider.fetch("give up")?.meaning == "降服する / 諦める / やめる")
+  }
+
+  @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")
+  func mapsInflectionToPrebuiltHeadword() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(ranJsonl))
+
+    let first = try #require(try await provider.fetch("ran"))
+    let second = try #require(try await provider.fetch("ran"))
+
+    #expect(first.word == "run")
+    #expect(first.meaning == "走る / …を経営する")
+    #expect(second == first)
+    #expect(kaikkiCalls.count == 1)
+    #expect(tatoebaCalls.count == 0)
+  }
+
+  @Test("句動詞の活用形も原形に寄せる")
+  func mapsPhrasalVerbInflection() async throws {
+    let gaveUp = #"{"word":"gave up","pos":"verb","senses":[{"glosses":["simple past of give up"],"tags":["form-of"],"form_of":[{"word":"give up"}]}]}"#
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(gaveUp))
+
+    #expect(try await provider.fetch("gave up")?.word == "give up")
+  }
+
+  @Test("原形が事前生成辞書に無ければ、入力のまま今までの経路で返す")
+  func keepsInflectionWithoutPrebuiltBase() async throws {
+    let info = try #require(try await makeProvider(kaikki: ok(ranJsonl)).fetch("ran"))
+
+    #expect(info.word == "ran")
+    #expect(tatoebaCalls.count == 1)
   }
 
   @Test("kaikki・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を訳す")

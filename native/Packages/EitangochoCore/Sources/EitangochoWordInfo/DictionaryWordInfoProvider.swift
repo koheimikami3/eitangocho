@@ -86,6 +86,16 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       kaikkiFailure = error
     }
 
+    // 1.5 活用形(ran・gave up)なら、その原形が事前生成辞書に載っていれば原形の値を返す。
+    //     WordInfo.word を原形にするので、登録の見出しも原形に置き換わる。
+    if let entries {
+      for base in Self.baseForms(entries, of: normalized) {
+        if let entry = await prebuiltDictionary.lookup(base, language: language) {
+          return Self.wordInfo(base, entry, language: language)
+        }
+      }
+    }
+
     // 2. EJDict の訳(取込完了を待ってから引く)。英和辞書なので日本語のときだけ。
     var meaning: String?
     if language == .ja {
@@ -130,6 +140,23 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       }
     }
     return info
+  }
+
+  /// 活用形の語義(`simple past of run`)が指す原形を、出てきた順に重複なく返す。
+  ///
+  /// `ran` は run と rin(古語)の両方を指すので、呼ぶ側が辞書に載る最初の語を採る。
+  /// `found`・`left` のように自分の意味も持つ語は、それ自体が辞書に載っていれば
+  /// ここまで来ない(辞書に無ければ、活用形として原形に寄せる)。
+  static func baseForms(_ entries: [KaikkiEntry], of word: String) -> [String] {
+    var bases: [String] = []
+    for sense in entries.flatMap(\.senses) {
+      for formOf in sense.formOf {
+        let base = normalizeHeadword(formOf.word ?? "").lowercased()
+        guard !base.isEmpty, base != word, !bases.contains(base) else { continue }
+        bases.append(base)
+      }
+    }
+    return bases
   }
 
   /// 事前生成辞書の値を WordInfo にする。
