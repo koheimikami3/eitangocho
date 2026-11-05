@@ -1,7 +1,8 @@
-# 句動詞 1000 語。使われる頻度の高い順。
+# 句動詞 996 語。使われる頻度の高い順。
 # 範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 1000 のもの。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
 #   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に archaic, derogatory, obsolete, offensive, vulgar のどれかが付くもの。
+#   個別に除いた句: bite in, feel up, sex in, shit on(表示では落ちなかった性的・卑俗・古い意味だけの句)。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
@@ -664,7 +665,6 @@ creep out
 deal in
 run away with
 set down
-sex in
 sign on
 sleep over
 laugh with
@@ -757,7 +757,6 @@ grow into
 let on
 rule in
 shake up
-shit on
 cut back
 joke around
 make out with
@@ -971,7 +970,6 @@ close in on
 cop on
 cough up
 cut into
-feel up
 fold up
 follow through
 glance over
@@ -987,7 +985,6 @@ roll on
 slack off
 strike out
 tie in
-bite in
 block out
 blow over
 bunk off
