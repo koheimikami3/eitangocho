@@ -59,8 +59,13 @@ try await EjdictImporter.importIfNeeded(dao: database.ejdictDao, source: ejdictS
 
 let session = URLSession(configuration: .default)
 
+// 同梱の事前生成辞書は空にする。辞書に足す語を元の取得経路の値から作るため、辞書の値を返す手順と
+// 活用形を辞書の原形に寄せる手順(DictionaryWordInfoProvider.fetch の 0 と 1.5)を通さない。
+let emptyPrebuiltDictionary = PrebuiltDictionary { Data(#"{"version":1,"words":{}}"#.utf8) }
+
 func makeProvider(_ language: TranslationLanguage) -> DictionaryWordInfoProvider {
   DictionaryWordInfoProvider(
+    prebuiltDictionary: emptyPrebuiltDictionary,
     kaikkiClient: KaikkiClient(session: session),
     tatoebaClient: TatoebaClient(session: session),
     deeplClient: DeeplClient(session: session),
