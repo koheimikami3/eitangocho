@@ -162,6 +162,11 @@ final class WordRegistrationModel {
       translationFailed = info.translationLanguage.translatesExamples && !info.exampleEn.isEmpty && info.exampleTranslation.isEmpty
       enterForm(with: info)
       analytics.logAutofillResult(.success, isPhrase: isPhrase, notice: notice)
+      if info.prebuiltDictionaryMiss {
+        analytics.logAutofillDictionaryMiss(
+          word: info.word, language: info.translationLanguage, isPhrase: isPhrase,
+          missing: AutofillMissingField.of(info))
+      }
     } catch {
       step = .input
       self.error = .fetchFailed

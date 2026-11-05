@@ -216,6 +216,9 @@
   枠は iOS / macOS / Android の合計で決まる。名前と値は変えると過去のデータとつながらない
 - **ユーザーが入力した中身(単語・訳・例文・検索語)と OS のエラー文言は送らない。**
   送るのは区分と件数だけ(App Privacy の申告を「製品の操作」に留めるため)
+  - 例外は `autofill_dictionary_miss` の単語だけ。事前生成辞書に足す語を選ぶのに、語そのものが要るため。
+    kaikki か EJDict に見出しがある英単語に絞り(入力の断片や個人の情報を送らないため)、
+    App Privacy と `PrivacyInfo.xcprivacy` に「その他のユーザコンテンツ(紐付けなし・分析)」を申告する
 - iOS と macOS は Bundle ID が同じなので、Firebase 上は 1 つの Apple アプリを共有する。
   プラットフォームはユーザープロパティ `app_platform` で分ける
 - 自動の screen_view は Info.plist で止めている(Flutter は画面が 1 つで意味のある名前が

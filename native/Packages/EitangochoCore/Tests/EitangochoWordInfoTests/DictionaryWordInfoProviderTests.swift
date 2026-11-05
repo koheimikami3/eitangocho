@@ -194,6 +194,19 @@ struct DictionaryWordInfoProviderTests {
     #expect(tatoebaCalls.count == 1)
   }
 
+  @Test("辞書に無かった語に数えるのは、日本語・繁体字で kaikki か EJDict に見出しがある語だけ")
+  func prebuiltDictionaryMissFlag() async throws {
+    try await seedEjdict(["milksop": "意気地なし"])
+    #expect(try await makeProvider().fetch("milksop")?.prebuiltDictionaryMiss == true)
+    #expect(try await makeProvider(kaikki: ok(achieveJsonl), language: .zhHant).fetch("achieve")?.prebuiltDictionaryMiss == true)
+    // 対象外の言語・Tatoeba だけで埋まった語・辞書に載る語は数えない
+    #expect(try await makeProvider(kaikki: ok(achieveEsFrJsonl), language: .es).fetch("achieve")?.prebuiltDictionaryMiss == false)
+    let tatoebaOnly = makeProvider(tatoeba: ok(tatoebaHit("We've run out of soap.", "石鹸がないです。")))
+    #expect(try await tatoebaOnly.fetch("run out of")?.prebuiltDictionaryMiss == false)
+    let prebuilt = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+    #expect(try await prebuilt.fetch("give up")?.prebuiltDictionaryMiss == false)
+  }
+
   @Test("kaikki・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を訳す")
   func mapsAllFields() async throws {
     try await seedEjdict(["serendipity": "思わぬ発見"])

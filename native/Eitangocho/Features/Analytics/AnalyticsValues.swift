@@ -1,4 +1,5 @@
 import EitangochoSync
+import EitangochoWordInfo
 import Foundation
 
 // 計測に送る値の変換(Flutter 版の analytics_values.dart)。GA4 のレポートで読みやすく、後から
@@ -7,6 +8,24 @@ import Foundation
 /// 単語の自動入力の結果(autofill_result の result)。
 enum AutofillResult: String, Sendable {
   case success, notFound, fetchFailed
+}
+
+/// 自動入力の後も空だった欄(autofill_dictionary_miss の missing)。並びは送る順。
+enum AutofillMissingField: String, CaseIterable, Sendable {
+  case ipa, meaning, example
+  case exampleTranslation = "example_translation"
+
+  /// 取得結果のうち空の欄。
+  static func of(_ info: WordInfo) -> [Self] {
+    allCases.filter { field in
+      switch field {
+      case .ipa: info.ipa.isEmpty
+      case .meaning: info.meaning.isEmpty
+      case .example: info.exampleEn.isEmpty
+      case .exampleTranslation: info.exampleTranslation.isEmpty
+      }
+    }
+  }
 }
 
 /// クイズを始めた契機(quiz_started の trigger)。

@@ -113,6 +113,10 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     // 出番は EJDict が持たない見出し(句動詞がほぼこれに当たる)だけになる。
     var info = mapEntries(normalized, entries ?? [], language: language)
     if let meaning { info.meaning = meaning }
+    // 英単語として実在が確かめられる語(kaikki か EJDict に見出しがある)だけを、辞書に無かった語に数える。
+    // Tatoeba だけで埋まった語は綴り間違いや入力の断片がありうるので数えない(計測で入力そのものを送るため)。
+    info.prebuiltDictionaryMiss =
+      PrebuiltDictionary.covers(language) && (!(entries ?? []).isEmpty || meaning != nil)
 
     // 4. Tatoeba の例文を優先する。訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
