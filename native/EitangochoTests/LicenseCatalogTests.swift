@@ -132,7 +132,7 @@ struct LicenseCatalogTests {
     let items = try LicenseCatalog.load()
     #expect(
       items.map(\.name) == [
-        "Andika", "EJDict-hand", "Firebase", "Google Translate", "GoogleAdsOnDeviceConversion",
+        "Andika", "Eitangocho Dictionary", "EJDict-hand", "Firebase", "Google Translate", "GoogleAdsOnDeviceConversion",
         "GoogleAppMeasurement", "GoogleUtilities", "GRDB.swift", "Inter", "nanopb", "Noto Sans JP", "Noto Sans TC",
         "Promises", "Tatoeba", "Wiktionary / kaikki.org",
       ])
@@ -141,6 +141,7 @@ struct LicenseCatalogTests {
     #expect(summaries["GRDB.swift"] == "MIT License")
     #expect(summaries["Firebase"] == "Apache License 2.0")
     #expect(summaries["Tatoeba"] == "CC BY 2.0 FR")
+    #expect(summaries["Eitangocho Dictionary"] == "CC BY-SA 4.0")
   }
 
   @Test func iOSだけのパッケージの本文も同梱されている() throws {
