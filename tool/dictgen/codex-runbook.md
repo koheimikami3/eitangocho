@@ -57,4 +57,5 @@ python3 validate.py out/<出力>
 
 - `input-NNN.json`、`fill-instructions.md`、`words/`、`validate.py`、`Sources/` を変えない
 - `out/<出力>/cache.sqlite` を消さない(収集のやり直しに使う)
+- `build_bundle.py` を回さない(アプリへの組み込みは、内容を確かめてから別に行う)
 - git のコミット・プッシュをしない
