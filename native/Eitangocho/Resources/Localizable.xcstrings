@@ -2825,6 +2825,42 @@
         }
       }
     },
+    "noticeBaseForm" : {
+      "comment" : "自動入力で活用形(ran)を原形(run)に置き換えたときの注意。1 つ目が入力、2 つ目が原形",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changed “%1$@” to its base form “%2$@”"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se cambió «%1$@» a su forma base «%2$@»"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %1$@ » a été remplacé par sa forme de base « %2$@ »"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%1$@」を原形の「%2$@」にしました"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已將「%1$@」改為原形「%2$@」"
+          }
+        }
+      }
+    },
     "noticeMeaningNotFound" : {
       "extractionState" : "manual",
       "localizations" : {

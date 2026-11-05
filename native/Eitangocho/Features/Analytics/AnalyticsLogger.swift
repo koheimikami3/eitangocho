@@ -7,6 +7,7 @@ import Foundation
 ///
 /// 各イベントは「値によってどの判断が変わるか」で絞り込んだもの(docs/design.md「計測」)。
 /// **ユーザーが入力した中身(単語・訳・検索語・例文)は送らない**。送るのは区分と件数だけ。
+/// 例外は autofill_dictionary_miss の単語だけ(事前生成辞書に足す語を集めるため。docs/design.md「計測」)。
 /// 名前と値は Flutter 版と同じ(変えると過去のデータとつながらない)。
 struct AnalyticsLogger {
   /// soon_after_quiz の判定に使う、クイズで答えてからの時間。
@@ -41,6 +42,22 @@ struct AnalyticsLogger {
       parameters["notice"] = notice.map { snakeCase(String(describing: $0)) } ?? "none"
     }
     log("autofill_result", parameters)
+  }
+
+  /// 自動入力で事前生成辞書に無かった語(`WordInfo.prebuiltDictionaryMiss`)。次の版で辞書に足す語を選ぶのに使う。
+  /// `missing` は自動入力の後も空だった欄で、取得経路で埋まらない語ほど先に足す。
+  func logAutofillDictionaryMiss(
+    word: String, language: TranslationLanguage, isPhrase: Bool, missing: [AutofillMissingField]
+  ) {
+    log(
+      "autofill_dictionary_miss",
+      [
+        // GA4 のパラメータの値は 100 文字まで
+        "word": String(word.prefix(100)),
+        "translation_language": language.storageCode,
+        "is_phrase": boolValue(isPhrase),
+        "missing": missing.isEmpty ? "none" : missing.map(\.rawValue).joined(separator: ","),
+      ])
   }
 
   /// 単語の登録。自動入力の値を書き換えたかは自動入力のときだけ送る(手動入力では比べる元が無い)。

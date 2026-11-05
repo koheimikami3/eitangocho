@@ -44,6 +44,24 @@ private let commuteDefinitionJsonl = """
 
   """
 
+/// 事前生成辞書(build_bundle.py が書く形)。
+private let prebuiltFixture = """
+  {"version":1,"words":{"give up":{"ipa":"/ˌɡɪv ˈʌp/","pos":["verb"],"exampleEn":"Don't give up before you try.",\
+  "ja":{"meaning":"諦める / …をやめる","exampleTranslation":"やってみる前に諦めないで。"},\
+  "zhHant":{"meaning":"放棄 / 戒掉","exampleTranslation":"試之前別放棄。"}},\
+  "run":{"ipa":"/ɹʌn/","pos":["verb","noun"],"exampleEn":"I run in the park every morning.",\
+  "ja":{"meaning":"走る / …を経営する","exampleTranslation":"私は毎朝公園を走る。"},\
+  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}}}}
+  """
+
+/// `ran` の実レスポンスから語義の形だけ抜き出したもの。活用形の語義は run と rin(古語)を指し、
+/// 自分の意味(名詞)も混ざる。
+private let ranJsonl = """
+  {"word":"ran","pos":"verb","senses":[{"glosses":["simple past of run"],"tags":["form-of","past"],"form_of":[{"word":"run"}]},{"glosses":["simple past of rin"],"tags":["form-of","past"],"form_of":[{"word":"rin"}]}]}
+  {"word":"ran","pos":"noun","senses":[{"glosses":["Yarns coiled on a spun-yarn winch."],"tags":["uncountable"]}]}
+
+  """
+
 /// Tatoeba のヒット 1 件分のレスポンス。
 private func tatoebaHit(_ en: String, _ ja: String) -> String {
   json(["data": [["text": en, "translations": [["lang": "jpn", "text": ja]]]]])
@@ -63,7 +81,9 @@ struct DictionaryWordInfoProviderTests {
   }
 
   /// kaikki / Tatoeba / DeepL のレスポンスを差し替えて組み立てる。
+  /// 事前生成辞書は既定で空にする(同梱の辞書に載る語で、取得経路の振る舞いを確かめられるように)。
   private func makeProvider(
+    prebuilt: PrebuiltDictionary = .init { Data(#"{"version":1,"words":{}}"#.utf8) },
     kaikki: Respond? = nil,
     tatoeba: Respond? = nil,
     deepl: Respond? = nil,
@@ -72,6 +92,7 @@ struct DictionaryWordInfoProviderTests {
   ) -> DictionaryWordInfoProvider {
     let (kaikkiCalls, tatoebaCalls, deeplCalls) = (kaikkiCalls, tatoebaCalls, deeplCalls)
     return DictionaryWordInfoProvider(
+      prebuiltDictionary: prebuilt,
       kaikkiClient: KaikkiClient(
         session: StubURLProtocol.session { request, _ in
           kaikkiCalls.append(request)
@@ -100,6 +121,91 @@ struct DictionaryWordInfoProviderTests {
   }
 
   private func ok(_ body: String) -> Respond { { .init(status: 200, body: body) } }
+
+  @Test("事前生成辞書に載る語は、通信せず辞書の値だけを返す")
+  func prebuiltDictionaryHit() async throws {
+    try await seedEjdict(["give up": "あきらめる(EJDict 側)"])
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(giveUpJsonl))
+
+    let info = try #require(try await provider.fetch(" Give Up "))
+
+    #expect(info == WordInfo(
+      word: "give up", ipa: "/ˌɡɪv ˈʌp/", partsOfSpeech: [.verb], meaning: "諦める / …をやめる",
+      exampleEn: "Don't give up before you try.", exampleTranslation: "やってみる前に諦めないで。"))
+    #expect(kaikkiCalls.count == 0)
+    #expect(tatoebaCalls.count == 0)
+  }
+
+  @Test("繁体字では事前生成辞書の繁体字の訳を返す")
+  func prebuiltDictionaryTraditionalChinese() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, language: .zhHant)
+
+    let info = try #require(try await provider.fetch("give up"))
+
+    #expect(info.meaning == "放棄 / 戒掉")
+    #expect(info.exampleTranslation == "試之前別放棄。")
+    #expect(info.translationLanguage == .zhHant)
+  }
+
+  // 事前生成辞書は日本語と繁体字の訳しか持たない。
+  @Test("スペイン語・英語の語義では事前生成辞書を使わない")
+  func prebuiltDictionaryOnlyForCoveredLanguages() async throws {
+    for language in [TranslationLanguage.es, .enDefinition] {
+      let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(giveUpJsonl), language: language)
+      let info = try await provider.fetch("give up")
+      #expect(info?.exampleEn != "Don't give up before you try.")
+    }
+    #expect(kaikkiCalls.count == 1)  // 2 回目はキャッシュから読む
+  }
+
+  @Test("事前生成辞書が読めなくても、取得経路で自動入力を続ける")
+  func unreadablePrebuiltDictionary() async throws {
+    let provider = makeProvider(prebuilt: .init { Data("broken".utf8) }, kaikki: ok(giveUpJsonl))
+    #expect(try await provider.fetch("give up")?.meaning == "降服する / 諦める / やめる")
+  }
+
+  @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")
+  func mapsInflectionToPrebuiltHeadword() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(ranJsonl))
+
+    let first = try #require(try await provider.fetch("ran"))
+    let second = try #require(try await provider.fetch("ran"))
+
+    #expect(first.word == "run")
+    #expect(first.meaning == "走る / …を経営する")
+    #expect(second == first)
+    #expect(kaikkiCalls.count == 1)
+    #expect(tatoebaCalls.count == 0)
+  }
+
+  @Test("句動詞の活用形も原形に寄せる")
+  func mapsPhrasalVerbInflection() async throws {
+    let gaveUp = #"{"word":"gave up","pos":"verb","senses":[{"glosses":["simple past of give up"],"tags":["form-of"],"form_of":[{"word":"give up"}]}]}"#
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(gaveUp))
+
+    #expect(try await provider.fetch("gave up")?.word == "give up")
+  }
+
+  @Test("原形が事前生成辞書に無ければ、入力のまま今までの経路で返す")
+  func keepsInflectionWithoutPrebuiltBase() async throws {
+    let info = try #require(try await makeProvider(kaikki: ok(ranJsonl)).fetch("ran"))
+
+    #expect(info.word == "ran")
+    #expect(tatoebaCalls.count == 1)
+  }
+
+  @Test("辞書に無かった語に数えるのは、日本語・繁体字で kaikki か EJDict に見出しがある語だけ")
+  func prebuiltDictionaryMissFlag() async throws {
+    try await seedEjdict(["milksop": "意気地なし"])
+    #expect(try await makeProvider().fetch("milksop")?.prebuiltDictionaryMiss == true)
+    #expect(try await makeProvider(kaikki: ok(achieveJsonl), language: .zhHant).fetch("achieve")?.prebuiltDictionaryMiss == true)
+    // 対象外の言語・Tatoeba だけで埋まった語・辞書に載る語は数えない
+    #expect(try await makeProvider(kaikki: ok(achieveEsFrJsonl), language: .es).fetch("achieve")?.prebuiltDictionaryMiss == false)
+    let tatoebaOnly = makeProvider(tatoeba: ok(tatoebaHit("We've run out of soap.", "石鹸がないです。")))
+    #expect(try await tatoebaOnly.fetch("run out of")?.prebuiltDictionaryMiss == false)
+    let prebuilt = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+    #expect(try await prebuilt.fetch("give up")?.prebuiltDictionaryMiss == false)
+  }
 
   @Test("kaikki・EJDict 両ヒット: 全項目をマッピングし DeepL で例文を訳す")
   func mapsAllFields() async throws {

@@ -1,13 +1,15 @@
 import EitangochoData
 import Foundation
 
-/// WordInfoProvider の辞書ベース実装(kaikki + Tatoeba + EJDict + DeepL)。
+/// WordInfoProvider の辞書ベース実装(事前生成辞書 + kaikki + Tatoeba + EJDict + DeepL)。
 ///
-/// 訳は訳の言語(TranslationLanguage)で取得する。日本語は同梱の EJDict を
-/// 優先し、それ以外の言語は kaikki の訳語だけを使う(同梱できる辞書が無い)。
+/// 訳は訳の言語(TranslationLanguage)で取得する。日本語と繁体字では同梱の
+/// 事前生成辞書を最優先し、載っている語は通信せずにその値だけを返す。
+/// 載っていない語は、日本語なら同梱の EJDict、それ以外の言語は kaikki の訳語を使う。
 /// 英語の語義は kaikki の語義の文から採る。
 /// 依存はすべて init で受け取り、テストで差し替えられるようにする。
 public struct DictionaryWordInfoProvider: WordInfoProvider {
+  private let prebuiltDictionary: PrebuiltDictionary
   private let kaikkiClient: KaikkiClient
   private let tatoebaClient: TatoebaClient
   private let deeplClient: DeeplClient
@@ -22,6 +24,7 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
   private let getTranslationLanguage: @Sendable () async -> TranslationLanguage
 
   public init(
+    prebuiltDictionary: PrebuiltDictionary,
     kaikkiClient: KaikkiClient,
     tatoebaClient: TatoebaClient,
     deeplClient: DeeplClient,
@@ -31,6 +34,7 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     getDeeplApiKey: @escaping @Sendable () async -> String,
     getTranslationLanguage: @escaping @Sendable () async -> TranslationLanguage
   ) {
+    self.prebuiltDictionary = prebuiltDictionary
     self.kaikkiClient = kaikkiClient
     self.tatoebaClient = tatoebaClient
     self.deeplClient = deeplClient
@@ -59,6 +63,12 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     let normalized = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     let language = await getTranslationLanguage()
 
+    // 0. 事前生成辞書に載っていれば、その値だけで返す。訳・例文・例文の訳を検査済みの値で
+    //    揃えて作ってあり、取得経路で引き直すと質が下がるうえ通信が要るため。
+    if let entry = await prebuiltDictionary.lookup(normalized, language: language) {
+      return Self.wordInfo(normalized, entry, language: language)
+    }
+
     // 1. kaikki: キャッシュ優先、miss なら取得し成功時のみ保存。
     //    取得に失敗しても例外にせず、EJDict の訳だけで登録を続けられるようにする
     //    (辞書ソースが落ちている間に登録フロー全体が死ぬのを防ぐ。
@@ -74,6 +84,16 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       entries = try entriesJson.map(KaikkiClient.parseEntries)
     } catch let error as WordInfoError {
       kaikkiFailure = error
+    }
+
+    // 1.5 活用形(ran・gave up)なら、その原形が事前生成辞書に載っていれば原形の値を返す。
+    //     WordInfo.word を原形にするので、登録の見出しも原形に置き換わる。
+    if let entries {
+      for base in Self.baseForms(entries, of: normalized) {
+        if let entry = await prebuiltDictionary.lookup(base, language: language) {
+          return Self.wordInfo(base, entry, language: language)
+        }
+      }
     }
 
     // 2. EJDict の訳(取込完了を待ってから引く)。英和辞書なので日本語のときだけ。
@@ -93,6 +113,10 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     // 出番は EJDict が持たない見出し(句動詞がほぼこれに当たる)だけになる。
     var info = mapEntries(normalized, entries ?? [], language: language)
     if let meaning { info.meaning = meaning }
+    // 英単語として実在が確かめられる語(kaikki か EJDict に見出しがある)だけを、辞書に無かった語に数える。
+    // Tatoeba だけで埋まった語は綴り間違いや入力の断片がありうるので数えない(計測で入力そのものを送るため)。
+    info.prebuiltDictionaryMiss =
+      PrebuiltDictionary.covers(language) && (!(entries ?? []).isEmpty || meaning != nil)
 
     // 4. Tatoeba の例文を優先する。訳が対で付いてくるうえ、kaikki の例文より
     //    単語帳向き(kaikki 側は語義の説明が目的で、断片や文献引用が混ざる)。
@@ -120,6 +144,36 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       }
     }
     return info
+  }
+
+  /// 活用形の語義(`simple past of run`)が指す原形を、出てきた順に重複なく返す。
+  ///
+  /// `ran` は run と rin(古語)の両方を指すので、呼ぶ側が辞書に載る最初の語を採る。
+  /// `found`・`left` のように自分の意味も持つ語は、それ自体が辞書に載っていれば
+  /// ここまで来ない(辞書に無ければ、活用形として原形に寄せる)。
+  static func baseForms(_ entries: [KaikkiEntry], of word: String) -> [String] {
+    var bases: [String] = []
+    for sense in entries.flatMap(\.senses) {
+      for formOf in sense.formOf {
+        let base = normalizeHeadword(formOf.word ?? "").lowercased()
+        guard !base.isEmpty, base != word, !bases.contains(base) else { continue }
+        bases.append(base)
+      }
+    }
+    return bases
+  }
+
+  /// 事前生成辞書の値を WordInfo にする。
+  static func wordInfo(_ word: String, _ entry: PrebuiltEntry, language: TranslationLanguage) -> WordInfo {
+    WordInfo(
+      word: word,
+      ipa: entry.ipa,
+      partsOfSpeech: entry.partsOfSpeech,
+      meaning: entry.meaning,
+      exampleEn: entry.exampleEn,
+      exampleTranslation: entry.exampleTranslation,
+      translationLanguage: language
+    )
   }
 
   /// kaikki のエントリ(1 件 = 1 品詞)を WordInfo に畳み込む。

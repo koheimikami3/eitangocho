@@ -100,15 +100,25 @@ public struct KaikkiTranslation: Codable, Equatable, Sendable {
 /// 語義。glosses は語義の文で、下位の語義では `[上位の語義, この語義]` の
 /// ように上位から並ぶ(最後がこの語義そのもの)。tags は `obsolete` /
 /// `archaic` / `form-of` などの注記で、英語の語義を選ぶときの除外に使う。
+/// formOf は活用形の語義(`simple past of run`)が指す原形で、事前生成辞書の見出しに寄せるのに使う。
 public struct KaikkiSense: Codable, Equatable, Sendable {
   public var glosses: [String]
   public var tags: [String]
   public var examples: [KaikkiExample]
+  public var formOf: [KaikkiFormOf]
 
-  public init(glosses: [String] = [], tags: [String] = [], examples: [KaikkiExample] = []) {
+  enum CodingKeys: String, CodingKey {
+    case glosses, tags, examples
+    case formOf = "form_of"
+  }
+
+  public init(
+    glosses: [String] = [], tags: [String] = [], examples: [KaikkiExample] = [], formOf: [KaikkiFormOf] = []
+  ) {
     self.glosses = glosses
     self.tags = tags
     self.examples = examples
+    self.formOf = formOf
   }
 
   public init(from decoder: any Decoder) throws {
@@ -116,6 +126,30 @@ public struct KaikkiSense: Codable, Equatable, Sendable {
     glosses = container.lenientList(String.self, .glosses)
     tags = container.lenientList(String.self, .tags)
     examples = container.lenientList(KaikkiExample.self, .examples)
+    formOf = container.lenientList(KaikkiFormOf.self, .formOf)
+  }
+
+  /// 活用形の語義を持たない語義(大半)ではキャッシュに `form_of` を書かない(キャッシュを膨らませないため)。
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(glosses, forKey: .glosses)
+    try container.encode(tags, forKey: .tags)
+    try container.encode(examples, forKey: .examples)
+    if !formOf.isEmpty { try container.encode(formOf, forKey: .formOf) }
+  }
+}
+
+/// 活用形の語義が指す語(`form_of` の要素。生のレスポンスと同じ `{"word": "run"}` の形)。
+public struct KaikkiFormOf: Codable, Equatable, Sendable {
+  public var word: String?
+
+  public init(word: String? = nil) {
+    self.word = word
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    word = container.lenient(String.self, .word)
   }
 }
 

@@ -53,6 +53,8 @@ final class WordRegistrationModel {
   private(set) var notFound = false
   /// 英例文はあるのに訳が取れなかった(訳は空のまま続行し警告を出す)
   private(set) var translationFailed = false
+  /// 自動入力で活用形を原形に置き換えたときの、元の入力(ran → run の ran)。置き換えていなければ nil。
+  private(set) var replacedInput: String?
   private(set) var selectedPartsOfSpeech: Set<PartOfSpeech> = []
   private(set) var error: RegistrationError?
   /// 直前に登録した単語。ステップ 1 に「登録しました」と出すために持つ。
@@ -106,6 +108,12 @@ final class WordRegistrationModel {
     return nil
   }
 
+  /// 活用形を原形に置き換えたことの注意(置き換えていなければ nil)。
+  var baseFormNotice: String? {
+    guard let replacedInput, let base = fetched?.word else { return nil }
+    return RegistrationMessages.baseForm(input: replacedInput, baseForm: base)
+  }
+
   /// 品詞のバッジは「選択が 0 件になったら消す」。
   func showsBadge(_ field: Field) -> Bool {
     guard autoFilledFields.contains(field) else { return false }
@@ -127,6 +135,7 @@ final class WordRegistrationModel {
     step = .loading
     error = nil
     registeredWord = nil
+    replacedInput = nil
     // 句(空白を含む見出し語)は辞書の収録が薄いので、取得率を分けて見る。
     let isPhrase = headword.contains(" ")
     do {
@@ -139,11 +148,25 @@ final class WordRegistrationModel {
       // 抽象は翻訳の失敗を返せないため、「英例文はあるのに訳が空」を失敗とみなす
       // (取得成功で空になることは実質ない)。辞書側(kaikki)の例文を採ったときは
       // 対訳が無いのでここに該当する。例文の訳を持たない言語(英語の語義)では空が正常。
+      // 活用形を辞書の原形に寄せたときは、原形で重複を見直す(run が登録済みなら ran で登録させない)。
+      // provider は小文字にした見出しを返すので、大文字の入力(Apple)は置き換えに数えない。
+      if info.word != headword.lowercased() {
+        if await rejectIfDuplicate(info.word) {
+          step = .input
+          return
+        }
+        replacedInput = headword
+      }
       notFound = false
       selectedPartsOfSpeech = Set(info.partsOfSpeech)
       translationFailed = info.translationLanguage.translatesExamples && !info.exampleEn.isEmpty && info.exampleTranslation.isEmpty
       enterForm(with: info)
       analytics.logAutofillResult(.success, isPhrase: isPhrase, notice: notice)
+      if info.prebuiltDictionaryMiss {
+        analytics.logAutofillDictionaryMiss(
+          word: info.word, language: info.translationLanguage, isPhrase: isPhrase,
+          missing: AutofillMissingField.of(info))
+      }
     } catch {
       step = .input
       self.error = .fetchFailed
@@ -154,6 +177,7 @@ final class WordRegistrationModel {
   /// ステップ 1 の「スキップして手動で入力する」(空のフォームへ)。
   func skipToManual() {
     notFound = false
+    replacedInput = nil
     translationFailed = false
     error = nil
     registeredWord = nil
@@ -165,6 +189,7 @@ final class WordRegistrationModel {
     step = .input
     fetched = nil
     notFound = false
+    replacedInput = nil
     translationFailed = false
     error = nil
     selectedPartsOfSpeech = []

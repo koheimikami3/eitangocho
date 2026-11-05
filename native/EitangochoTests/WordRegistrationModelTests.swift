@@ -324,6 +324,43 @@ struct WordRegistrationModelTests {
     #expect(try await database.wordDao.getAll().count == 1)
   }
 
+  // MARK: - 活用形の原形への置き換え
+
+  @Test func 活用形を原形に置き換えたら見出しを原形にして知らせる() async {
+    let model = makeModel { _ in WordInfo(word: "run", meaning: "走る") }
+    model.word = "ran"
+    await model.autoFill()
+    #expect(model.step == .form)
+    #expect(model.word == "run")
+    #expect(model.replacedInput == "ran")
+    #expect(model.baseFormNotice != nil)
+  }
+
+  @Test func 大文字の入力は置き換えに数えない() async {
+    let model = makeModel { _ in Self.fetchedInfo }
+    model.word = "Serendipity"
+    await model.autoFill()
+    #expect(model.replacedInput == nil)
+    #expect(model.baseFormNotice == nil)
+  }
+
+  @Test func 原形が登録済みなら重複で止める() async throws {
+    try await insertApple()
+    let model = makeModel { _ in WordInfo(word: "apple", meaning: "りんご") }
+    model.word = "apples"
+    await model.autoFill()
+    #expect(model.step == .input)
+    #expect(model.error == .duplicate("apple"))
+  }
+
+  @Test func 戻ると置き換えの知らせを消す() async {
+    let model = makeModel { _ in WordInfo(word: "run", meaning: "走る") }
+    model.word = "ran"
+    await model.autoFill()
+    model.backToInput()
+    #expect(model.replacedInput == nil)
+  }
+
   // MARK: - 句動詞の空白の正規化
 
   @Test func autoFillは語間の連続空白を1つに畳んで辞書を引く() async {

@@ -19,4 +19,9 @@ enum RegistrationMessages {
     case .onlyMeaningFound: String(localized: .noticeOnlyMeaningFound)
     }
   }
+
+  /// 自動入力で活用形(input)を辞書の原形(baseForm)に置き換えたことを伝える。
+  static func baseForm(input: String, baseForm: String) -> String {
+    String(localized: .noticeBaseForm(input, baseForm))
+  }
 }

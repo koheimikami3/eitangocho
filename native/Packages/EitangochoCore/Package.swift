@@ -27,7 +27,9 @@ let package = Package(
     ),
     .target(
       name: "EitangochoWordInfo",
-      dependencies: ["EitangochoData"]
+      dependencies: ["EitangochoData"],
+      // 事前生成辞書(tool/dictgen の build_bundle.py が書き出す)
+      resources: [.copy("Resources/prebuilt-dictionary.json")]
     ),
     .testTarget(
       name: "EitangochoDataTests",

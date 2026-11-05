@@ -32,6 +32,19 @@ struct AnalyticsLoggerTests {
       ])
   }
 
+  // MARK: - autofill_dictionary_miss
+
+  @Test func 辞書に無かった語は単語と空の欄を送る() {
+    logger.logAutofillDictionaryMiss(word: "serendipity", language: .zhHant, isPhrase: false, missing: [.ipa, .exampleTranslation])
+    logger.logAutofillDictionaryMiss(word: String(repeating: "a", count: 120), language: .ja, isPhrase: true, missing: [])
+
+    #expect(
+      client.eventsNamed("autofill_dictionary_miss") == [
+        ["word": "serendipity", "translation_language": "zh-Hant", "is_phrase": "false", "missing": "ipa,example_translation"],
+        ["word": String(repeating: "a", count: 100), "translation_language": "ja", "is_phrase": "true", "missing": "none"],
+      ])
+  }
+
   // MARK: - word_registered
 
   @Test func 自動入力なら書き換えの有無を送る() {

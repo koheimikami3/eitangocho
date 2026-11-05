@@ -6,6 +6,8 @@
   - UserDefaults(CA92.1): 設定値・同期とレビュー依頼の記録。アプリ自身しか読み書きしない(App Group の UserDefaults は使わない)
   - ファイルの日時(C617.1): Flutter 版の DB の引き継ぎで元ファイルの更新日時を記録し、iCloud のスナップショットと
     競合版の更新日時を比べる。どれもアプリのコンテナ・App Group・アプリの iCloud コンテナの中のファイル
+  集めるデータ: 自動入力で事前生成辞書に無かった英単語(その他のユーザコンテンツ・紐付けなし・分析)。
+    辞書に足す語を選ぶため。Firebase が集める分は Firebase のマニフェストが持つ
   使う API を足したら(ディスクの空き容量・起動からの時間など)、ここに理由を足す。
 -->
 <plist version="1.0">
@@ -15,7 +17,20 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>

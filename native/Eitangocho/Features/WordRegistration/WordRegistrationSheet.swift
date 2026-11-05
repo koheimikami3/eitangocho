@@ -117,6 +117,11 @@
     private func formStep(_ language: TranslationLanguage) -> some View {
       let languageLabel = String(localized: language.shortLabel)
       return VStack(alignment: .leading, spacing: 0) {
+        // 見出しを書き換えたことは、他の注意より先に伝える(英単語の欄を見直してもらうため)。
+        if let baseFormNotice = model.baseFormNotice {
+          MobileRegistrationWarningBanner(message: baseFormNotice)
+            .padding(.bottom, 14)
+        }
         if let notice = model.notice {
           MobileRegistrationWarningBanner(message: RegistrationMessages.notice(notice, language: language))
             .padding(.bottom, 14)

@@ -16,6 +16,10 @@ public struct WordInfo: Equatable, Sendable {
   /// (docs/design.md)。words の同名の列を埋める経路だけ残している。
   public var audioUrl: String
 
+  /// 事前生成辞書に無く、取得経路(kaikki か EJDict)には見出しがあった語か。
+  /// 辞書へ足す語を計測で集めるのに使う。訳の言語が日本語・繁体字のときだけ立つ。
+  public var prebuiltDictionaryMiss: Bool
+
   public init(
     word: String,
     ipa: String = "",
@@ -24,7 +28,8 @@ public struct WordInfo: Equatable, Sendable {
     exampleEn: String = "",
     exampleTranslation: String = "",
     translationLanguage: TranslationLanguage = .ja,
-    audioUrl: String = ""
+    audioUrl: String = "",
+    prebuiltDictionaryMiss: Bool = false
   ) {
     self.word = word
     self.ipa = ipa
@@ -34,6 +39,7 @@ public struct WordInfo: Equatable, Sendable {
     self.exampleTranslation = exampleTranslation
     self.translationLanguage = translationLanguage
     self.audioUrl = audioUrl
+    self.prebuiltDictionaryMiss = prebuiltDictionaryMiss
   }
 }
 
@@ -63,7 +69,7 @@ public struct WordInfoError: Error, Sendable, CustomStringConvertible {
 }
 
 /// 単語情報の自動取得を抽象化する(将来 LLM 実装への差し替えを可能にするため)。
-/// 実装は DictionaryWordInfoProvider(kaikki + Tatoeba + EJDict)。
+/// 実装は DictionaryWordInfoProvider(事前生成辞書 + kaikki + Tatoeba + EJDict)。
 public protocol WordInfoProvider: Sendable {
   /// 辞書に未収録の場合は nil を返す。ネットワーク等の失敗は WordInfoError を投げる。
   func fetch(_ word: String) async throws -> WordInfo?
