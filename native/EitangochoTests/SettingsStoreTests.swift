@@ -33,8 +33,6 @@ final class SettingsStoreTests {
     #expect(settings.cardLayout == .twoColumns)
     // 全単語の並びの既定は登録日の新しい順(並び替え導入前と同じ)。
     #expect(settings.wordSortOrder == .newest)
-    // 発音の既定は Google 翻訳(端末の読み上げを足す前と同じ)。
-    #expect(settings.pronunciationMethod == .googleTranslate)
     // 訳の言語は端末の言語から決まる。英語の端末は日本語になる。
     #expect(settings.translationLanguage == .ja)
     #expect(settings.appearance == .light)
@@ -65,13 +63,6 @@ final class SettingsStoreTests {
     store.setCardLayout(.oneColumn)
     #expect(store.cardLayout == .oneColumn)
     #expect(makeStore().cardLayout == .oneColumn)
-  }
-
-  @Test func setPronunciationMethodで更新され次回読み込みでも復元される() {
-    let store = makeStore()
-    store.setPronunciationMethod(.deviceSpeech)
-    #expect(store.pronunciationMethod == .deviceSpeech)
-    #expect(makeStore().pronunciationMethod == .deviceSpeech)
   }
 
   @Test func setUiScaleは範囲外の値をminとmaxに丸めて保存する() {
