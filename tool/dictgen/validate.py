@@ -42,6 +42,8 @@ FULLWIDTH_PUNCT = re.compile("[，。？！；：、]")
 KO_SENTENCE = re.compile(r"(?<=[.?!])\s+")
 # 文末は 해라체(다)か 해요체(요・죠)。引用符で閉じる文も通す
 KO_SENTENCE_END = re.compile(r"[다요죠][.?!][\"”']?$")
+# 반말の文末は語尾が多いので、ハングルと .?! で終わることだけを見る
+KO_CASUAL_SENTENCE_END = re.compile(r"[가-힣][.?!][\"”']?$")
 # 니다 の前の音節の終声が ㅂ なら 합쇼체(합니다・입니다・습니다)。아니다 は 해라체なので通す
 HANGUL_BASE, JONGSEONG_COUNT, JONGSEONG_BIEUP = 0xAC00, 28, 17
 KO_NIDA_END = re.compile(r"([가-힣])니다[.?!][\"”']?$")
@@ -164,8 +166,13 @@ def check_ko_word(inp, out, problems):
     if any(len(s.split(",")) > MAX_WORDS_PER_SENSE for s in senses):
         problems.append(f"{word} meaning: 1 語義の訳語が 4 個以上ある")
 
+    # 卑語の語は、訳全体の先頭に注記を 1 つ付け、発言の文は 반말でもよい
+    is_vulgar = inp["ja"].startswith("(卑語)")
+    if meaning.count("(비속어)") != is_vulgar or (is_vulgar and not meaning.startswith("(비속어) ")):
+        problems.append(f"{word} meaning: 注記 (비속어) は ja に(卑語)がある語の先頭に 1 つだけ")
+
     for sentence in KO_SENTENCE.split(translation):
-        if not KO_SENTENCE_END.search(sentence):
+        if not (KO_CASUAL_SENTENCE_END if is_vulgar else KO_SENTENCE_END).search(sentence):
             problems.append(f"{word} exampleTranslation: 文末が 다・요・죠 と .?! でない「{sentence}」")
         elif is_ko_formal(sentence):
             problems.append(f"{word} exampleTranslation: 합쇼체が使われている「{sentence}」")
