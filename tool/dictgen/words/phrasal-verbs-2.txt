@@ -1,8 +1,8 @@
-# 句動詞の続き 963 語。使われる頻度の高い順。
+# 句動詞の続き 960 語。使われる頻度の高い順。
 # 範囲: Wiktionary の句動詞のうち、差別語・古語の表示がなく(卑語は除かない)、Tatoeba で 4 文以上のもののうち、ほかの単語リストに無いもの。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
 #   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に archaic, derogatory, obsolete, offensive のどれかが付くもの。
-#   個別に除いた句: bite in, sex in(表示では落ちなかった性的・古い意味だけの句)。
+#   個別に除いた句: ass out, bite in, blood out, paw off, sex in(表示では落ちなかった性的・古い意味だけの句と、句動詞でない文で 4 文に届いた句)。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
@@ -312,7 +312,6 @@ tear away
 tear out
 wash over
 add on
-ass out
 block off
 branch out
 break apart
@@ -357,7 +356,6 @@ weigh up
 weight down
 word up
 zone in
-blood out
 breathe out
 budge up
 burn off
@@ -781,7 +779,6 @@ monkey around
 move off
 nose around
 open out
-paw off
 pay down
 play through
 plug away

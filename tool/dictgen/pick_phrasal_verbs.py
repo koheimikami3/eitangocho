@@ -54,6 +54,12 @@ MANUAL_EXCLUDED_VULGAR = {
     "feel up",  # 性的にさわる意味だけ
     "shit on",  # 表示の無い意味が文字どおりの 1 つだけで、残りは vulgar
 }
+# 句動詞でない文で 4 文に届いた珍しい句(文数は語が並ぶ文を数えるだけなので、句の用法かは見分けられない)
+MANUAL_EXCLUDED_ACCIDENTAL = {
+    "ass out",  # Tatoeba に句動詞の用例が無い
+    "blood out",  # blood out of a stone など
+    "paw off",  # paws off me など
+}
 # phrasal-verbs は生成済みなので範囲を変えない。phrasal-verbs-2 はその続きで、
 # ドラマなどで出て意味を調べたい語のために卑語を除かない(順位は卑語を含めて付け直す)
 LISTS = {
@@ -73,8 +79,8 @@ LISTS = {
         "allow_vulgar": True,
         "title": "句動詞の続き",
         "scope": "差別語・古語の表示がなく(卑語は除かない)、Tatoeba で 4 文以上のもののうち、ほかの単語リストに無いもの",
-        "manual_excluded": MANUAL_EXCLUDED,
-        "manual_note": "表示では落ちなかった性的・古い意味だけの句",
+        "manual_excluded": MANUAL_EXCLUDED | MANUAL_EXCLUDED_ACCIDENTAL,
+        "manual_note": "表示では落ちなかった性的・古い意味だけの句と、句動詞でない文で 4 文に届いた句",
     },
 }
 # 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
