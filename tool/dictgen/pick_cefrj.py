@@ -2,7 +2,7 @@
 """CEFR-J の単語リスト(words/cefrj.txt)を作る。
 
 範囲: CEFR-J 語彙表(A1〜B2)と Octanove Vocabulary Profile(C1〜C2)の見出しのうち、既存の単語リストに無い語。
-英綴り(colour・analyse)も別の見出しとして入れる(綴りどおりに引けるように)。除くのは次の 3 つだけ。
+英綴り(colour・analyse)も別の見出しとして入れる(綴りどおりに引けるように)。除くのは次の 4 つだけ。
 
 - 記号(`.`・`'`)入りの表記を含む見出し(a.m./am・Mr./Mr・'m)。略語・縮約形は単語帳の見出しにしない。
   同じ行の記号の無い表記(am・mr)も同じ略語なので一緒に除く
@@ -10,6 +10,7 @@
   アプリが辞書の原形に寄せて引く。kaikki に略語などの別の意味もあり、次の判定では落ちないため品詞で除く
 - kaikki で全部の意味が活用形(form_of)で、その原形が辞書(既存リストかこのリスト)にある語(these・stimuli)。
   アプリが辞書の原形に寄せて引くので、別の見出しは要らない。原形が辞書に無い語(belongings)は残す
+- 元のリストの誤記(MISSPELLINGS)。実在しない綴りで、生成しても訳と例文が作れない
 
 並び: A1 → A2 → B1 → B2 → C1 → C2。各レベルの中は CSV の順。品詞違いで同じ見出しが何度も出るので、最初の 1 回だけ使う。
 
@@ -42,6 +43,8 @@ SOURCES = ["cefrj-vocabulary-profile-1.5.csv", "octanove-vocabulary-profile-c1c2
 LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"]
 # be・have・do の活用形だけを載せる行の品詞
 INFLECTION_POS = {"be-verb", "have-verb", "do-verb"}
+# 元のリストの誤記(正しい綴りは portent・misdemeanour・worn-out・flat-out)。生成の検査で見つけた
+MISSPELLINGS = {"porten", "misdemanour", "wornout", "flatout"}
 REQUEST_INTERVAL = 0.5
 
 
@@ -81,7 +84,7 @@ def candidates(rows):
             if any(re.search(r"[.']", w) for w in spellings):
                 continue
             for word in spellings:
-                if not word or word in seen or word in listed:
+                if not word or word in seen or word in listed or word in MISSPELLINGS:
                     continue
                 seen.add(word)
                 picked.append((word, level))
@@ -172,7 +175,8 @@ def main():
     header = f"""# CEFR-J の見出しのうち、既存の単語リストに無い {len(kept):,} 語。CEFR のレベル順({breakdown})。
 # 範囲: CEFR-J 語彙表(A1〜B2)と Octanove Vocabulary Profile(C1〜C2)の見出し。英綴りの見出しも入れる。
 #   除くもの: 記号(. や ')入りの表記を含む見出し(a.m./am など)、品詞が be-verb・have-verb・do-verb の行、
-#     kaikki(Wiktionary の抽出データ)で全部の意味が活用形で、その原形が辞書にある語(these・stimuli など)。
+#     kaikki(Wiktionary の抽出データ)で全部の意味が活用形で、その原形が辞書にある語(these・stimuli など)、
+#     元のリストの誤記({', '.join(sorted(MISSPELLINGS))})。
 #   並び: 各レベルの中は CSV の順。品詞違いで同じ見出しが何度も出るときは最初の 1 回。
 # 出典:
 #   The CEFR-J Wordlist Version 1.5. Compiled by Yukio Tono, Tokyo University of Foreign Studies.

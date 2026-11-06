@@ -1,7 +1,8 @@
-# CEFR-J の見出しのうち、既存の単語リストに無い 4,392 語。CEFR のレベル順(A1 173・A2 320・B1 823・B2 1,517・C1 740・C2 819)。
+# CEFR-J の見出しのうち、既存の単語リストに無い 4,388 語。CEFR のレベル順(A1 173・A2 320・B1 823・B2 1,516・C1 740・C2 816)。
 # 範囲: CEFR-J 語彙表(A1〜B2)と Octanove Vocabulary Profile(C1〜C2)の見出し。英綴りの見出しも入れる。
 #   除くもの: 記号(. や ')入りの表記を含む見出し(a.m./am など)、品詞が be-verb・have-verb・do-verb の行、
-#     kaikki(Wiktionary の抽出データ)で全部の意味が活用形で、その原形が辞書にある語(these・stimuli など)。
+#     kaikki(Wiktionary の抽出データ)で全部の意味が活用形で、その原形が辞書にある語(these・stimuli など)、
+#     元のリストの誤記(flatout, misdemanour, porten, wornout)。
 #   並び: 各レベルの中は CSV の順。品詞違いで同じ見出しが何度も出るときは最初の 1 回。
 # 出典:
 #   The CEFR-J Wordlist Version 1.5. Compiled by Yukio Tono, Tokyo University of Foreign Studies.
@@ -2827,7 +2828,6 @@ worktable
 worldly
 worldview
 worm
-wornout
 worn out
 worn-out
 worrying
@@ -4028,7 +4028,6 @@ meager
 meagre
 arcane
 arcanely
-porten
 divination
 flit
 hitch
@@ -4223,7 +4222,6 @@ economise
 breadwinner
 cosset
 misdemeanor
-misdemanour
 aptitude
 torrential
 banish
@@ -4280,7 +4278,6 @@ coax
 formidably
 squint
 hoist
-flatout
 buzzard
 bogus
 derision
