@@ -102,6 +102,11 @@ def check_word(inp, out, problems):
         problems.append(f"{word}: 英例文が {n} 語(8〜15 語の決まり)")
     if NOTATION.search(ja_meaning):
         problems.append(f"{word} ja.meaning: 表記の記号が残っている")
+    # 区切りの後に空白を入れない決まり。Codex の長い実行の途中で「, 」に崩れたことがある
+    if ", " in ja_meaning:
+        problems.append(f"{word} ja.meaning: 訳語の区切りが「, 」(「,」の決まり)")
+    if ", " in zh_meaning:
+        problems.append(f"{word} zhHant.meaning: 訳語の区切りが「, 」(「 / 」の決まり)")
     senses = ja_meaning.split(" / ")
     if len(senses) > MAX_SENSES:
         problems.append(f"{word} ja.meaning: 語義が {len(senses)} 個(7 個までの決まり)")
