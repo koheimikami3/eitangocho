@@ -77,10 +77,14 @@ enum LicenseCatalog {
         It is adapted from Wiktionary (via kaikki.org), Tatoeba and EJDict-hand, and is licensed under \
         the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
 
+        Words were selected using The CEFR-J Wordlist Version 1.5, compiled by Yukio Tono, Tokyo University \
+        of Foreign Studies, and the Octanove Vocabulary Profile C1/C2 1.0 (CC BY-SA 4.0).
+
         https://creativecommons.org/licenses/by-sa/4.0/
         https://en.wiktionary.org/
         https://tatoeba.org/
         https://github.com/kujirahand/EJDict
+        https://github.com/openlanguageprofiles/olp-en-cefrj
         """),
     LicenseEntry(
       packages: ["Wiktionary / kaikki.org"],

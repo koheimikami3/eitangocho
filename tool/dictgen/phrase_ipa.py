@@ -174,7 +174,26 @@ IPA_DICT_FIXES = {
     "revaluation": "ˌɹivæljuˈeɪʃən", "reviewer": "ɹɪˈvjuɚ", "sightsee": "ˈsaɪtˌsi", "takeover": "ˈteɪkˌoʊvɚ",
     "unattended": "ˌʌnəˈtɛndɪd", "unauthorize": "ʌnˈɔθəˌɹaɪz", "unauthorized": "ʌnˈɔθəˌɹaɪzd",
     "unsecured": "ˌʌnsɪˈkjʊɹd", "unsure": "ʌnˈʃʊɹ", "webpage": "ˈwɛbˌpeɪd͡ʒ",
+    "anticancer": "ˌæntiˈkænsɚ", "autonomously": "ɔˈtɑnəməsli", "bestseller": "ˌbɛstˈsɛlɚ",
+    "businesswoman": "ˈbɪznəsˌwʊmən", "contextual": "kənˈtɛkst͡ʃuəl", "correctness": "kəˈɹɛktnəs",
+    "culturally": "ˈkʌlt͡ʃɚəli", "dj": "ˈdiˌd͡ʒeɪ", "dna": "ˌdiˌɛnˈeɪ", "dynamically": "daɪˈnæmɪkli",
+    "elegantly": "ˈɛlɪɡəntli", "explosively": "ɪkˈsploʊsɪvli", "ferociously": "fəˈɹoʊʃəsli",
+    "figuratively": "ˈfɪɡjɚətɪvli", "film-maker": "ˈfɪlmˌmeɪkɚ", "hard-working": "ˌhɑɹdˈwɝkɪŋ",
+    "hiv": "ˌeɪt͡ʃˌaɪˈvi", "hospitalize": "ˈhɑspɪtəˌlaɪz", "hysterically": "hɪˈstɛɹɪkli",
+    "impersonator": "ɪmˈpɝsəˌneɪtɚ", "impressionist": "ɪmˈpɹɛʃənɪst", "incongruously": "ɪnˈkɑŋɡɹuəsli",
+    "indignantly": "ɪnˈdɪɡnəntli", "infected": "ɪnˈfɛktɪd", "ingratiating": "ɪnˈɡɹeɪʃiˌeɪtɪŋ",
+    "intrinsically": "ɪnˈtɹɪnsɪkli", "intuitively": "ɪnˈtuɪtɪvli", "irrelevancy": "ɪˈɹɛləvənsi",
+    "microcomputer": "ˌmaɪkɹoʊkəmˈpjutɚ", "mistrustful": "mɪsˈtɹʌstfəl", "modernization": "ˌmɑdɚnəˈzeɪʃən",
+    "non-smoking": "ˌnɑnˈsmoʊkɪŋ", "nonchalantly": "ˌnɑnʃəˈlɑntli", "pc": "ˌpiˈsi", "ph": "ˌpiˈeɪt͡ʃ",
+    "policewoman": "pəˈlisˌwʊmən", "realisation": "ˌɹiələˈzeɪʃən", "realization": "ˌɹiələˈzeɪʃən", "self-aggrandizement": "ˌsɛlfəˈɡɹændɪzmənt",
+    "spokeswoman": "ˈspoʊksˌwʊmən", "startlingly": "ˈstɑɹtlɪŋli", "sterility": "stəˈɹɪlɪti",
+    "superficially": "ˌsupɚˈfɪʃəli", "t-shirt": "ˈtiˌʃɝt", "tee-shirt": "ˈtiˌʃɝt",
+    "unrealistic": "ˌʌnɹiəˈlɪstɪk", "verbally": "ˈvɝbəli",
 }
+
+# 句を組み立てるときだけ使う語の IPA。kaikki の先頭の値が句の意味と合わないもの(bow to の bow は「弓」の発音ではない)、
+# 珍しい発音のもの(chew の /t͡ʃju/、remote の /ɹəˈməʊt̞/)、強勢の無いもの(because の /bɪkəz/)
+PHRASE_WORD_IPA = {"because": "bɪˈkɔz", "bow": "ˈbaʊ", "chew": "ˈt͡ʃu", "remote": "ɹɪˈmoʊt"}
 
 
 def load_ipa_dict():

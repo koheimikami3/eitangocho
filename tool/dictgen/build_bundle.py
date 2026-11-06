@@ -22,11 +22,11 @@ import sys
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from phrase_ipa import compose, join_words, load_ipa_dict
+from phrase_ipa import PHRASE_WORD_IPA, compose, join_words, load_ipa_dict
 from validate import check_pair
 
 ROOT = Path(__file__).resolve().parent
-SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs"]
+SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs", "cefrj"]
 LANGS = ("ja", "zhHant")
 # pick_cefrj.py が kaikki から残した綴り違いの行き先(IPA を埋めるのに使う)
 ALT_OF = ROOT / "out/cefrj-pick/kaikki.jsonl"
@@ -97,6 +97,7 @@ def fill_missing_ipa(words):
     alt_of = load_alt_of()
     kaikki = {word: entry["ipa"] for word, entry in words.items() if entry["ipa"]}
     word_ipa = lambda w: kaikki.get(w) or ipa_dict.get(w, "")
+    phrase_word_ipa = lambda w: PHRASE_WORD_IPA.get(w) or word_ipa(w)
 
     def single(word):
         for spelling in [word, *us_spellings(word)]:
@@ -112,9 +113,9 @@ def fill_missing_ipa(words):
         if entry["ipa"]:
             continue
         if " " in word:
-            ipa = compose(word, word_ipa) or join_words(word, word_ipa)
+            ipa = compose(word, phrase_word_ipa) or join_words(word, phrase_word_ipa)
         else:
-            ipa = single(word) or ("-" in word and join_words(word, word_ipa)) or ""
+            ipa = single(word) or ("-" in word and join_words(word, phrase_word_ipa)) or ""
         if ipa:
             entry["ipa"] = ipa
             filled += 1

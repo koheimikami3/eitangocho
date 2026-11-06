@@ -16,7 +16,7 @@ public struct PrebuiltEntry: Equatable, Sendable {
 /// 中身は tool/dictgen の build_bundle.py が書き出す(作り方と範囲は tool/dictgen を参照)。
 /// 訳と例文の訳は日本語と繁体字だけを持つので、それ以外の訳の言語では引かない。
 ///
-/// 約 2.6 MB あるので起動時には読まず、最初に引いたときに読み込んで持ち続ける。
+/// 約 4.5 MB あるので起動時には読まず、最初に引いたときに読み込んで持ち続ける。
 public actor PrebuiltDictionary {
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "prebuilt-dictionary")
 
