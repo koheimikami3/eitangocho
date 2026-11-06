@@ -1,5 +1,5 @@
-# 熟語 1000 語。使われる頻度の高い順。
-# 範囲: Wiktionary の熟語と前置詞句のうち、既存の単語リストに無く、句動詞でもことわざでもなく、差別語・古語の表示がなく、使われる頻度が上位 1000 のもの。
+# 熟語 2000 語。使われる頻度の高い順。
+# 範囲: Wiktionary の熟語と前置詞句のうち、既存の単語リストに無く、句動詞でもことわざでもなく、差別語・古語の表示がなく、使われる頻度が上位 2000 のもの。
 #   形の条件: 2 語以上、英小文字・空白・ハイフン・アポストロフィのみ。
 #   除く分類: Category:English phrasal verbs, Category:English proverbs。
 #   除く表示: kaikki(Wiktionary の抽出データ)ですべての意味に archaic, derogatory, obsolete, offensive のどれかが付くもの。卑語(vulgar)は除かない。
@@ -1010,3 +1010,1003 @@ and his mother
 at the end of the day
 at the mercy of
 come forward
+end of the line
+fair share
+for one's part
+give someone a hard time
+have a say
+have someone's head
+in favour
+in flames
+in the event
+let oneself go
+nowhere to be found
+of choice
+on the fence
+on the point of
+pay the price
+stuck in the mud
+time will tell
+to and fro
+under the influence
+watch one's step
+with young
+as was
+blind date
+dead on
+don't go there
+fingers crossed
+good old days
+in haste
+in one's teens
+in the soup
+into thin air
+lose touch
+make peace
+morning person
+not in the least
+off one's face
+on one's guard
+on the rocks
+red meat
+save it
+strong suit
+to one's heart's content
+all ears
+at the corner
+be no match for
+break one's neck
+day after day
+get a move on
+get to the point
+have been around
+in color
+in contrast
+in the same boat
+just on
+on record
+on the same page
+out of line
+piece of shit
+rain or shine
+sell one's soul
+son of a bitch
+take credit
+to some extent
+up to no good
+ahead of time
+at the wheel
+at this rate
+best regards
+broken heart
+by ear
+by foot
+by night
+change the channel
+come clean
+come to pass
+down the drain
+fall short
+freezing cold
+from the heart
+go hungry
+in length
+in stock
+in the bucket
+jump for joy
+let something slip
+like water
+look the other way
+love at first sight
+no pressure
+on a mission
+on high
+on horseback
+one second
+out of date
+pick a fight
+play a role
+play ball
+play dumb
+stand tall
+take a shit
+take cover
+tell all
+there is no telling
+to the fullest
+turn a blind eye
+under the stars
+wave goodbye
+an arm and a leg
+at a glance
+blink of an eye
+bread and butter
+buy time
+by any means
+by half
+by the day
+come to light
+come to someone's rescue
+come what may
+dead end
+drama queen
+fine line
+for rent
+from hunger
+get to one's feet
+have a way with
+hold a grudge
+in one's right mind
+in reverse
+inside the box
+keep an eye out
+long since
+loose end
+loose ends
+no fear
+now for
+on all fours
+on hand
+on one's legs
+on someone's account
+serve someone right
+the thing is
+to perfection
+you bet
+you're telling me
+ahead of schedule
+as it gets
+black sheep
+breathe a sigh of relief
+by the name of
+do the talking
+full bloom
+go nowhere
+go walking
+hand to mouth
+high up
+in moderation
+in office
+join forces
+make faces
+on condition
+on the scene
+out of stock
+out of tune
+pave the way
+put a stop to
+read someone's mind
+take a turn
+throw in the towel
+to one's name
+with open arms
+all wet
+as it happens
+bear in mind
+behind closed doors
+believe one's ears
+big shot
+crystal clear
+do one's own thing
+early bird
+for the loss
+from the bottom of one's heart
+go downhill
+grit one's teeth
+head to toe
+in action
+in line with
+in no way
+keep company
+lose one's cool
+lose patience
+of value
+on a daily basis
+on display
+out of luck
+scratch one's head
+sick man
+soft spot
+spill the beans
+to someone's taste
+to the death
+up in the air
+what with
+without exception
+and so forth
+as we know it
+at will
+cut someone some slack
+easier said than done
+for the last time
+get busy
+give someone something to think about
+give something a go
+go all the way
+hot air
+in check
+in one piece
+in ways
+into shape
+like hot cakes
+look over one's shoulder
+make a move
+of all things
+of one's own accord
+of one's word
+on a regular basis
+on camera
+out of touch
+roll one's eyes
+serve time
+sinking ship
+speak of the devil
+take into consideration
+take the lead
+under one's feet
+under way
+white rabbit
+all set
+big boy
+do the math
+falling out
+get moving
+green light
+in disguise
+in places
+in the moment
+keep one's fingers crossed
+keep up with the times
+lie low
+make light of
+night out
+on a pair
+on occasion
+one and only
+one's heart out
+out of reach
+peace of mind
+put forward
+put on airs
+straight face
+the finger
+to no avail
+to the gods
+to the letter
+top drawer
+turn upside down
+until further notice
+above average
+according to plan
+at liberty
+at odds
+be mother
+black hat
+blow someone's mind
+dead fish
+en route
+fight for one's life
+for one thing
+get down to business
+have one's hands full
+hit the road
+in command
+in short supply
+in the blink of an eye
+in the clouds
+in theory
+keep someone posted
+last resort
+leave it alone
+life is too short
+made for each other
+make someone's day
+none other than
+old school
+on ice
+out of the box
+point blank
+say the word
+small change
+take no for an answer
+then again
+to one's rescue
+above the law
+all things considered
+apply oneself
+at rest
+at short notice
+behind the times
+big picture
+by degrees
+call a spade a spade
+change of heart
+day at the beach
+day out
+do me a favour
+every bit
+for short
+for the love of
+from beginning to end
+give someone the creeps
+go left
+have an eye for
+in black and white
+in someone's day
+in the black
+in the nick
+in the nick of time
+in the wrong place at the wrong time
+kick someone's ass
+little old
+make a mountain out of a molehill
+matter of life and death
+of the moment
+off the shelf
+on the deck
+on the move
+pain in the neck
+rain cats and dogs
+through the gate
+to the core
+to the touch
+under the covers
+as you please
+asleep at the wheel
+at gunpoint
+bad joke
+bite one's lip
+bite one's tongue
+break a promise
+bright side
+bring to justice
+bucket list
+but good
+by sight
+come to nothing
+cry for help
+dirty look
+for a fact
+from memory
+from start to finish
+get one's feet wet
+give me a break
+go overboard
+go wild
+gut feeling
+hard at work
+here you are
+high and low
+in broad daylight
+in isolation
+in retrospect
+in season
+in the clear
+keep a low profile
+lend a hand
+like hell
+live in the past
+lose face
+lose one's head
+lose one's touch
+make a run for it
+more often than not
+on the house
+on top of that
+place to be
+play hooky
+push one's way
+sell like hot cakes
+stone's throw
+swallow one's pride
+sweet dreams
+table scrap
+the measles
+tie the knot
+to someone's liking
+turning point
+under water
+up a tree
+why in the world
+write the book
+all eyes
+at peace with
+behind the scenes
+bend over backwards
+big screen
+blue moon
+can't get enough
+come to someone's aid
+do the trick
+feel one's way
+from side to side
+get one's hands dirty
+get the point
+get the sack
+golden age
+helping hand
+in principle
+in wine
+keep watch
+matter of course
+off one's head
+old hat
+on deck
+on the case
+outside the box
+pay a visit
+red tape
+special treatment
+stuff you
+sweet tooth
+then and there
+to one's knowledge
+to speak of
+top to bottom
+turn over a new leaf
+two birds with one stone
+up to here
+upper hand
+wait for it
+with flying colors
+with the best
+without doubt
+woe to
+bad company
+black market
+bottom line
+break the ice
+broad shoulders
+by definition
+by trade
+carry oneself
+close to home
+come into the world
+count one's blessings
+crack of dawn
+creature of habit
+cry one's eyes out
+deep water
+dirty work
+drop someone a line
+ever after
+face value
+food chain
+for that matter
+from top to bottom
+get a grip
+go all out
+go back in time
+have had it
+hit the jackpot
+hit the nail on the head
+hold hostage
+how's the weather
+in a nutshell
+in cold blood
+in pairs
+in pursuit
+in style
+keep pace
+last straw
+leave it at that
+lie in wait
+light at the end of the tunnel
+like the wind
+lose count
+lose heart
+night owl
+nothing for it
+nothing short of
+of sorts
+off the air
+old enough to vote
+on credit
+on one's toes
+on the go
+on the hook
+on the lookout
+on the mat
+on the one hand
+on tour
+one of a kind
+open book
+out of one's skin
+pain in the ass
+pour cold water over
+push one's luck
+retrace one's steps
+spilt milk
+square one
+take a risk
+take sides
+throw a tantrum
+turn a deaf ear
+under one's wing
+up someone's ass
+above water
+act one's age
+ancient history
+as far as the eye could see
+at the most
+bark up the wrong tree
+beats me
+bite me
+climb the ladder
+come to life
+come to power
+dirty laundry
+draw the line
+face the music
+fall off one's chair
+fresh out of
+get high
+happily ever after
+head south
+in a flash
+in character
+in flight
+in gear
+in someone's view
+in the post
+in view
+leave no stone unturned
+like fun
+long arm
+look here
+name names
+nothing less than
+off course
+on bad terms
+on short notice
+on special
+on the money
+once in a blue moon
+out of one's league
+poke one's nose into
+refresh someone's memory
+return the favor
+rough patch
+slip someone's mind
+someone's jaw dropped
+stop at nothing
+stuck up
+take a hike
+take aim
+take matters into one's own hands
+to the effect
+truth be told
+under no circumstances
+what not
+apple of someone's eye
+arm to the teeth
+at a loss for words
+at bay
+bad word
+be in and out
+beside the point
+between ourselves
+bit by bit
+break open
+breath of fresh air
+by virtue of
+chess piece
+cold shoulder
+come alive
+come into being
+come to think of it
+common ground
+cross paths
+cut corners
+down the toilet
+for fear that
+for goodness' sake
+from the outset
+give one's all
+go a long way
+go hang
+go south
+hands down
+hate someone's guts
+have someone's back
+in protest
+in the club
+it can't be helped
+join the club
+just the same
+kick it
+kill two birds with one stone
+lay eyes on
+let the cat out of the bag
+line of work
+lose one's virginity
+make a statement
+make all the difference
+make head or tail of
+make history
+mother of all
+move house
+move someone to tears
+on someone's doorstep
+on the loose
+on the tip of one's tongue
+out and about
+over the hill
+put it there
+read lips
+round about
+say one's prayers
+say someone's prayers
+see red
+set the record straight
+shoot oneself in the foot
+skin and bones
+stop the bleeding
+take refuge
+take someone's breath away
+take the cake
+talk about the weather
+ten to one
+the world over
+there you are
+through the roof
+tie someone's hands
+tip of the iceberg
+to the rescue
+under someone's nose
+white bread
+work wonders
+after hours
+ahead of one's time
+all thumbs
+beat it
+busy as a bee
+by default
+catch red-handed
+change hands
+draw a line
+eat one's hat
+eat shit
+even then
+fall into place
+favorite person
+for the record
+from cover to cover
+get one's hopes up
+go one's own way
+go to great lengths
+go to someone's head
+have a bite
+hit the wall
+hurt a fly
+ill health
+in arms
+in good hands
+in name
+in one go
+in one's teeth
+in some places
+in the green
+in the making
+in the tank
+laughing stock
+leaps and bounds
+let someone have it
+like new
+live beyond one's means
+living soul
+long story short
+lucky star
+make someone's blood boil
+mass destruction
+mind you
+oh well
+on call
+on one's watch
+on speaking terms
+on tape
+one step at a time
+only time will tell
+out of the corner of one's eye
+over the edge
+pick up the pace
+put one's finger on
+real quick
+rest assured
+rock the boat
+rotten egg
+run wild
+say it all
+shit one's pants
+skip a beat
+small print
+spread the word
+take no notice of
+take the initiative
+take the stand
+thing of the past
+to the good
+turn the corner
+turn the page
+under the radar
+under the rug
+white lie
+wishful thinking
+agree to disagree
+and the like
+as anything
+at someone's service
+at table
+at your service
+back to square one
+beg for one's life
+beneath the surface
+blow someone's brains out
+bogged down
+bolt from the blue
+bring forward
+build bridges
+by the skin of one's teeth
+by turns
+clean hands
+cloud nine
+collect one's thoughts
+dog's life
+down under
+drag one's feet
+fall victim
+false alarm
+fish to fry
+for crying out loud
+go to sea
+have a go
+heads or tails
+here's to
+high life
+hold one's liquor
+hold the line
+hold up one's end
+in consequence
+in perspective
+in spirit
+in the driver's seat
+in the hand
+in the pocket
+ladies' man
+lady's man
+like no other
+no comment
+of a lifetime
+off the record
+on a whim
+on cloud nine
+on the block
+on the town
+one and the same
+one's hour
+open doors
+out of practice
+pee one's pants
+put the cart before the horse
+ready or not
+remain to be seen
+rotten apple
+shoulder to cry on
+silver spoon
+spread one's wings
+stand on one's head
+stand trial
+steal someone's heart
+take the wheel
+thick and thin
+through thick and thin
+tight spot
+to bits
+under cover
+under oath
+under someone's roof
+up the wall
+up to one's ears
+what was someone thinking
+wipe someone's nose
+with a bang
+with child
+without question
+wolf in sheep's clothing
+written all over someone's face
+all too well
+apples and oranges
+at long last
+at the door of
+beat someone's ass
+behind time
+boiling point
+burn one's fingers
+bury the hatchet
+buy a ticket to
+cast a shadow
+cream in one's coffee
+day and age
+done deal
+extend one's hand
+get wind
+get wind of
+go with the flow
+green with envy
+head start
+hear things
+hold one's own
+hold water
+in depth
+in force
+in full swing
+in heat
+in one sitting
+in one's own right
+in the long term
+in the nude
+in waiting
+lay an egg
+let loose
+lie through one's teeth
+look on the bright side
+lost cause
+of theirs
+off the mark
+on alert
+on bail
+on one's deathbed
+on the same wavelength
+on the stock
+on top of the world
+on wheels
+one at a time
+one step ahead
+one too many
+out of one's face
+party animal
+pet peeve
+play a part
+politically correct
+pressed for time
+put a lid on
+rose-colored glasses
+save the day
+seize the opportunity
+state of affairs
+stop dead
+take a bite out of
+take great pains
+take someone's arm
+take time off
+tell it like it is
+there you go
+tip one's hat
+to all appearances
+track record
+when the time comes
+with a grain of salt
+within reach
+all the while
+any old
+as they come
+bare one's teeth
+be my guest
+beat the shit out of
+big hand
+big spender
+bitter end
+blow a fuse
+blow the whistle
+by the book
+chuck it
+due course
+fish out of water
+foot the bill
+for your information
+four-leaf clover
+game plan
+go berserk
+go in one ear and out the other
+have a fit
+have words
+hold one's horses
+in all likelihood
+in concert
+in due course
+in little
+in one's bones
+in parallel
+in plenty
+in the hole
+in the spotlight
+in the works
+in this day and age
+in unison
+it's none of your business
+jack of all trades
+kick the bucket
+leave someone no choice
+let one's hair down
+like two peas in a pod
+little hand
+lose ground
+make every effort
+mean the world to
+nook and cranny
+off the wagon
+on a roll
+on the button
+on tiptoe
+one of those things
+open one's mind
+out of thin air
+over the top
+pay one's dues
+piece of work
+play hard to get
+pull the wool over someone's eyes
+put into practice
+put one's feet up
+read minds
+rise and shine
+rocket science
+room for doubt
+rose garden
+save something for a rainy day
+say no more
+sharp tongue
+show one's true colors
+sit on the fence
+so be it
+stab in the back
+stand one's ground
+stay tuned
+take a wife
+take ill
+take it or leave it
+take kindly
+take the hint
+tear one's hair out
+touch a nerve
+up front
+up to speed
+use one's head
+were it not for
+with bated breath
+within one's means
+above and beyond
+adrenaline rush
+answer someone's prayers
+anyone's guess
+at a price
+at intervals
+at someone's heels
+ax to grind
+bad blood
+below the surface
+bent on
+beyond words
+bigger fish to fry
+bored out of one's mind
+by blood
+by the minute
+castle in the air
+catch flies
+change of clothes
+come to a close
+corporate ladder
+count sheep
+cry wolf
+dig one's own grave
+dire straits
+do one's business
+do someone's head in
+fan the flames
+find one's place
+fly off the handle
+from the face of the earth
+fuck this
+get a kick out of
+get life
+get off someone's back

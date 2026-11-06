@@ -44,7 +44,7 @@ CATEGORIES = ["English idioms", "English prepositional phrases"]
 SKIP_CATEGORIES = ["English phrasal verbs", "English proverbs"]
 # 頻度で落ちない不適切な語だけを除く。vulgar はドラマで出て意味を調べたい語なので除かない
 EXCLUDED_TAGS = {"offensive", "derogatory", "archaic", "obsolete"}
-TOP_N = 1000
+TOP_N = 2000
 # 区切りを広げて検討できるよう、kaikki はこの順位に届きうる句まで引く
 RANK_DEPTH = 3000
 # 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
