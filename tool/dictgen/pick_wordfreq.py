@@ -8,8 +8,13 @@
 - kaikki で全部の意味が略語(abbreviation・initialism・acronym)の語
 - kaikki で全部の意味に offensive・derogatory・archaic・obsolete のどれかが付く語(差別語・古語)。
   vulgar は除かない(ドラマで出て意味を調べたい語のため)
-- kaikki で全部の意味が活用形(form_of)で、その原形が辞書(既存リストかこのリスト)にある語(told・games)。
-  アプリが辞書の原形に寄せて引くので、別の見出しは要らない。原形が辞書に無い語は残す
+- 差別語(SLURS)。侮蔑のタグが無い意味が 1 つでもあると上の条件を抜けるので、語を指定する
+- be・have・do の活用形(BE_HAVE_DO_FORMS)。kaikki に別の意味もあるが、アプリが原形に寄せて引く
+- 次の 4 つ。ただし KEEP の語は残す
+  - EJDict に小文字の見出しが無い語(paris・maxwell・didnt)。kaikki では人名や綴りの崩れた語を判別できないため
+  - kaikki で意味の半分以上が活用形の語(told・made)。アプリは別の意味があっても原形に寄せて引く
+  - 2 文字の語(ll・st)
+  - kaikki で全部の意味が綴り違い(alt_of)の語(matt・oxford)
 
 並び: wordfreq の順位順(頻度の高い順)。
 
@@ -37,12 +42,53 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 USER_AGENT = "eitangocho-dictgen/1.0 (https://github.com/koheimikami3)"
 PREBUILT = ROOT.parent.parent / "native/Packages/EitangochoCore/Sources/EitangochoWordInfo/Resources/prebuilt-dictionary.json"
+EJDICT = ROOT.parent.parent / "assets/ejdict/ejdict-hand-utf8.txt"
 TOP_COUNT = 20000
 # 内容が変わらないよう、取る版を固定する(pip install の版と揃える)
 WORDFREQ_VERSION = "3.1.1"
 TOP_CACHE = f"wordfreq-{WORDFREQ_VERSION}-top-{TOP_COUNT}.txt"
 ABBREVIATION_TAGS = {"abbreviation", "initialism", "acronym"}
 AVOID_TAGS = {"offensive", "derogatory", "archaic", "obsolete"}
+SLURS = set("nigger nigga faggot fag dyke retarded mick cunt".split())
+BE_HAVE_DO_FORMS = set("is am are was were been being has had having does did done doing".split())
+# 機械的な絞り込みで落ちるが、単語帳に残す語。候補の一覧を見て選んだ
+KEEP = set((
+    # 卑語(ドラマで出て意味を調べたい語は除かない決まり)
+    "fucked balls asshole fuckin lmao wtf cum screwed tits dammit shits motherfucker pissing ffs screwing dildo "
+    "shitting blowjob lmfao shite ho "
+    # 活用形の意味が多いが、原形が辞書に無くアプリが寄せられない語
+    "alumni destined uprising accredited panties whoops condensed outspoken handwritten entrenched condolences "
+    "goggles barracks nuggets "
+    # 2 文字の語
+    "oh ah ha eh uh um aw hm yo ma ai vs "
+    # 綴り違いの扱いだが、この綴りで引く語
+    "thru grad rpm fulfillment postwar kickoff counsellor chateau raja "
+    # 略語の形でも日常で使う語
+    "etc aka atm pdf gif ceo vip ufo asap wifi bbq btw omg lol "
+    # 話し言葉
+    "wanna kinda sorta gimme gotcha dunno outta anyways bro nah yup yay duh jeez geez meh haha hmm ooh aww yikes "
+    # EJDict に大文字の見出しだけあるが、普通の語として使う語
+    "cellular tertiary biblical mafia expo diaspora utopia nemesis alpine titan excellency odyssey messiah sabbath grail "
+    # EJDict より新しいなどで見出しが無い語
+    "based app anime podcast iconic sexually mega indie remix cyber gameplay manga vibe admin meme transgender "
+    "headphones ninja mindset midfielder superhero startup bot fundraising intro mic promo thankfully rehab analytics "
+    "username bluetooth screenshot selfie homosexuality turbo retro flawed pixel ebook fest manually songwriter hyper "
+    "restart sushi cosmetics hashtag blockchain storytelling graffiti samurai preseason multiplayer bandwidth "
+    "computational filmmaker ebola meth midfield falsely geek playlist wiki cinematic crypto testosterone attacker "
+    "fundraiser societal entrepreneurship connectivity encryption bloke entitlement karate meltdown onboard "
+    "accreditation dealings neurological reboot robotic uniquely amenities pediatric robotics lockdown tsunami "
+    "wellbeing delusional dumpster inbox ridiculously homophobic router fella malware negativity techno motivational "
+    "noir progressively biomedical makeover paranormal vaguely postseason digitally homepage neuroscience stripper "
+    "workload cardio federally inadvertently redevelopment rematch undocumented correctional homelessness logically "
+    "offseason pharma cosplay anonymously mindfulness proactive prominently unpublished childcare hoodie matchup "
+    "openness oversized smiley clinically multicultural standalone biomass comedic biker decidedly dopamine "
+    "identifiable lifespan racially undisclosed dysfunctional handheld legitimately metadata oncology revisit "
+    "wastewater cybersecurity geographically ramen synth homophobia insanely mixtape socioeconomic carb fatally "
+    "grossly holistic microbial millennial opioid playback positivity relatable usefulness crowdfunding cutie exec "
+    "mojo preparedness selectively skincare uplifting voicemail biopsy deadliest fracking fungal prematurely "
+    "prioritize spectroscopy unanswered unethical cryptocurrency disproportionately ecommerce exponentially externally "
+    "fanbase latte margarita pedophile peptide rockstar typo chai detox playbook tofu"
+).split())
 REQUEST_INTERVAL = 0.5
 
 
@@ -70,6 +116,16 @@ def listed_words():
             if line.strip() and not line.startswith("#"):
                 words.add(line.strip().lower())
     return words
+
+
+def ejdict_lowercase_headwords():
+    """EJDict の小文字の見出し。大文字の見出しは固有名詞なので入れない(訳は使わない)。"""
+    headwords = set()
+    for line in EJDICT.read_text(encoding="utf-8").splitlines():
+        for headword in line.split("\t")[0].split(","):
+            if headword.strip() == headword.strip().lower():
+                headwords.add(headword.strip())
+    return headwords
 
 
 def candidates(top_words):
@@ -129,6 +185,11 @@ def all_senses_tagged(row, tags):
     return bool(row["senseTags"]) and all(tags & set(sense) for sense in row["senseTags"])
 
 
+def mostly_forms(row):
+    """意味の半分以上が活用形か。"""
+    return sum("form-of" in sense for sense in row["senseTags"]) * 2 >= len(row["senseTags"])
+
+
 def main():
     args = sys.argv[1:]
     if not args or args[0].startswith("-"):
@@ -161,22 +222,45 @@ def main():
     not_found = [w for w in picked if not kaikki[w]["found"]]
     abbreviation = [w for w in picked if all_senses_tagged(kaikki[w], ABBREVIATION_TAGS)]
     avoid = [w for w in picked if all_senses_tagged(kaikki[w], AVOID_TAGS) and w not in abbreviation]
-    # 上の条件で除いた語は辞書に入らないので、原形としては数えない
-    removed = set(not_found) | set(abbreviation) | set(avoid)
-    known = listed_words() | {w for w in picked if w not in removed}
-    form_only = [w for w in picked if w not in removed
-                 and kaikki[w]["formOnly"] and any(base in known for base in kaikki[w]["formOf"])]
-    removed |= set(form_only)
-    kept = [w for w in picked if w not in removed]
+    slurs = [w for w in picked if w in SLURS]
+    be_have_do = [w for w in picked if w in BE_HAVE_DO_FORMS]
+    removed = set(not_found) | set(abbreviation) | set(avoid) | SLURS | BE_HAVE_DO_FORMS
+    unknown_keep = sorted(KEEP - {w for w in picked if w not in removed})
+    if unknown_keep:
+        sys.exit(f"KEEP の語が候補に無い: {', '.join(unknown_keep)}")
+
+    # 順に当てはめ、最初に当たった理由で数える
+    ejdict = ejdict_lowercase_headwords()
+    rules = [("EJDict に小文字の見出しが無い", lambda w: w not in ejdict),
+             ("意味の半分以上が活用形", lambda w: mostly_forms(kaikki[w])),
+             ("2 文字", lambda w: len(w) == 2),
+             ("全部の意味が綴り違い", lambda w: all_senses_tagged(kaikki[w], {"alt-of"}))]
+    dropped = {name: [] for name, _ in rules}
+    kept = []
+    for word in picked:
+        if word in removed:
+            continue
+        name = None if word in KEEP else next((name for name, rule in rules if rule(word)), None)
+        if name:
+            dropped[name].append(word)
+        else:
+            kept.append(word)
+
     print(f"kaikki に小文字の見出しが無くて除いた {len(not_found)}: {', '.join(not_found)}")
     print(f"全部の意味が略語で除いた {len(abbreviation)}: {', '.join(abbreviation)}")
     print(f"全部の意味が差別語・古語で除いた {len(avoid)}: {', '.join(avoid)}")
-    print(f"原形が辞書にある活用形で除いた {len(form_only)}: {', '.join(form_only)}")
+    print(f"差別語の指定で除いた {len(slurs)}: {', '.join(slurs)}")
+    print(f"be・have・do の活用形で除いた {len(be_have_do)}: {', '.join(be_have_do)}")
+    for name, words in dropped.items():
+        print(f"{name}で除いた {len(words)}: {', '.join(words)}")
+    print(f"KEEP で残した {len(KEEP)}")
 
     header = f"""# wordfreq(英語)の上位 {TOP_COUNT:,} 語のうち、既存の単語リストにも同梱辞書にも無い {len(kept):,} 語。wordfreq の順位順。
 #   除くもの: 英小文字以外を含む語・1 文字の語、kaikki(Wiktionary の抽出データ)に小文字の見出しが無い語、
 #     kaikki で全部の意味が略語の語、全部の意味に offensive・derogatory・archaic・obsolete のどれかが付く語、
-#     全部の意味が活用形で、その原形が辞書にある語(told・games など)。vulgar(卑語)は除かない。
+#     指定した差別語、be・have・do の活用形。vulgar(卑語)は除かない。
+#     さらに、EJDict に小文字の見出しが無い語、kaikki で意味の半分以上が活用形の語、2 文字の語、全部の意味が綴り違いの語。
+#     ただし単語帳に残すと決めた語(pick_wordfreq.py の KEEP)はこの 4 つでは除かない。
 # 出典: Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo. https://doi.org/10.5281/zenodo.7199437
 #   使った版は wordfreq {WORDFREQ_VERSION}。https://github.com/rspeer/wordfreq
 #   wordfreq のデータの元: Google Books Ngrams(http://books.google.com/ngrams)、Leeds Internet Corpus、Wikipedia、
