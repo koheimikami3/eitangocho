@@ -10,7 +10,8 @@
   vulgar は除かない(ドラマで出て意味を調べたい語のため)
 - 差別語(SLURS)。侮蔑のタグが無い意味が 1 つでもあると上の条件を抜けるので、語を指定する
 - be・have・do の活用形(BE_HAVE_DO_FORMS)。kaikki に別の意味もあるが、アプリが原形に寄せて引く
-- 次の 4 つ。ただし KEEP の語は残す
+- 人名・地名など(NOT_COMMON_WORDS)。kaikki にも EJDict にも小文字の見出しがあり、下の条件を抜けるので語を指定する
+- 次の 4 つ。ただし KEEP の語は、これらと kaikki の見出し・略語・差別語・古語の条件では除かない
   - EJDict に小文字の見出しが無い語(paris・maxwell・didnt)。kaikki では人名や綴りの崩れた語を判別できないため
   - kaikki で意味の半分以上が活用形の語(told・made)。アプリは別の意味があっても原形に寄せて引く
   - 2 文字の語(ll・st)
@@ -51,8 +52,28 @@ ABBREVIATION_TAGS = {"abbreviation", "initialism", "acronym"}
 AVOID_TAGS = {"offensive", "derogatory", "archaic", "obsolete"}
 SLURS = set("nigger nigga faggot fag dyke retarded mick cunt".split())
 BE_HAVE_DO_FORMS = set("is am are was were been being has had having does did done doing".split())
+# 人名・地名・商標と、語の断片や綴りの崩れ(don・cant・wont)で順位が上がった語。別の意味があっても、その意味で引く人が少ない語。
+# 別の意味でよく使う語(jack・bill・victor・nick)は入れない。候補の一覧を見て選んだ
+NOT_COMMON_WORDS = set((
+    "john trump japan china peter tom twitter mike martin lee harry don jimmy victoria carter johnny josh jay rick "
+    "billy graham jerry khan nelson batman bobby charlotte franklin ken wright turner collins morris costa brad bailey "
+    "superman hart marc palmer dale shanghai sally drake cox randy jenny kirk donna yahoo timothy freeman rand morocco "
+    "fuller tucker surrey chandler wheeler gloria hank beck benedict jess bonnie hogan goodman dell kris sheila tanner "
+    "meg sawyer burgess dickens ulster thatcher skinner mercer phoebe bowman cutler madras collier barker welch dyer "
+    "bourne greenwood obi clement colleen dirk trey bey coca chevy airbus draper fay lea raj lam ole mil lib ave sol "
+    "ting roc wen ser col cor tor pas lac tata cant wont"
+).split())
 # 機械的な絞り込みで落ちるが、単語帳に残す語。候補の一覧を見て選んだ
 KEEP = set((
+    # 略語・差別語・古語の条件で落ちるが、普通に使う語
+    "condo limo nerd caucus christianity welsh dumbass whore "
+    # 大文字で書く語のうち、国籍・言語・宗教・祝日を表す語(国名や都市名は入れない)
+    "english french german spanish greek dutch arabic swiss danish indian american british european chinese russian "
+    "australian african japanese canadian asian italian scottish irish korean latin mexican israeli turkish brazilian "
+    "egyptian swedish thai iranian syrian portuguese pakistani hispanic czech iraqi norwegian cuban hebrew indonesian "
+    "vietnamese malaysian persian belgian hindi austrian hungarian filipino finnish ukrainian nigerian palestinian "
+    "victorian muslim jewish islamic islam hindu buddhist buddhism judaism catholic catholicism protestant christmas "
+    "easter halloween bible nazi "
     # 卑語(ドラマで出て意味を調べたい語は除かない決まり)
     "fucked balls asshole fuckin lmao wtf cum screwed tits dammit shits motherfucker pissing ffs screwing dildo "
     "shitting blowjob lmfao shite ho "
@@ -219,22 +240,24 @@ def main():
     missing = [w for w in picked if w not in kaikki]
     if missing:
         sys.exit(f"kaikki を引けなかった語が {len(missing)} ある。もう一度実行すると続きから進む")
-    not_found = [w for w in picked if not kaikki[w]["found"]]
-    abbreviation = [w for w in picked if all_senses_tagged(kaikki[w], ABBREVIATION_TAGS)]
-    avoid = [w for w in picked if all_senses_tagged(kaikki[w], AVOID_TAGS) and w not in abbreviation]
+    not_found = [w for w in picked if not kaikki[w]["found"] and w not in KEEP]
+    abbreviation = [w for w in picked if all_senses_tagged(kaikki[w], ABBREVIATION_TAGS) and w not in KEEP]
+    avoid = [w for w in picked if all_senses_tagged(kaikki[w], AVOID_TAGS) and w not in abbreviation and w not in KEEP]
     slurs = [w for w in picked if w in SLURS]
     be_have_do = [w for w in picked if w in BE_HAVE_DO_FORMS]
-    removed = set(not_found) | set(abbreviation) | set(avoid) | SLURS | BE_HAVE_DO_FORMS
-    unknown_keep = sorted(KEEP - {w for w in picked if w not in removed})
-    if unknown_keep:
-        sys.exit(f"KEEP の語が候補に無い: {', '.join(unknown_keep)}")
+    not_common = [w for w in picked if w in NOT_COMMON_WORDS]
+    removed = set(not_found) | set(abbreviation) | set(avoid) | SLURS | BE_HAVE_DO_FORMS | NOT_COMMON_WORDS
+    # 指定の綴り間違いや、指定した語が候補に無くなったときに気づけるように止める
+    unknown = sorted((KEEP | NOT_COMMON_WORDS) - set(picked)) + sorted(KEEP & removed)
+    if unknown:
+        sys.exit(f"KEEP・NOT_COMMON_WORDS の語が候補に無い: {', '.join(unknown)}")
 
     # 順に当てはめ、最初に当たった理由で数える
     ejdict = ejdict_lowercase_headwords()
-    rules = [("EJDict に小文字の見出しが無い", lambda w: w not in ejdict),
-             ("意味の半分以上が活用形", lambda w: mostly_forms(kaikki[w])),
-             ("2 文字", lambda w: len(w) == 2),
-             ("全部の意味が綴り違い", lambda w: all_senses_tagged(kaikki[w], {"alt-of"}))]
+    rules = [("EJDict に小文字の見出しが無い語", lambda w: w not in ejdict),
+             ("意味の半分以上が活用形の語", lambda w: mostly_forms(kaikki[w])),
+             ("2 文字の語", lambda w: len(w) == 2),
+             ("全部の意味が綴り違いの語", lambda w: all_senses_tagged(kaikki[w], {"alt-of"}))]
     dropped = {name: [] for name, _ in rules}
     kept = []
     for word in picked:
@@ -251,6 +274,7 @@ def main():
     print(f"全部の意味が差別語・古語で除いた {len(avoid)}: {', '.join(avoid)}")
     print(f"差別語の指定で除いた {len(slurs)}: {', '.join(slurs)}")
     print(f"be・have・do の活用形で除いた {len(be_have_do)}: {', '.join(be_have_do)}")
+    print(f"人名・地名などの指定で除いた {len(not_common)}: {', '.join(not_common)}")
     for name, words in dropped.items():
         print(f"{name}で除いた {len(words)}: {', '.join(words)}")
     print(f"KEEP で残した {len(KEEP)}")
@@ -258,9 +282,9 @@ def main():
     header = f"""# wordfreq(英語)の上位 {TOP_COUNT:,} 語のうち、既存の単語リストにも同梱辞書にも無い {len(kept):,} 語。wordfreq の順位順。
 #   除くもの: 英小文字以外を含む語・1 文字の語、kaikki(Wiktionary の抽出データ)に小文字の見出しが無い語、
 #     kaikki で全部の意味が略語の語、全部の意味に offensive・derogatory・archaic・obsolete のどれかが付く語、
-#     指定した差別語、be・have・do の活用形。vulgar(卑語)は除かない。
+#     指定した差別語、be・have・do の活用形、指定した人名・地名など。vulgar(卑語)は除かない。
 #     さらに、EJDict に小文字の見出しが無い語、kaikki で意味の半分以上が活用形の語、2 文字の語、全部の意味が綴り違いの語。
-#     ただし単語帳に残すと決めた語(pick_wordfreq.py の KEEP)はこの 4 つでは除かない。
+#     ただし単語帳に残すと決めた語(pick_wordfreq.py の KEEP)は、この 4 つと kaikki の見出し・略語・差別語・古語の条件では除かない。
 # 出典: Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo. https://doi.org/10.5281/zenodo.7199437
 #   使った版は wordfreq {WORDFREQ_VERSION}。https://github.com/rspeer/wordfreq
 #   wordfreq のデータの元: Google Books Ngrams(http://books.google.com/ngrams)、Leeds Internet Corpus、Wikipedia、

@@ -1,9 +1,9 @@
-# wordfreq(英語)の上位 20,000 語のうち、既存の単語リストにも同梱辞書にも無い 3,420 語。wordfreq の順位順。
+# wordfreq(英語)の上位 20,000 語のうち、既存の単語リストにも同梱辞書にも無い 3,380 語。wordfreq の順位順。
 #   除くもの: 英小文字以外を含む語・1 文字の語、kaikki(Wiktionary の抽出データ)に小文字の見出しが無い語、
 #     kaikki で全部の意味が略語の語、全部の意味に offensive・derogatory・archaic・obsolete のどれかが付く語、
-#     指定した差別語、be・have・do の活用形。vulgar(卑語)は除かない。
+#     指定した差別語、be・have・do の活用形、指定した人名・地名など。vulgar(卑語)は除かない。
 #     さらに、EJDict に小文字の見出しが無い語、kaikki で意味の半分以上が活用形の語、2 文字の語、全部の意味が綴り違いの語。
-#     ただし単語帳に残すと決めた語(pick_wordfreq.py の KEEP)はこの 4 つでは除かない。
+#     ただし単語帳に残すと決めた語(pick_wordfreq.py の KEEP)は、この 4 つと kaikki の見出し・略語・差別語・古語の条件では除かない。
 # 出典: Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo. https://doi.org/10.5281/zenodo.7199437
 #   使った版は wordfreq 3.1.1。https://github.com/rspeer/wordfreq
 #   wordfreq のデータの元: Google Books Ngrams(http://books.google.com/ngrams)、Leeds Internet Corpus、Wikipedia、
@@ -20,12 +20,12 @@ making
 seen
 based
 men
+american
 shit
 oh
 coming
 fuck
 taking
-john
 saying
 fucking
 taken
@@ -34,6 +34,8 @@ according
 heard
 thinking
 won
+english
+british
 higher
 gone
 sent
@@ -41,10 +43,11 @@ tried
 felt
 cannot
 led
-china
 lord
 born
 decided
+french
+european
 built
 waiting
 lol
@@ -53,24 +56,27 @@ wanna
 etc
 included
 spent
+chinese
+russian
 ass
 winning
 sold
 calling
 wow
+german
 gotta
 finished
-trump
+australian
 telling
 bought
+christmas
+indian
 speaking
 supposed
 congress
 driving
 established
 holding
-japan
-peter
 showing
 app
 seconds
@@ -86,30 +92,29 @@ keeping
 covered
 forced
 fourth
-tom
-twitter
 acting
+african
 jack
 becoming
+japanese
 happening
-mike
 senate
 helping
 housing
 bitch
 knowing
-martin
 ordered
 stated
-lee
-harry
+spanish
 picked
 providing
 drinking
 flying
+canadian
 dick
 intended
 republican
+asian
 planned
 supreme
 younger
@@ -118,6 +123,8 @@ increasing
 applied
 confirmed
 grown
+muslim
+italian
 committed
 affected
 extended
@@ -135,10 +142,11 @@ zero
 charged
 serving
 cutting
+jewish
 spoke
 dealing
-don
 offering
+scottish
 fucked
 kinda
 nick
@@ -148,9 +156,12 @@ teeth
 understood
 crying
 mining
+catholic
 headed
+bible
 checked
 driven
+irish
 drawn
 haha
 letting
@@ -161,14 +172,17 @@ rising
 fed
 facing
 ford
+greek
 miller
 porn
 roman
 faced
+korean
 riding
 studied
 wanting
 heading
+latin
 bullshit
 accused
 ceo
@@ -180,17 +194,19 @@ fort
 informed
 spoken
 yo
-jimmy
+islamic
 lieutenant
 picking
 settled
-victoria
 bags
 beating
 android
 handed
+islam
 colonel
 dragon
+dutch
+mexican
 saint
 stolen
 tho
@@ -198,6 +214,7 @@ bro
 crap
 dean
 forgotten
+israeli
 nah
 thrown
 assumed
@@ -207,7 +224,6 @@ makeup
 posting
 roger
 yep
-jay
 pope
 shaped
 sixth
@@ -216,31 +232,24 @@ drove
 gaming
 jean
 searching
-cant
-carter
 crossed
 epic
-johnny
-josh
 rep
 screaming
 virgin
 asshole
-billy
 boots
 fuckin
 eve
 hiding
 listing
 nursing
-rick
 wounded
 arsenal
 footage
 cape
 failing
 goodbye
-graham
 nuts
 touched
 accounting
@@ -254,7 +263,9 @@ galaxy
 gulf
 knight
 lmao
+nazi
 printing
+turkish
 firing
 huh
 traveling
@@ -263,7 +274,6 @@ classified
 eh
 federation
 guardian
-jerry
 mounted
 nope
 ruined
@@ -271,7 +281,6 @@ uh
 warren
 yea
 gathering
-khan
 loaded
 measured
 pissed
@@ -279,20 +288,17 @@ seventh
 tribute
 democrat
 landed
-nelson
 pat
 pussy
 ai
 assuming
 backing
 blessed
+brazilian
 certified
 cock
 stealing
 ultra
-batman
-bobby
-charlotte
 custody
 ho
 touching
@@ -301,17 +307,18 @@ woke
 wtf
 beaten
 blown
-franklin
+egyptian
 hung
 imperial
-ken
 stole
+swedish
+swiss
 catching
 eighth
 marijuana
 pic
 punk
-wright
+christianity
 colored
 lit
 ranking
@@ -319,7 +326,6 @@ restricted
 situated
 spotted
 sustained
-turner
 advised
 earl
 floating
@@ -328,6 +334,7 @@ metro
 metropolitan
 reserved
 rifle
+ukrainian
 victor
 vintage
 chuck
@@ -338,8 +345,11 @@ licensed
 piss
 propaganda
 tactics
+thai
 tweet
 underlying
+halloween
+iranian
 premiere
 sporting
 teens
@@ -349,20 +359,19 @@ vocal
 accomplished
 aka
 casting
-collins
-costa
 lesbian
 minded
-morris
 podcast
 screening
 smiling
+welsh
 binding
 buffalo
 commons
 mason
 rod
 staring
+syrian
 wrestling
 aw
 cheers
@@ -376,14 +385,16 @@ sexually
 um
 washing
 banner
-brad
+easter
 feminist
 pressed
 rev
 sealed
+victorian
 ace
 babe
 hmm
+palestinian
 parish
 pathetic
 potter
@@ -406,7 +417,6 @@ dairy
 heated
 roster
 skull
-wont
 bleeding
 butler
 chick
@@ -422,12 +432,12 @@ inn
 ninth
 reign
 tops
-bailey
 btw
 demon
 elder
 guinea
 martial
+nigerian
 pronounced
 sierra
 streak
@@ -449,26 +459,24 @@ shooter
 warfare
 aging
 anyways
-ave
 clearing
 cum
 dried
 finale
-hart
 inspiring
 lineup
 questioning
-shanghai
 shitty
 thanksgiving
 thee
+arabic
 burnt
 cannabis
 chapel
 elevated
 hype
-marc
 mob
+portuguese
 ranch
 vampire
 broadcasting
@@ -479,22 +487,22 @@ flowing
 heck
 justified
 mega
-palmer
 platinum
 starter
-superman
 voltage
 buck
 congrats
 den
 legit
 liquor
+pakistani
 reasoning
 stark
 upside
 admiral
 civic
 drone
+hindu
 indie
 jerk
 nude
@@ -519,7 +527,6 @@ skinny
 whatsoever
 cocaine
 cyber
-dale
 gameplay
 intact
 intake
@@ -537,9 +544,9 @@ bachelor
 condemned
 convincing
 hardcore
+hispanic
 manga
 poker
-sally
 scattered
 scout
 artillery
@@ -551,7 +558,6 @@ concentrated
 dame
 deceased
 detention
-drake
 infantry
 maritime
 rapper
@@ -560,11 +566,13 @@ tab
 touchdown
 appealing
 chi
-col
 collision
+czech
 depot
 homeland
+iraqi
 marking
+norwegian
 plasma
 plea
 quarterback
@@ -574,7 +582,6 @@ waking
 anal
 anatomy
 cement
-cox
 grind
 grove
 junction
@@ -589,6 +596,7 @@ wifi
 zombie
 amen
 begging
+cuban
 dodge
 drilling
 guild
@@ -613,15 +621,16 @@ heroin
 hooked
 notification
 nova
-randy
 tenth
 theology
 yay
 aerial
 ammunition
 anthem
+danish
 feminine
 fury
+hebrew
 humanitarian
 immunity
 lone
@@ -673,7 +682,7 @@ contracted
 designing
 fist
 homer
-jenny
+indonesian
 landmark
 rogue
 solidarity
@@ -729,28 +738,29 @@ stunt
 sync
 thrust
 trilogy
-yahoo
+whore
 atm
 bait
+buddhist
 censorship
 compilation
 cowboy
 feminism
 genesis
-kirk
 spinal
 spit
 superhero
 therapeutic
+vietnamese
 batting
 cardiac
 commanding
 crashing
 creep
 doe
-donna
 gel
 heroic
+malaysian
 marina
 mat
 nationally
@@ -760,7 +770,6 @@ swamp
 treason
 activation
 borough
-freeman
 inland
 inning
 innocence
@@ -768,7 +777,7 @@ ivy
 livestock
 mafia
 missionary
-rand
+persian
 refined
 reset
 startup
@@ -777,10 +786,12 @@ toddler
 vodka
 archbishop
 assassination
+belgian
 bibliography
 bot
 congregation
 guru
+hindi
 hm
 lace
 maiden
@@ -792,7 +803,6 @@ replay
 rooted
 slate
 tee
-timothy
 token
 twilight
 vagina
@@ -814,8 +824,10 @@ mic
 obesity
 pony
 promo
+protestant
 shotgun
 atlas
+austrian
 automation
 cavalry
 combo
@@ -829,7 +841,6 @@ font
 freestyle
 glue
 homicide
-morocco
 providence
 psychic
 puppet
@@ -849,8 +860,8 @@ constable
 destined
 detached
 fascist
-fuller
 horny
+hungarian
 kindergarten
 pitcher
 probation
@@ -860,7 +871,6 @@ remake
 sweeping
 swinging
 trillion
-tucker
 apparatus
 departed
 foam
@@ -896,11 +906,9 @@ lunar
 memoir
 registry
 seating
-surrey
 theological
 undercover
 velvet
-wheeler
 behold
 billionaire
 brewing
@@ -936,7 +944,6 @@ ark
 armour
 bluetooth
 borrowing
-chandler
 disciplinary
 eligibility
 flagship
@@ -945,7 +952,6 @@ glucose
 gore
 halo
 infamous
-lib
 limestone
 moron
 observing
@@ -972,7 +978,6 @@ homosexuality
 jealousy
 joker
 laden
-mil
 offline
 palette
 psycho
@@ -997,14 +1002,11 @@ ethnicity
 faded
 flex
 genus
-gloria
 greed
-hank
 hose
 impacted
 longtime
 magnet
-ole
 oops
 paranoid
 retro
@@ -1046,7 +1048,6 @@ accredited
 apex
 apocalypse
 barred
-beck
 bingo
 boiler
 boulder
@@ -1080,7 +1081,6 @@ vista
 vogue
 volcanic
 akin
-benedict
 beware
 bisexual
 boulevard
@@ -1152,7 +1152,6 @@ scrub
 sewing
 shale
 shin
-sol
 solicitor
 squadron
 squirrel
@@ -1172,6 +1171,7 @@ communal
 countdown
 drummer
 efficacy
+filipino
 flashing
 gin
 ignition
@@ -1207,9 +1207,9 @@ bunker
 caffeine
 cosmetics
 dammit
-dell
 dumping
 enlightenment
+finnish
 focal
 fucker
 gala
@@ -1240,7 +1240,6 @@ assassin
 backlash
 bbq
 blockchain
-bonnie
 crossover
 dire
 dominion
@@ -1250,11 +1249,11 @@ hare
 herein
 honorary
 immature
-jess
 manly
 maternity
 misconduct
 mute
+nerd
 oxide
 poop
 pornography
@@ -1290,7 +1289,6 @@ hamlet
 inception
 incompetent
 kin
-kris
 lobster
 manifesto
 masked
@@ -1319,7 +1317,6 @@ bam
 baton
 brew
 charger
-coca
 conditioned
 cove
 deserted
@@ -1354,8 +1351,10 @@ amnesty
 atop
 attic
 autobiography
+buddhism
 cache
 comfy
+condo
 conflicting
 crooked
 cultivation
@@ -1371,7 +1370,6 @@ gill
 guarded
 halftime
 hash
-hogan
 inactive
 laurel
 leftist
@@ -1408,7 +1406,6 @@ feud
 filmmaker
 furnace
 gluten
-goodman
 heavyweight
 lotus
 mantle
@@ -1529,7 +1526,6 @@ aesthetics
 attacker
 authoritarian
 avail
-barker
 booty
 brutally
 buff
@@ -1556,7 +1552,6 @@ marital
 multitude
 nanny
 orbital
-pas
 poppy
 readiness
 resemblance
@@ -1577,6 +1572,7 @@ backdrop
 beau
 blackout
 bluff
+caucus
 charcoal
 cheesy
 choking
@@ -1593,6 +1589,7 @@ fascism
 fearful
 glacier
 influx
+judaism
 kernel
 miner
 mosaic
@@ -1619,6 +1616,7 @@ colt
 crescent
 deportation
 deserving
+dumbass
 dungeon
 dwell
 entrepreneurship
@@ -1635,7 +1633,6 @@ indicative
 jockey
 jolly
 latitude
-lea
 libertarian
 majestic
 metropolis
@@ -1652,7 +1649,6 @@ rosemary
 secrecy
 skipping
 sweetie
-tor
 unnamed
 venom
 winger
@@ -1696,11 +1692,9 @@ savvy
 scanner
 schizophrenia
 seriousness
-sheila
 spree
 sup
 sweaty
-tanner
 thinner
 topping
 tracing
@@ -1729,7 +1723,6 @@ karate
 lighthouse
 longevity
 lore
-meg
 meltdown
 messiah
 meteor
@@ -1742,7 +1735,6 @@ phi
 prevailing
 puff
 pun
-raj
 rampant
 retaliation
 rooftop
@@ -1754,7 +1746,6 @@ summon
 tavern
 titanium
 tuck
-ulster
 urgency
 ware
 wonderfully
@@ -1796,7 +1787,6 @@ poultry
 quartet
 reboot
 robotic
-sawyer
 sect
 seminary
 sideways
@@ -1820,9 +1810,7 @@ backbone
 beetle
 blizzard
 brawl
-burgess
 celestial
-chevy
 countess
 flowering
 gunfire
@@ -1866,7 +1854,6 @@ condemnation
 cruiser
 dart
 dew
-dickens
 disconnected
 dosage
 dysfunction
@@ -2001,7 +1988,6 @@ router
 sabbath
 scouting
 shovel
-skinner
 synonymous
 arbor
 astronomical
@@ -2055,7 +2041,6 @@ powerless
 radiant
 rpm
 sanity
-ser
 showdown
 shuffle
 siding
@@ -2065,7 +2050,6 @@ supplemental
 techno
 trance
 unconditional
-wen
 ammo
 avalanche
 badger
@@ -2146,7 +2130,6 @@ grumpy
 guise
 immersion
 makeover
-mercer
 mermaid
 moderation
 ordeal
@@ -2165,7 +2148,6 @@ stuffing
 summons
 taboo
 teaser
-thatcher
 throttle
 trendy
 trivia
@@ -2174,7 +2156,6 @@ vaguely
 wand
 alias
 bondage
-bowman
 brunch
 chestnut
 cleanup
@@ -2336,7 +2317,6 @@ inadvertently
 insistence
 invincible
 jubilee
-lam
 lavender
 lodging
 mania
@@ -2388,12 +2368,10 @@ chaplain
 chlorine
 chow
 chubby
-clement
 collusion
 coroner
 correctional
 deterioration
-dirk
 disbelief
 discreet
 duet
@@ -2435,7 +2413,6 @@ sire
 stale
 sterile
 torrent
-trey
 trough
 tummy
 unjust
@@ -2585,7 +2562,6 @@ extravagant
 fender
 fiance
 fused
-greenwood
 harp
 heartfelt
 hoodie
@@ -2706,7 +2682,6 @@ chatter
 comedic
 compressor
 cougar
-cutler
 defamation
 directional
 ditto
@@ -2727,7 +2702,6 @@ inhibitor
 jumbo
 kale
 lash
-madras
 manageable
 manslaughter
 meridian
@@ -2735,7 +2709,6 @@ midi
 mountainous
 obnoxious
 orphanage
-phoebe
 rake
 retribution
 rightful
@@ -2761,8 +2734,8 @@ biker
 bipartisan
 buildup
 butch
+catholicism
 cobalt
-collier
 colossal
 commodore
 compiler
@@ -2819,7 +2792,6 @@ sizable
 subdued
 surpass
 tart
-ting
 transformer
 triumphant
 umpire
@@ -2827,7 +2799,6 @@ unborn
 undisclosed
 undone
 vicar
-welch
 wretched
 adolescence
 afterlife
@@ -2907,7 +2878,6 @@ awaken
 azure
 blowjob
 bonnet
-bourne
 breeder
 cadet
 casing
@@ -2920,7 +2890,6 @@ cupcake
 cybersecurity
 davenport
 deli
-dyer
 enamel
 escalate
 exceedingly
@@ -2946,7 +2915,6 @@ maroon
 masonry
 mechanically
 muffin
-obi
 outspoken
 parkway
 pedigree
@@ -3051,7 +3019,6 @@ viva
 washer
 wick
 afloat
-airbus
 alteration
 anon
 ante
@@ -3094,6 +3061,7 @@ intrusive
 jackass
 joyous
 kiwi
+limo
 mace
 malignant
 mane
@@ -3127,7 +3095,6 @@ shipbuilding
 smoky
 spade
 steroid
-tata
 thematic
 threesome
 toaster
@@ -3155,7 +3122,6 @@ buggy
 canonical
 cautiously
 celery
-cor
 counsellor
 couture
 crowdfunding
@@ -3220,7 +3186,6 @@ voicemail
 volt
 barb
 bastion
-bey
 biopsy
 bray
 chopper
@@ -3250,7 +3215,6 @@ incidental
 indigo
 intimidate
 labyrinth
-lac
 latency
 limbo
 mammal
@@ -3274,7 +3238,6 @@ proprietor
 raider
 raja
 resurgence
-roc
 rooster
 seamless
 shite
@@ -3307,7 +3270,6 @@ brigadier
 cameraman
 carnage
 chateau
-colleen
 commune
 conclusive
 coo
@@ -3387,9 +3349,7 @@ daredevil
 detox
 doodle
 dossier
-draper
 eradicate
-fay
 feral
 grange
 hangar
