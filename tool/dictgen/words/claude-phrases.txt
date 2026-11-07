@@ -1,4 +1,4 @@
-# Claude の判断で足した句 285 語。分野の順。
+# Claude の判断で足した句 309 語。分野の順。
 # 範囲: 既存の単語リストと同梱辞書に無く、語彙表や頻度の基準で漏れたが、学習者が意味を調べそうな句。
 #   仕事・会議、日常の動作、感情・状態、考え・判断、会話・あいさつ、よくある慣用句、句動詞の分野ごとに考えて選んだ。
 sign up for
@@ -286,3 +286,28 @@ point to
 pull apart
 tell apart
 zoom out
+# 利用者の単語帳で辞書に無かった句(2026-11-08)
+that said
+a world of
+a string of
+so much so that
+the gist of
+follow through on
+in light of
+the better part of
+stand behind
+be up for
+put two and two together
+a raft of
+course through
+a heck of
+to a degree
+turn heads
+in time with
+a slew of
+rev up
+put something in perspective
+double down on
+belt out
+lace with
+be versed in
