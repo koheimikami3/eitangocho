@@ -28,6 +28,24 @@ struct PrebuiltDictionaryTests {
     #expect(await PrebuiltDictionary.bundled.lookup("serendipity", language: .ja) == nil)
   }
 
+  @Test("韓国語は省略可で読み、無い語は nil で、ほかの言語は引ける")
+  func optionalKorean() async {
+    let dictionary = PrebuiltDictionary {
+      Data(
+        #"""
+        {"version":1,"words":{
+        "a":{"ipa":"","pos":[],"exampleEn":"e","ja":{"meaning":"日","exampleTranslation":"日例"},
+        "zhHant":{"meaning":"繁","exampleTranslation":"繁例"},"ko":{"meaning":"한","exampleTranslation":"한예"}},
+        "b":{"ipa":"","pos":[],"exampleEn":"e","ja":{"meaning":"日","exampleTranslation":"日例"},
+        "zhHant":{"meaning":"繁","exampleTranslation":"繁例"}}}}
+        """#.utf8)
+    }
+    #expect(await dictionary.lookup("a", language: .ko)?.meaning == "한")
+    #expect(await dictionary.lookup("a", language: .ko)?.exampleTranslation == "한예")
+    #expect(await dictionary.lookup("b", language: .ko) == nil)
+    #expect(await dictionary.lookup("b", language: .ja)?.meaning == "日")
+  }
+
   @Test("版が違うファイルは空の辞書として扱う")
   func unsupportedVersion() async {
     let dictionary = PrebuiltDictionary {

@@ -3,7 +3,7 @@ import Foundation
 
 /// WordInfoProvider の辞書ベース実装(事前生成辞書 + kaikki + Tatoeba + EJDict + DeepL)。
 ///
-/// 訳は訳の言語(TranslationLanguage)で取得する。日本語と繁体字では同梱の
+/// 訳は訳の言語(TranslationLanguage)で取得する。日本語・繁体字・韓国語では同梱の
 /// 事前生成辞書を最優先し、載っている語は通信せずにその値だけを返す。
 /// 載っていない語は、日本語なら同梱の EJDict、それ以外の言語は kaikki の訳語を使う。
 /// 英語の語義は kaikki の語義の文から採る。
@@ -115,6 +115,7 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     if let meaning { info.meaning = meaning }
     // 英単語として実在が確かめられる語(kaikki か EJDict に見出しがある)だけを、辞書に無かった語に数える。
     // Tatoeba だけで埋まった語は綴り間違いや入力の断片がありうるので数えない(計測で入力そのものを送るため)。
+    // 辞書に語があって韓国語の訳だけが無い語も数える。次にどの語の韓国語を作るかを選ぶのに使うため。
     info.prebuiltDictionaryMiss =
       PrebuiltDictionary.covers(language) && (!(entries ?? []).isEmpty || meaning != nil)
 

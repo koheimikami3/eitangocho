@@ -16,6 +16,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
   case zhHant
   case es
   case fr
+  case ko
   case enDefinition
 
   /// words.translation_language と同期 JSON に保存する値(BCP 47)。
@@ -25,6 +26,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
     case .zhHant: "zh-Hant"
     case .es: "es"
     case .fr: "fr"
+    case .ko: "ko"
     case .enDefinition: "en"
     }
   }
@@ -37,6 +39,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
     case .zhHant: "cmn"
     case .es: "es"
     case .fr: "fr"
+    case .ko: "ko"
     case .enDefinition: nil
     }
   }
@@ -48,6 +51,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
     case .zhHant: "cmn"
     case .es: "spa"
     case .fr: "fra"
+    case .ko: "kor"
     case .enDefinition: nil
     }
   }
@@ -65,6 +69,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
     case .zhHant: "ZH-HANT"
     case .es: "ES"
     case .fr: "FR"
+    case .ko: "KO"
     case .enDefinition: nil
     }
   }
@@ -76,6 +81,7 @@ public enum TranslationLanguage: String, CaseIterable, Sendable {
     case .zhHant: "zh-TW"
     case .es: "es"
     case .fr: "fr"
+    case .ko: "ko"
     case .enDefinition: "en"
     }
   }

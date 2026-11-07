@@ -6874,6 +6874,48 @@
         }
       }
     },
+    "translationLanguageName.ko" : {
+      "comment" : "訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korean"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coreano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coréen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "韓国語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한국어"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "韓文"
+          }
+        }
+      }
+    },
     "translationLanguageName.zhHant" : {
       "comment" : "訳の言語の名前(設定の選択肢)。language は TranslationLanguage.name",
       "extractionState" : "manual",
@@ -7050,6 +7092,48 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日文"
+          }
+        }
+      }
+    },
+    "translationLanguageShortName.ko" : {
+      "comment" : "訳の言語の短い名前(項目名・出題方向に差し込む)。es / fr は文中に差し込むので小文字で書く",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korean"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "coreano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "coréen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "韓国語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한국어"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "韓文"
           }
         }
       }
