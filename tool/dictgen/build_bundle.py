@@ -14,6 +14,7 @@ out/ は gitignore なので、コミットする正本は書き出した側。�
   phrase_ipa.py で組み立てて埋める(fill_missing_ipa)。最後まで空の語は一覧を出す
 - 英例文は言語間で共通にする決まり(fill-instructions.md)なので 1 つだけ持つ。違っていれば止まる
 - 出どころ(source)はアプリで使わないので書かない
+- 韓国語は既存の語に後から足すので、out/ko/ の出力を語の `ko` に足す(add_korean)。無ければ `ko` は書かない
 """
 
 import json
@@ -23,11 +24,13 @@ from difflib import SequenceMatcher
 from pathlib import Path
 
 from phrase_ipa import PHRASE_WORD_IPA, compose, join_words, load_ipa_dict
-from validate import check_pair
+from validate import check_ko_pair, check_pair
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs", "cefrj"]
 LANGS = ("ja", "zhHant")
+# 韓国語の出力の置き場(collect_ko.py)。単語リストごとに分けず 1 か所に足していく
+KOREAN_SOURCE = "ko"
 # pick_cefrj.py が kaikki から残した綴り違いの行き先(IPA を埋めるのに使う)
 ALT_OF = ROOT / "out/cefrj-pick/kaikki.jsonl"
 # alt_of の行き先を綴り違いとみなす似ている度合い(jewellery → jewelry は 0.89、are → our は 0.33)
@@ -64,6 +67,7 @@ def main():
                     **{lang: {"meaning": row[lang]["meaning"]["value"],
                               "exampleTranslation": row[lang]["exampleTranslation"]["value"]} for lang in LANGS},
                 }
+    with_korean = add_korean(words, problems)
     if problems:
         print("\n".join(problems), file=sys.stderr)
         sys.exit("問題があるので書かなかった")
@@ -76,6 +80,36 @@ def main():
     empty = [word for word, entry in words.items() if not entry["ipa"]]
     if empty:
         print(f"IPA が空 {len(empty)}: {', '.join(empty)}")
+    if with_korean:
+        print(f"韓国語あり {with_korean} / {len(words)}")
+
+
+def add_korean(words, problems):
+    """out/ko/ の出力を語の `ko` に足し、足した語数を返す。
+
+    英例文は生成のときの入力と今の辞書で同じものだけを使う。後から英例文を直した語に古い訳が残らないようにするため。
+    """
+    added = 0
+    for output_path in sorted((ROOT / "out" / KOREAN_SOURCE).glob("output-*.json")):
+        input_path = output_path.with_name(output_path.name.replace("output-", "input-"))
+        found = check_ko_pair(input_path, output_path)
+        if found:
+            problems.append(f"{output_path.relative_to(ROOT)}: 検査の問題 {len(found)} 件")
+            continue
+        inputs = {row["word"]: row for row in json.loads(input_path.read_text(encoding="utf-8"))}
+        for row in json.loads(output_path.read_text(encoding="utf-8")):
+            word = row["word"]
+            entry = words.get(word)
+            if entry is None:
+                problems.append(f"{word}: 韓国語の出力にあるが辞書に無い")
+            elif "ko" in entry:
+                problems.append(f"{word}: 2 つの韓国語の出力に入っている")
+            elif inputs[word]["exampleEn"] != entry["exampleEn"]:
+                problems.append(f"{word}: 韓国語の生成のときと英例文が違う")
+            else:
+                entry["ko"] = {"meaning": row["meaning"], "exampleTranslation": row["exampleTranslation"]}
+                added += 1
+    return added
 
 
 def phonemic(ipa):

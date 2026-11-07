@@ -5,6 +5,8 @@
     python3 validate.py <input.json> <output.json>   1 組だけ確かめる
     python3 validate.py <ディレクトリ>                input-NNN.json と output-NNN.json を組にして全部確かめる
 
+    python3 validate.py --ko ...                     韓国語の出力(fill-instructions-ko.md)を同じ形で確かめる
+
 問題があれば内容を出して終了コード 1 で終わる。output の無い input は「未生成」として数えるだけで、
 問題には含めない(収集と生成を並行して進めている途中でも回せるようにするため)。
 
@@ -29,6 +31,22 @@ EXAMPLE_WORDS = range(8, 16)
 NOTATION = re.compile(r"[〈〉《》『』]")
 # 繁体字の例文の訳に残りやすい半角の約物
 HALFWIDTH_PUNCT = re.compile(r"[,?!;:]")
+KO_FIELDS = {"word", "meaning", "exampleTranslation"}
+HANGUL = re.compile(r"[가-힣]")
+# 日本語・中国語の混入(漢字・仮名)
+HAN_OR_KANA = re.compile(r"[぀-ヿ㐀-鿿豈-﫿]")
+# 英語のまま残った語。小文字を含むものだけ拾う(略語の CD・TV は韓国語でもそのまま書くので通す)
+ENGLISH_WORD = re.compile(r"[A-Za-z]*[a-z][A-Za-z]*")
+# 韓国語の約物は半角(日本語・中国語の約物の混入を拾う)
+FULLWIDTH_PUNCT = re.compile("[，。？！；：、]")
+KO_SENTENCE = re.compile(r"(?<=[.?!])\s+")
+# 文末は 해라체(다)か 해요체(요・죠)。引用符で閉じる文も通す
+KO_SENTENCE_END = re.compile(r"[다요죠][.?!][\"”']?$")
+# 반말の文末は語尾が多いので、ハングルと .?! で終わることだけを見る
+KO_CASUAL_SENTENCE_END = re.compile(r"[가-힣][.?!][\"”']?$")
+# 니다 の前の音節の終声が ㅂ なら 합쇼체(합니다・입니다・습니다)。아니다 は 해라체なので通す
+HANGUL_BASE, JONGSEONG_COUNT, JONGSEONG_BIEUP = 0xAC00, 28, 17
+KO_NIDA_END = re.compile(r"([가-힣])니다[.?!][\"”']?$")
 
 
 def check_source(word, where, item, input_value, input_source, problems):
@@ -118,7 +136,54 @@ def check_word(inp, out, problems):
         problems.append(f"{word} zhHant.exampleTranslation: 半角の約物がある")
 
 
-def check_pair(input_path, output_path):
+def is_ko_formal(sentence):
+    """합쇼체の文末(합니다・습니다)か。"""
+    match = KO_NIDA_END.search(sentence)
+    return bool(match) and (ord(match.group(1)) - HANGUL_BASE) % JONGSEONG_COUNT == JONGSEONG_BIEUP
+
+
+def check_ko_word(inp, out, problems):
+    """韓国語の出力の 1 語を確かめる。見出しの品詞・英例文は辞書のものを使うので出力に無い。"""
+    word = inp["word"]
+    if out.get("word") != word:
+        problems.append(f"{word}: 出力の語が「{out.get('word')}」になっている")
+        return
+    if set(out) != KO_FIELDS:
+        problems.append(f"{word}: キーが違う {sorted(out)}")
+    meaning, translation = out.get("meaning"), out.get("exampleTranslation")
+    if not (isinstance(meaning, str) and isinstance(translation, str) and meaning and translation):
+        problems.append(f"{word}: meaning か exampleTranslation が空")
+        return
+
+    for field, value in (("meaning", meaning), ("exampleTranslation", translation)):
+        if not HANGUL.search(value):
+            problems.append(f"{word} {field}: ハングルが無い")
+        if HAN_OR_KANA.search(value):
+            problems.append(f"{word} {field}: 漢字か仮名が混じっている")
+        if ENGLISH_WORD.search(value):
+            problems.append(f"{word} {field}: 英語のまま残っている")
+        if FULLWIDTH_PUNCT.search(value):
+            problems.append(f"{word} {field}: 全角の約物がある")
+
+    senses = meaning.split(" / ")
+    if len(senses) > MAX_SENSES:
+        problems.append(f"{word} meaning: 語義が {len(senses)} 個(7 個までの決まり)")
+    if any(len(s.split(",")) > MAX_WORDS_PER_SENSE for s in senses):
+        problems.append(f"{word} meaning: 1 語義の訳語が 4 個以上ある")
+
+    # 卑語の語は、訳全体の先頭に注記を 1 つ付け、発言の文は 반말でもよい
+    is_vulgar = inp["ja"].startswith("(卑語)")
+    if meaning.count("(비속어)") != is_vulgar or (is_vulgar and not meaning.startswith("(비속어) ")):
+        problems.append(f"{word} meaning: 注記 (비속어) は ja に(卑語)がある語の先頭に 1 つだけ")
+
+    for sentence in KO_SENTENCE.split(translation):
+        if not (KO_CASUAL_SENTENCE_END if is_vulgar else KO_SENTENCE_END).search(sentence):
+            problems.append(f"{word} exampleTranslation: 文末が 다・요・죠 と .?! でない「{sentence}」")
+        elif is_ko_formal(sentence):
+            problems.append(f"{word} exampleTranslation: 합쇼체が使われている「{sentence}」")
+
+
+def check_pair(input_path, output_path, check=check_word):
     """1 組を確かめて問題の一覧を返す。"""
     try:
         inputs = json.loads(Path(input_path).read_text(encoding="utf-8"))
@@ -134,12 +199,20 @@ def check_pair(input_path, output_path):
         if not isinstance(out, dict):
             problems.append(f"{inp['word']}: 出力がオブジェクトになっていない")
             continue
-        check_word(inp, out, problems)
+        check(inp, out, problems)
     return problems
+
+
+def check_ko_pair(input_path, output_path):
+    """韓国語の 1 組を確かめて問題の一覧を返す。"""
+    return check_pair(input_path, output_path, check_ko_word)
 
 
 def main():
     args = sys.argv[1:]
+    check = check_pair
+    if args[:1] == ["--ko"]:
+        check, args = check_ko_pair, args[1:]
     if len(args) == 2:
         pairs = [(Path(args[0]), Path(args[1]))]
     elif len(args) == 1 and Path(args[0]).is_dir():
@@ -154,7 +227,7 @@ def main():
         if not output_path.exists():
             missing.append(output_path.name)
             continue
-        problems = check_pair(input_path, output_path)
+        problems = check(input_path, output_path)
         if problems:
             failed.append(output_path.name)
             print(f"## {output_path.name}: {len(problems)} 件")
