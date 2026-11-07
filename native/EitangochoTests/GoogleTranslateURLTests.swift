@@ -26,5 +26,8 @@ struct GoogleTranslateURLTests {
     #expect(
       GoogleTranslateURL.make("apple", language: .fr).absoluteString
         == "https://translate.google.com/?sl=en&tl=fr&text=apple&op=translate")
+    #expect(
+      GoogleTranslateURL.make("apple", language: .ko).absoluteString
+        == "https://translate.google.com/?sl=en&tl=ko&text=apple&op=translate")
   }
 }

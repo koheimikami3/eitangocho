@@ -4,7 +4,7 @@ import SwiftUI
 /// 同梱フォント(Flutter 版と同じ `assets/fonts/` のファイル)の登録と、
 /// Flutter 版と同じ字形・行の高さになるフォントの組み立て。
 ///
-/// 欧文は Inter を主にし、Inter に無い漢字・かなは cjkFallback の順に探す。
+/// 欧文は Inter を主にし、Inter に無い漢字・かな・ハングルは cjkFallback の順に探す。
 /// 発音記号だけは IPA 用に作られた Andika を使う。
 /// Noto の縦の数値は `tool/center_font_metrics.py` でファイルそのものを直してあるので、
 /// そのファイルを入れれば補正も効く(CoreText も hhea の値で行を組む)。
@@ -17,7 +17,7 @@ enum AppFonts {
   }
 
   /// 同梱するファイル。Xcode の Resources に `../assets/fonts/` のファイル参照で入れてある。
-  static let fileNames = ["Inter.ttf", "NotoSansJP.ttf", "NotoSansTC.ttf", "Andika-Regular.ttf"]
+  static let fileNames = ["Inter.ttf", "NotoSansJP.ttf", "NotoSansTC.ttf", "NotoSansKR.ttf", "Andika-Regular.ttf"]
 
   // PostScript 名。Inter と Noto は可変フォントで、名前が指すのは既定の位置の
   // インスタンス(Noto の既定は Thin)。太さは wght 軸で指定する。
@@ -25,6 +25,7 @@ enum AppFonts {
   private static let andikaName = "Andika"
   private static let japaneseName = "NotoSansJP-Thin"
   private static let traditionalChineseName = "NotoSansTC-Thin"
+  private static let koreanName = "NotoSansKR-Thin"
 
   // 可変フォントの軸の識別子('wght' / 'opsz' の 4 文字コード)。
   private static let weightAxis = 0x7767_6874
@@ -46,25 +47,30 @@ enum AppFonts {
     }
   }
 
-  /// 和文・繁体字フォントの優先順(PostScript 名)。
+  /// 和文・繁体字・韓国語フォントの優先順(PostScript 名)。
   ///
-  /// 漢字はどちらのフォントにも入っているので、先頭のフォントの字形で出る。
-  /// 繁体字の画面で日本の字形を出さないよう、表示言語で先頭を入れ替える。
-  /// 繁体字以外の画面(英・西・仏を含む)は和文を先にする。訳の言語の既定が
+  /// 漢字はどのフォントにも入っているので、先頭のフォントの字形で出る。
+  /// 繁体字・韓国語の画面で日本の字形を出さないよう、表示言語で先頭を入れ替える。
+  /// それ以外の画面(英・西・仏を含む)は和文を先にする。訳の言語の既定が
   /// 日本語になるため(AppLocale.defaultTranslationLanguage)。
+  ///
+  /// ハングルは韓国語のフォントにしか無い。訳の言語は画面の言語と別に選べるので、
+  /// どの画面でもハングルを出せるよう、韓国語のフォントを必ず入れる。
   static func cjkFallback(_ language: AppLocale.Language) -> [String] {
-    language == .zhHant
-      ? [traditionalChineseName, japaneseName]
-      : [japaneseName, traditionalChineseName]
+    switch language {
+    case .zhHant: [traditionalChineseName, japaneseName, koreanName]
+    case .ko: [koreanName, japaneseName, traditionalChineseName]
+    case .ja, .en, .es, .fr: [japaneseName, traditionalChineseName, koreanName]
+    }
   }
 
-  /// 漢字・かなの字面の下端がベースラインより下に出る量(文字の大きさに対する比)。
-  /// Noto Sans JP / TC の字面の枠の下端(OS/2 typo の -120 / 1000。Flutter 版の AppFonts.cjkEmBoxDescent)。
+  /// 漢字・かな・ハングルの字面の下端がベースラインより下に出る量(文字の大きさに対する比)。
+  /// Noto Sans JP / TC / KR の字面の枠の下端(OS/2 typo の -120 / 1000。Flutter 版の AppFonts.cjkEmBoxDescent)。
   static let cjkEmBoxDescent: CGFloat = 0.12
 
-  /// 画面の文字が漢字・かなになる表示言語か(日本語・繁体字)。
+  /// 画面の文字が漢字・かな・ハングルになる表示言語か(日本語・繁体字・韓国語)。
   static func isCjk(_ language: AppLocale.Language) -> Bool {
-    language == .ja || language == .zhHant
+    language == .ja || language == .zhHant || language == .ko
   }
 
   // MARK: - フォントの組み立て
@@ -78,7 +84,7 @@ enum AppFonts {
 
   private static var fontCache: [FontKey: CTFont] = [:]
 
-  /// 主のフォントに、和文・繁体字の cascade list と太さを付けたもの。
+  /// 主のフォントに、和文・繁体字・韓国語の cascade list と太さを付けたもの。
   /// `size` は倍率を掛けた後の値。
   static func ctFont(
     _ family: Family, size: CGFloat, weight: Int, language: AppLocale.Language = AppLocale.current
@@ -146,7 +152,7 @@ enum AppFonts {
     family == .sans ? interName : andikaName
   }
 
-  /// 和文の代替フォントの縦の数値(JP / TC は同じ値に直してある)。
+  /// 和文の代替フォントの縦の数値(JP / TC / KR は同じ値に直してある)。
   static var fallbackMetrics: VerticalMetrics { verticalMetrics(postScriptName: japaneseName) }
 
   /// `text` の文字を、主のフォントにある文字と無い文字(漢字・かな・全角記号など)に分けたときに、

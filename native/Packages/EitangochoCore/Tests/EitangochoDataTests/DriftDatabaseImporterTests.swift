@@ -79,7 +79,7 @@ final class DriftDatabaseImporterTests {
 
     // 開けば最新のスキーマで作られる。
     let database = try openDestination()
-    #expect(try database.writer.read { try AppDatabase.userVersion($0) } == 7)
+    #expect(try database.writer.read { try AppDatabase.userVersion($0) } == 8)
   }
 
   @Test("v7 の DB を引き継ぐと単語・削除ログ・辞書がそろい、記録が残る")
@@ -118,7 +118,7 @@ final class DriftDatabaseImporterTests {
     #expect(mode == "wal")
   }
 
-  @Test("古い版(v1・v3)の DB は v7 に上げてから引き継ぐ", arguments: [1, 3])
+  @Test("古い版(v1・v3)の DB は v8 に上げてから引き継ぐ", arguments: [1, 3])
   func upgradesOldVersions(version: Int) async throws {
     try makeSource { db in
       if version == 1 {
@@ -136,7 +136,7 @@ final class DriftDatabaseImporterTests {
     guard case .performed(let record) = outcome else { Issue.record("\(outcome)"); return }
     #expect(record.sourceUserVersion == version)
     let database = try openDestination()
-    #expect(try await database.writer.read { try AppDatabase.userVersion($0) } == 7)
+    #expect(try await database.writer.read { try AppDatabase.userVersion($0) } == 8)
     #expect(try await database.wordDao.getAll().first?.translationLanguage == "ja")
     #expect(try await database.dictionaryCacheDao.find("apple") == nil)
   }
@@ -153,7 +153,7 @@ final class DriftDatabaseImporterTests {
     _ = try importer.run()
 
     #expect(try sha256(source) == before)
-    // スキーマの更新(v3 → v7)も元ファイルには及んでいない。
+    // スキーマの更新(v3 → v8)も元ファイルには及んでいない。
     let version = try DatabaseQueue(path: source.path, configuration: readOnly).read {
       try AppDatabase.userVersion($0)
     }

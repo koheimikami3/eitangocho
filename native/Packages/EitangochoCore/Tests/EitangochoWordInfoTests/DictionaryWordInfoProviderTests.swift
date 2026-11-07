@@ -48,7 +48,8 @@ private let commuteDefinitionJsonl = """
 private let prebuiltFixture = """
   {"version":1,"words":{"give up":{"ipa":"/ˌɡɪv ˈʌp/","pos":["verb"],"exampleEn":"Don't give up before you try.",\
   "ja":{"meaning":"諦める / …をやめる","exampleTranslation":"やってみる前に諦めないで。"},\
-  "zhHant":{"meaning":"放棄 / 戒掉","exampleTranslation":"試之前別放棄。"}},\
+  "zhHant":{"meaning":"放棄 / 戒掉","exampleTranslation":"試之前別放棄。"},\
+  "ko":{"meaning":"포기하다 / 그만두다","exampleTranslation":"해 보기도 전에 포기하지 마."}},\
   "run":{"ipa":"/ɹʌn/","pos":["verb","noun"],"exampleEn":"I run in the park every morning.",\
   "ja":{"meaning":"走る / …を経営する","exampleTranslation":"私は毎朝公園を走る。"},\
   "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}}}}
@@ -59,6 +60,12 @@ private let prebuiltFixture = """
 private let ranJsonl = """
   {"word":"ran","pos":"verb","senses":[{"glosses":["simple past of run"],"tags":["form-of","past"],"form_of":[{"word":"run"}]},{"glosses":["simple past of rin"],"tags":["form-of","past"],"form_of":[{"word":"rin"}]}]}
   {"word":"ran","pos":"noun","senses":[{"glosses":["Yarns coiled on a spun-yarn winch."],"tags":["uncountable"]}]}
+
+  """
+
+/// `run` の韓国語の訳語。事前生成辞書に韓国語の無い語の取得経路を確かめる。
+private let runKoJsonl = """
+  {"word":"run","pos":"verb","senses":[],"translations":[{"lang":"Korean","code":"ko","lang_code":"ko","word":"달리다"}]}
 
   """
 
@@ -147,7 +154,33 @@ struct DictionaryWordInfoProviderTests {
     #expect(info.translationLanguage == .zhHant)
   }
 
-  // 事前生成辞書は日本語と繁体字の訳しか持たない。
+  @Test("韓国語の訳がある語は、通信せず辞書の値を返す")
+  func prebuiltDictionaryKorean() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, language: .ko)
+    let info = try #require(try await provider.fetch("give up"))
+    #expect(info.meaning == "포기하다 / 그만두다")
+    #expect(info.exampleTranslation == "해 보기도 전에 포기하지 마.")
+    #expect(info.translationLanguage == .ko)
+    #expect(info.prebuiltDictionaryMiss == false)
+    #expect(kaikkiCalls.count == 0)
+  }
+
+  @Test("韓国語の訳が無い語は取得経路に任せ、辞書に無かった語に数える")
+  func prebuiltDictionaryWithoutKorean() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(runKoJsonl), language: .ko)
+    let info = try #require(try await provider.fetch("run"))
+    #expect(info.meaning == "달리다")
+    #expect(info.prebuiltDictionaryMiss == true)
+    #expect(kaikkiCalls.count == 1)
+  }
+
+  @Test("活用形の原形に韓国語の訳が無ければ、原形に寄せず取得経路に任せる")
+  func inflectionWithoutKorean() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(ranJsonl), language: .ko)
+    #expect(try await provider.fetch("ran")?.word == "ran")
+  }
+
+  // 事前生成辞書はスペイン語・フランス語・英語の語義を持たない。
   @Test("スペイン語・英語の語義では事前生成辞書を使わない")
   func prebuiltDictionaryOnlyForCoveredLanguages() async throws {
     for language in [TranslationLanguage.es, .enDefinition] {
@@ -194,7 +227,7 @@ struct DictionaryWordInfoProviderTests {
     #expect(tatoebaCalls.count == 1)
   }
 
-  @Test("辞書に無かった語に数えるのは、日本語・繁体字で kaikki か EJDict に見出しがある語だけ")
+  @Test("辞書に無かった語に数えるのは、日本語・繁体字・韓国語で kaikki か EJDict に見出しがある語だけ")
   func prebuiltDictionaryMissFlag() async throws {
     try await seedEjdict(["milksop": "意気地なし"])
     #expect(try await makeProvider().fetch("milksop")?.prebuiltDictionaryMiss == true)

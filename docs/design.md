@@ -20,16 +20,20 @@
 | IPA(米音優先)・品詞・英例文 | kaikki.org(Wiktionary を構造化した静的 JSONL) |
 | 英例文 + 対訳 | Tatoeba(`api.tatoeba.org/unstable/sentences`) |
 | 単語の訳(日本語) | EJDict-hand(同梱、初回起動時に DB へ取込)。未収録なら kaikki の `translations`(ja) |
-| 単語の訳(日本語以外) | kaikki の `translations`(繁体字は cmn の `實現 /实现` の繁体字側だけ採る) |
+| 単語の訳(日本語以外) | kaikki の `translations`(繁体字は cmn の `實現 /实现` の繁体字側だけ採る。韓国語は事前生成辞書に無い語だけ) |
 | 例文の訳 | Tatoeba の対訳(繁体字は `script == Hant` の訳だけ。字形変換はしない) |
 | 例文の訳(予備) | DeepL API Free(設定 UI は隠してある。コードとチェーンは残す) |
 | 発音 | Google 翻訳の URL を生成して開く(音声は再生しない) |
 
-- **日本語・繁体字では、同梱の事前生成辞書(ネイティブ版のみ)を最優先する。** 載っている語は
+- **日本語・繁体字・韓国語では、同梱の事前生成辞書(ネイティブ版のみ)を最優先する。** 載っている語は
   通信せず辞書の値だけを入れ、取得経路と混ぜない(検査済みの値を揃えて作ってあるため)。
+  韓国語は語によって訳が無く(`ko` は省略可)、無い語は載っていない語と同じに扱う。
   中身は `tool/dictgen` で作り、Wiktionary の改変を含むので CC BY-SA 4.0 で配る(ライセンス一覧に出す)。
-  IPA は LLM に書かせず、kaikki → ipa-dict(MIT、ライセンス一覧に出す)の順に取り、句動詞は語の IPA を
-  つないで強勢を決まりで付ける(`tool/dictgen/phrase_ipa.py`)
+  語の範囲と選び方は `tool/dictgen/words/` の各リストの頭に書く。
+  IPA は LLM に書かせず、kaikki → ipa-dict(MIT、ライセンス一覧に出す)→ 英綴りを米綴りに直して ipa-dict →
+  kaikki の `alt_of` の綴りが似た行き先の順に取る。句動詞は語の IPA をつないで強勢を決まりで付け、ほかの
+  複合語・熟語は語ごとの強勢のまま並べる(`tool/dictgen/phrase_ipa.py`)。派生語・つながった複合語は
+  強勢が推測になるので組み立てず、空のままにする
 - **活用形(ran・gave up)は、kaikki の `form_of` が指す原形が事前生成辞書にあれば原形に寄せ、
   見出しも原形に置き換えて知らせる。** 単語帳の見出しは原形で持つため。入力そのものが辞書に
   あれば寄せない(found・left は自分の意味を持つ)
@@ -49,7 +53,7 @@
 ## 多言語化
 
 - **画面の表示言語と訳の言語は別に持つ。** 表示言語は端末の優先言語から
-  `AppLocale.resolve` で決める(ja / zh-Hant / es / fr / en。es / fr は地域を区別しない。
+  `AppLocale.resolve` で決める(ja / zh-Hant / es / fr / ko / en。es / fr は地域を区別しない。
   簡体字・対応外は en)。訳の言語は設定(`TranslationLanguage`)で、既定は画面と同じ
   言語があればそれ、無ければ ja。英語の画面を使う日本語話者(海外在住など)がいるため。
   ただし端末の言語一覧に対応言語が 1 つも無いときだけ、既定は英語の語義(下記)
@@ -71,15 +75,20 @@
 - **同期・書き出しのファイル形式のバージョンは上げない。** 上げると古い版の端末が
   同期ファイルを読めなくなる。`translationLanguage` は省略可の項目として足し、
   無ければ ja として読む。古い版の端末が編集した単語は ja に戻りうる(訳自体は残る)
-- **言語の選定は「同梱辞書なしで kaikki の訳語が日本語並みに取れるか」で決める。**
-  日本語以外には EJDict に当たる同梱辞書が無い。韓国語は取得率不足で見送った
+- **言語の選定は「kaikki の訳語が日本語並みに取れるか」で決める。足りない言語は、事前生成辞書に訳を入れて補う。**
+  日本語以外には EJDict に当たる同梱辞書が無い。韓国語は取得率が足りないので辞書で補っており、
+  辞書に訳の無い語は空欄が出やすい
 - **Notifier・データ層は文言を組み立てない。** エラーや状態は種類(enum など)で持ち、
   ウィジェットが `AppLocalizations` で文言にする(BuildContext が無いため)
 - 言語を足すときは、`TranslationLanguage` に値を足して各取得元のコードを埋め、
   ARB(`lib/l10n/`)・`AppLocale`・両 OS の `CFBundleLocalizations` と
-  `InfoPlist.strings`・ストアの掲載情報を揃える。ストアのリリースノートも
+  `InfoPlist.strings`・ストアの掲載情報を揃える(ネイティブ版は `Localizable.xcstrings`・
+  `InfoPlist.xcstrings`・`knownRegions`)。同梱の書体に無い文字の言語は書体も足し、
+  `tool/center_font_metrics.py` で縦の数値を揃える。ストアのリリースノートも
   言語ごとに要る。辞書キャッシュは対応言語の訳語だけを残して保存しているので、
   `schemaVersion` を上げて捨て直す(残すと登録済みの語で新しい言語の訳が空になる)
+- **韓国語はネイティブ版だけに足す。** Flutter の最終版は `ko` の単語を未知の言語として ja に読む
+  (訳は残り、ラベルだけ「日本語訳」になる)
 
 ## データ・同期
 
@@ -220,6 +229,7 @@
   送るのは区分と件数だけ(App Privacy の申告を「製品の操作」に留めるため)
   - 例外は `autofill_dictionary_miss` の単語だけ。事前生成辞書に足す語を選ぶのに、語そのものが要るため。
     kaikki か EJDict に見出しがある英単語に絞り(入力の断片や個人の情報を送らないため)、
+    韓国語では辞書に語があって訳だけが無い語も送る(次に作る語を選ぶため。`translation_language` で分ける)。
     App Privacy と `PrivacyInfo.xcprivacy` に「その他のユーザコンテンツ(紐付けなし・分析)」を申告する
 - iOS と macOS は Bundle ID が同じなので、Firebase 上は 1 つの Apple アプリを共有する。
   プラットフォームはユーザープロパティ `app_platform` で分ける

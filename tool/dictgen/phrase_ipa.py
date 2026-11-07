@@ -34,6 +34,8 @@ PARTICLES = {
 }
 # 句の中でいつも前置詞として働く語(強勢を置かない)
 PREPOSITIONS = {"for", "with", "to", "of", "into", "after"}
+# 複合語・熟語(join_words)の中で強勢を置かない冠詞・接続詞。冠詞は句の中で読む弱形(once in a while の a は /eɪ/ と読まない)
+FUNCTION_WORDS = {"a": "ə", "an": "ən", "the": "ðə", "and": "ænd", "or": "ɔɹ"}
 # 副詞にも前置詞にもなる不変化詞(in・on など)のうち、主な意味で前置詞として働く 2 語の句。
 # 目的語の後ろに回せない(count on it は言えても count it on とは言わない)ものを、辞書の最初の意味で選んだ。
 # ここに無い句は副詞として扱い、不変化詞に強勢を置く
@@ -140,6 +142,26 @@ def compose(phrase, word_ipa):
     return "/" + " ".join(parts) + "/"
 
 
+def join_words(phrase, word_ipa):
+    """複合語・熟語(bus stop・brand-new)の IPA を返す。構成する語の IPA が 1 つでも無ければ空文字。
+
+    複合語の強勢は前に来る語(bus stop)も後ろに来る語(central heating)もあり、決まりでは決められない。
+    推測の強勢を入れないよう、各語の IPA をそれぞれの強勢のまま空白でつなぐ(ハイフンも語の区切りとして扱う)。
+    ただし前置詞・冠詞・接続詞(face to face の to)は句の中で強く読まないので、強勢の印を付けない
+    (ipa-dict は 1 音節の語にも強勢の印を付けている)。
+    """
+    parts = []
+    for word in re.split(r"[ -]", phrase):
+        if word in PREPOSITIONS or word in FUNCTION_WORDS:
+            parts.append(unstressed(FUNCTION_WORDS.get(word) or PARTICLES[word]))
+            continue
+        ipa = word_ipa(word)
+        if not ipa:
+            return ""
+        parts.append(clean(ipa))
+    return "/" + " ".join(parts) + "/"
+
+
 # ipa-dict の値を手で直したもの・ipa-dict に無い語。辞書に入れる単語(kaikki に IPA が無い 163 語)を全部読み、
 # CMU 発音辞書由来の崩れ(複合語の区切り違い・第 1 強勢が 2 つ・un- の弱化・t の脱落)があったものだけ直した
 IPA_DICT_FIXES = {
@@ -152,6 +174,45 @@ IPA_DICT_FIXES = {
     "revaluation": "ˌɹivæljuˈeɪʃən", "reviewer": "ɹɪˈvjuɚ", "sightsee": "ˈsaɪtˌsi", "takeover": "ˈteɪkˌoʊvɚ",
     "unattended": "ˌʌnəˈtɛndɪd", "unauthorize": "ʌnˈɔθəˌɹaɪz", "unauthorized": "ʌnˈɔθəˌɹaɪzd",
     "unsecured": "ˌʌnsɪˈkjʊɹd", "unsure": "ʌnˈʃʊɹ", "webpage": "ˈwɛbˌpeɪd͡ʒ",
+    "anticancer": "ˌæntiˈkænsɚ", "autonomously": "ɔˈtɑnəməsli", "bestseller": "ˌbɛstˈsɛlɚ",
+    "businesswoman": "ˈbɪznəsˌwʊmən", "contextual": "kənˈtɛkst͡ʃuəl", "correctness": "kəˈɹɛktnəs",
+    "culturally": "ˈkʌlt͡ʃɚəli", "dj": "ˈdiˌd͡ʒeɪ", "dna": "ˌdiˌɛnˈeɪ", "dynamically": "daɪˈnæmɪkli",
+    "elegantly": "ˈɛlɪɡəntli", "explosively": "ɪkˈsploʊsɪvli", "ferociously": "fəˈɹoʊʃəsli",
+    "figuratively": "ˈfɪɡjɚətɪvli", "film-maker": "ˈfɪlmˌmeɪkɚ", "hard-working": "ˌhɑɹdˈwɝkɪŋ",
+    "hiv": "ˌeɪt͡ʃˌaɪˈvi", "hospitalize": "ˈhɑspɪtəˌlaɪz", "hysterically": "hɪˈstɛɹɪkli",
+    "impersonator": "ɪmˈpɝsəˌneɪtɚ", "impressionist": "ɪmˈpɹɛʃənɪst", "incongruously": "ɪnˈkɑŋɡɹuəsli",
+    "indignantly": "ɪnˈdɪɡnəntli", "infected": "ɪnˈfɛktɪd", "ingratiating": "ɪnˈɡɹeɪʃiˌeɪtɪŋ",
+    "intrinsically": "ɪnˈtɹɪnsɪkli", "intuitively": "ɪnˈtuɪtɪvli", "irrelevancy": "ɪˈɹɛləvənsi",
+    "microcomputer": "ˌmaɪkɹoʊkəmˈpjutɚ", "mistrustful": "mɪsˈtɹʌstfəl", "modernization": "ˌmɑdɚnəˈzeɪʃən",
+    "non-smoking": "ˌnɑnˈsmoʊkɪŋ", "nonchalantly": "ˌnɑnʃəˈlɑntli", "pc": "ˌpiˈsi", "ph": "ˌpiˈeɪt͡ʃ",
+    "policewoman": "pəˈlisˌwʊmən", "realisation": "ˌɹiələˈzeɪʃən", "realization": "ˌɹiələˈzeɪʃən", "self-aggrandizement": "ˌsɛlfəˈɡɹændɪzmənt",
+    "spokeswoman": "ˈspoʊksˌwʊmən", "startlingly": "ˈstɑɹtlɪŋli", "sterility": "stəˈɹɪlɪti",
+    "superficially": "ˌsupɚˈfɪʃəli", "t-shirt": "ˈtiˌʃɝt", "tee-shirt": "ˈtiˌʃɝt",
+    "unrealistic": "ˌʌnɹiəˈlɪstɪk", "verbally": "ˈvɝbəli",
+    # wordfreq の語。r の音節の区切り違い(sɚˈæmɪks)・n や t の脱落もあった
+    "aka": "ˌeɪˌkeɪˈeɪ", "asap": "ˌeɪˌɛsˌeɪˈpi", "blockchain": "ˈblɑkˌt͡ʃeɪn", "ceramics": "səˈɹæmɪks",
+    "correctional": "kəˈɹɛkʃənəl", "handheld": "ˈhændˌhɛld", "ineligible": "ɪnˈɛlɪd͡ʒəbəl",
+    "intellectually": "ˌɪntəˈlɛkt͡ʃuəli", "offseason": "ˈɔfˌsizən", "outspoken": "ˌaʊtˈspoʊkən",
+    "postwar": "ˌpoʊstˈwɔɹ", "reborn": "ˌɹiˈbɔɹn", "regeneration": "ɹiˌd͡ʒɛnəˈɹeɪʃən", "rpm": "ˌɑɹˌpiˈɛm",
+    "saturated": "ˈsæt͡ʃəˌɹeɪtɪd", "saturation": "ˌsæt͡ʃəˈɹeɪʃən", "supplementary": "ˌsʌpləˈmɛntəɹi",
+    "theoretically": "ˌθiəˈɹɛtɪkəli", "unanswered": "ʌnˈænsɚd", "unborn": "ˌʌnˈbɔɹn",
+    "undocumented": "ʌnˈdɑkjəmɛntɪd", "uplifting": "ʌpˈlɪftɪŋ", "vs": "ˈvɝsəs",
+}
+
+# 句を組み立てるときだけ使う語の IPA。kaikki の先頭の値が句の意味と合わないもの(bow to の bow は「弓」の発音ではない)、
+# 珍しい発音のもの(chew の /t͡ʃju/、remote の /ɹəˈməʊt̞/)、強勢の無いもの(because の /bɪkəz/)。
+# 熟語 2,000 語に使われる語は全部読み、弱形(in /ən/)・方言(fight /fəɪt/)・誤り(do /doʊ/)を直した
+PHRASE_WORD_IPA = {
+    "because": "bɪˈkɔz", "bow": "ˈbaʊ", "chew": "ˈt͡ʃu", "remote": "ɹɪˈmoʊt",
+    "as": "æz", "backyard": "ˌbækˈjɑɹd", "bath": "bæθ", "behind": "bɪˈhaɪnd", "better": "ˈbɛtɚ", "caught": "kɔt",
+    "channel": "ˈt͡ʃænəl", "collect": "kəˈlɛkt", "colored": "ˈkʌlɚd", "concert": "ˈkɑnsɚt", "content": "kənˈtɛnt",
+    "contrast": "ˈkɑntɹæst", "could": "kʊd", "couldn't": "ˈkʊdənt", "deaf": "dɛf", "do": "du", "dog": "dɔɡ",
+    "don't": "doʊnt", "draw": "dɹɔ", "falling": "ˈfɔlɪŋ", "fight": "faɪt", "first": "fɝst", "granted": "ˈɡɹæntɪd",
+    "in": "ɪn", "jackpot": "ˈd͡ʒækˌpɑt", "left": "lɛft", "noise": "nɔɪz", "nude": "nud", "nutshell": "ˈnʌtˌʃɛl",
+    "on": "ɑn", "overboard": "ˈoʊvɚˌbɔɹd", "paper": "ˈpeɪpɚ", "particular": "pɚˈtɪkjəlɚ", "pass": "pæs",
+    "relief": "ɹɪˈlif", "road": "ɹoʊd", "sale": "seɪl", "spread": "spɹɛd", "stop": "stɑp", "tank": "tæŋk",
+    "tantrum": "ˈtæntɹəm", "tears": "tɪɹz", "that": "ðæt", "there": "ðɛɹ", "trouble": "ˈtɹʌbəl", "what's": "wʌts",
+    "wheels": "wilz", "while": "waɪl", "whim": "wɪm", "wife": "waɪf", "write": "ɹaɪt", "you": "ju",
 }
 
 

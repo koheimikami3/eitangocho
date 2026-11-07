@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-"""句動詞の単語リスト(words/phrasal-verbs.txt)を作る。
+"""句動詞の単語リスト(words/phrasal-verbs.txt・words/phrasal-verbs-2.txt)を作る。
 
-範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 TOP_N のもの。
+範囲: Wiktionary の句動詞のうち、差別語・古語の表示がなく、使われる頻度が高いもの。範囲の違いは LISTS の定義を見る。
 「NGSL の動詞に限る」「例文がある」のような代わりの目安では普通の句(cheer up など)まで落ちたため、
-頻度の順位で切る。見出しは原形で、活用形は頻度を数えるのにだけ使う。
+頻度で切る。見出しは原形で、活用形は頻度を数えるのにだけ使う。
 
 使い方(tool/dictgen で):
-    python3 pick_phrasal_verbs.py <作業ディレクトリ> [--list-only]
+    python3 pick_phrasal_verbs.py <作業ディレクトリ> [--list-only] [--list <LISTS の名前>]
+
+--list を省くと phrasal-verbs を作る。
 
 1. Wiktionary の Category:English phrasal verbs の全項目を取る(作業ディレクトリの candidates.json にキャッシュ)
 2. 形で絞る: 2〜3 語・英小文字だけ・2 語目以降がすべて不変化詞か前置詞
 3. kaikki で verb の項目を引き、活用形と意味ごとのタグを取る(kaikki.jsonl に書き足す)。
-   すべての意味に EXCLUDED_TAGS のどれかが付くもの・verb の項目が無いものは除く
+   すべての意味に除くタグのどれかが付くもの・verb の項目が無いものは除く
 4. Tatoeba で原形と活用形を含む英文をまとめて数える(freq.jsonl に書き足す)
-5. 件数の多い順に上位 TOP_N を words/phrasal-verbs.txt へ書く
+5. 件数の多い順に top_n・min_count の範囲を採り、ほかの単語リストにある句を除いて words/<名前>.txt へ書く
 
 3 と 4 は別のサイトなので、kaikki を別スレッドで引きながら、引けた句から順に数える(Tatoeba は TATOEBA_WORKERS 本同時)。
 どちらも止まっても続きから進む。--list-only を付けると 2 までで止め、候補の数だけ出す。
@@ -41,14 +43,45 @@ PARTICLES = set(
 )
 # 頻度で落ちない不適切な語だけを除く。slang は chill out にも付くので除かない(珍しい俗語は順位で落ちる)
 EXCLUDED_TAGS = {"vulgar", "offensive", "derogatory", "archaic", "obsolete"}
-TOP_N = 1000
-# 上の表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
-# 上位 TOP_N を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
+# 表示では落ちなかったが、学習用の辞書に入れない句(生成で空欄になったもの)。
+# 範囲を採った後に除く(繰り上げで足すと順位の区切りが変わるため)
 MANUAL_EXCLUDED = {
     "bite in",  # すべての意味が dated
-    "feel up",  # 性的にさわる意味だけ
     "sex in",  # ギャングの性的な入会儀式の意味だけ
+}
+# 同じく空欄になったが、卑語を除かないリストには入れる句
+MANUAL_EXCLUDED_VULGAR = {
+    "feel up",  # 性的にさわる意味だけ
     "shit on",  # 表示の無い意味が文字どおりの 1 つだけで、残りは vulgar
+}
+# 句動詞でない文で 4 文に届いた珍しい句(文数は語が並ぶ文を数えるだけなので、句の用法かは見分けられない)
+MANUAL_EXCLUDED_ACCIDENTAL = {
+    "ass out",  # Tatoeba に句動詞の用例が無い
+    "blood out",  # blood out of a stone など
+    "paw off",  # paws off me など
+}
+# phrasal-verbs は生成済みなので範囲を変えない。phrasal-verbs-2 はその続きで、
+# ドラマなどで出て意味を調べたい語のために卑語を除かない(順位は卑語を含めて付け直す)
+LISTS = {
+    "phrasal-verbs": {
+        "top_n": 1000,
+        "min_count": 0,
+        "allow_vulgar": False,
+        "title": "句動詞",
+        "scope": "卑語・差別語・古語の表示がなく、使われる頻度が上位 1000 のもの",
+        "manual_excluded": MANUAL_EXCLUDED | MANUAL_EXCLUDED_VULGAR,
+        "manual_note": "表示では落ちなかった性的・卑俗・古い意味だけの句",
+    },
+    "phrasal-verbs-2": {
+        # 同じ文数の句を辞書順で切らないよう、順位ではなく文数で区切る
+        "top_n": None,
+        "min_count": 4,
+        "allow_vulgar": True,
+        "title": "句動詞の続き",
+        "scope": "差別語・古語の表示がなく(卑語は除かない)、Tatoeba で 4 文以上のもののうち、ほかの単語リストに無いもの",
+        "manual_excluded": MANUAL_EXCLUDED | MANUAL_EXCLUDED_ACCIDENTAL,
+        "manual_note": "表示では落ちなかった性的・古い意味だけの句と、句動詞でない文で 4 文に届いた句",
+    },
 }
 # 相手への負荷を抑えるための間隔(秒)。dictgen-collect が Tatoeba に空ける間隔と同じ
 REQUEST_INTERVAL = 0.5
@@ -88,11 +121,11 @@ def fetch_candidates(work):
     return titles
 
 
-def listed_words():
-    """既存の単語リストにある語(重複を除くため)。"""
+def listed_words(output_name):
+    """作るリスト以外の単語リストにある語(重複を除くため)。"""
     words = set()
     for path in glob.glob(str(ROOT / "words/*.txt")):
-        if Path(path).name == "phrasal-verbs.txt":
+        if Path(path).name == output_name:
             continue
         for line in Path(path).read_text(encoding="utf-8").splitlines():
             if line.strip() and not line.startswith("#"):
@@ -131,7 +164,17 @@ def kaikki_entry(phrase):
                     if re.fullmatch(r"[a-z]+( [a-z]+)+", f["form"]) and f["form"].split(" ")[1:] == particles}
                    - {phrase})
     excluded = all(EXCLUDED_TAGS & set(s.get("tags", [])) for s in senses)
-    return {"phrase": phrase, "found": True, "excluded": excluded, "forms": forms}
+    vulgar_only = excluded and not all((EXCLUDED_TAGS - {"vulgar"}) & set(s.get("tags", [])) for s in senses)
+    return {"phrase": phrase, "found": True, "excluded": excluded, "vulgar_only": vulgar_only, "forms": forms}
+
+
+def is_excluded(entry, allow_vulgar):
+    return entry["excluded"] and not (allow_vulgar and entry.get("vulgar_only"))
+
+
+def needs_fetch(entry):
+    """vulgar_only が無い古いキャッシュのうち、除いた句だけ引き直す(除かなかった句は卑語を許しても結果が同じ)。"""
+    return entry["excluded"] and "vulgar_only" not in entry
 
 
 def tatoeba_count(phrase, forms):
@@ -157,7 +200,7 @@ def kaikki_worker(phrases, kaikki, path, out_queue):
     """kaikki を引き、引けた項目を順に out_queue に渡す。最後に None を渡す。"""
     with path.open("a", encoding="utf-8") as f:
         for phrase in phrases:
-            if phrase in kaikki:
+            if phrase in kaikki and not needs_fetch(kaikki[phrase]):
                 out_queue.put(kaikki[phrase])
                 continue
             entry = kaikki_entry(phrase)
@@ -176,9 +219,13 @@ def main():
         sys.exit(64)
     work = Path(args[0])
     work.mkdir(parents=True, exist_ok=True)
+    list_name = args[args.index("--list") + 1] if "--list" in args else "phrasal-verbs"
+    config = LISTS[list_name]
+    output = f"{list_name}.txt"
+    allow_vulgar = config["allow_vulgar"]
 
     titles = fetch_candidates(work)
-    shaped = sorted({t for t in titles if matches_shape(t)} - listed_words())
+    shaped = sorted({t for t in titles if matches_shape(t)})
     print(f"Wiktionary の項目 {len(titles)} / 形で絞った後 {len(shaped)}", flush=True)
     if "--list-only" in args:
         return
@@ -203,22 +250,27 @@ def main():
     with freq_path.open("a", encoding="utf-8") as f, ThreadPoolExecutor(TATOEBA_WORKERS) as pool:
         while (entry := entries.get()) is not None:
             kaikki[entry["phrase"]] = entry
-            if entry["found"] and not entry["excluded"] and entry["phrase"] not in freq:
+            if entry["found"] and not is_excluded(entry, allow_vulgar) and entry["phrase"] not in freq:
                 pool.submit(count_one, entry)
 
     not_found = [p for p in shaped if p in kaikki and not kaikki[p]["found"]]
-    excluded = [p for p in shaped if p in kaikki and kaikki[p]["excluded"]]
-    usable = [p for p in shaped if p in kaikki and kaikki[p]["found"] and not kaikki[p]["excluded"]]
-    missing = [p for p in shaped if p not in kaikki] + [p for p in usable if p not in freq]
+    excluded = [p for p in shaped if p in kaikki and is_excluded(kaikki[p], allow_vulgar)]
+    usable = [p for p in shaped if p in kaikki and kaikki[p]["found"] and not is_excluded(kaikki[p], allow_vulgar)]
+    missing = ([p for p in shaped if p not in kaikki or needs_fetch(kaikki[p])]
+               + [p for p in usable if p not in freq])
     print(f"kaikki に無い {len(not_found)} / 表示で除いた {len(excluded)} / 残り {len(usable)}")
     if missing:
         sys.exit(f"取れなかった句が {len(missing)} ある。もう一度実行すると続きから進む")
-    picked = [p for p in sorted(usable, key=lambda p: (-freq[p]["count"], p))[:TOP_N] if p not in MANUAL_EXCLUDED]
-    header = f"""# 句動詞 {len(picked)} 語。使われる頻度の高い順。
-# 範囲: Wiktionary の句動詞のうち、卑語・差別語・古語の表示がなく、使われる頻度が上位 {TOP_N} のもの。
+    # 順位はほかのリストにある句も含めて付ける(既存のリストを足してもこのリストの範囲が動かないように)
+    listed = listed_words(output) | config["manual_excluded"]
+    ranked = sorted(usable, key=lambda p: (-freq[p]["count"], p))[:config["top_n"]]
+    picked = [p for p in ranked if freq[p]["count"] >= config["min_count"] and p not in listed]
+    excluded_tags = EXCLUDED_TAGS - {"vulgar"} if allow_vulgar else EXCLUDED_TAGS
+    header = f"""# {config["title"]} {len(picked)} 語。使われる頻度の高い順。
+# 範囲: Wiktionary の句動詞のうち、{config["scope"]}。
 #   形の条件: 2〜3 語、2 語目以降がすべて不変化詞か前置詞。
-#   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に {", ".join(sorted(EXCLUDED_TAGS))} のどれかが付くもの。
-#   個別に除いた句: {", ".join(sorted(MANUAL_EXCLUDED))}(表示では落ちなかった性的・卑俗・古い意味だけの句)。
+#   除く表示: kaikki(Wiktionary の抽出データ)で verb のすべての意味に {", ".join(sorted(excluded_tags))} のどれかが付くもの。
+#   個別に除いた句: {", ".join(sorted(config["manual_excluded"]))}({config["manual_note"]})。
 #   頻度: Tatoeba の英文のうち、原形か活用形(kaikki の forms)を含む文の件数。
 # 出典: Wiktionary「Category:English phrasal verbs」の項目名
 #   https://en.wiktionary.org/wiki/Category:English_phrasal_verbs
@@ -226,8 +278,8 @@ def main():
 #   https://creativecommons.org/licenses/by-sa/4.0/
 # 作り方: tool/dictgen/pick_phrasal_verbs.py
 """
-    (ROOT / "words/phrasal-verbs.txt").write_text(header + "\n".join(picked) + "\n", encoding="utf-8")
-    print(f"採った {len(picked)} → words/phrasal-verbs.txt")
+    (ROOT / "words" / output).write_text(header + "\n".join(picked) + "\n", encoding="utf-8")
+    print(f"採った {len(picked)} → words/{output}")
 
 
 if __name__ == "__main__":

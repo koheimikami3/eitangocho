@@ -7,23 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000014 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppIcon.icon */; };
+		A10000000000000000000015 /* AppIcon-dev.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* AppIcon-dev.icon */; };
+		A1000000000000000000001E /* EitangochoData in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001D /* EitangochoData */; };
+		A10000000000000000000020 /* EitangochoSync in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001F /* EitangochoSync */; };
 		A10000000000000000000036 /* EitangochoWordInfo in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* EitangochoWordInfo */; };
-		A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000038 /* ejdict-hand-utf8.txt */; };
+		A10000000000000000000052 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000051 /* FirebaseAnalytics */; };
+		A10000000000000000000062 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = A10000000000000000000061 /* GoogleMobileAds */; };
+		A10000000000000000000065 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = A10000000000000000000064 /* RevenueCat */; };
 		A10000000000000000000130 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000030 /* Inter.ttf */; };
 		A10000000000000000000131 /* NotoSansJP.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* NotoSansJP.ttf */; };
 		A10000000000000000000132 /* NotoSansTC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000032 /* NotoSansTC.ttf */; };
+		A10000000000000000000134 /* NotoSansKR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000037 /* NotoSansKR.ttf */; };
 		A10000000000000000000133 /* Andika-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000033 /* Andika-Regular.ttf */; };
+		A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000038 /* ejdict-hand-utf8.txt */; };
 		A10000000000000000000140 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000040 /* Inter-OFL.txt */; };
 		A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000041 /* NotoSansJP-OFL.txt */; };
 		A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000042 /* NotoSansTC-OFL.txt */; };
+		A10000000000000000000144 /* NotoSansKR-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000045 /* NotoSansKR-OFL.txt */; };
 		A10000000000000000000143 /* Andika-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000043 /* Andika-OFL.txt */; };
-		A1000000000000000000001E /* EitangochoData in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001D /* EitangochoData */; };
-		A10000000000000000000020 /* EitangochoSync in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000001F /* EitangochoSync */; };
-		A10000000000000000000014 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000006 /* AppIcon.icon */; };
-		A10000000000000000000015 /* AppIcon-dev.icon in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* AppIcon-dev.icon */; };
-		A10000000000000000000052 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000051 /* FirebaseAnalytics */; };
-		A10000000000000000000062 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, ); productRef = A10000000000000000000061 /* GoogleMobileAds */; };
-		A10000000000000000000065 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, ); productRef = A10000000000000000000064 /* RevenueCat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,18 +39,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000038 /* ejdict-hand-utf8.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ejdict-hand-utf8.txt"; path = "../assets/ejdict/ejdict-hand-utf8.txt"; sourceTree = "<group>"; };
-		A10000000000000000000030 /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
-		A10000000000000000000031 /* NotoSansJP.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansJP.ttf; path = ../assets/fonts/NotoSansJP.ttf; sourceTree = "<group>"; };
-		A10000000000000000000032 /* NotoSansTC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansTC.ttf; path = ../assets/fonts/NotoSansTC.ttf; sourceTree = "<group>"; };
-		A10000000000000000000033 /* Andika-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Andika-Regular.ttf; path = ../assets/fonts/Andika-Regular.ttf; sourceTree = "<group>"; };
-		A10000000000000000000040 /* Inter-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Inter-OFL.txt"; path = "../assets/fonts/licenses/Inter-OFL.txt"; sourceTree = "<group>"; };
-		A10000000000000000000041 /* NotoSansJP-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansJP-OFL.txt"; path = "../assets/fonts/licenses/NotoSansJP-OFL.txt"; sourceTree = "<group>"; };
-		A10000000000000000000042 /* NotoSansTC-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansTC-OFL.txt"; path = "../assets/fonts/licenses/NotoSansTC-OFL.txt"; sourceTree = "<group>"; };
-		A10000000000000000000043 /* Andika-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Andika-OFL.txt"; path = "../assets/fonts/licenses/Andika-OFL.txt"; sourceTree = "<group>"; };
-		A10000000000000000000021 /* EitangochoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EitangochoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000022 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
-		A10000000000000000000004 /* Eitangocho.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eitangocho.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000004 /* シンプル英単語帳(Dev).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "シンプル英単語帳(Dev).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000037 /* NotoSansKR.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansKR.ttf; path = ../assets/fonts/NotoSansKR.ttf; sourceTree = "<group>"; };
+		A10000000000000000000045 /* NotoSansKR-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansKR-OFL.txt"; path = "../assets/fonts/licenses/NotoSansKR-OFL.txt"; sourceTree = "<group>"; };
 		A10000000000000000000006 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = AppIcon.icon; path = ../shared/AppIcon.icon; sourceTree = "<group>"; };
 		A10000000000000000000007 /* AppIcon-dev.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = "AppIcon-dev.icon"; path = "../shared/AppIcon-dev.icon"; sourceTree = "<group>"; };
 		A10000000000000000000009 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
@@ -56,11 +49,30 @@
 		A1000000000000000000000B /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		A1000000000000000000000D /* Eitangocho-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Eitangocho-iOS.entitlements"; sourceTree = "<group>"; };
 		A1000000000000000000000E /* Eitangocho-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Eitangocho-macOS.entitlements"; sourceTree = "<group>"; };
+		A10000000000000000000021 /* EitangochoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EitangochoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000022 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		A10000000000000000000030 /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
+		A10000000000000000000031 /* NotoSansJP.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansJP.ttf; path = ../assets/fonts/NotoSansJP.ttf; sourceTree = "<group>"; };
+		A10000000000000000000032 /* NotoSansTC.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NotoSansTC.ttf; path = ../assets/fonts/NotoSansTC.ttf; sourceTree = "<group>"; };
+		A10000000000000000000033 /* Andika-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Andika-Regular.ttf"; path = "../assets/fonts/Andika-Regular.ttf"; sourceTree = "<group>"; };
+		A10000000000000000000038 /* ejdict-hand-utf8.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ejdict-hand-utf8.txt"; path = "../assets/ejdict/ejdict-hand-utf8.txt"; sourceTree = "<group>"; };
+		A10000000000000000000040 /* Inter-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Inter-OFL.txt"; path = "../assets/fonts/licenses/Inter-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000041 /* NotoSansJP-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansJP-OFL.txt"; path = "../assets/fonts/licenses/NotoSansJP-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000042 /* NotoSansTC-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "NotoSansTC-OFL.txt"; path = "../assets/fonts/licenses/NotoSansTC-OFL.txt"; sourceTree = "<group>"; };
+		A10000000000000000000043 /* Andika-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Andika-OFL.txt"; path = "../assets/fonts/licenses/Andika-OFL.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000000023 /* EitangochoTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = EitangochoTests; sourceTree = "<group>"; };
-		A10000000000000000000005 /* Eitangocho */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Eitangocho; sourceTree = "<group>"; };
+		A10000000000000000000005 /* Eitangocho */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Eitangocho;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000023 /* EitangochoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EitangochoTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +117,7 @@
 		A10000000000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000004 /* Eitangocho.app */,
+				A10000000000000000000004 /* シンプル英単語帳(Dev).app */,
 				A10000000000000000000021 /* EitangochoTests.xctest */,
 			);
 			name = Products;
@@ -146,20 +158,10 @@
 				A10000000000000000000030 /* Inter.ttf */,
 				A10000000000000000000031 /* NotoSansJP.ttf */,
 				A10000000000000000000032 /* NotoSansTC.ttf */,
+				A10000000000000000000037 /* NotoSansKR.ttf */,
 				A10000000000000000000033 /* Andika-Regular.ttf */,
 			);
 			name = Fonts;
-			sourceTree = "<group>";
-		};
-		A10000000000000000000044 /* FontLicenses */ = {
-			isa = PBXGroup;
-			children = (
-				A10000000000000000000040 /* Inter-OFL.txt */,
-				A10000000000000000000041 /* NotoSansJP-OFL.txt */,
-				A10000000000000000000042 /* NotoSansTC-OFL.txt */,
-				A10000000000000000000043 /* Andika-OFL.txt */,
-			);
-			name = FontLicenses;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000039 /* Dictionary */ = {
@@ -168,6 +170,18 @@
 				A10000000000000000000038 /* ejdict-hand-utf8.txt */,
 			);
 			name = Dictionary;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000044 /* FontLicenses */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000040 /* Inter-OFL.txt */,
+				A10000000000000000000041 /* NotoSansJP-OFL.txt */,
+				A10000000000000000000042 /* NotoSansTC-OFL.txt */,
+				A10000000000000000000045 /* NotoSansKR-OFL.txt */,
+				A10000000000000000000043 /* Andika-OFL.txt */,
+			);
+			name = FontLicenses;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,7 +212,7 @@
 				A10000000000000000000064 /* RevenueCat */,
 			);
 			productName = Eitangocho;
-			productReference = A10000000000000000000004 /* Eitangocho.app */;
+			productReference = A10000000000000000000004 /* シンプル英単語帳(Dev).app */;
 			productType = "com.apple.product-type.application";
 		};
 		A10000000000000000000026 /* EitangochoTests */ = {
@@ -251,6 +265,7 @@
 				"zh-Hant",
 				es,
 				fr,
+				ko,
 			);
 			mainGroup = A10000000000000000000002;
 			minimizedProjectReferenceProxies = 1;
@@ -281,11 +296,13 @@
 				A10000000000000000000130 /* Inter.ttf in Resources */,
 				A10000000000000000000131 /* NotoSansJP.ttf in Resources */,
 				A10000000000000000000132 /* NotoSansTC.ttf in Resources */,
+				A10000000000000000000134 /* NotoSansKR.ttf in Resources */,
 				A10000000000000000000133 /* Andika-Regular.ttf in Resources */,
 				A10000000000000000000138 /* ejdict-hand-utf8.txt in Resources */,
 				A10000000000000000000140 /* Inter-OFL.txt in Resources */,
 				A10000000000000000000141 /* NotoSansJP-OFL.txt in Resources */,
 				A10000000000000000000142 /* NotoSansTC-OFL.txt in Resources */,
+				A10000000000000000000144 /* NotoSansKR-OFL.txt in Resources */,
 				A10000000000000000000143 /* Andika-OFL.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

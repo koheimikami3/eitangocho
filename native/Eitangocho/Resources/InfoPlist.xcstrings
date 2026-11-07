@@ -23,6 +23,12 @@
             "value" : "Vocab Anglais"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어장"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -51,6 +57,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vocab Anglais"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어장"
           }
         },
         "zh-Hant" : {
@@ -87,6 +99,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリ内に表示する広告を、あなたの興味に合ったものにするために使用します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱에서 관심사에 더 잘 맞는 광고를 표시하는 데 사용해요."
           }
         },
         "zh-Hant" : {

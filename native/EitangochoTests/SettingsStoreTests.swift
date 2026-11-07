@@ -40,7 +40,8 @@ final class SettingsStoreTests {
 
   @Test func 訳の言語が未保存なら端末の言語から決めて保存しない() {
     #expect(makeStore(languages: ["zh-Hant-TW"]).translationLanguage == .zhHant)
-    #expect(makeStore(languages: ["ko-KR"]).translationLanguage == .enDefinition)
+    #expect(makeStore(languages: ["de-DE"]).translationLanguage == .enDefinition)
+    #expect(makeStore(languages: ["ko-KR"]).translationLanguage == .ko)
     #expect(defaults.object(forKey: SettingsStore.Key.translationLanguage) == nil)
   }
 

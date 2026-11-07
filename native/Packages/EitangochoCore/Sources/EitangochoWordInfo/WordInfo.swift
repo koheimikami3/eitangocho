@@ -17,7 +17,7 @@ public struct WordInfo: Equatable, Sendable {
   public var audioUrl: String
 
   /// 事前生成辞書に無く、取得経路(kaikki か EJDict)には見出しがあった語か。
-  /// 辞書へ足す語を計測で集めるのに使う。訳の言語が日本語・繁体字のときだけ立つ。
+  /// 辞書へ足す語を計測で集めるのに使う。訳の言語が日本語・繁体字・韓国語のときだけ立つ。
   public var prebuiltDictionaryMiss: Bool
 
   public init(

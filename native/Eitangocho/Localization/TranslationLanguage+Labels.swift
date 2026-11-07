@@ -10,6 +10,7 @@ extension TranslationLanguage {
     case .zhHant: .translationLanguageNameZhHant
     case .es: .translationLanguageNameEs
     case .fr: .translationLanguageNameFr
+    case .ko: .translationLanguageNameKo
     case .enDefinition: .translationLanguageNameEnDefinition
     }
   }
@@ -21,6 +22,7 @@ extension TranslationLanguage {
     case .zhHant: .translationLanguageShortNameZhHant
     case .es: .translationLanguageShortNameEs
     case .fr: .translationLanguageShortNameFr
+    case .ko: .translationLanguageShortNameKo
     case .enDefinition: .translationLanguageShortNameEnDefinition
     }
   }

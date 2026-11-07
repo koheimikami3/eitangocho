@@ -34,7 +34,7 @@ struct AppDatabaseMigrationTests {
     #expect(word.word == "apple")
     #expect(word.translationLanguage == "ja")
     #expect(try database.writer.read { try $0.tableExists("deleted_words") })
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
   @Test("v2 の DB を開くと辞書キャッシュだけが空になり、単語は残る")
@@ -49,7 +49,7 @@ struct AppDatabaseMigrationTests {
 
     #expect(try words(database).map(\.word) == ["apple"])
     #expect(try cacheCount(database) == 0)
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
   @Test("v3 の DB を開くと訳の言語の列が ja で追加され、辞書キャッシュが空になる")
@@ -67,7 +67,7 @@ struct AppDatabaseMigrationTests {
     #expect(word.meaning == "りんご")
     #expect(word.translationLanguage == "ja")
     #expect(try cacheCount(database) == 0)
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
   // v4 で列を足した後に v3 のアプリで開くと、列はそのまま user_version だけ
@@ -84,15 +84,16 @@ struct AppDatabaseMigrationTests {
 
     #expect(try words(database).first?.translationLanguage == "ja")
     #expect(try cacheCount(database) == 0)
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
-  @Test("v4〜v6 の DB を開くと辞書キャッシュが空になり、単語と訳の言語は残る", arguments: [
+  @Test("v4〜v7 の DB を開くと辞書キャッシュが空になり、単語と訳の言語は残る", arguments: [
     (4, "蘋果", "zh-Hant"),
     (5, "manzana", "es"),
     (6, "蘋果", "zh-Hant"),
+    (7, "manzana", "es"),
   ])
-  func upgradesFromV4ToV6(version: Int, meaning: String, language: String) throws {
+  func upgradesFromV4ToV7(version: Int, meaning: String, language: String) throws {
     let queue = try DriftSchemaFixtures.queue { db in
       try DriftSchemaFixtures.createV4(db, userVersion: version)
       try DriftSchemaFixtures.insertApple(db, meaning: meaning, language: language)
@@ -105,13 +106,13 @@ struct AppDatabaseMigrationTests {
     #expect(word.meaning == meaning)
     #expect(word.translationLanguage == language)
     #expect(try cacheCount(database) == 0)
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
-  @Test("v7 の DB は何も変えずに開く(辞書キャッシュも残る)")
-  func opensV7AsIs() throws {
+  @Test("v8 の DB は何も変えずに開く(辞書キャッシュも残る)")
+  func opensV8AsIs() throws {
     let queue = try DriftSchemaFixtures.queue { db in
-      try DriftSchemaFixtures.createV4(db, userVersion: 7)
+      try DriftSchemaFixtures.createV4(db, userVersion: 8)
       try DriftSchemaFixtures.insertApple(db)
       try DriftSchemaFixtures.insertAppleCache(db)
     }
@@ -131,7 +132,7 @@ struct AppDatabaseMigrationTests {
         db, sql: "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
     }
     #expect(tables == ["deleted_words", "dictionary_cache_entries", "ejdict_entries", "words"])
-    #expect(try userVersion(database) == 7)
+    #expect(try userVersion(database) == 8)
   }
 
   @Test("新規 DB の列は drift の既定値で埋まる")

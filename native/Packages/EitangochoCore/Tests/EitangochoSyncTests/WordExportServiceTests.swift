@@ -181,14 +181,14 @@ struct WordExportServiceTests {
       {"version": 1, "exportedAt": "2026-01-01T00:00:00Z", "words": [
         {"word": "apple", "japanese": "りんご"},
         {"word": "achieve", "japanese": "實現", "translationLanguage": "zh-Hant"},
-        {"word": "future", "japanese": "?", "translationLanguage": "ko"}
+        {"word": "future", "japanese": "?", "translationLanguage": "de"}
       ]}
       """
 
     try await service.importJson(json)
 
     let byWord = Dictionary(uniqueKeysWithValues: try await dao.getAll().map { ($0.word, $0.translationLanguage) })
-    #expect(byWord == ["apple": "ja", "achieve": "zh-Hant", "future": "ko"])
+    #expect(byWord == ["apple": "ja", "achieve": "zh-Hant", "future": "de"])
 
     // 書き出しにも載り、JSON のキーは訳の言語によらず japanese のまま。
     let exported = try #require(try object(try await service.exportJson())["words"] as? [[String: Any]])
