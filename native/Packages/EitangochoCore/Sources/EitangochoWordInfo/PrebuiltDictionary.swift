@@ -42,7 +42,10 @@ public actor PrebuiltDictionary {
 
   /// 見出し語(trim・小文字化済み)の値を `language` で返す。辞書に無い語・対象外の言語は nil。
   public func lookup(_ word: String, language: TranslationLanguage) -> PrebuiltEntry? {
-    guard let entry = loadedWords()[word], let translation = entry.translation(language) else { return nil }
+    // 対象外の言語では、使わない辞書(約 8 MB)を読み込まない
+    guard Self.covers(language), let entry = loadedWords()[word], let translation = entry.translation(language) else {
+      return nil
+    }
     return PrebuiltEntry(
       ipa: entry.ipa,
       partsOfSpeech: entry.pos.compactMap(PartOfSpeech.init(rawValue:)),

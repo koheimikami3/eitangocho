@@ -28,6 +28,17 @@ struct PrebuiltDictionaryTests {
     #expect(await PrebuiltDictionary.bundled.lookup("serendipity", language: .ja) == nil)
   }
 
+  @Test("訳を持たない言語では辞書を読み込まない")
+  func notCoveredDoesNotLoad() async {
+    let dictionary = PrebuiltDictionary {
+      Issue.record("辞書を読み込んだ")
+      return Data()
+    }
+    for language in [TranslationLanguage.es, .fr, .enDefinition] {
+      #expect(await dictionary.lookup("the", language: language) == nil)
+    }
+  }
+
   @Test("韓国語は省略可で読み、無い語は nil で、ほかの言語は引ける")
   func optionalKorean() async {
     let dictionary = PrebuiltDictionary {
