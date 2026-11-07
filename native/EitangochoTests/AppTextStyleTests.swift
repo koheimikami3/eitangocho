@@ -84,10 +84,16 @@ struct AppTextStyleTests {
   }
 
   @Test func 同梱フォントが登録されていて名前で引ける() {
-    for name in ["Inter-Regular", "NotoSansJP-Thin", "NotoSansTC-Thin", "Andika"] {
+    for name in ["Inter-Regular", "NotoSansJP-Thin", "NotoSansTC-Thin", "NotoSansKR-Thin", "Andika"] {
       let font = CTFontCreateWithName(name as CFString, 12, nil)
       #expect(CTFontCopyPostScriptName(font) as String == name)
     }
+  }
+
+  @Test(arguments: [AppLocale.Language.ja, .en, .zhHant, .ko])
+  func どの表示言語でもハングルは韓国語のフォントで出る(language: AppLocale.Language) {
+    let font = AppFonts.ctFont(.sans, size: 20, weight: 400, language: language)
+    #expect(runFontName("한", font).hasPrefix("NotoSansKR"))
   }
 
   @Test func cascade_の和文にも太さが付き表示言語で順が入れ替わる() throws {
@@ -95,6 +101,8 @@ struct AppTextStyleTests {
     let traditional = AppFonts.ctFont(.sans, size: 20, weight: 600, language: .zhHant)
     #expect(runFontName("学", japanese).hasPrefix("NotoSansJP"))
     #expect(runFontName("學", traditional).hasPrefix("NotoSansTC"))
+    let korean = AppFonts.ctFont(.sans, size: 20, weight: 600, language: .ko)
+    #expect(runFontName("学", korean).hasPrefix("NotoSansKR"))
 
     let fallback = try #require(runFont("学", japanese))
     let variation = CTFontCopyVariation(fallback) as? [Int: Double]

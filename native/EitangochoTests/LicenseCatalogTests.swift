@@ -133,7 +133,7 @@ struct LicenseCatalogTests {
     #expect(
       items.map(\.name) == [
         "Andika", "Eitangocho Dictionary", "EJDict-hand", "Firebase", "Google Translate", "GoogleAdsOnDeviceConversion",
-        "GoogleAppMeasurement", "GoogleUtilities", "GRDB.swift", "Inter", "ipa-dict", "nanopb", "Noto Sans JP", "Noto Sans TC",
+        "GoogleAppMeasurement", "GoogleUtilities", "GRDB.swift", "Inter", "ipa-dict", "nanopb", "Noto Sans JP", "Noto Sans KR", "Noto Sans TC",
         "Promises", "Tatoeba", "Wiktionary / kaikki.org",
       ])
     let summaries = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.summary) })

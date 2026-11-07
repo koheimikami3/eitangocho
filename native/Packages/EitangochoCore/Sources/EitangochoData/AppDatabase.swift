@@ -7,11 +7,11 @@ import GRDB
 /// `PRAGMA user_version` で持ち、drift の番号を引き継ぐ。GRDB の
 /// `DatabaseMigrator` は使わない(`grdb_migrations` 表を作らない)。ファイルを
 /// drift と互換のまま保てば、Flutter に戻す版が必要になってもそのまま開ける。
-/// 今後スキーマを変えるときは v8 以降にし、列・テーブルの追加だけにする
+/// 今後スキーマを変えるときは v9 以降にし、列・テーブルの追加だけにする
 /// (docs/design.md「データ・同期」)。
 public final class AppDatabase: Sendable {
-  /// drift の `schemaVersion` と同じ番号。
-  public static let schemaVersion = 7
+  /// v7 までは drift の `schemaVersion` と同じ番号。v8 からは Swift 版だけが上げる。
+  public static let schemaVersion = 8
 
   public let writer: any DatabaseWriter
 
@@ -137,10 +137,10 @@ public final class AppDatabase: Sendable {
       try db.execute(
         sql: #"ALTER TABLE "words" ADD COLUMN "translation_language" TEXT NOT NULL DEFAULT 'ja'"#)
     }
-    // v2 → v3 以降の各段(v3〜v7)は、どれも辞書キャッシュを捨てるだけ。
+    // v2 → v3 以降の各段(v3〜v8)は、どれも辞書キャッシュを捨てるだけ。
     // キャッシュの形式や残す訳語を変えるたびに捨て直しており、次の自動入力で
     // kaikki から入れ直される。
-    if version < 7 {
+    if version < 8 {
       try db.execute(sql: "DELETE FROM dictionary_cache_entries")
     }
   }

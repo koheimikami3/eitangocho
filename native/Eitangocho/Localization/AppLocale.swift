@@ -3,7 +3,7 @@ import Foundation
 
 /// 画面の表示言語の解決を 1 箇所に集約する(Flutter 版の AppLocale と同じ規則)。
 ///
-/// 対応は日本語・英語・繁体字中国語・スペイン語・フランス語。端末の優先言語を
+/// 対応は日本語・英語・繁体字中国語・スペイン語・フランス語・韓国語。端末の優先言語を
 /// 上から見て、最初に対応しているものを採る。どれも無ければ英語にする
 /// (対応外の言語の端末向け)。スペイン語・フランス語は地域を区別しない。
 ///
@@ -18,6 +18,7 @@ enum AppLocale {
     case zhHant = "zh-Hant"
     case es
     case fr
+    case ko
   }
 
   /// `preferred`(端末の優先言語の BCP 47 の並び)から表示言語を決める。
@@ -26,7 +27,7 @@ enum AppLocale {
   /// 簡体字の利用者に出すより、英語の方が読みやすいため。
   static func resolve(_ preferred: [String]) -> Language { match(preferred) ?? .en }
 
-  /// `preferred` に対応言語が 1 つも無いか(ドイツ語・韓国語・簡体字の端末など)。
+  /// `preferred` に対応言語が 1 つも無いか(ドイツ語・簡体字の端末など)。
   /// 画面は英語になり、訳の言語の既定は英語の語義になる。
   static func isUnsupported(_ preferred: [String]) -> Bool { match(preferred) == nil }
 
@@ -40,6 +41,7 @@ enum AppLocale {
       case "zh" where isTraditional(language): return .zhHant
       case "es": return .es
       case "fr": return .fr
+      case "ko": return .ko
       default: continue
       }
     }
@@ -64,6 +66,7 @@ enum AppLocale {
     case .zhHant: .zhHant
     case .es: .es
     case .fr: .fr
+    case .ko: .ko
     case .ja, .en: .ja
     }
   }
@@ -94,7 +97,7 @@ enum AppLocale {
     translationLanguageChoices(Locale.preferredLanguages, current: current)
   }
 
-  /// 今の表示言語(Bundle が選んだ .lproj)。書体の和文・繁体字の順を決めるのに使う。
+  /// 今の表示言語(Bundle が選んだ .lproj)。書体の和文・繁体字・韓国語の順を決めるのに使う。
   static var current: Language {
     Bundle.main.preferredLocalizations.first.flatMap(Language.init(rawValue:)) ?? .en
   }
