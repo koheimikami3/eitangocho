@@ -11,12 +11,14 @@
 ///
 /// `enDefinition` だけは訳ではなく英語の語義(英英)。対応外の言語の端末で
 /// 日本語などの訳を出さないための既定で、訳の欄に語義を入れ、例文の訳は持たない。
+///
+/// 値の順が設定の選択肢の順になる(日本語を先頭にアジアの言語、次にヨーロッパの言語)。
 public enum TranslationLanguage: String, CaseIterable, Sendable {
   case ja
   case zhHant
+  case ko
   case es
   case fr
-  case ko
   case enDefinition
 
   /// words.translation_language と同期 JSON に保存する値(BCP 47)。
