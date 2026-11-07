@@ -197,6 +197,25 @@ IPA_DICT_FIXES = {
     "saturated": "ˈsæt͡ʃəˌɹeɪtɪd", "saturation": "ˌsæt͡ʃəˈɹeɪʃən", "supplementary": "ˌsʌpləˈmɛntəɹi",
     "theoretically": "ˌθiəˈɹɛtɪkəli", "unanswered": "ʌnˈænsɚd", "unborn": "ˌʌnˈbɔɹn",
     "undocumented": "ʌnˈdɑkjəmɛntɪd", "uplifting": "ʌpˈlɪftɪŋ", "vs": "ˈvɝsəs",
+    # kaikki の英音・崩れた値(build_bundle の UNUSABLE_IPA)を ipa-dict で埋め直した語のうち、ipa-dict も崩れていたもの
+    "archbishop": "ˌɑɹt͡ʃˈbɪʃəp", "calmly": "ˈkɑmli", "cogently": "ˈkoʊd͡ʒəntli", "disadvantaged": "ˌdɪsədˈvæntɪd͡ʒd",
+    "denomination": "dɪˌnɑməˈneɪʃən", "dishonesty": "dɪsˈɑnəsti", "dislodge": "dɪsˈlɑd͡ʒ", "ecological": "ˌɛkəˈlɑd͡ʒɪkəl",
+    "electrode": "ɪˈlɛktɹoʊd", "espionage": "ˈɛspiəˌnɑʒ", "firearm": "ˈfaɪɚˌɑɹm", "gaga": "ˈɡɑɡɑ",
+    "hardcore": "ˌhɑɹdˈkɔɹ", "hierarchy": "ˈhaɪəˌɹɑɹki", "illogical": "ɪˈlɑd͡ʒɪkəl", "imam": "ɪˈmɑm",
+    "incarceration": "ɪnˌkɑɹsəˈɹeɪʃən", "incompetence": "ɪnˈkɑmpətəns", "incompetent": "ɪnˈkɑmpətənt",
+    "insomnia": "ɪnˈsɑmniə", "iraqi": "ɪˈɹæki", "islamic": "ɪzˈlɑmɪk", "login": "ˈlɔɡˌɪn", "mirage": "mɪˈɹɑʒ",
+    "moderator": "ˈmɑdəˌɹeɪtɚ", "offshore": "ˌɔfˈʃɔɹ", "overnight": "ˌoʊvɚˈnaɪt", "overseer": "ˈoʊvɚˌsiɚ",
+    "overturn": "ˌoʊvɚˈtɝn", "papa": "ˈpɑpə", "popularise": "ˈpɑpjələˌɹaɪz", "predominantly": "pɹɪˈdɑmənəntli",
+    "prosecute": "ˈpɹɑsəˌkjut", "pyjamas": "pəˈd͡ʒɑməz", "relocation": "ˌɹiloʊˈkeɪʃən", "shoplift": "ˈʃɑpˌlɪft",
+    "solitariness": "ˈsɑləˌtɛɹinəs", "subcontinent": "ˌsʌbˈkɑntɪnənt", "telescopic": "ˌtɛləˈskɑpɪk",
+    "terrorist": "ˈtɛɹəɹɪst", "uncommon": "ʌnˈkɑmən", "unwanted": "ʌnˈwɔntɪd", "uphold": "ʌpˈhoʊld",
+    "virtuosity": "ˌvɝt͡ʃuˈɑsəti", "yoghurt": "ˈjoʊɡɚt",
+    # 同じ埋め直しで ipa-dict に無かった語
+    "digitalize": "ˈdɪd͡ʒɪtəˌlaɪz", "dodgy": "ˈdɑd͡ʒi", "entrée": "ˈɑnˌtɹeɪ", "glocal": "ˈɡloʊkəl",
+    "jewellery": "ˈd͡ʒuəlɹi", "motorway": "ˈmoʊtɚˌweɪ", "naivety": "naɪˈivəti", "opioid": "ˈoʊpiˌɔɪd",
+    "pawnbroker": "ˈpɔnˌbɹoʊkɚ", "postgraduate": "ˌpoʊstˈɡɹæd͡ʒuət", "pullover": "ˈpʊlˌoʊvɚ", "raja": "ˈɹɑd͡ʒə",
+    "remonstrance": "ɹɪˈmɑnstɹəns", "shoal": "ʃoʊl", "solipsism": "ˈsɑləpˌsɪzəm", "totemic": "toʊˈtɛmɪk",
+    "undemonstrative": "ˌʌndɪˈmɑnstɹətɪv", "waistcoat": "ˈweɪstˌkoʊt",
 }
 
 # 句を組み立てるときだけ使う語の IPA。kaikki の先頭の値が句の意味と合わないもの(bow to の bow は「弓」の発音ではない)、

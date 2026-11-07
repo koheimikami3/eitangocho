@@ -35,6 +35,9 @@ KOREAN_SOURCE = "ko"
 ALT_OF = ROOT / "out/cefrj-pick/kaikki.jsonl"
 # alt_of の行き先を綴り違いとみなす似ている度合い(jewellery → jewelry は 0.89、are → our は 0.33)
 ALT_OF_MIN_SIMILARITY = 0.7
+# kaikki の IPA のうち使わず、kaikki に無い語と同じ順で埋め直すもの。英音(ɒ・əʊ・r の無い ɑː)、
+# 途中で切れた値(/ə-/)、IPA でない表記(/ˈdôr-ˌkē-pər/)、細かすぎる補助記号(/t̪oː/)、閉じの前の空白
+UNUSABLE_IPA = re.compile(r"ɒ|əʊ|ɑː(?!ɹ)|[-ôēīä̝̞̟̪ʰᵻᵿɣ]| /$")
 DEST = ROOT.parent.parent / "native/Packages/EitangochoCore/Sources/EitangochoWordInfo/Resources/prebuilt-dictionary.json"
 # アプリの PrebuiltDictionary が読める形の版。形を変えたら上げ、アプリ側も合わせる
 VERSION = 1
@@ -71,6 +74,9 @@ def main():
     if problems:
         print("\n".join(problems), file=sys.stderr)
         sys.exit("問題があるので書かなかった")
+    for entry in words.values():
+        if UNUSABLE_IPA.search(entry["ipa"]):
+            entry["ipa"] = ""
     filled = fill_missing_ipa(words)
     DEST.parent.mkdir(parents=True, exist_ok=True)
     DEST.write_text(json.dumps({"version": VERSION, "words": words}, ensure_ascii=False, separators=(",", ":")) + "\n",
