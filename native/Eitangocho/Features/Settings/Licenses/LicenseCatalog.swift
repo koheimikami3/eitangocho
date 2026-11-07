@@ -72,19 +72,21 @@ enum LicenseCatalog {
     LicenseEntry(
       packages: ["Eitangocho Dictionary"],
       text: """
-        This app bundles a dictionary of frequent English words and phrasal verbs (pronunciations, \
+        This app bundles a dictionary of frequent English words, phrasal verbs and idioms (pronunciations, \
         parts of speech, meanings and example sentences with translations) prepared for this app. \
         It is adapted from Wiktionary (via kaikki.org), Tatoeba and EJDict-hand, and is licensed under \
         the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
 
         Words were selected using The CEFR-J Wordlist Version 1.5, compiled by Yukio Tono, Tokyo University \
-        of Foreign Studies, and the Octanove Vocabulary Profile C1/C2 1.0 (CC BY-SA 4.0).
+        of Foreign Studies, the Octanove Vocabulary Profile C1/C2 1.0 (CC BY-SA 4.0), and wordfreq by \
+        Robyn Speer (v3.1.1, data under CC BY-SA 4.0).
 
         https://creativecommons.org/licenses/by-sa/4.0/
         https://en.wiktionary.org/
         https://tatoeba.org/
         https://github.com/kujirahand/EJDict
         https://github.com/openlanguageprofiles/olp-en-cefrj
+        https://github.com/rspeer/wordfreq
         """),
     LicenseEntry(
       packages: ["Wiktionary / kaikki.org"],

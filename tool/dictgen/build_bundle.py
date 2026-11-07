@@ -27,7 +27,7 @@ from phrase_ipa import PHRASE_WORD_IPA, compose, join_words, load_ipa_dict
 from validate import check_ko_pair, check_pair
 
 ROOT = Path(__file__).resolve().parent
-SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs", "cefrj"]
+SOURCES = ["ngsl", "tsl-bsl-nawl", "phrasal-verbs", "cefrj", "phrasal-verbs-2", "idioms", "wordfreq"]
 LANGS = ("ja", "zhHant")
 # 韓国語の出力の置き場(collect_ko.py)。単語リストごとに分けず 1 か所に足していく
 KOREAN_SOURCE = "ko"
