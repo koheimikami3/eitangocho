@@ -65,8 +65,12 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
 
     // 0. 事前生成辞書に載っていれば、その値だけで返す。訳・例文・例文の訳を検査済みの値で
     //    揃えて作ってあり、取得経路で引き直すと質が下がるうえ通信が要るため。
-    if let entry = await prebuiltDictionary.lookup(normalized, language: language) {
-      return Self.wordInfo(normalized, entry, language: language)
+    //    載っていなければ、ハイフンと空白の書き方違い(ping pong と ping-pong)でも引く。
+    //    見出しは入力のまま返す(綴りの違いで、原形への置き換えではないため)。
+    for spelling in [normalized] + Self.spellingVariants(of: normalized) {
+      if let entry = await prebuiltDictionary.lookup(spelling, language: language) {
+        return Self.wordInfo(normalized, entry, language: language)
+      }
     }
 
     // 1. kaikki: キャッシュ優先、miss なら取得し成功時のみ保存。
@@ -145,6 +149,18 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
       }
     }
     return info
+  }
+
+  /// 事前生成辞書に無かったときに試す、ハイフンと空白の書き方違い(試す順)。
+  ///
+  /// 空白をハイフンにする(ping pong → ping-pong)と、ハイフンを抜いてつなぐ(e-mail → email)の 2 つだけ。
+  /// ハイフンを空白にする向きは試さない。`go-to`(定番の)が `go to`(…へ行く)に当たるように、
+  /// 別の語の訳を返してしまうため。
+  static func spellingVariants(of word: String) -> [String] {
+    var variants: [String] = []
+    if word.contains(" ") { variants.append(word.replacingOccurrences(of: " ", with: "-")) }
+    if word.contains("-") { variants.append(word.replacingOccurrences(of: "-", with: "")) }
+    return variants
   }
 
   /// 活用形の語義(`simple past of run`)が指す原形を、出てきた順に重複なく返す。

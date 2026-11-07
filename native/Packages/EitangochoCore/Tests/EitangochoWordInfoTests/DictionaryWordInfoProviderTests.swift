@@ -52,7 +52,16 @@ private let prebuiltFixture = """
   "ko":{"meaning":"포기하다 / 그만두다","exampleTranslation":"해 보기도 전에 포기하지 마."}},\
   "run":{"ipa":"/ɹʌn/","pos":["verb","noun"],"exampleEn":"I run in the park every morning.",\
   "ja":{"meaning":"走る / …を経営する","exampleTranslation":"私は毎朝公園を走る。"},\
-  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}}}}
+  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}},\
+  "ping-pong":{"ipa":"/ˈpɪŋ ˌpɔŋ/","pos":["noun"],"exampleEn":"We played ping-pong after school.",\
+  "ja":{"meaning":"卓球","exampleTranslation":"放課後に卓球をした。"},\
+  "zhHant":{"meaning":"乒乓球","exampleTranslation":"我們放學後打了乒乓球。"}},\
+  "email":{"ipa":"/ˈiˌmeɪl/","pos":["noun","verb"],"exampleEn":"I sent her an email this morning.",\
+  "ja":{"meaning":"電子メール","exampleTranslation":"今朝、彼女にメールを送った。"},\
+  "zhHant":{"meaning":"電子郵件","exampleTranslation":"我今天早上寄了一封電子郵件給她。"}},\
+  "go to":{"ipa":"/ˈɡoʊ tu/","pos":["verb"],"exampleEn":"We go to the beach every summer.",\
+  "ja":{"meaning":"…へ行く","exampleTranslation":"私たちは毎年夏に海へ行く。"},\
+  "zhHant":{"meaning":"去……","exampleTranslation":"我們每年夏天都去海邊。"}}}}
   """
 
 /// `ran` の実レスポンスから語義の形だけ抜き出したもの。活用形の語義は run と rin(古語)を指し、
@@ -195,6 +204,24 @@ struct DictionaryWordInfoProviderTests {
   func unreadablePrebuiltDictionary() async throws {
     let provider = makeProvider(prebuilt: .init { Data("broken".utf8) }, kaikki: ok(giveUpJsonl))
     #expect(try await provider.fetch("give up")?.meaning == "降服する / 諦める / やめる")
+  }
+
+  @Test("空白とハイフンの書き方違いでも事前生成辞書を引き、見出しは入力のまま返す")
+  func prebuiltDictionarySpellingVariants() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    let pingPong = try #require(try await provider.fetch("ping pong"))
+    #expect(pingPong.word == "ping pong")
+    #expect(pingPong.meaning == "卓球")
+    #expect(try await provider.fetch("e-mail")?.meaning == "電子メール")
+    #expect(kaikkiCalls.count == 0)
+  }
+
+  @Test("ハイフンを空白にした綴りでは引かない(go-to が go to に当たらない)")
+  func prebuiltDictionaryDoesNotSplitHyphen() async throws {
+    let info = try await makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }).fetch("go-to")
+
+    #expect(info?.meaning != "…へ行く")
   }
 
   @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")
