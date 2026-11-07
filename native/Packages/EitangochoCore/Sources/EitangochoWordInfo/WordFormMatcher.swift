@@ -98,9 +98,15 @@ public enum WordFormMatcher {
 /// ようになった。そのままだと kaikki のパス(`give  up.jsonl`)が 404 に
 /// なり、`give up` と別単語として重複登録もできてしまう。
 ///
+/// 丸い引用符(’ ‘)もまっすぐな `'` にそろえる。iOS・macOS のスマート句読点で
+/// `one’s` と入ると、`'` で書いた辞書の見出し(`keep one's word`)に当たらず、
+/// `one's` と別単語として重複登録もできてしまうため。
+///
 /// 保存・照合の直前で通す前提。WordDao.matchKey と書き出しのマージキー
 /// (trim + 小文字化)は同期のマージキーでもあるため触らない。ここで正規化した
 /// 文字列を渡せば両者はそのまま成立する。
 public func normalizeHeadword(_ word: String) -> String {
   word.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    .replacingOccurrences(of: "’", with: "'")
+    .replacingOccurrences(of: "‘", with: "'")
 }

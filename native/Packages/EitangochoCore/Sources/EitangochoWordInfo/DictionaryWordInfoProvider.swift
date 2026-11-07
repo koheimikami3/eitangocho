@@ -60,14 +60,14 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
   ]
 
   public func fetch(_ word: String) async throws -> WordInfo? {
-    let normalized = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    let normalized = normalizeHeadword(word).lowercased()
     let language = await getTranslationLanguage()
 
     // 0. 事前生成辞書に載っていれば、その値だけで返す。訳・例文・例文の訳を検査済みの値で
     //    揃えて作ってあり、取得経路で引き直すと質が下がるうえ通信が要るため。
-    //    載っていなければ、ハイフンと空白の書き方違い(ping pong と ping-pong)でも引く。
-    //    見出しは入力のまま返す(綴りの違いで、原形への置き換えではないため)。
-    for spelling in [normalized] + Self.spellingVariants(of: normalized) {
+    //    載っていなければ、書き方の違い(lookupVariants)でも引く。
+    //    見出しは入力のまま返す(書き方の違いで、原形への置き換えではないため)。
+    for spelling in [normalized] + Self.lookupVariants(of: normalized) {
       if let entry = await prebuiltDictionary.lookup(spelling, language: language) {
         return Self.wordInfo(normalized, entry, language: language)
       }
@@ -151,16 +151,92 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     return info
   }
 
-  /// 事前生成辞書に無かったときに試す、ハイフンと空白の書き方違い(試す順)。
+  /// 事前生成辞書に無かったときに試す、書き方の違い(試す順、入力そのものは含まない)。
   ///
+  /// ハイフンと空白(hyphenVariants)、句の中の代名詞や記号(placeholderVariants)、
+  /// 句の末尾の語の単数・複数(pluralVariants)の順。
+  static func lookupVariants(of word: String) -> [String] {
+    var variants: [String] = []
+    for variant in hyphenVariants(of: word) + placeholderVariants(of: word) + pluralVariants(of: word)
+    where variant != word && !variants.contains(variant) {
+      variants.append(variant)
+    }
+    return variants
+  }
+
   /// 空白をハイフンにする(ping pong → ping-pong)と、ハイフンを抜いてつなぐ(e-mail → email)の 2 つだけ。
   /// ハイフンを空白にする向きは試さない。`go-to`(定番の)が `go to`(…へ行く)に当たるように、
   /// 別の語の訳を返してしまうため。
-  static func spellingVariants(of word: String) -> [String] {
+  static func hyphenVariants(of word: String) -> [String] {
     var variants: [String] = []
     if word.contains(" ") { variants.append(word.replacingOccurrences(of: " ", with: "-")) }
     if word.contains("-") { variants.append(word.replacingOccurrences(of: "-", with: "")) }
     return variants
+  }
+
+  /// 句の中の語を、辞書の句の書き方に替える候補。辞書の句は目的語や所有格を
+  /// `someone`・`something`・`one's`・`oneself` で書く(`keep one's word`)が、利用者は
+  /// 例文のまま(`keep my word`)や記号(`put ~ in perspective`)で入力するため。
+  static let placeholderReplacements: [String: [String]] = {
+    var table: [String: [String]] = [
+      "her": ["one's", "someone's", "someone"],
+      "it": ["something"],
+      "~": ["something", "someone"], "...": ["something", "someone"], "…": ["something", "someone"],
+      "sth": ["something"], "sb": ["someone"], "sb's": ["one's", "someone's"], "somebody": ["someone"],
+      "somebody's": ["someone's", "one's"], "one's": ["someone's"], "someone's": ["one's"],
+    ]
+    for word in ["my", "your", "his", "its", "our", "their"] { table[word] = ["one's", "someone's"] }
+    for word in ["me", "him", "us", "them", "you"] { table[word] = ["someone"] }
+    for word in ["myself", "yourself", "himself", "herself", "itself", "ourselves", "yourselves", "themselves"] {
+      table[word] = ["oneself"]
+    }
+    return table
+  }()
+
+  /// 句の中の代名詞・記号を辞書の書き方に替えた候補。替える語が少ない順。
+  /// 組み合わせが増えすぎないよう、替える候補にするのは先頭から 3 語まで。
+  static func placeholderVariants(of word: String) -> [String] {
+    let tokens = word.split(separator: " ").map(String.init)
+    guard tokens.count > 1 else { return [] }
+    var replaceable = 0
+    // 語ごとの選択肢(先頭は元の語)と、替えた語の数
+    var combos: [(tokens: [String], replaced: Int)] = [([], 0)]
+    for token in tokens {
+      var options = [token]
+      if replaceable < 3, let replacements = placeholderReplacements[token] {
+        options += replacements
+        replaceable += 1
+      }
+      combos = combos.flatMap { combo in
+        options.enumerated().map { index, option in (combo.tokens + [option], combo.replaced + (index == 0 ? 0 : 1)) }
+      }
+    }
+    return combos.filter { $0.replaced > 0 }
+      .sorted { $0.replaced < $1.replaced }
+      .map { $0.tokens.joined(separator: " ") }
+  }
+
+  /// 句(空白を含む語)の末尾の語の単数・複数を入れ替えた候補(potato chip ↔ potato chips)。
+  /// 1 語の複数形は kaikki の form_of で原形に寄せられるが、複合名詞は kaikki に項目が無いことが多いため。
+  static func pluralVariants(of word: String) -> [String] {
+    guard let space = word.lastIndex(of: " ") else { return [] }
+    let head = String(word[...space])
+    let last = String(word[word.index(after: space)...])
+    var forms: [String] = []
+    if last.hasSuffix("ies") {
+      forms.append(String(last.dropLast(3)) + "y")
+    } else if last.hasSuffix("es") {
+      forms += [String(last.dropLast(2)), String(last.dropLast())]
+    } else if last.hasSuffix("s") && !last.hasSuffix("ss") {
+      forms.append(String(last.dropLast()))
+    } else if ["s", "x", "z", "ch", "sh"].contains(where: last.hasSuffix) {
+      forms.append(last + "es")
+    } else if last.hasSuffix("y"), let before = last.dropLast().last, !"aeiou".contains(before) {
+      forms += [String(last.dropLast()) + "ies", last + "s"]
+    } else {
+      forms.append(last + "s")
+    }
+    return forms.map { head + $0 }
   }
 
   /// 活用形の語義(`simple past of run`)が指す原形を、出てきた順に重複なく返す。

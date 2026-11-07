@@ -61,7 +61,13 @@ private let prebuiltFixture = """
   "zhHant":{"meaning":"電子郵件","exampleTranslation":"我今天早上寄了一封電子郵件給她。"}},\
   "go to":{"ipa":"/ˈɡoʊ tu/","pos":["verb"],"exampleEn":"We go to the beach every summer.",\
   "ja":{"meaning":"…へ行く","exampleTranslation":"私たちは毎年夏に海へ行く。"},\
-  "zhHant":{"meaning":"去……","exampleTranslation":"我們每年夏天都去海邊。"}}}}
+  "zhHant":{"meaning":"去……","exampleTranslation":"我們每年夏天都去海邊。"}},\
+  "keep one's word":{"ipa":"","pos":["verb"],"exampleEn":"She kept her word and came back on time.",\
+  "ja":{"meaning":"約束を守る","exampleTranslation":"彼女は約束を守って時間どおりに戻ってきた。"},\
+  "zhHant":{"meaning":"守信","exampleTranslation":"她守信準時回來了。"}},\
+  "potato chips":{"ipa":"","pos":["noun"],"exampleEn":"We bought potato chips for the party.",\
+  "ja":{"meaning":"ポテトチップス","exampleTranslation":"パーティー用にポテトチップスを買った。"},\
+  "zhHant":{"meaning":"洋芋片","exampleTranslation":"我們買了洋芋片要在派對上吃。"}}}}
   """
 
 /// `ran` の実レスポンスから語義の形だけ抜き出したもの。活用形の語義は run と rin(古語)を指し、
@@ -222,6 +228,36 @@ struct DictionaryWordInfoProviderTests {
     let info = try await makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }).fetch("go-to")
 
     #expect(info?.meaning != "…へ行く")
+  }
+
+  @Test("丸い引用符・代名詞・記号・単数で入力しても、辞書の句の書き方で引き、見出しは入力のまま返す")
+  func prebuiltDictionaryPhraseVariants() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    #expect(try await provider.fetch("Keep One’s Word")?.meaning == "約束を守る")
+    let keepMyWord = try #require(try await provider.fetch("keep my word"))
+    #expect(keepMyWord.word == "keep my word")
+    #expect(keepMyWord.meaning == "約束を守る")
+    #expect(try await provider.fetch("keep sb's word")?.meaning == "約束を守る")
+    #expect(try await provider.fetch("potato chip")?.meaning == "ポテトチップス")
+  }
+
+  @Test("代名詞・記号の読み替えは、辞書の句の書き方に替えた候補を替えた語が少ない順に返す")
+  func placeholderVariants() {
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "put ~ in perspective")
+      == ["put something in perspective", "put someone in perspective"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "keep my word") == ["keep one's word", "keep someone's word"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "behave yourself") == ["behave oneself"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "apple").isEmpty)
+  }
+
+  @Test("単数・複数の読み替えは、句の末尾の語だけを入れ替える")
+  func pluralVariants() {
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "potato chip") == ["potato chips"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "onion rings") == ["onion ring"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "pencil box") == ["pencil boxes"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "jelly candies") == ["jelly candy"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "kidney") == [])
   }
 
   @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")
