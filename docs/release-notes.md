@@ -22,6 +22,63 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.16.0 (build 32)
+
+iOS・macOS 共通(両方 build 32)。今回から韓国語のローカリゼーションがあり、新機能の欄は 6 言語ぶん入れる。
+「自動入力」は同梱の辞書を 17,344 語に増やしたこと(韓国語の訳があるのは 6,616 語)。
+「細かな不具合」は発音記号の英音・崩れの修正と、対象外の言語で辞書を読み込まないようにしたこと。
+翻訳言語の並び替えと、韓国語の文言の調整は掲載していない。
+
+日本語:
+
+```
+韓国語に対応しました。
+英単語と熟語の自動入力を改善しました。
+細かな不具合を修正しました。
+```
+
+繁體中文:
+
+```
+新增韓文介面與翻譯。
+改善了英文單字與慣用語的自動填入。
+修正了一些小問題。
+```
+
+Español:
+
+```
+Añadimos el coreano para la interfaz y las traducciones.
+Mejoramos el autocompletado de palabras y expresiones.
+Corregimos pequeños errores.
+```
+
+Français:
+
+```
+Ajout du coréen pour l'interface et les traductions.
+Amélioration du remplissage automatique des mots et expressions.
+Correction de petits bugs.
+```
+
+English:
+
+```
+Added Korean for the interface and translations.
+Improved autofill for words and idioms.
+Fixed minor bugs.
+```
+
+한국어:
+
+```
+한국어 화면과 번역을 추가했어요.
+영어 단어와 숙어의 자동 입력을 개선했어요.
+사소한 버그를 수정했어요.
+```
+
+---
+
 ## 2.15.0 (build 31)
 
 iOS・macOS 共通(両方 build 31)。build 30 で両 OS をアップロードしたが、提出前に自動入力のインジケータを
