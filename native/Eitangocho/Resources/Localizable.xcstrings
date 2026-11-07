@@ -29,6 +29,12 @@
             "value" : "＋ 登録"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "＋ 등록"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -62,6 +68,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "＋ 単語を登録"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "＋ 단어 등록"
           }
         },
         "zh-Hant" : {
@@ -99,6 +111,12 @@
             "value" : "ダーク"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다크"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -132,6 +150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트"
           }
         },
         "zh-Hant" : {
@@ -169,6 +193,12 @@
             "value" : "外観モード"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면 모드"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -202,6 +232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "システムの設定と同じ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 설정과 동일"
           }
         },
         "zh-Hant" : {
@@ -239,6 +275,12 @@
             "value" : "端末の設定と同じ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기기 설정과 동일"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -272,6 +314,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動入力"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동 입력"
           }
         },
         "zh-Hant" : {
@@ -310,6 +358,12 @@
             "value" : "自動入力"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동 입력"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -343,6 +397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "戻る"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뒤로"
           }
         },
         "zh-Hant" : {
@@ -380,6 +440,12 @@
             "value" : "買い切り %@ で購入"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 1회 구매"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -413,6 +479,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キャンセル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
           }
         },
         "zh-Hant" : {
@@ -450,6 +522,12 @@
             "value" : "学習中カードの並び"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 카드 배치"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -483,6 +561,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "閉じる"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
           }
         },
         "zh-Hant" : {
@@ -544,6 +628,12 @@
             "value" : "覚えた %lld回"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억 %lld회"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -577,6 +667,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DeepL API Free のキーを設定すると、自動入力時に英例文の%@訳を取得します。未設定の場合、例文の訳はスキップされます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeepL API Free 키를 설정하면 자동 입력할 때 영어 예문의 %@ 번역도 가져와요. 설정하지 않으면 예문 번역은 건너뛰어요."
           }
         },
         "zh-Hant" : {
@@ -614,6 +710,12 @@
             "value" : "DeepL API キーを入力"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeepL API 키 입력"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -647,6 +749,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この操作は取り消せません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 작업은 되돌릴 수 없어요."
           }
         },
         "zh-Hant" : {
@@ -684,6 +792,12 @@
             "value" : "やめる"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -717,6 +831,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
           }
         },
         "zh-Hant" : {
@@ -754,6 +874,12 @@
             "value" : "「%@」を削除しますか?"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" 단어를 삭제할까요?"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -787,6 +913,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제..."
           }
         },
         "zh-Hant" : {
@@ -824,6 +956,12 @@
             "value" : "この単語を削除"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 단어 삭제"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -857,6 +995,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집..."
           }
         },
         "zh-Hant" : {
@@ -894,6 +1038,12 @@
             "value" : "単語を編集"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어 편집"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -927,6 +1077,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」は既に登録されています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" 단어는 이미 등록되어 있어요."
           }
         },
         "zh-Hant" : {
@@ -964,6 +1120,12 @@
             "value" : "英単語を入力してください。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어를 입력해 주세요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -997,6 +1159,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "辞書データの取得に失敗しました。通信環境を確認してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사전 데이터를 가져오지 못했어요. 인터넷 연결을 확인해 주세요."
           }
         },
         "zh-Hant" : {
@@ -1034,6 +1202,12 @@
             "value" : "英単語と%@訳は必須です。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어와 %@ 뜻은 필수 항목이에요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1067,6 +1241,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "例文の%@訳を取得できませんでした。手動で入力できます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예문의 %@ 번역을 가져오지 못했어요. 직접 입력할 수 있어요."
           }
         },
         "zh-Hant" : {
@@ -1104,6 +1284,12 @@
             "value" : "データを書き出す"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 내보내기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1137,6 +1323,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データを書き出す..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 내보내기..."
           }
         },
         "zh-Hant" : {
@@ -1174,6 +1366,12 @@
             "value" : "エクスポートしました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "내보냈어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1207,6 +1405,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "辞書データを取得中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사전 데이터를 가져오는 중..."
           }
         },
         "zh-Hant" : {
@@ -1245,6 +1449,12 @@
             "value" : "語義 *"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뜻풀이 *"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1278,6 +1488,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "英例文"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 예문"
           }
         },
         "zh-Hant" : {
@@ -1316,6 +1532,12 @@
             "value" : "%@例文"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 예문"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1349,6 +1571,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "発音記号 (IPA)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음 기호 (IPA)"
           }
         },
         "zh-Hant" : {
@@ -1387,6 +1615,12 @@
             "value" : "%@訳 *"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 뜻 *"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1420,6 +1654,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "品詞(複数選択可)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "품사 (복수 선택 가능)"
           }
         },
         "zh-Hant" : {
@@ -1457,6 +1697,12 @@
             "value" : "英単語 *"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어 *"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1490,6 +1736,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "入手"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받기"
           }
         },
         "zh-Hant" : {
@@ -1527,6 +1779,12 @@
             "value" : "iCloud 同期"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 동기화"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1560,6 +1818,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "追加 %lld件"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추가 %lld개"
           }
         },
         "zh-Hant" : {
@@ -1597,6 +1861,12 @@
             "value" : "データを読み込む"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 가져오기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1630,6 +1900,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データを読み込む..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 가져오기..."
           }
         },
         "zh-Hant" : {
@@ -1667,6 +1943,12 @@
             "value" : "インポートが完了しました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가져오기를 완료했어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1700,6 +1982,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JSON の形式が不正です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON 형식이 올바르지 않아요."
           }
         },
         "zh-Hant" : {
@@ -1737,6 +2025,12 @@
             "value" : "JSON として読み込めませんでした。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON으로 읽을 수 없어요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1770,6 +2064,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "対応していないバージョンのファイルです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지원하지 않는 버전의 파일이에요."
           }
         },
         "zh-Hant" : {
@@ -1807,6 +2107,12 @@
             "value" : "インポートできませんでした"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가져오지 못했어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1840,6 +2146,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップ %lld件"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건너뜀 %lld개"
           }
         },
         "zh-Hant" : {
@@ -1877,6 +2189,12 @@
             "value" : "変更なし %lld件"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "변경 없음 %lld개"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1910,6 +2228,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更新 %lld件"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트 %lld개"
           }
         },
         "zh-Hant" : {
@@ -1947,6 +2271,12 @@
             "value" : "最終同期: %@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 동기화: %@"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1980,6 +2310,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1列(横幅いっぱい)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1열 (가로 전체)"
           }
         },
         "zh-Hant" : {
@@ -2017,6 +2353,12 @@
             "value" : "2列(コンパクト)"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2열 (간결하게)"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2052,6 +2394,12 @@
             "value" : "学習中の単語はありません。\n単語を登録しましょう。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중인 단어가 없어요.\n단어를 등록해 보세요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2085,6 +2433,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この一覧はビルド時に自動生成されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 목록은 빌드할 때 자동으로 만들어져요."
           }
         },
         "zh-Hant" : {
@@ -2171,6 +2525,12 @@
             }
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이선스 %lld개"
+          }
+        },
         "zh-Hant" : {
           "variations" : {
             "plural" : {
@@ -2218,6 +2578,12 @@
             "value" : "ライセンス情報を読み込めませんでした。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이선스 정보를 불러오지 못했어요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2251,6 +2617,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライセンス"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이선스"
           }
         },
         "zh-Hant" : {
@@ -2288,6 +2660,12 @@
             "value" : "発音を聞く"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음 듣기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2323,6 +2701,12 @@
             "value" : "手動で入力してください"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "직접 입력해 주세요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2356,6 +2740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学習済みにする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 완료로 표시"
           }
         },
         "zh-Hant" : {
@@ -2394,6 +2784,12 @@
             "value" : "編集"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2428,6 +2824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ウィンドウ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "윈도우"
           }
         },
         "zh-Hant" : {
@@ -2466,6 +2868,12 @@
             "value" : "単語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2499,6 +2907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全単語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 단어"
           }
         },
         "zh-Hant" : {
@@ -2536,6 +2950,12 @@
             "value" : "学習中"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2571,6 +2991,12 @@
             "value" : "学習中の単語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중인 단어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2604,6 +3030,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フラッシュクイズ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플래시 퀴즈"
           }
         },
         "zh-Hant" : {
@@ -2642,6 +3074,12 @@
             "value" : "クイズ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "퀴즈"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2675,6 +3113,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "単語を登録"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어 등록"
           }
         },
         "zh-Hant" : {
@@ -2712,6 +3156,12 @@
             "value" : "設定"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2745,6 +3195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "まだ同期していません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 동기화하지 않았어요"
           }
         },
         "zh-Hant" : {
@@ -2782,6 +3238,12 @@
             "value" : "例文なし"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예문 없음"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2815,6 +3277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "単語がまだありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 단어가 없어요."
           }
         },
         "zh-Hant" : {
@@ -2853,6 +3321,12 @@
             "value" : "「%1$@」を原形の「%2$@」にしました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%1$@\" 단어를 원형 \"%2$@\" 단어로 바꿨어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2886,6 +3360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@訳は辞書に見つかりませんでした(手動で入力してください)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사전에서 %@ 뜻을 찾지 못했어요 (직접 입력해 주세요)"
           }
         },
         "zh-Hant" : {
@@ -2923,6 +3403,12 @@
             "value" : "辞書に見つかりませんでした。手動で入力できます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사전에서 찾지 못했어요. 직접 입력할 수 있어요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2956,6 +3442,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "発音記号・例文は辞書に見つかりませんでした(訳のみ自動入力)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음 기호와 예문을 사전에서 찾지 못했어요 (뜻만 자동 입력했어요)"
           }
         },
         "zh-Hant" : {
@@ -2993,6 +3485,12 @@
             "value" : "ページを読み込めませんでした。\n通信状況を確認してから、もう一度お試しください。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "페이지를 불러오지 못했어요.\n인터넷 연결을 확인한 뒤 다시 시도해 주세요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3026,6 +3524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "形容詞"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "형용사"
           }
         },
         "zh-Hant" : {
@@ -3063,6 +3567,12 @@
             "value" : "副詞"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "부사"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3096,6 +3606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名詞"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "명사"
           }
         },
         "zh-Hant" : {
@@ -3133,6 +3649,12 @@
             "value" : "その他"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기타"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3166,6 +3688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "動詞"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동사"
           }
         },
         "zh-Hant" : {
@@ -3203,6 +3731,12 @@
             "value" : "価格を取得できませんでした"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가격을 가져오지 못했어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3236,6 +3770,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コーヒー1杯分で開発の励みになります ☕"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커피 한 잔 값으로 개발을 응원할 수 있어요 ☕"
           }
         },
         "zh-Hant" : {
@@ -3273,6 +3813,12 @@
             "value" : "今後も機能を追加予定"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앞으로도 기능을 추가할 예정이에요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3306,6 +3852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "広告を非表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "광고 제거"
           }
         },
         "zh-Hant" : {
@@ -3343,6 +3895,12 @@
             "value" : "テーマカラーを%lld色から選べる"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테마 색상 %lld가지 중에서 선택"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3376,6 +3934,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro 版で広告を消せます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 버전으로 광고를 없앨 수 있어요"
           }
         },
         "zh-Hant" : {
@@ -3413,6 +3977,12 @@
             "value" : "発音"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3446,6 +4016,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Google 翻訳で発音を確認"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google 번역에서 발음 확인"
           }
         },
         "zh-Hant" : {
@@ -3483,6 +4059,12 @@
             "value" : "ご購入いただきありがとうございます！"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매해 주셔서 감사해요!"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3516,6 +4098,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro 版"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 버전"
           }
         },
         "zh-Hant" : {
@@ -3553,6 +4141,12 @@
             "value" : "Pro 版にアップグレード"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro 버전으로 업그레이드"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3586,6 +4180,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매"
           }
         },
         "zh-Hant" : {
@@ -3623,6 +4223,12 @@
             "value" : "購入できませんでした"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매하지 못했어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3656,6 +4262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 완료"
           }
         },
         "zh-Hant" : {
@@ -3693,6 +4305,12 @@
             "value" : "続ける"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3726,6 +4344,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイズの出題"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "퀴즈 출제 방향"
           }
         },
         "zh-Hant" : {
@@ -3764,6 +4388,12 @@
             "value" : "英語 → %@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 → %@"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3798,6 +4428,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ → 英語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ → 영어"
           }
         },
         "zh-Hant" : {
@@ -3835,6 +4471,12 @@
             "value" : "復習完了"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복습 완료"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3868,6 +4510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復習対象の単語がまだありません。\n単語を学習済みにするとここに表示されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 복습할 단어가 없어요.\n단어를 학습 완료로 표시하면 여기에 나타나요."
           }
         },
         "zh-Hant" : {
@@ -3905,6 +4553,12 @@
             "value" : "忘れていた"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잊어버렸어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3938,6 +4592,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「忘れていた」を選ぶと学習中リストに戻ります"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"잊어버렸어요\"를 고르면 학습 중 목록으로 돌아가요"
           }
         },
         "zh-Hant" : {
@@ -3975,6 +4635,12 @@
             "value" : "忘れていた単語(学習中リストに戻りました)"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잊어버린 단어 (학습 중 목록으로 돌아갔어요)"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4008,6 +4674,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "覚えている"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억해요"
           }
         },
         "zh-Hant" : {
@@ -4046,6 +4718,12 @@
             "value" : "広告を表示します"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "광고를 표시할게요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4079,6 +4757,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "覚えている %1$lld語 / 忘れていた %2$lld語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억 %1$lld개 / 잊어버림 %2$lld개"
           }
         },
         "zh-Hant" : {
@@ -4116,6 +4800,12 @@
             "value" : "登録する"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4151,6 +4841,12 @@
             "value" : "登録"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4184,6 +4880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "英単語を入力すると、発音記号・%@訳・例文などを辞書から自動取得します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어를 입력하면 발음 기호, %@ 뜻, 예문 등을 사전에서 자동으로 가져와요."
           }
         },
         "zh-Hant" : {
@@ -4222,6 +4924,12 @@
             "value" : "英単語を入力すると、発音記号・英語の語義・例文などを辞書から自動取得します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어를 입력하면 발음 기호, 영어 뜻풀이, 예문 등을 사전에서 자동으로 가져와요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4255,6 +4963,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再読み込み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새로 고침"
           }
         },
         "zh-Hant" : {
@@ -4293,6 +5007,12 @@
             "value" : "覚えた"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "암기 완료"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4326,6 +5046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認中…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인 중…"
           }
         },
         "zh-Hant" : {
@@ -4363,6 +5089,12 @@
             "value" : "復元しました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복원했어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4396,6 +5128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "復元できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복원하지 못했어요"
           }
         },
         "zh-Hant" : {
@@ -4433,6 +5171,12 @@
             "value" : "購入履歴が見つかりません"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 내역을 찾을 수 없어요"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4466,6 +5210,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入を復元"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 복원"
           }
         },
         "zh-Hant" : {
@@ -4504,6 +5254,12 @@
             "value" : "再試行"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4537,6 +5293,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장"
           }
         },
         "zh-Hant" : {
@@ -4574,6 +5336,12 @@
             "value" : "検索"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4607,6 +5375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外観"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면"
           }
         },
         "zh-Hant" : {
@@ -4645,6 +5419,12 @@
             "value" : "作者の他のアプリ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개발자의 다른 앱"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4678,6 +5458,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터"
           }
         },
         "zh-Hant" : {
@@ -4715,6 +5501,12 @@
             "value" : "表示"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4748,6 +5540,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "情報"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정보"
           }
         },
         "zh-Hant" : {
@@ -4785,6 +5583,12 @@
             "value" : "学習"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4818,6 +5622,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイズ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "퀴즈"
           }
         },
         "zh-Hant" : {
@@ -4855,6 +5665,12 @@
             "value" : "サポート"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지원"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4890,6 +5706,12 @@
             "value" : "訳の言語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "번역 언어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4923,6 +5745,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "答えを表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정답 보기"
           }
         },
         "zh-Hant" : {
@@ -4961,6 +5789,12 @@
             "value" : "語義を表示"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뜻풀이 보기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4994,6 +5828,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "発音記号(IPA)を表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음 기호(IPA) 보기"
           }
         },
         "zh-Hant" : {
@@ -5031,6 +5871,12 @@
             "value" : "訳を表示"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뜻 보기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5064,6 +5910,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@訳を表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 뜻 보기"
           }
         },
         "zh-Hant" : {
@@ -5137,6 +5989,12 @@
             "value" : "%lld語を表示中"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어 %lld개 표시 중"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5170,6 +6028,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ローカル DB に保存済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 Mac에 저장됨"
           }
         },
         "zh-Hant" : {
@@ -5207,6 +6071,12 @@
             "value" : "単語帳"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어장"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5240,6 +6110,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップして手動で入力する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건너뛰고 직접 입력"
           }
         },
         "zh-Hant" : {
@@ -5277,6 +6153,12 @@
             "value" : "学習済み → 学習中"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 완료 → 학습 중"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5310,6 +6192,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学習中 → 学習済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중 → 학습 완료"
           }
         },
         "zh-Hant" : {
@@ -5347,6 +6235,12 @@
             "value" : "覚えた回数が少ない順"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억 횟수 적은 순"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5380,6 +6274,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "覚えた回数が多い順"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기억 횟수 많은 순"
           }
         },
         "zh-Hant" : {
@@ -5417,6 +6317,12 @@
             "value" : "登録日が新しい順"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 등록 순"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5450,6 +6356,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登録日が古い順"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오래된 등록 순"
           }
         },
         "zh-Hant" : {
@@ -5487,6 +6399,12 @@
             "value" : "並び順: %@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정렬: %@"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5520,6 +6438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並び替え"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정렬"
           }
         },
         "zh-Hant" : {
@@ -5558,6 +6482,12 @@
             "value" : "エラー内容"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오류 내용"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5592,6 +6522,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以前のバージョンのデータを引き継げませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 버전의 데이터를 옮기지 못했어요"
           }
         },
         "zh-Hant" : {
@@ -5630,6 +6566,12 @@
             "value" : "もう一度お試しください。解決しない場合は、お問い合わせの際に下のエラー内容をお知らせください。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도해 주세요. 문제가 계속되면 문의할 때 아래 오류 내용을 함께 알려 주세요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5664,6 +6606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データを開けませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터를 열지 못했어요"
           }
         },
         "zh-Hant" : {
@@ -5702,6 +6650,12 @@
             "value" : "引き継ぎ直す"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 다시 옮기기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5736,6 +6690,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データの保存先を用意できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 저장 위치를 준비하지 못했어요"
           }
         },
         "zh-Hant" : {
@@ -5773,6 +6733,12 @@
             "value" : "同期に失敗しました。時間をおいてもう一度お試しください。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동기화하지 못했어요. 잠시 후 다시 시도해 주세요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5806,6 +6772,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud が利用できません。設定で iCloud Drive にサインインしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud를 사용할 수 없어요. 설정에서 iCloud Drive에 로그인해 주세요."
           }
         },
         "zh-Hant" : {
@@ -5843,6 +6815,12 @@
             "value" : "iCloud から最新のデータを取得できなかったため、同期を見送りました。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud에서 최신 데이터를 가져오지 못해 동기화를 건너뛰었어요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5876,6 +6854,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このプラットフォームでは iCloud 同期を利用できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 플랫폼에서는 iCloud 동기화를 사용할 수 없어요."
           }
         },
         "zh-Hant" : {
@@ -5913,6 +6897,12 @@
             "value" : "今すぐ同期"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 동기화"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5946,6 +6936,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同期中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동기화 중..."
           }
         },
         "zh-Hant" : {
@@ -5984,6 +6980,12 @@
             "value" : "語義"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뜻풀이"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6017,6 +7019,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "例文"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예문"
           }
         },
         "zh-Hant" : {
@@ -6054,6 +7062,12 @@
             "value" : "発音記号"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음 기호"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6087,6 +7101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学習済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 완료"
           }
         },
         "zh-Hant" : {
@@ -6124,6 +7144,12 @@
             "value" : "%@訳"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 뜻"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6157,6 +7183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "品詞"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "품사"
           }
         },
         "zh-Hant" : {
@@ -6194,6 +7226,12 @@
             "value" : "発音"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6227,6 +7265,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "単語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어"
           }
         },
         "zh-Hant" : {
@@ -6264,6 +7308,12 @@
             "value" : "テーマカラー"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테마 색상"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6297,6 +7347,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ブルー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "블루"
           }
         },
         "zh-Hant" : {
@@ -6334,6 +7390,12 @@
             "value" : "グラファイト"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "그래파이트"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6367,6 +7429,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "グリーン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "그린"
           }
         },
         "zh-Hant" : {
@@ -6404,6 +7472,12 @@
             "value" : "インディゴ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인디고"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6437,6 +7511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オレンジ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오렌지"
           }
         },
         "zh-Hant" : {
@@ -6474,6 +7554,12 @@
             "value" : "ピンク"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "핑크"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6507,6 +7593,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パープル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "퍼플"
           }
         },
         "zh-Hant" : {
@@ -6544,6 +7636,12 @@
             "value" : "ティール"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "틸"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6577,6 +7675,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学習中リストへ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "학습 중 목록으로"
           }
         },
         "zh-Hant" : {
@@ -6615,6 +7719,12 @@
             "value" : "シンプル英単語帳は、広告の収益で運営しています。\n\n次の画面で［許可］を選ぶと、興味・関心に合った広告が表示されるようになります。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 단어장은 광고 수익으로 운영돼요.\n\n다음 화면에서 [허용]을 선택하면 관심사에 더 잘 맞는 광고가 표시돼요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6649,6 +7759,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次へ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
           }
         },
         "zh-Hant" : {
@@ -6687,6 +7803,12 @@
             "value" : "広告の表示について"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "광고 안내"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6720,6 +7842,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しく登録する単語の訳を、この言語で取得します。\n登録済みの単語の訳は変わりません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새로 등록하는 단어의 뜻을 이 언어로 가져와요.\n이미 등록한 단어의 뜻은 바뀌지 않아요."
           }
         },
         "zh-Hant" : {
@@ -6758,6 +7886,12 @@
             "value" : "英語(語義)"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 (뜻풀이)"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6792,6 +7926,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スペイン語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스페인어"
           }
         },
         "zh-Hant" : {
@@ -6830,6 +7970,12 @@
             "value" : "フランス語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프랑스어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6864,6 +8010,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日本語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일본어"
           }
         },
         "zh-Hant" : {
@@ -6944,6 +8096,12 @@
             "value" : "中国語(繁体字)"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국어 (번체)"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6978,6 +8136,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "語義"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뜻풀이"
           }
         },
         "zh-Hant" : {
@@ -7016,6 +8180,12 @@
             "value" : "スペイン語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스페인어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7052,6 +8222,12 @@
             "value" : "フランス語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프랑스어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7086,6 +8262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日本語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일본어"
           }
         },
         "zh-Hant" : {
@@ -7166,6 +8348,12 @@
             "value" : "中国語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국어"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7201,6 +8389,12 @@
             "value" : "表示サイズ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시 크기"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7234,6 +8428,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전"
           }
         },
         "zh-Hant" : {
@@ -7307,6 +8507,12 @@
             "value" : "%lld語"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단어 %lld개"
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7343,6 +8549,12 @@
             "value" : "「%@」を登録しました。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" 단어를 등록했어요."
+          }
+        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7376,6 +8588,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Store でレビューを書く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store에서 리뷰 쓰기"
           }
         },
         "zh-Hant" : {

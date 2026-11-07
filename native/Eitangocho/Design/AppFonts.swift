@@ -50,25 +50,27 @@ enum AppFonts {
   /// 和文・繁体字・韓国語フォントの優先順(PostScript 名)。
   ///
   /// 漢字はどのフォントにも入っているので、先頭のフォントの字形で出る。
-  /// 繁体字の画面で日本の字形を出さないよう、表示言語で先頭を入れ替える。
-  /// 繁体字以外の画面(英・西・仏を含む)は和文を先にする。訳の言語の既定が
+  /// 繁体字・韓国語の画面で日本の字形を出さないよう、表示言語で先頭を入れ替える。
+  /// それ以外の画面(英・西・仏を含む)は和文を先にする。訳の言語の既定が
   /// 日本語になるため(AppLocale.defaultTranslationLanguage)。
   ///
   /// ハングルは韓国語のフォントにしか無い。訳の言語は画面の言語と別に選べるので、
   /// どの画面でもハングルを出せるよう、韓国語のフォントを必ず入れる。
   static func cjkFallback(_ language: AppLocale.Language) -> [String] {
-    language == .zhHant
-      ? [traditionalChineseName, japaneseName, koreanName]
-      : [japaneseName, traditionalChineseName, koreanName]
+    switch language {
+    case .zhHant: [traditionalChineseName, japaneseName, koreanName]
+    case .ko: [koreanName, japaneseName, traditionalChineseName]
+    case .ja, .en, .es, .fr: [japaneseName, traditionalChineseName, koreanName]
+    }
   }
 
-  /// 漢字・かなの字面の下端がベースラインより下に出る量(文字の大きさに対する比)。
-  /// Noto Sans JP / TC の字面の枠の下端(OS/2 typo の -120 / 1000。Flutter 版の AppFonts.cjkEmBoxDescent)。
+  /// 漢字・かな・ハングルの字面の下端がベースラインより下に出る量(文字の大きさに対する比)。
+  /// Noto Sans JP / TC / KR の字面の枠の下端(OS/2 typo の -120 / 1000。Flutter 版の AppFonts.cjkEmBoxDescent)。
   static let cjkEmBoxDescent: CGFloat = 0.12
 
-  /// 画面の文字が漢字・かなになる表示言語か(日本語・繁体字)。
+  /// 画面の文字が漢字・かな・ハングルになる表示言語か(日本語・繁体字・韓国語)。
   static func isCjk(_ language: AppLocale.Language) -> Bool {
-    language == .ja || language == .zhHant
+    language == .ja || language == .zhHant || language == .ko
   }
 
   // MARK: - フォントの組み立て
@@ -82,7 +84,7 @@ enum AppFonts {
 
   private static var fontCache: [FontKey: CTFont] = [:]
 
-  /// 主のフォントに、和文・繁体字の cascade list と太さを付けたもの。
+  /// 主のフォントに、和文・繁体字・韓国語の cascade list と太さを付けたもの。
   /// `size` は倍率を掛けた後の値。
   static func ctFont(
     _ family: Family, size: CGFloat, weight: Int, language: AppLocale.Language = AppLocale.current
