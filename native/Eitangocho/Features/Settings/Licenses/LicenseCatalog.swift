@@ -30,6 +30,7 @@ enum LicenseCatalog {
     ("Inter", "Inter-OFL"),
     ("Noto Sans JP", "NotoSansJP-OFL"),
     ("Noto Sans TC", "NotoSansTC-OFL"),
+    ("Noto Sans KR", "NotoSansKR-OFL"),
     ("Andika", "Andika-OFL"),
   ]
 
