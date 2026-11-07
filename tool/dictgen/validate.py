@@ -160,7 +160,9 @@ def check_ko_word(inp, out, problems):
             problems.append(f"{word} {field}: ハングルが無い")
         if HAN_OR_KANA.search(value):
             problems.append(f"{word} {field}: 漢字か仮名が混じっている")
-        if ENGLISH_WORD.search(value):
+        # 語そのものを話題にする例文(「tits は下品な言葉だ」)では、見出し語だけ英語で書く
+        text = value if field == "meaning" else re.sub(re.escape(word), "", value, flags=re.IGNORECASE)
+        if ENGLISH_WORD.search(text):
             problems.append(f"{word} {field}: 英語のまま残っている")
         if FULLWIDTH_PUNCT.search(value):
             problems.append(f"{word} {field}: 全角の約物がある")
