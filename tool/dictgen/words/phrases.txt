@@ -1,0 +1,2001 @@
+# 句 1,988 語。Tatoeba の英文に出てくる文の数の多い順。
+# 範囲: 既存の単語リストと同梱辞書に無い句のうち、次の候補 4,060 語を読んで、見出しとして覚える価値がある句を選んだもの。
+#   - Wiktionary の English multiword terms のうち、動詞・前置詞・接続詞・限定詞・副詞の句(10 文以上)、間投詞の句(10 文以上)、
+#     形容詞の句(20 文以上)、それ以外の句(50 文以上)
+#   - Wiktionary で短い見出しへの転送になっている句(10 文以上)
+#   - NGSL の動詞 + 前置詞(50 文以上、かつ前置詞の平均の 5 倍以上結びつく)、動詞 + 名詞 + 前置詞(50 文以上)
+#   - 形容詞 + 前置詞(20 文以上、かつ前置詞の平均の 5 倍以上結びつく。be を付けた見出しにする)、a + 名詞 + of(20 文以上)、
+#     be + 語 + 前置詞(30 文以上)
+#   - 個別に足した句 15 語
+# 外したもの: 単語を並べただけの句(do it・first time)、名詞の並びを拾ったもの、文の一部を切り出しただけのもの。
+# kaikki(Wiktionary の抽出データ)で全部の意味に差別・古語の表示が付く 7 語は、差別語でないので残した
+#   (filthy rich・get a clue・get a life・get a word in edgewise・shove it・spit it out・you wish)。卑語は除かない。
+# 頻度は Tatoeba の英文(eng_sentences.tsv.bz2、CC BY 2.0 FR)で数えた。
+want to
+be going to
+try to
+a lot
+you know
+be able to
+how to
+a lot of
+the same
+seem to
+a little
+plan to
+look like
+look at
+a few
+more than
+to come
+the way
+how many
+how much
+decide to
+listen to
+right now
+every day
+what happened
+or not
+a bit
+be interested in
+up to
+last night
+so much
+how long
+make it
+too much
+be likely to
+take care
+that is
+be born
+take care of
+be ready to
+go home
+see you
+worry about
+in front of
+be afraid of
+be supposed to
+come from
+get married
+this morning
+you see
+the end
+all day
+in that
+thank you
+agree to
+would like
+refuse to
+get home
+no idea
+last time
+have no idea
+no longer
+make sure
+what time
+intend to
+any more
+in love with
+next week
+work for
+last week
+believe in
+very much
+in the morning
+manage to
+last year
+you guys
+all the time
+what kind of
+this time
+as well as
+go to school
+be about to
+go to bed
+over there
+even though
+a piece of
+let's go
+return to
+a number of
+be proud of
+come home
+much as
+belong to
+be tired of
+a couple of
+stare at
+the rest of
+work with
+same thing
+as much as
+be careful
+be allowed to
+close to
+you tell me
+have fun
+talk with
+for a while
+back home
+be willing to
+many times
+even if
+no matter
+due to
+so many
+be born in
+lots of
+care about
+be ready for
+in the middle of
+laugh at
+a sense of
+in order to
+arrive at
+far from
+along with
+so that
+a pair of
+next year
+a little bit
+be full of
+some time
+thank for
+all night
+fall in love
+one day
+be unable to
+speak with
+such as
+anything else
+depend on
+be late for
+that's why
+get ready
+a cup of
+be aware of
+run out of
+pretend to
+be glad to
+be sorry for
+someone else
+be responsible for
+next time
+stay at home
+prepare for
+suffer from
+not only
+sort of
+complain about
+old man
+hang out with
+less than
+something else
+best friend
+get used to
+made up
+enjoy oneself
+any longer
+hear about
+fall in love with
+focus on
+excuse me
+so long
+too many
+be permitted to
+kill oneself
+be good at
+plenty of
+afford to
+take place
+be mad at
+phone number
+tend to
+apologize to
+arrive in
+anyone else
+dream of
+hear from
+by the time
+something like that
+a lack of
+get along with
+a group of
+for the first time
+how about
+be scared of
+attempt to
+who knows
+make a mistake
+appear to
+nothing but
+as far as
+go out with
+a bit of
+do well
+be involved in
+these days
+as to
+far away
+be capable of
+be used to
+convert to
+argue with
+be determined to
+rely on
+not really
+a glass of
+be reluctant to
+based on
+be different from
+as soon as possible
+be required to
+be filled with
+not that
+at the age of
+not even
+fail to
+be happy with
+what if
+now that
+no matter what
+no need
+a sign of
+rather than
+more and more
+ahead of
+be angry with
+to blame
+a matter of
+be surrounded by
+a bunch of
+not yet
+graduate from
+any time
+free time
+hard time
+be part of
+be concerned about
+way out
+how far
+be forced to
+all the way
+the fact that
+lose weight
+run for
+apologize for
+everyone else
+smile at
+for one
+vote for
+relate to
+way too
+in case
+in touch with
+pay attention to
+be quiet
+parking lot
+social media
+sooner or later
+be eager to
+nothing to do with
+be covered with
+driver's license
+thanks to
+foreign language
+have sex
+get sick
+get to know
+a waste of
+be satisfied with
+it doesn't matter
+apply for
+be similar to
+be good for
+good enough
+participate in
+spend time
+be unlikely to
+hard work
+one another
+tell you what
+be allergic to
+got it
+front door
+take advantage
+take advantage of
+escape from
+brush one's teeth
+be made of
+be bad for
+good thing
+be fluent in
+a bottle of
+be ashamed of
+learn from
+take part in
+just because
+be married to
+catch up with
+know better
+take a shower
+you wish
+fight with
+feel bad
+why not
+birthday party
+be sick of
+the next day
+accuse of
+be worried about
+be familiar with
+no doubt
+take a break
+dream about
+out of bed
+succeed in
+respond to
+feel about
+native language
+solar system
+anybody else
+be hesitant to
+in the distance
+as good as
+believe me
+be located in
+could use
+day off
+fight for
+first thing
+be surprised by
+you're right
+all in
+world war
+as it is
+friend of mine
+be accused of
+go abroad
+be up to
+learn about
+waste of time
+have breakfast
+so what
+anytime soon
+be desperate to
+compare to
+in for
+ever since
+no use
+be attracted to
+feel sorry for
+long ago
+make friends
+be accustomed to
+help oneself
+let go
+over here
+insist on
+threaten to
+dare to
+be happy about
+new year
+be sure to
+except for
+be gone
+summer vacation
+contribute to
+the day after tomorrow
+way back
+from now on
+good news
+would rather
+any way
+apply to
+as though
+be tempted to
+be excited about
+every single
+recover from
+all alone
+be angry at
+be known for
+have a look
+somebody else
+any good
+be rude to
+get in touch
+older brother
+get dressed
+go without
+apart from
+outside of
+some kind of
+almost all
+make a decision
+be there for
+have an affair
+as usual
+be addicted to
+do without
+die from
+done for
+old friend
+be said to
+more like
+younger brother
+be based on
+be jealous of
+fresh air
+what about
+express oneself
+spend time with
+be grateful for
+be faced with
+agree on
+good luck
+have time for
+communicate with
+get drunk
+refer to
+phone call
+human being
+but for
+give up on
+if you like
+off of
+be covered in
+no problem
+pretty well
+leave me alone
+pray for
+the day before yesterday
+be surprised to
+increase in
+reply to
+worth it
+waste time
+be famous for
+air conditioner
+bad mood
+down with
+no good
+orange juice
+steal from
+charge with
+from behind
+once more
+sense of humor
+and a half
+say hello
+one way
+who knew
+just now
+let go of
+short of
+be expected to
+invest in
+be absent from
+be sentenced to
+blame for
+do you mind
+everybody else
+hesitate to
+over again
+get away from
+in charge of
+leave alone
+hide from
+be bad at
+forget it
+go crazy
+not exactly
+shake one's head
+translate into
+as for
+be dependent on
+down there
+comment on
+find one's way
+keep going
+what do you mean
+gas station
+give birth to
+struggle with
+be friends with
+glance at
+how dare you
+be unwilling to
+good day
+lie about
+pretty much
+belly button
+all kinds of
+a variety of
+be fascinated by
+better off
+half past
+little brother
+hands on
+be present at
+to think that
+approve of
+be honest with
+thank you very much
+behave oneself
+it is said
+blood pressure
+associate with
+attach to
+movie theater
+over and over
+piece of paper
+built in
+for some time
+old age
+leave behind
+regardless of
+let me see
+sleep well
+do the dishes
+mother tongue
+over with
+be anxious to
+be surprised at
+little sister
+messed up
+some day
+be stuck in
+connect to
+aim at
+shout at
+every other
+in favor of
+be kind to
+if not
+what the hell
+or so
+a kind of
+a series of
+dressed up
+have sex with
+one time
+a box of
+argue about
+be charged with
+mental health
+shake hands
+stay up late
+a pile of
+artificial intelligence
+be crazy about
+be due to
+be obsessed with
+younger sister
+gain weight
+the opposite of
+way to go
+civil war
+have got to
+together with
+older sister
+bad luck
+one more time
+railway station
+in terms of
+just in time
+nothing like
+pick me up
+all of a sudden
+appeal to
+up until
+be caught in
+be sorry about
+toilet paper
+adapt to
+be guilty of
+be opposed to
+coffee shop
+drinking water
+move forward
+world cup
+change into
+talk to oneself
+divide into
+middle school
+say goodbye to
+wait and see
+for the sake of
+no less
+concentrate on
+have access to
+be careful with
+national park
+on stage
+a great deal of
+be terrified of
+economic growth
+elementary school
+quite a few
+well known
+make up for
+on the edge of
+point at
+for fun
+a range of
+all for
+be lucky to
+be unaware of
+in addition to
+scream at
+set the table
+as a result of
+never ever
+no wonder
+watch out for
+amount to
+be diagnosed with
+be known as
+in search of
+keep one's word
+back and forth
+be suitable for
+commit suicide
+fight against
+get going
+in case of
+night sky
+oh no
+black and white
+do good
+hold hands
+only just
+for ever
+have to do with
+on the verge of
+say hello to
+second chance
+security guard
+aim to
+be curious about
+be grateful to
+be passionate about
+be used for
+grown up
+lose one's way
+too soon
+convenience store
+crash into
+real life
+since when
+who cares
+a ton of
+bring oneself to
+sports car
+to burn
+at the bottom of
+be impressed by
+be known to
+emerge from
+good one
+head on
+something to do with
+spare time
+the other way
+meant to be
+take notes
+followed by
+me too
+not so much
+a slice of
+be upset about
+in tears
+in the face of
+junior high
+take turns
+thank god
+to this day
+comic book
+driving licence
+more or less
+time being
+depending on
+make a fool of
+be entitled to
+be superior to
+do business
+have no right
+inside of
+make love
+not to say
+be worthy of
+eye contact
+be dressed in
+official language
+say no to
+wedding ring
+be made from
+be prepared to
+expose to
+gaze at
+go on vacation
+it's nothing
+separate from
+be impressed with
+city centre
+be anxious about
+be divided into
+make use
+make use of
+study abroad
+that's enough
+yell at
+across from
+as always
+compete with
+happy birthday
+junior high school
+lean against
+live up to
+be bound to
+be prepared for
+be serious about
+day and night
+derive from
+do one's duty
+it depends
+sleeping bag
+teddy bear
+connect with
+need not
+take someone's place
+also known as
+be sensitive to
+dedicate to
+make friends with
+many a
+once upon a time
+resort to
+school year
+so as to
+waiting room
+you never know
+again and again
+at the sight of
+be home to
+death penalty
+most of the time
+not bad
+report to
+stand still
+compare with
+fall ill
+joke about
+only if
+see you tomorrow
+whatever you do
+email address
+give someone a lift
+go missing
+go to show
+greater than
+not long
+remove from
+true love
+benefit from
+can't help but
+change the subject
+get a hold of
+give way
+light bulb
+not to worry
+see to it
+be right back
+be comfortable with
+differ from
+oh my god
+that's it
+that's right
+you're welcome
+be popular with
+business trip
+daily life
+make one's bed
+middle ages
+not necessarily
+through with
+wink at
+a sip of
+apartment building
+be buried in
+be composed of
+be open to
+end of the day
+lit up
+may well
+provide for
+what time is it
+against someone's will
+go bad
+seeing that
+with one's eyes closed
+be the case
+driving test
+matter of fact
+skip school
+speed limit
+wave at
+be inclined to
+like it or not
+one by one
+back seat
+be thankful for
+cannot help
+get at
+a load of
+ask for it
+borrow from
+capital city
+not guilty
+on behalf of
+result from
+speak ill of
+special forces
+adjust to
+in the name of
+lose control
+make a living
+one or two
+share with
+sick and tired of
+a handful of
+as hell
+at all times
+back when
+full moon
+make an effort
+pack one's bags
+sea level
+take a seat
+compared with
+good work
+in need of
+knock at
+minimum wage
+out of time
+stay behind
+tell the difference
+turn one's back
+be content with
+be done with
+birthday cake
+devote to
+every now and then
+flat tire
+if possible
+react to
+so on
+be essential for
+be incapable of
+be oneself
+go on a trip
+hand in hand
+have a word with
+only child
+rush into
+sold out
+take responsibility
+take time to
+be fond of
+find fault with
+have faith in
+it's no use
+law school
+left out
+specialize in
+transform into
+walk away from
+be convicted of
+be lost in
+cash register
+crime scene
+cut down on
+go against
+here and there
+it goes without saying
+judge from
+press charges
+proceed to
+so far as
+take control
+a pack of
+amusement park
+be away from
+be rich in
+brand new
+green tea
+in the process
+just in case
+no clue
+take revenge
+be annoyed by
+be pleased with
+contrary to
+little by little
+long live
+sense of humour
+a set of
+be mindful of
+do well in
+french fries
+night shift
+outer space
+shopping mall
+side by side
+take action
+be meant to
+choose between
+go mad
+have trouble with
+life sentence
+natural gas
+seat belt
+tied up
+you should talk
+laugh about
+learn one's lesson
+lung cancer
+pitch black
+quarter of
+throw a party
+be equal to
+compete in
+do one's part
+fall behind
+job interview
+meaning of life
+nice to meet you
+no thanks
+wait a minute
+at all costs
+big brother
+do it yourself
+have confidence in
+national anthem
+second language
+set fire to
+be angry about
+be exposed to
+by way of
+conference room
+go well with
+hands off
+prior to
+run out of gas
+sign language
+way of life
+be absorbed in
+be shocked by
+be wrong about
+day by day
+mixed up
+rainy season
+soon enough
+vending machine
+be patient with
+black eye
+city hall
+fairy tale
+first class
+freedom of speech
+make sense to
+public health
+to tell you the truth
+what the fuck
+application form
+be prone to
+cost of living
+exact same
+experiment with
+generally speaking
+health insurance
+hiding place
+judge by
+keep track
+be disappointed with
+be nervous about
+be scheduled to
+black hole
+go to hell
+up to date
+world peace
+be accompanied by
+be obliged to
+be related to
+cold war
+free of charge
+have had enough
+love letter
+not the case
+retire from
+risk one's life
+stay the night
+after a while
+be affected by
+be apt to
+be engaged in
+be harmful to
+be indifferent to
+give way to
+haunted house
+hot chocolate
+human nature
+in bed with
+in the presence of
+lose interest in
+one of these days
+renewable energy
+think for oneself
+vacuum cleaner
+a drop of
+a mixture of
+all gone
+as fuck
+bathing suit
+be faithful to
+be pleased to
+by name
+get past
+have fun with
+how old are you
+hundreds of thousands
+in the midst of
+keep from
+on and on
+parking space
+trash can
+what's your name
+a third of
+all too
+close by
+foreign country
+fucked up
+give rise to
+good evening
+how are things
+keep away from
+on about
+take responsibility for
+up to now
+be excited to
+be independent of
+full name
+keep track of
+ladies and gentlemen
+later on
+press conference
+sheet of paper
+take control of
+well aware
+along the way
+as much as possible
+blame on
+construction site
+how are you doing
+just then
+lose track of
+no question
+take pride in
+be subject to
+be thought to
+even as
+for the moment
+kill time
+mean to say
+pair of scissors
+prove oneself
+put on weight
+qualify for
+yield to
+be engaged to
+be mad about
+come round
+customer service
+finish line
+for lack of
+go bankrupt
+go round
+good night's sleep
+public transportation
+shoot at
+sore throat
+struggle for
+summer camp
+take aback
+take charge
+taken aback
+well off
+a sheet of
+arrange for
+as follows
+aside from
+be enthusiastic about
+distinguish between
+emergency room
+first aid
+keep one's distance
+life insurance
+surprise party
+thanks a lot
+where are you from
+be free from
+be set to
+cross someone's mind
+get hold of
+no end
+take the time
+a glimpse of
+a great many
+be committed to
+be conscious of
+be designed to
+be ignorant of
+by means of
+get the job done
+if ever
+in that case
+keep in mind
+lose one's balance
+pick up the phone
+see for oneself
+stressed out
+be believed to
+be connected to
+cats and dogs
+do the laundry
+get lucky
+have nothing to lose
+in the process of
+pull oneself together
+a touch of
+as it were
+be equivalent to
+bound for
+catch cold
+clear one's throat
+give something a shot
+just kidding
+keep one's eyes open
+on good terms with
+plugged in
+used up
+a quarter of
+a sort of
+anywhere near
+be vulnerable to
+bring forth
+either way
+fall silent
+find time
+good old
+hold onto
+in honor of
+make an exception
+all the more
+be busy with
+be devoted to
+be free to
+come upon
+for real
+just saying
+make it up to
+much too
+out of hand
+salt and pepper
+so to speak
+speaking of
+a combination of
+be characteristic of
+be devoid of
+be typical of
+break free
+date back to
+go to war
+hot dog
+in fashion
+only too
+pass the time
+real world
+straight ahead
+be annoyed with
+be suspicious of
+check it out
+could do with
+far off
+go to waste
+take hold
+the hell out of
+way off
+among other things
+at any cost
+be confident in
+be dissatisfied with
+be fed up
+be generous with
+be keen on
+cut out for
+drive someone mad
+go easy
+go on strike
+just yet
+lead the way
+like shit
+mentally ill
+run short
+set sail
+speak for oneself
+take one's own life
+a crowd of
+be derived from
+be dying to
+be focused on
+be guilty about
+be quick to
+if you will
+in doubt
+left over
+less and less
+make certain
+make up for lost time
+never again
+no match for
+on the brink of
+open source
+play tricks
+rise above
+spot on
+take a dump
+to begin with
+be destined to
+be furious with
+be particular about
+get the idea
+have a clue
+in exchange
+in place of
+look upon
+washed up
+be loyal to
+every once in a while
+give a shit
+go under
+hit it off
+in accordance with
+in the hands of
+no thank you
+occur to
+take seriously
+the other way around
+up for sale
+a flock of
+all over again
+be careful about
+be equipped with
+be liable to
+draw attention
+go for it
+gone wrong
+lose oneself
+of color
+one way or another
+pull out of
+step by step
+talk it over
+a total of
+be new to
+be yet to
+go easy on
+go forth
+lost in thought
+most of all
+moving forward
+second to none
+tear gas
+a shortage of
+be careful of
+be compelled to
+be eligible for
+be free of
+blow one's nose
+burned out
+cut short
+eye to eye
+forget about it
+get one's hands on
+make way
+shut one's mouth
+try it on
+a grain of
+all in all
+all together
+be suspected of
+be unsure of
+call upon
+declare war
+enough already
+in the eyes of
+more so
+out of business
+play tricks on
+strictly speaking
+work it out
+a loaf of
+be inferior to
+be proficient in
+be reduced to
+creeped out
+damn it
+early on
+filthy rich
+give one's best
+go viral
+look for trouble
+make do with
+make sense of
+next generation
+off and on
+oh yeah
+such that
+that is to say
+what in the world
+be associated with
+be attached to
+be carried away
+be certain to
+be indebted to
+be situated in
+be true to
+draw near
+even so
+get laid
+just as well
+left and right
+make a fortune
+miss the point
+no fun
+one after the other
+swear at
+think much of
+up till
+with regard to
+a herd of
+all the best
+be critical of
+be picky about
+blacked out
+earn a living
+have the heart
+look alike
+lose no time
+many thanks
+think straight
+yet again
+at the risk of
+be blessed with
+be compatible with
+be desperate for
+be good with
+be hard on
+be immune to
+be scheduled for
+be strict with
+be teeming with
+be uncomfortable with
+be unfamiliar with
+big time
+draw attention to
+fake it
+have a point
+hell of a
+let one's guard down
+no worries
+run the risk
+see you soon
+take the place of
+top priority
+with respect to
+wrapped up
+at the cost of
+be optimistic about
+be wary of
+catch up on
+in exchange for
+kung fu
+make love to
+mean well
+nowhere near
+talk shit
+tell a story
+try one's luck
+work one's way
+attract attention
+be bored with
+be consistent with
+be parallel to
+be unhappy about
+fend for oneself
+give blood
+go nuts
+good for nothing
+in earnest
+not a little
+odds are
+stumble upon
+take away from
+to be fair
+what's more
+with the exception of
+worth seeing
+a stack of
+a way with
+any minute now
+be resistant to
+be skilled at
+be unhappy with
+cross one's fingers
+take steps
+vice versa
+you don't say
+be akin to
+be protective of
+be synonymous with
+break the silence
+dare say
+dead or alive
+drive someone nuts
+get the hint
+given that
+laid back
+my pleasure
+next level
+rest in peace
+run low
+speak well of
+take courage
+take one's life
+throw oneself into
+a multitude of
+be accountable for
+best part of
+call in sick
+come to that
+do time
+for one's own good
+get back at
+here and now
+high speed
+hung over
+in favour of
+jump at
+make the first move
+search engine
+to be expected
+word for word
+a breath of
+a majority of
+arm in arm
+be intent on
+crack open
+dwell on
+get it over with
+go beyond
+jump rope
+leave much to be desired
+make haste
+off the wall
+on guard
+per capita
+thank goodness
+to start with
+working class
+a bundle of
+a hint of
+a pinch of
+be peculiar to
+be reminiscent of
+be susceptible to
+come under
+good looking
+lay a hand on
+not anymore
+nowhere to be seen
+on condition that
+owe someone one
+put to death
+save for
+sleep like a baby
+take one's chances
+tired out
+wait up for
+a bite of
+be confident about
+be insecure about
+be oblivious to
+best wishes
+cover one's tracks
+cut it out
+each and every
+far out
+get a life
+guard against
+ill at ease
+lag behind
+let the cat out
+oh dear
+put oneself in someone's shoes
+rack one's brains
+stand guard
+stick out one's tongue
+take credit for
+take effect
+think highly of
+time travel
+a hell of
+a host of
+a pound of
+an abundance of
+an average of
+be frustrated with
+be indispensable to
+be weary of
+brick wall
+come between
+day to day
+dead tired
+deep inside
+down to earth
+fall flat
+flesh and blood
+fly a kite
+follow one's heart
+force one's way
+from head to toe
+hold good
+keep at
+lift a finger
+nick of time
+provided that
+right off
+round the corner
+see fit
+sell oneself
+show one's face
+speak volumes
+take notice
+the shit out of
+whatever you say
+as you wish
+at the hands of
+be knowledgeable about
+be on top of
+better than nothing
+cover to cover
+cross one's arms
+do more harm than good
+fall under
+first and foremost
+get real
+hail from
+just enough
+keep it down
+keep it up
+low profile
+now that you mention it
+now then
+part ways
+pepper spray
+run errands
+see the point
+shy away from
+side to side
+stand in the way
+stark naked
+state the obvious
+straight up
+take a leak
+take a toll
+watch one's back
+well said
+win someone's heart
+a good many
+a tad
+adjacent to
+advise against
+being that
+best of luck
+call the shots
+can't be bothered
+drink and drive
+far and wide
+friend request
+frown at
+further to
+have seen better days
+in contrast to
+in relation to
+in the event of
+make both ends meet
+on the basis of
+out to get someone
+peer pressure
+play by the rules
+put forth
+spit it out
+straight out
+take note
+take the trouble
+as you were
+break the news
+catch on fire
+come undone
+day one
+do one's thing
+for want of
+go ballistic
+heart and soul
+hook up with
+lay low
+make a face
+make someone's acquaintance
+night and day
+rock and roll
+run dry
+set free
+shed tears
+stock up on
+strange to say
+take offense
+take pity
+think nothing of
+waste no time
+zip code
+call it quits
+cannot but
+come to a stop
+cross one's legs
+duct tape
+ever so
+feel up to
+fly high
+fold one's arms
+get cold feet
+go from bad to worse
+have the pleasure
+having said that
+in brief
+in the light of
+in the shadow of
+kick oneself
+knock it off
+know any better
+make the bed
+much obliged
+out of context
+pen pal
+shame on you
+shove it
+sleep like a log
+take it back
+take offence
+take pleasure
+take shape
+turn against
+up close
+wear and tear
+wish someone well
+wreak havoc
+a trifle
+assert oneself
+close the door on
+crack down on
+dive into
+drink like a fish
+flatter oneself
+get ahead of oneself
+give one's word
+head to foot
+hit a home run
+in abundance
+in regard to
+not half
+rack one's brain
+take root
+the crap out of
+wait one's turn
+wing it
+abound in
+be no stranger to
+blood test
+die laughing
+do wonders
+face the facts
+fall out of love
+fall prey
+get a clue
+god willing
+have no business
+in order that
+look one's age
+make contact with
+make it big
+make much of
+my apologies
+none the less
+not again
+play truant
+rub it in
+run for cover
+seeing as
+sneak up on
+take by surprise
+take pity on
+take the bait
+to be frank
+to the power of
+twist someone's arm
+under the auspices of
+as good as new
+back to front
+break loose
+bring it on
+come forth
+complete with
+contain oneself
+door to door
+from generation to generation
+frown upon
+get the best of
+hats off
+have eyes for
+if and only if
+in the absence of
+loud and clear
+make a habit of
+mince one's words
+nail it
+oh boy
+play dead
+return fire
+road rage
+take office
+think better of
+act upon
+as regards
+break one's word
+brush up on
+by reason of
+catch a ride
+change places
+check this out
+come out on top
+crack me up
+fall on deaf ears
+get round to
+go astray
+go steady
+hang onto
+have one's work cut out
+hold true
+leg it
+long time no see
+my goodness
+pick up speed
+put one's foot down
+put the blame on
+raise one's glass
+so much so
+step on it
+the fuck out of
+the likes of
+too much information
+worst-case scenario
+yeah right
+as opposed to
+body and soul
+change one's ways
+courtesy of
+draw to a close
+follow in someone's footsteps
+from then on
+full well
+get the picture
+go down in history
+good bye
+have a cow
+here we go
+however much
+in its entirety
+in memory of
+in passing
+irrespective of
+know full well
+look down upon
+make headlines
+make the difference
+no shit
+one way or the other
+roll the dice
+run aground
+scare the hell out of
+shut the door on
+single parent
+slap in the face
+spell it out
+steer clear
+sure thing
+talk shop
+the other way round
+there and then
+trade places
+wrap one's head around
+as a consequence of
+brute force
+by and by
+catch hold
+change course
+come naturally
+count one's chickens
+cut class
+do no harm
+every so often
+fall sick
+fuck me
+get away with murder
+get under someone's skin
+give someone the cold shoulder
+go to extremes
+hang one's head
+have it easy
+have nothing on
+high five
+hold fast
+if at all
+in view of
+in your face
+keep one's hands to oneself
+keep one's head above water
+keep one's voice down
+lay a finger on
+least of all
+live paycheck to paycheck
+mess around with
+my gosh
+nine to five
+now or never
+pat on the back
+pull the plug
+right and left
+save face
+say yes to
+see stars
+shake like a leaf
+shed light on
+sit tight
+slap on the wrist
+something awful
+speak highly
+step on the gas
+take a breath
+take a liking to
+take flight
+take it out on
+take kindly to
+take leave
+take one's leave
+thank one's lucky stars
+the heck out of
+the living daylights out of
+throw a fit
+time and again
+train wreck
+try one's hand
+want for nothing
+water ski
+admit defeat
+at the very least
+base upon
+be born yesterday
+be in on
+black and blue
+break a leg
+burst into flames
+butt heads
+by and large
+call someone's bluff
+cold turkey
+come out of the closet
+conceive of
+cut ties
+damn you
+dear me
+double check
+drive someone insane
+drive someone up the wall
+face facts
+fair and square
+fall off the wagon
+fire truck
+follow suit
+for starters
+for the longest time
+from the ground up
+gain ground
+get a word in edgewise
+get cracking
+get one's act together
+give credit
+give it one's best shot
+give up the ghost
+go by the name of
+go in circles
+go their separate ways
+go to press
+go to the polls
+go up in smoke
+god damn
+going forward
+hit a nerve
+hit upon
+hold still
+in the hope of
+in the wake of
+join hands
+keep one's chin up
+keep one's head down
+keep one's temper
+lay bare
+let bygones be bygones
+lick one's lips
+make good on
+mean business
+meet one's match
+mince words
+mind one's business
+off the grid
+oh my gosh
+oh really
+on thin ice
+pace oneself
+parallel park
+pay dearly
+pay homage to
+pitch a tent
+play it safe
+play one's part
+pull a fast one
+put in a good word
+reflect upon
+resign oneself
+rub shoulders
+rubber band
+send shivers down someone's spine
+smell a rat
+spread like wildfire
+steer clear of
+stick one's nose into
+stop short
+tai chi
+take a guess
+take one's hat off to
+take the liberty
+talk big
+talk someone's ear off
+tear to pieces
+thanks in advance
+this minute
+thus far
+try someone's patience
+up one's game
+wait tables

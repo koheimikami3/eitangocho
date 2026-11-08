@@ -11,7 +11,9 @@ struct WordRegistrationModelTests {
   /// 自動入力のテスト用(実際の取得元を呼ばない)。
   private struct FakeWordInfoProvider: WordInfoProvider {
     let handler: @Sendable (String) async throws -> WordInfo?
+    var suggestions: @Sendable (String) -> [String] = { _ in [] }
     func fetch(_ word: String) async throws -> WordInfo? { try await handler(word) }
+    func spellingSuggestions(for word: String) async -> [String] { suggestions(word) }
   }
 
   nonisolated private final class Box<T>: @unchecked Sendable {
@@ -35,8 +37,14 @@ struct WordRegistrationModelTests {
     language: TranslationLanguage = .ja, resetsAfterSave: Bool = true,
     _ handler: @escaping @Sendable (String) async throws -> WordInfo? = { _ in nil }
   ) -> WordRegistrationModel {
+    makeModel(language: language, resetsAfterSave: resetsAfterSave, wordInfo: FakeWordInfoProvider(handler: handler))
+  }
+
+  private func makeModel(
+    language: TranslationLanguage = .ja, resetsAfterSave: Bool = true, wordInfo: FakeWordInfoProvider
+  ) -> WordRegistrationModel {
     WordRegistrationModel(
-      dao: database.wordDao, wordInfo: FakeWordInfoProvider(handler: handler), analytics: AnalyticsLogger(analytics),
+      dao: database.wordDao, wordInfo: wordInfo, analytics: AnalyticsLogger(analytics),
       review: disabledReviewPrompter(dao: database.wordDao), resetsAfterSave: resetsAfterSave,
       // インジケータの最短時間はテストでは待たない
       minimumLoading: .zero, currentLanguage: { language })
@@ -182,6 +190,23 @@ struct WordRegistrationModelTests {
     #expect(model.notice == .notFound)
     // 英単語はステップ 1 の入力のまま残す。
     #expect(model.word == "zzzzz")
+  }
+
+  @Test func 綴りの候補を受け取り押すとその語で自動入力し直す() async {
+    let model = makeModel(
+      wordInfo: FakeWordInfoProvider(
+        handler: { $0 == "serendipity" ? Self.fetchedInfo : nil },
+        suggestions: { $0 == "serendipty" ? ["serendipity"] : [] }))
+    model.word = "serendipty"
+    await model.autoFill()
+    #expect(model.notice == .notFound)
+    #expect(model.spellingSuggestions == ["serendipity"])
+
+    await model.applySpellingSuggestion("serendipity")
+    #expect(model.word == "serendipity")
+    #expect(model.meaning == "思わぬ発見")
+    #expect(model.spellingSuggestions.isEmpty)
+    #expect(model.notice == nil)
   }
 
   @Test func 取得に失敗したらinputに戻しエラーを表示する() async {

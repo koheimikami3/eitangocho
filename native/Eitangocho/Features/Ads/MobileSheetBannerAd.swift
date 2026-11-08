@@ -57,17 +57,14 @@
         adView
           .padding(
             EdgeInsets(
-              // 上の線の太さの分は上の余白に足す(Flutter の Container は枠線の幅を内側の余白に足す)。
-              top: Self.topPadding + 1, leading: Self.horizontalPadding, bottom: Self.bottomPadding,
+              top: Self.topPadding, leading: Self.horizontalPadding, bottom: Self.bottomPadding,
               trailing: Self.horizontalPadding)
           )
           .frame(maxWidth: .infinity)
-          // シートと同じ地の色にし、上の細い線だけで入力欄と分ける
-          // (灰色の帯にすると別の部品が挟まったように見えるため)。
+          // シートと同じ地の色にし(灰色の帯にすると別の部品が挟まったように見えるため)、
+          // 上端は一覧の下のバナー(MobileBannerAd)と同じ影で入力欄と分ける。シートの見出しの下の影と対になる。
           .background(palette.surface)
-          .overlay(alignment: .top) {
-            Rectangle().fill(palette.borderAlpha(8)).frame(height: 1)
-          }
+          .appShadows(palette.bottomBarShadow, in: Rectangle(), scale: 1)
       }
     }
   }

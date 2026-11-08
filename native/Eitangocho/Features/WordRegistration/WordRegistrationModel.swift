@@ -55,6 +55,8 @@ final class WordRegistrationModel {
   private(set) var translationFailed = false
   /// 自動入力で活用形を原形に置き換えたときの、元の入力(ran → run の ran)。置き換えていなければ nil。
   private(set) var replacedInput: String?
+  /// 綴りを誤ったとみられる入力の、正しい綴りの候補(「もしかして」)。置き換えず、押されたらその語で引き直す。
+  private(set) var spellingSuggestions: [String] = []
   private(set) var selectedPartsOfSpeech: Set<PartOfSpeech> = []
   private(set) var error: RegistrationError?
   /// 直前に登録した単語。ステップ 1 に「登録しました」と出すために持つ。
@@ -141,10 +143,12 @@ final class WordRegistrationModel {
     error = nil
     registeredWord = nil
     replacedInput = nil
+    spellingSuggestions = []
     // 句(空白を含む見出し語)は辞書の収録が薄いので、取得率を分けて見る。
     let isPhrase = headword.contains(" ")
     do {
       guard let info = try await fetchShowingIndicator(headword) else {
+        spellingSuggestions = await wordInfo.spellingSuggestions(for: headword)
         notFound = true
         enterForm(with: nil)
         analytics.logAutofillResult(.notFound, isPhrase: isPhrase)
@@ -159,6 +163,7 @@ final class WordRegistrationModel {
         }
         replacedInput = headword
       }
+      spellingSuggestions = await wordInfo.spellingSuggestions(for: headword)
       notFound = false
       selectedPartsOfSpeech = Set(info.partsOfSpeech)
       // 抽象は翻訳の失敗を返せないため、「英例文はあるのに訳が空」を失敗とみなす
@@ -192,10 +197,17 @@ final class WordRegistrationModel {
     }
   }
 
+  /// 「もしかして」の候補を押した。英単語をその語にして、自動入力をやり直す。
+  func applySpellingSuggestion(_ suggestion: String) async {
+    word = suggestion
+    await autoFill()
+  }
+
   /// ステップ 1 の「スキップして手動で入力する」(空のフォームへ)。
   func skipToManual() {
     notFound = false
     replacedInput = nil
+    spellingSuggestions = []
     translationFailed = false
     error = nil
     registeredWord = nil
@@ -208,6 +220,7 @@ final class WordRegistrationModel {
     fetched = nil
     notFound = false
     replacedInput = nil
+    spellingSuggestions = []
     translationFailed = false
     error = nil
     selectedPartsOfSpeech = []

@@ -28,6 +28,21 @@ struct PrebuiltDictionaryTests {
     #expect(await PrebuiltDictionary.bundled.lookup("serendipity", language: .ja) == nil)
   }
 
+  @Test("同梱の辞書から、綴りの誤りに近い見出しを近い順に返す")
+  func bundledNearestHeadwords() async {
+    #expect(await PrebuiltDictionary.bundled.nearestHeadwords(to: "acommodate", limit: 3).first == "accommodate")
+    #expect(await PrebuiltDictionary.bundled.nearestHeadwords(to: "recieve", limit: 3).first == "receive")
+    #expect(await PrebuiltDictionary.bundled.contains("give up"))
+  }
+
+  @Test("編集距離は隣り合う 2 文字の入れ替えを 1 と数える")
+  func editDistance() {
+    #expect(PrebuiltDictionary.editDistance(Array("recieve"), Array("receive")) == 1)
+    #expect(PrebuiltDictionary.editDistance(Array("acommodate"), Array("accommodate")) == 1)
+    #expect(PrebuiltDictionary.editDistance(Array("cat"), Array("dog")) == 3)
+    #expect(PrebuiltDictionary.editDistance(Array(""), Array("ab")) == 2)
+  }
+
   @Test("訳を持たない言語では辞書を読み込まない")
   func notCoveredDoesNotLoad() async {
     let dictionary = PrebuiltDictionary {

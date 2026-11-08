@@ -116,5 +116,7 @@ struct WordFormMatcherTests {
   func normalizesHeadword() {
     #expect(normalizeHeadword("  give   up \n") == "give up")
     #expect(normalizeHeadword("apple") == "apple")
+    #expect(normalizeHeadword("keep one’s word") == "keep one's word")
+    #expect(normalizeHeadword("‘cause") == "'cause")
   }
 }

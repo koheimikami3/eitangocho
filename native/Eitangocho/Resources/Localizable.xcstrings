@@ -2680,37 +2680,37 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter manually"
+            "value" : "Type here"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escribe manualmente"
+            "value" : "Escribe aquí"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisie manuelle"
+            "value" : "Saisir ici"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "手動で入力してください"
+            "value" : "入力してください"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "직접 입력해 주세요"
+            "value" : "입력해 주세요"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請手動輸入"
+            "value" : "請輸入"
           }
         }
       }
@@ -3454,6 +3454,48 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "字典中找不到音標和例句（只自動填入翻譯）"
+          }
+        }
+      }
+    },
+    "noticeSpellingSuggestion" : {
+      "comment" : "自動入力の後、綴りを誤ったとみられる入力に正しい綴りの候補を出す帯の見出し。後ろに候補の語のボタンが並ぶ",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Did you mean:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quisiste decir?:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vouliez-vous dire :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もしかして:"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "혹시 이 단어인가요?"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您是不是要找:"
           }
         }
       }

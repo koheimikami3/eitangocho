@@ -52,7 +52,22 @@ private let prebuiltFixture = """
   "ko":{"meaning":"포기하다 / 그만두다","exampleTranslation":"해 보기도 전에 포기하지 마."}},\
   "run":{"ipa":"/ɹʌn/","pos":["verb","noun"],"exampleEn":"I run in the park every morning.",\
   "ja":{"meaning":"走る / …を経営する","exampleTranslation":"私は毎朝公園を走る。"},\
-  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}}}}
+  "zhHant":{"meaning":"跑 / 經營","exampleTranslation":"我每天早上在公園跑步。"}},\
+  "ping-pong":{"ipa":"/ˈpɪŋ ˌpɔŋ/","pos":["noun"],"exampleEn":"We played ping-pong after school.",\
+  "ja":{"meaning":"卓球","exampleTranslation":"放課後に卓球をした。"},\
+  "zhHant":{"meaning":"乒乓球","exampleTranslation":"我們放學後打了乒乓球。"}},\
+  "email":{"ipa":"/ˈiˌmeɪl/","pos":["noun","verb"],"exampleEn":"I sent her an email this morning.",\
+  "ja":{"meaning":"電子メール","exampleTranslation":"今朝、彼女にメールを送った。"},\
+  "zhHant":{"meaning":"電子郵件","exampleTranslation":"我今天早上寄了一封電子郵件給她。"}},\
+  "go to":{"ipa":"/ˈɡoʊ tu/","pos":["verb"],"exampleEn":"We go to the beach every summer.",\
+  "ja":{"meaning":"…へ行く","exampleTranslation":"私たちは毎年夏に海へ行く。"},\
+  "zhHant":{"meaning":"去……","exampleTranslation":"我們每年夏天都去海邊。"}},\
+  "keep one's word":{"ipa":"","pos":["verb"],"exampleEn":"She kept her word and came back on time.",\
+  "ja":{"meaning":"約束を守る","exampleTranslation":"彼女は約束を守って時間どおりに戻ってきた。"},\
+  "zhHant":{"meaning":"守信","exampleTranslation":"她守信準時回來了。"}},\
+  "potato chips":{"ipa":"","pos":["noun"],"exampleEn":"We bought potato chips for the party.",\
+  "ja":{"meaning":"ポテトチップス","exampleTranslation":"パーティー用にポテトチップスを買った。"},\
+  "zhHant":{"meaning":"洋芋片","exampleTranslation":"我們買了洋芋片要在派對上吃。"}}}}
   """
 
 /// `ran` の実レスポンスから語義の形だけ抜き出したもの。活用形の語義は run と rin(古語)を指し、
@@ -195,6 +210,95 @@ struct DictionaryWordInfoProviderTests {
   func unreadablePrebuiltDictionary() async throws {
     let provider = makeProvider(prebuilt: .init { Data("broken".utf8) }, kaikki: ok(giveUpJsonl))
     #expect(try await provider.fetch("give up")?.meaning == "降服する / 諦める / やめる")
+  }
+
+  @Test("空白とハイフンの書き方違いでも事前生成辞書を引き、見出しは入力のまま返す")
+  func prebuiltDictionarySpellingVariants() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    let pingPong = try #require(try await provider.fetch("ping pong"))
+    #expect(pingPong.word == "ping pong")
+    #expect(pingPong.meaning == "卓球")
+    #expect(try await provider.fetch("e-mail")?.meaning == "電子メール")
+    #expect(kaikkiCalls.count == 0)
+  }
+
+  @Test("ハイフンを空白にした綴りでは引かない(go-to が go to に当たらない)")
+  func prebuiltDictionaryDoesNotSplitHyphen() async throws {
+    let info = try await makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }).fetch("go-to")
+
+    #expect(info?.meaning != "…へ行く")
+  }
+
+  @Test("丸い引用符・代名詞・記号・単数で入力しても、辞書の句の書き方で引き、見出しは入力のまま返す")
+  func prebuiltDictionaryPhraseVariants() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    #expect(try await provider.fetch("Keep One’s Word")?.meaning == "約束を守る")
+    let keepMyWord = try #require(try await provider.fetch("keep my word"))
+    #expect(keepMyWord.word == "keep my word")
+    #expect(keepMyWord.meaning == "約束を守る")
+    #expect(try await provider.fetch("keep sb's word")?.meaning == "約束を守る")
+    #expect(try await provider.fetch("potato chip")?.meaning == "ポテトチップス")
+  }
+
+  @Test("代名詞・記号の読み替えは、辞書の句の書き方に替えた候補を替えた語が少ない順に返す")
+  func placeholderVariants() {
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "put ~ in perspective")
+      == ["put something in perspective", "put someone in perspective"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "keep my word") == ["keep one's word", "keep someone's word"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "behave yourself") == ["behave oneself"])
+    #expect(DictionaryWordInfoProvider.placeholderVariants(of: "apple").isEmpty)
+  }
+
+  @Test("単数・複数の読み替えは、句の末尾の語だけを入れ替える")
+  func pluralVariants() {
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "potato chip") == ["potato chips"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "onion rings") == ["onion ring"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "pencil box") == ["pencil boxes"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "jelly candies") == ["jelly candy"])
+    #expect(DictionaryWordInfoProvider.pluralVariants(of: "kidney") == [])
+  }
+
+  @Test("kaikki が綴りの誤りとして記録した語は、正しい綴りを候補に返す(キャッシュに alt_of が残る)")
+  func spellingSuggestionsFromKaikkiMisspelling() async throws {
+    let independant = """
+      {"word":"independant","pos":"adj","senses":[\
+      {"glosses":["Obsolete form of independent."],"tags":["alt-of","obsolete"],"alt_of":[{"word":"independent"}]},\
+      {"glosses":["Misspelling of independent."],"tags":["alt-of","misspelling"],"alt_of":[{"word":"independent"}]}]}
+      """
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(independant))
+
+    _ = try await provider.fetch("independant")
+
+    #expect(await provider.spellingSuggestions(for: "independant") == ["independent"])
+    #expect(kaikkiCalls.count == 1)
+  }
+
+  @Test("kaikki に普通の語義がある語・事前生成辞書に当たる語には、綴りの候補を出さない")
+  func noSpellingSuggestionsForRealWords() async throws {
+    let loose = """
+      {"word":"loose","pos":"adj","senses":[{"glosses":["Not fixed in place."],"tags":[]},\
+      {"glosses":["Misspelling of lose."],"tags":["alt-of","misspelling"],"alt_of":[{"word":"lose"}]}]}
+      """
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(loose))
+    _ = try await provider.fetch("loose")
+
+    #expect(await provider.spellingSuggestions(for: "loose").isEmpty)
+    #expect(await provider.spellingSuggestions(for: "ping pong").isEmpty)
+  }
+
+  @Test("kaikki にも EJDict にも無い 1 語は、事前生成辞書の綴りが近い見出しを候補に返す")
+  func spellingSuggestionsFromNearHeadwords() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    #expect(await provider.spellingSuggestions(for: "emial") == ["email"])
+    // 句と短すぎる語は近い綴りを探さない
+    #expect(await provider.spellingSuggestions(for: "potato chipz").isEmpty)
+    #expect(await provider.spellingSuggestions(for: "rnu").isEmpty)
+    // EJDict に見出しがある語は誤りとみなさない
+    try await seedEjdict(["emial": "(テスト用の見出し)"])
+    #expect(await provider.spellingSuggestions(for: "emial").isEmpty)
   }
 
   @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")

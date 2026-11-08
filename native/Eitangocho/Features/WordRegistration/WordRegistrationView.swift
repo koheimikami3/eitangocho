@@ -70,8 +70,15 @@ struct WordRegistrationView: View {
         DictionaryWarningBanner(message: baseFormNotice)
         Spacer().frame(height: px(16))
       }
-      if let notice = model.notice {
-        DictionaryWarningBanner(message: noticeText(notice, language))
+      // 綴りの候補があれば、辞書の注意と同じ帯にまとめて出す。
+      let noticeMessage = model.notice.map { noticeText($0, language) }
+      if !model.spellingSuggestions.isEmpty {
+        SpellingSuggestionBanner(message: noticeMessage, suggestions: model.spellingSuggestions) { suggestion in
+          Task { await model.applySpellingSuggestion(suggestion) }
+        }
+        Spacer().frame(height: px(16))
+      } else if let noticeMessage {
+        DictionaryWarningBanner(message: noticeMessage)
         Spacer().frame(height: px(16))
       }
       // iOS の登録シートと同じく、辞書の警告と同じバナーで出す。

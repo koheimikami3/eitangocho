@@ -73,4 +73,12 @@ public struct WordInfoError: Error, Sendable, CustomStringConvertible {
 public protocol WordInfoProvider: Sendable {
   /// 辞書に未収録の場合は nil を返す。ネットワーク等の失敗は WordInfoError を投げる。
   func fetch(_ word: String) async throws -> WordInfo?
+
+  /// 綴りを誤ったとみられる語の、正しい綴りの候補(無ければ空)。fetch の後に呼ぶ。
+  /// 置き換えはせず、登録画面で「もしかして」として出す(造語や固有名詞を壊さないため)。
+  func spellingSuggestions(for word: String) async -> [String]
+}
+
+extension WordInfoProvider {
+  public func spellingSuggestions(for word: String) async -> [String] { [] }
 }

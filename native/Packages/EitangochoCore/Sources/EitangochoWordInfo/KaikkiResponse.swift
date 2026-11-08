@@ -101,24 +101,30 @@ public struct KaikkiTranslation: Codable, Equatable, Sendable {
 /// ように上位から並ぶ(最後がこの語義そのもの)。tags は `obsolete` /
 /// `archaic` / `form-of` などの注記で、英語の語義を選ぶときの除外に使う。
 /// formOf は活用形の語義(`simple past of run`)が指す原形で、事前生成辞書の見出しに寄せるのに使う。
+/// altOf は綴り違いの語義が指す語で、`misspelling` の語義(`Misspelling of independent`)なら正しい綴り。
+/// 登録画面で綴りの候補を出すのに使う。
 public struct KaikkiSense: Codable, Equatable, Sendable {
   public var glosses: [String]
   public var tags: [String]
   public var examples: [KaikkiExample]
   public var formOf: [KaikkiFormOf]
+  public var altOf: [KaikkiFormOf]
 
   enum CodingKeys: String, CodingKey {
     case glosses, tags, examples
     case formOf = "form_of"
+    case altOf = "alt_of"
   }
 
   public init(
-    glosses: [String] = [], tags: [String] = [], examples: [KaikkiExample] = [], formOf: [KaikkiFormOf] = []
+    glosses: [String] = [], tags: [String] = [], examples: [KaikkiExample] = [], formOf: [KaikkiFormOf] = [],
+    altOf: [KaikkiFormOf] = []
   ) {
     self.glosses = glosses
     self.tags = tags
     self.examples = examples
     self.formOf = formOf
+    self.altOf = altOf
   }
 
   public init(from decoder: any Decoder) throws {
@@ -127,15 +133,18 @@ public struct KaikkiSense: Codable, Equatable, Sendable {
     tags = container.lenientList(String.self, .tags)
     examples = container.lenientList(KaikkiExample.self, .examples)
     formOf = container.lenientList(KaikkiFormOf.self, .formOf)
+    altOf = container.lenientList(KaikkiFormOf.self, .altOf)
   }
 
-  /// 活用形の語義を持たない語義(大半)ではキャッシュに `form_of` を書かない(キャッシュを膨らませないため)。
+  /// 活用形・綴り違いの語義を持たない語義(大半)ではキャッシュに `form_of`・`alt_of` を書かない
+  /// (キャッシュを膨らませないため)。
   public func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(glosses, forKey: .glosses)
     try container.encode(tags, forKey: .tags)
     try container.encode(examples, forKey: .examples)
     if !formOf.isEmpty { try container.encode(formOf, forKey: .formOf) }
+    if !altOf.isEmpty { try container.encode(altOf, forKey: .altOf) }
   }
 }
 

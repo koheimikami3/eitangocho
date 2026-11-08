@@ -1,0 +1,313 @@
+# Claude の判断で足した句 309 語。分野の順。
+# 範囲: 既存の単語リストと同梱辞書に無く、語彙表や頻度の基準で漏れたが、学習者が意味を調べそうな句。
+#   仕事・会議、日常の動作、感情・状態、考え・判断、会話・あいさつ、よくある慣用句、句動詞の分野ごとに考えて選んだ。
+sign up for
+cut back on
+reach out to
+get in touch with
+keep in touch with
+be on leave
+take a day off
+work overtime
+work from home
+meet a deadline
+miss a deadline
+make an appointment
+make a reservation
+make a presentation
+give a presentation
+make a profit
+make progress
+do research
+go out of business
+on business
+behind schedule
+out of print
+at a discount
+in cash
+in bulk
+under pressure
+in conclusion
+in summary
+in response to
+in compliance with
+with reference to
+as per
+subject to
+by the end of
+no later than
+in the short term
+at any time
+at worst
+at the end of
+at the beginning of
+at the earliest
+take a look at
+take a photo
+take a trip
+take a rest
+take medicine
+have a cold
+have a fever
+have a headache
+have difficulty
+have trouble
+go shopping
+go swimming
+go fishing
+go camping
+go jogging
+go hiking
+go skiing
+go for a walk
+go for a drive
+go on a date
+go on a diet
+go out for dinner
+get a job
+get a haircut
+get out of bed
+get worse
+get well soon
+make a wish
+make a promise
+keep a promise
+tell a lie
+tell a joke
+change clothes
+save money
+be in a hurry
+be in trouble
+be in danger
+be in a good mood
+be in a bad mood
+be out of breath
+be out of town
+be on time
+be on vacation
+be on a diet
+be at risk
+be sure of
+be disappointed in
+be shocked at
+be delighted with
+be frightened of
+be concerned with
+be occupied with
+be crowded with
+be packed with
+be lined with
+be made up of
+be keen to
+be meant for
+be in the way
+be on one's way
+feel free to
+feel at home
+feel better
+feel sick
+feel good
+feel guilty
+sound good
+sound like
+smell like
+taste like
+seem like
+stay calm
+keep calm
+keep still
+stay healthy
+stay awake
+stay home
+stay in touch
+stay out of
+come to a conclusion
+reach a conclusion
+reach an agreement
+come to an agreement
+make a choice
+make a judgment
+make a guess
+take it for granted
+take it seriously
+think ahead
+think positively
+think outside the box
+on second thought
+to my knowledge
+to a certain extent
+to a great extent
+to my surprise
+to one's surprise
+as a consequence
+as expected
+not only but also
+not always
+in the beginning
+for a long time
+for this reason
+by then
+better and better
+worse and worse
+so far so good
+now and again
+year after year
+time after time
+all year round
+in a moment
+in a second
+right after
+right before
+just a moment
+how's it going
+how do you do
+nice to see you
+good to see you
+see you again
+have a nice day
+have a good day
+have a good one
+i see
+you're kidding
+are you kidding
+are you sure
+don't mention it
+of course not
+sounds good
+that's too bad
+that's a shame
+it's up to you
+it's your turn
+it's on me
+here you go
+what's wrong
+what do you think
+what a shame
+what a pity
+how about you
+would you mind
+would you like
+let's see
+let me know
+let me think
+i wish
+can i help you
+may i help you
+wait a second
+welcome home
+sorry to hear that
+happy new year
+merry christmas
+good for you
+lucky you
+me neither
+so do i
+so am i
+neither do i
+you too
+same here
+same to you
+as you can see
+i mean
+i guess
+i bet
+sure enough
+a piece of cake
+hit the books
+hit the sack
+cost an arm and a leg
+the last straw
+a blessing in disguise
+a dime a dozen
+bite the bullet
+burn the midnight oil
+get out of hand
+get the ball rolling
+give it a try
+give it a shot
+go the extra mile
+lose touch with
+miss the boat
+on the ball
+play it by ear
+take a rain check
+the ball is in your court
+the best of both worlds
+the elephant in the room
+twist of fate
+wake-up call
+a drop in the ocean
+a drop in the bucket
+back to the drawing board
+better late than never
+bring home the bacon
+close call
+come rain or shine
+every cloud has a silver lining
+go down the drain
+have a sweet tooth
+have butterflies in one's stomach
+high and dry
+in hot water
+keep a straight face
+know the ropes
+let off steam
+make waves
+nip in the bud
+no pain no gain
+pay through the nose
+pass the buck
+put all one's eggs in one basket
+second nature
+set in stone
+sleep on it
+step up to the plate
+stick to one's guns
+take a back seat
+take the plunge
+the bottom line
+the whole nine yards
+under one's nose
+up to one's neck
+water under the bridge
+when pigs fly
+word of mouth
+worth one's salt
+you can say that again
+boil down to
+cheer on
+come up against
+head for
+hold on to
+opt for
+opt out
+play down
+point to
+pull apart
+tell apart
+zoom out
+# 利用者の単語帳で辞書に無かった句(2026-11-08)
+that said
+a world of
+a string of
+so much so that
+the gist of
+follow through on
+in light of
+the better part of
+stand behind
+be up for
+put two and two together
+a raft of
+course through
+a heck of
+to a degree
+turn heads
+in time with
+a slew of
+rev up
+put something in perspective
+double down on
+belt out
+lace with
+be versed in

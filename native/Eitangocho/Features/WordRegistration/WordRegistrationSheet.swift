@@ -10,15 +10,15 @@
   struct WordRegistrationSheet: View {
     let settings: SettingsStore
     let dismiss: () -> Void
-    /// 保存してシートを閉じた後に呼ぶ(Pro の案内など、閉じた後に重ねるもの)。
-    let onRegistered: () -> Void
+    /// 保存してシートを閉じた後に、登録した見出し語を渡して呼ぶ(カードの演出・Pro の案内など、閉じた後に重ねるもの)。
+    let onRegistered: (String) -> Void
 
     @Environment(\.palette) private var palette
     @State private var model: WordRegistrationModel
 
     init(
       settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger,
-      review: ReviewPrompter, dismiss: @escaping () -> Void, onRegistered: @escaping () -> Void = {}
+      review: ReviewPrompter, dismiss: @escaping () -> Void, onRegistered: @escaping (String) -> Void = { _ in }
     ) {
       self.settings = settings
       self.dismiss = dismiss
@@ -54,7 +54,8 @@
       return VStack(spacing: 0) {
         switch model.step {
         case .input: inputStep(language)
-        case .loading: loadingStep
+        // 入力のステップと同じ高さに重ねて出す。高さが変わると下のレクタングル広告が上下に動くため。
+        case .loading: inputStep(language).hidden().overlay { loadingStep }
         case .form: formStep(language)
         }
         // 入力から読み込み中へ進んでも読み込み直さないよう、段階の切り替えの外に 1 つだけ置く。
@@ -71,9 +72,11 @@
     /// macOS 版は登録の画面に留まるが、iOS はシートを閉じるだけでよい(背後の一覧は WordStore が更新する)。
     private func save() {
       Task {
+        // 保存では見出し語を正規化して書くので、一覧の単語と突き合わせられるよう同じ形にして渡す。
+        let headword = normalizeHeadword(model.word)
         if await model.save() {
           dismiss()
-          onRegistered()
+          onRegistered(headword)
         }
       }
     }
@@ -86,12 +89,15 @@
       VStack(alignment: .leading, spacing: 16) {
         AppText(language.registrationIntro, style: AppTextStyle(size: 12, height: 1.6))
           .foregroundStyle(palette.textAlpha(50))
-        MobileLabeledField(
-          label: String(localized: .fieldWord), text: $model.word, hint: "apple", asciiKeyboard: true,
-          correction: false, onSubmit: autoFill)
-        MobileFilledButton(
-          label: String(localized: .autoFill), padding: EdgeInsets(top: 13, leading: 13, bottom: 13, trailing: 13),
-          cornerRadius: 11, expands: true, action: autoFill)
+        // 「自動入力」はすぐ上の欄に入れた語に働くボタンなので、欄との間を他より詰めて組に見せる。
+        VStack(spacing: 12) {
+          MobileLabeledField(
+            label: String(localized: .fieldWord), text: $model.word, hint: "apple", asciiKeyboard: true,
+            correction: false, onSubmit: autoFill)
+          MobileFilledButton(
+            label: String(localized: .autoFill), padding: EdgeInsets(top: 13, leading: 13, bottom: 13, trailing: 13),
+            cornerRadius: 11, expands: true, action: autoFill)
+        }
         if let errorMessage = errorText(language) {
           AppText(errorMessage, style: AppTextStyle(size: 12))
             .foregroundStyle(palette.danger)
@@ -104,6 +110,8 @@
             .frame(maxWidth: .infinity)
         }
       }
+      // 見出しの下からの余白を、フォームの最初の項目(MobileFormRows の上の余白)とそろえる。
+      .padding(.top, 12)
     }
 
     private func autoFill() {
@@ -116,8 +124,7 @@
         AppText(.fetchingDictionary, style: AppTextStyle(size: 13))
           .foregroundStyle(palette.textAlpha(50))
       }
-      .frame(maxWidth: .infinity)
-      .padding(.vertical, 80)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func formStep(_ language: TranslationLanguage) -> some View {
@@ -128,8 +135,15 @@
           MobileRegistrationWarningBanner(message: baseFormNotice)
             .padding(.bottom, 14)
         }
-        if let notice = model.notice {
-          MobileRegistrationWarningBanner(message: RegistrationMessages.notice(notice, language: language))
+        // 綴りの候補があれば、辞書の注意と同じ帯にまとめて出す。
+        let noticeMessage = model.notice.map { RegistrationMessages.notice($0, language: language) }
+        if !model.spellingSuggestions.isEmpty {
+          MobileSpellingSuggestionBanner(message: noticeMessage, suggestions: model.spellingSuggestions) { suggestion in
+            Task { await model.applySpellingSuggestion(suggestion) }
+          }
+          .padding(.bottom, 14)
+        } else if let noticeMessage {
+          MobileRegistrationWarningBanner(message: noticeMessage)
             .padding(.bottom, 14)
         }
         if model.translationFailed {
@@ -137,10 +151,16 @@
             .padding(.bottom, 14)
         }
         MobileFormRows {
-          MobileLabeledField(
-            label: String(localized: .fieldWord), text: $model.word, asciiKeyboard: true, correction: false)
-          // IPA は ASCII ではないので英字キーボードにしない。
-          MobileLabeledField(label: String(localized: .fieldIpa), text: $model.ipa, autoFilled: model.showsBadge(.ipa))
+          // macOS 版と同じく単語と IPA を 1 行に並べる。長い句・IPA は折り返さず欄の中で横に流す
+          // (欄の高さをそろえ、下の欄の位置を動かさないため)。
+          HStack(alignment: .top, spacing: 14) {
+            MobileLabeledField(
+              label: String(localized: .fieldWord), text: $model.word, asciiKeyboard: true, correction: false)
+              .frame(maxWidth: .infinity)
+            // IPA は ASCII ではないので英字キーボードにしない。
+            MobileLabeledField(label: String(localized: .fieldIpa), text: $model.ipa, autoFilled: model.showsBadge(.ipa))
+              .frame(maxWidth: .infinity)
+          }
           MobileLabeledField(
             label: String(localized: language.meaningFieldLabel), text: $model.meaning, lineLimit: 1...Int.max,
             autoFilled: model.showsBadge(.meaning))
