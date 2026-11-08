@@ -10,16 +10,19 @@
   struct WordRegistrationSheet: View {
     let settings: SettingsStore
     let dismiss: () -> Void
+    /// 保存してシートを閉じた後に呼ぶ(Pro の案内など、閉じた後に重ねるもの)。
+    let onRegistered: () -> Void
 
     @Environment(\.palette) private var palette
     @State private var model: WordRegistrationModel
 
     init(
       settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger,
-      review: ReviewPrompter, dismiss: @escaping () -> Void
+      review: ReviewPrompter, dismiss: @escaping () -> Void, onRegistered: @escaping () -> Void = {}
     ) {
       self.settings = settings
       self.dismiss = dismiss
+      self.onRegistered = onRegistered
       _model = State(
         initialValue: WordRegistrationModel(
           dao: dao, wordInfo: wordInfo, analytics: analytics, review: review, resetsAfterSave: false
@@ -69,7 +72,10 @@
     /// macOS 版は登録の画面に留まるが、iOS はシートを閉じるだけでよい(背後の一覧は WordStore が更新する)。
     private func save() {
       Task {
-        if await model.save() { dismiss() }
+        if await model.save() {
+          dismiss()
+          onRegistered()
+        }
       }
     }
 
