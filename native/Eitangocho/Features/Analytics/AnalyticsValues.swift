@@ -45,8 +45,10 @@ enum ProPurchaseStage: String, Sendable {
 enum ProPurchaseSource: String, Sendable {
   /// 設定画面の Pro の欄。
   case settings
-  /// テーマカラーの鍵の案内(MobileThemeColorLockedDialog)。
+  /// テーマカラーの鍵の案内(MobileProOfferDialog)。
   case themeColor
+  /// 登録単語数が一定を超えた人に保存直後に 1 回だけ出す案内(ProPrompter)。
+  case proPrompt
 }
 
 /// レビュー依頼を出した契機(review_requested の trigger)。

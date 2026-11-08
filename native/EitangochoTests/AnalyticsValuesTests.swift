@@ -50,6 +50,7 @@ struct AnalyticsValuesTests {
   @Test func enumの名前と画面名はsnake_caseにする() {
     #expect(snakeCase(WordSortOrder.reverseAlphabetical.rawValue) == "reverse_alphabetical")
     #expect(snakeCase(LearningCardLayout.twoColumns.rawValue) == "two_columns")
+    #expect(snakeCase(ProPurchaseSource.proPrompt.rawValue) == "pro_prompt")
     #expect(screenName(.allWords) == "all_words")
     #expect(screenName(.learning) == "learning")
   }

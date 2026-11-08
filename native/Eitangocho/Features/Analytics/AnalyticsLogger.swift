@@ -145,6 +145,13 @@ struct AnalyticsLogger {
     log("theme_color_locked_tapped")
   }
 
+  /// 登録単語数が一定を超えた人に Pro の案内を出した(iOS だけ。ProPrompter)。pro_purchase の source=pro_prompt と
+  /// 並べて、出した人のうち購入まで進む人の割合を見る(案内を続けるか・出し直すかの判断用)。
+  /// 出し直したときもイベント名は変えず、日付で分ける。
+  func logProPromptShown() {
+    log("pro_prompt_shown")
+  }
+
   /// クイズ結果の広告の下にある Pro への導線を押した(iOS だけ。Phase 6 で呼ぶ)。導線を残すか外すかの
   /// 判断に使う(pro_purchase と並べて、導線経由で購入まで進む人がいるかを見る)。
   func logProLinkTapped() {

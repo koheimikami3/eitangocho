@@ -133,7 +133,21 @@
       model.overlay.presentSheet { [model, session] dismiss in
         WordRegistrationSheet(
           settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
-          analytics: model.analytics, review: session.review, dismiss: dismiss)
+          analytics: model.analytics, review: session.review, dismiss: dismiss,
+          onRegistered: { offerProIfNeeded() })
+      }
+    }
+
+    /// 登録の保存直後に、条件を満たせば Pro の案内を 1 回だけ出す(条件は ProPrompter)。
+    /// ほかのシート・ダイアログが出ていれば出さず、次の登録に回す。
+    private func offerProIfNeeded() {
+      Task { [model, session] in
+        await session.proPrompter.onWordRegistered {
+          let overlay = model.overlay
+          guard overlay.sheet == nil, overlay.dialogs.isEmpty, overlay.pages.isEmpty else { return false }
+          MobileProOfferDialog.present(purchase: model.purchase, source: .proPrompt, overlay: overlay)
+          return true
+        }
       }
     }
 
