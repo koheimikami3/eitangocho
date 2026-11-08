@@ -7,13 +7,16 @@
   /// iOS 18 はガラスが無いので、同じ大きさの丸で代える(2026-10-31 に決めた案 A):
   /// `prominent` は主ボタンと同じグラデーションと影、そうでなければ面の色の丸をカードと同じ影で浮かせる。
   struct MobileGlassCircleButton: View {
-    let systemName: String
+    /// SF Symbols の絵柄の名前。`customIcon` を渡すときは使わない。
+    var systemName = ""
     /// 読み上げの名前(アイコンだけで文字が無いため)。
     let accessibilityLabel: String
     var iconSize: CGFloat = 17
     var prominent = false
     /// 同じ GlassEffectContainer の別のガラスへ形を変えて移るときの ID(ヘッダの 🔍 が検索欄に伸びる)。
     var glassID: MobileGlassID?
+    /// SF Symbols に無い絵柄(シートの見出しの 🔖)。渡せば `systemName` の代わりに出す。
+    var customIcon: AnyView?
     let action: () -> Void
 
     @Environment(\.palette) private var palette
@@ -47,9 +50,15 @@
     }
 
     private var icon: some View {
-      Image(systemName: systemName)
-        .font(.system(size: iconSize, weight: .semibold))
-        .foregroundStyle(prominent ? .white : palette.text)
+      Group {
+        if let customIcon {
+          customIcon
+        } else {
+          Image(systemName: systemName)
+            .font(.system(size: iconSize, weight: .semibold))
+            .foregroundStyle(prominent ? .white : palette.text)
+        }
+      }
         .frame(width: Self.diameter, height: Self.diameter)
         .contentShape(Circle())
         .accessibilityLabel(Text(verbatim: accessibilityLabel))

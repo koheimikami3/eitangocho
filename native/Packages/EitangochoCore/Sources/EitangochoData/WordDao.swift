@@ -11,6 +11,8 @@ public struct NewWord: Sendable {
   public var exampleTranslation: String
   public var translationLanguage: String
   public var audioUrl: String
+  /// 登録と同時に入れるグループ(登録シートでブックマークを付けたとき)。
+  public var groupIds: [String]
 
   public init(
     word: String,
@@ -20,7 +22,8 @@ public struct NewWord: Sendable {
     exampleEn: String = "",
     exampleTranslation: String = "",
     translationLanguage: String = "ja",
-    audioUrl: String = ""
+    audioUrl: String = "",
+    groupIds: [String] = []
   ) {
     self.word = word
     self.meaning = meaning
@@ -30,6 +33,7 @@ public struct NewWord: Sendable {
     self.exampleTranslation = exampleTranslation
     self.translationLanguage = translationLanguage
     self.audioUrl = audioUrl
+    self.groupIds = groupIds
   }
 }
 
@@ -78,7 +82,7 @@ public struct ImportedWord: Sendable {
   public var createdAt: Date
   public var updatedAt: Date
   /// 属するグループ。nil はファイルにキーが無かった(グループを知らない版が書いた)ことを表し、
-  /// 上書きでもこちらのグループを残す(Flutter 版の端末で編集した単語の ★ を消さないため)。
+  /// 上書きでもこちらのグループを残す(Flutter 版の端末で編集した単語の 🔖 を消さないため)。
   public var groupIds: [String]?
 
   public init(
@@ -183,13 +187,13 @@ public struct WordDao: Sendable {
       try db.execute(
         sql: """
           INSERT INTO words (word, ipa, japanese, parts_of_speech, example_en, example_ja,
-                             translation_language, audio_url, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             translation_language, audio_url, created_at, updated_at, group_ids)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           """,
         arguments: [
           new.word, new.ipa, new.meaning, PartOfSpeech.encodeList(new.partsOfSpeech),
           new.exampleEn, new.exampleTranslation, new.translationLanguage, new.audioUrl,
-          timestamp, timestamp,
+          timestamp, timestamp, WordGroup.encodeIds(new.groupIds),
         ])
       let id = db.lastInsertedRowID
       try Self.clearDeletion(db, word: new.word)
@@ -263,14 +267,14 @@ public struct WordDao: Sendable {
     }
   }
 
-  /// お気に入りを付け外しする。`setLearned` と同じく updatedAt を進める(同期で他の端末へ伝えるため)。
+  /// ブックマークを付け外しする。`setLearned` と同じく updatedAt を進める(同期で他の端末へ伝えるため)。
   /// ほかのグループの ID はそのまま残す。
-  public func setFavorite(id: Int64, _ isFavorite: Bool, now: Date = .now) async throws {
+  public func setBookmarked(id: Int64, _ isBookmarked: Bool, now: Date = .now) async throws {
     try await writer.write { db in
       guard let csv = try String.fetchOne(db, sql: "SELECT group_ids FROM words WHERE id = ?", arguments: [id])
       else { return }
-      var ids = WordGroup.decodeIds(csv).filter { $0 != WordGroup.favoriteID }
-      if isFavorite { ids.insert(WordGroup.favoriteID, at: 0) }
+      var ids = WordGroup.decodeIds(csv).filter { $0 != WordGroup.bookmarkID }
+      if isBookmarked { ids.insert(WordGroup.bookmarkID, at: 0) }
       try db.execute(
         sql: "UPDATE words SET group_ids = ?, updated_at = ? WHERE id = ?",
         arguments: [WordGroup.encodeIds(ids), DatabaseTimestamp.seconds(now), id])

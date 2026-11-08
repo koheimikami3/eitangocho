@@ -15,6 +15,9 @@
 
     let word: String
     let variant: Variant
+    /// アイコンのみの形のタップ領域の幅。左隣に別のボタンが並ぶとき(全単語の行の 🔖)は、
+    /// 丸の左の余白をその間の分だけに詰め、隣のボタンとタップ領域が重ならないようにする。
+    var iconTapWidth: CGFloat = minTapTarget
 
     @Environment(\.palette) private var palette
     @Environment(\.openPronunciation) private var openPronunciation
@@ -37,7 +40,7 @@
       }
     }
 
-    /// タップ領域は 44pt 幅 × 30pt 高。高さを 44pt にするとカードのフッタが間延びするので幅だけ広げる。
+    /// タップ領域は既定で 44pt 幅 × 30pt 高。高さを 44pt にするとカードのフッタが間延びするので幅だけ広げる。
     /// 円はタップ領域の右端に揃える(常に行やフッタの末尾に置かれるため、中央寄せだと左寄りに見える)。
     private var iconButton: some View {
       // 淡い青の地 + 青の細い縁のフラットな丸(地だけだと品詞バッジと同じ見た目になりボタンに見えない)。
@@ -45,7 +48,7 @@
         .frame(width: Self.circleDiameter, height: Self.circleDiameter)
         .background(Circle().fill(palette.accentSoft))
         .overlay(Circle().strokeBorder(palette.accentLine, lineWidth: 1))
-        .frame(width: Self.minTapTarget, height: Self.circleDiameter, alignment: .trailing)
+        .frame(width: iconTapWidth, height: Self.circleDiameter, alignment: .trailing)
     }
 
     private var pillButton: some View {

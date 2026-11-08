@@ -220,35 +220,35 @@ struct WordDaoTests {
     #expect(try await dao.getAll().first?.isLearned == false)
   }
 
-  @Test("setFavorite でお気に入りを付け外しし、updatedAt を進め、ほかのグループは残す")
-  func togglesFavorite() async throws {
+  @Test("setBookmarked でブックマークを付け外しし、updatedAt を進め、ほかのグループは残す")
+  func togglesBookmark() async throws {
     let created = Date(timeIntervalSince1970: 1_700_000_000)
     let id = try await dao.insertWord(apple(), now: created)
     try await database.writer.write { db in
       try db.execute(sql: "UPDATE words SET group_ids = 'future' WHERE id = ?", arguments: [id])
     }
 
-    let favorited = created.addingTimeInterval(60)
-    try await dao.setFavorite(id: id, true, now: favorited)
+    let bookmarked = created.addingTimeInterval(60)
+    try await dao.setBookmarked(id: id, true, now: bookmarked)
     var word = try #require(try await dao.getAll().first)
-    #expect(word.groupIds == ["favorite", "future"])
-    #expect(word.updatedAt == favorited)
+    #expect(word.groupIds == ["bookmark", "future"])
+    #expect(word.updatedAt == bookmarked)
 
-    try await dao.setFavorite(id: id, false, now: favorited.addingTimeInterval(60))
+    try await dao.setBookmarked(id: id, false, now: bookmarked.addingTimeInterval(60))
     word = try #require(try await dao.getAll().first)
     #expect(word.groupIds == ["future"])
-    #expect(!word.isFavorite)
+    #expect(!word.isBookmarked)
   }
 
-  @Test("編集してもお気に入りは外れない")
-  func editKeepsFavorite() async throws {
+  @Test("編集してもブックマークは外れない")
+  func editKeepsBookmark() async throws {
     let id = try await dao.insertWord(apple())
-    try await dao.setFavorite(id: id, true)
+    try await dao.setBookmarked(id: id, true)
 
     try await dao.updateWord(
       id: id, WordEdit(word: "apple", meaning: "林檎", ipa: "", partsOfSpeech: [], exampleEn: "", exampleTranslation: ""))
 
-    #expect(try await dao.getAll().first?.isFavorite == true)
+    #expect(try await dao.getAll().first?.isBookmarked == true)
   }
 
   @Test("recordQuizResult(knew: true) は correctCount+1・lastReviewedAt を付け、updatedAt は変えない")

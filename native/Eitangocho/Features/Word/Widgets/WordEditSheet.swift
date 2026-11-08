@@ -43,9 +43,16 @@
 
     var body: some View {
       let languageLabel = String(localized: language.shortLabel)
+      // ブックマークは「保存」を待たず、押した時点で書く(閉じたときに付いたか迷わないように)。
+      // 付け外しは一覧の値で見る(このシートが受け取った word は開いた時点の写しなので)。
+      let current = store.words.first { $0.id == word.id } ?? word
       MobileSheet(
         title: String(localized: .editWordTitle), leftLabel: String(localized: .cancel), onLeft: dismiss,
-        rightLabel: String(localized: .save), onRight: { Task { await save() } }
+        rightLabel: String(localized: .save), onRight: { Task { await save() } },
+        headerAccessory: AnyView(
+          MobileSheetBookmarkButton(isBookmarked: current.isBookmarked) { value in
+            Task { await store.setBookmarked(current, value, screen: .wordEdit) }
+          })
       ) {
         VStack(alignment: .leading, spacing: 0) {
           MobileFormRows {

@@ -50,10 +50,10 @@ final class AnalyticsReporter {
     setProperty("word_count_bucket", wordCountBucket(count))
   }
 
-  /// お気に入りの単語数(登録単語数と同じ区間)。お気に入りを使っている人の数と、付けている数の分布を見る。
+  /// ブックマークの単語数(登録単語数と同じ区間)。ブックマークを使っている人の数と、付けている数の分布を見る。
   /// 初回の読み込みが終わる前は呼ばない(0 語と区別がつかないため)。
-  func reportFavoriteCount(_ count: Int) {
-    setProperty("favorite_count_bucket", wordCountBucket(count))
+  func reportBookmarkCount(_ count: Int) {
+    setProperty("bookmark_count_bucket", wordCountBucket(count))
   }
 
   /// 同期の有効 / 無効。Flutter 版は保存値の復元を待ってから送るが、Swift 版の SyncController は

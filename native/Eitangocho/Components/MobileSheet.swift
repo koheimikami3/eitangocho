@@ -18,6 +18,8 @@
     /// 右上のアクション(保存など)。nil なら出さない。
     var rightLabel: String?
     var onRight: (() -> Void)?
+    /// 右上の主ボタンの左に並べる丸いボタン(登録・編集シートの 🔖)。nil なら出さない。
+    var headerAccessory: AnyView?
     /// 中身をスクロール領域に載せるか。フォームは true(既定)。
     /// WebView のように自前で高さいっぱいに広がるものは false にして、余白ごとシートの残り高を渡す。
     var scrollableBody = true
@@ -46,7 +48,7 @@
       VStack(spacing: 0) {
         MobileSheetHeader(
           title: title, titleFontSize: titleFontSize, showGrabber: showGrabber, leftLabel: leftLabel,
-          leftIcon: leftIcon, onLeft: onLeft, rightLabel: rightLabel, onRight: onRight)
+          leftIcon: leftIcon, onLeft: onLeft, rightLabel: rightLabel, onRight: onRight, accessory: headerAccessory)
         if scrollableBody {
           ScrollView {
             content()
@@ -78,11 +80,13 @@
     init(
       title: String, titleFontSize: CGFloat = 15, leftLabel: String, leftIcon: MobileSheetLeftIcon = .close,
       onLeft: @escaping () -> Void, rightLabel: String? = nil, onRight: (() -> Void)? = nil,
-      scrollableBody: Bool = true, showGrabber: Bool = true, @ViewBuilder content: @escaping () -> Content
+      headerAccessory: AnyView? = nil, scrollableBody: Bool = true, showGrabber: Bool = true,
+      @ViewBuilder content: @escaping () -> Content
     ) {
       self.init(
         title: title, titleFontSize: titleFontSize, leftLabel: leftLabel, leftIcon: leftIcon, onLeft: onLeft,
-        rightLabel: rightLabel, onRight: onRight, scrollableBody: scrollableBody, showGrabber: showGrabber,
+        rightLabel: rightLabel, onRight: onRight, headerAccessory: headerAccessory, scrollableBody: scrollableBody,
+        showGrabber: showGrabber,
         content: content, footer: { EmptyView() })
     }
   }
@@ -117,6 +121,8 @@
     var onLeft: (() -> Void)?
     var rightLabel: String?
     var onRight: (() -> Void)?
+    /// 右上の主ボタンの左に並べる丸いボタン。
+    var accessory: AnyView?
 
     @Environment(\.palette) private var palette
 
@@ -133,6 +139,10 @@
             }
             Spacer(minLength: 0)
             // 確定操作(登録・保存)は、何が起きるかが分かるよう ✓ の丸にせず文字のまま主ボタンにする。
+            if let accessory {
+              accessory
+              Spacer().frame(width: MobileHeaderButtons.spacing)
+            }
             if let rightLabel, let onRight {
               MobileGlassCapsuleButton(label: rightLabel, action: onRight)
             }
@@ -159,7 +169,7 @@
   }
 
   extension MobileSheetHeader {
-    private var hasButtons: Bool { leftLabel != nil || rightLabel != nil }
+    private var hasButtons: Bool { leftLabel != nil || rightLabel != nil || accessory != nil }
 
     /// タイトルの行の高さ。丸いボタン(44pt)があるときは上下に 6pt ずつ空ける。
     /// ボタンの無い並び替えのシートは Flutter 版の高さのまま。

@@ -59,6 +59,8 @@ final class WordRegistrationModel {
   private(set) var spellingSuggestions: [String] = []
   private(set) var selectedPartsOfSpeech: Set<PartOfSpeech> = []
   private(set) var error: RegistrationError?
+  /// 登録と同時にブックマークを付けるか(iOS の登録シートの見出しの 🔖)。登録し終えたら外す。
+  var bookmarked = false
   /// 直前に登録した単語。ステップ 1 に「登録しました」と出すために持つ。
   /// 次の単語の取得・手動入力に進んだら消す。
   private(set) var registeredWord: String?
@@ -266,7 +268,8 @@ final class WordRegistrationModel {
           translationLanguage: language.storageCode,
           // audioUrl はフォームに出さない。今の辞書は音声の URL を返さないため常に空になるが、
           // 経路だけ残している(docs/design.md)。
-          audioUrl: fetched?.audioUrl ?? ""
+          audioUrl: fetched?.audioUrl ?? "",
+          groupIds: bookmarked ? [WordGroup.bookmarkID] : []
         ))
     } catch {
       return false
@@ -279,6 +282,7 @@ final class WordRegistrationModel {
       editedMeaning: fetched.map { trim($0.meaning) != trimmedMeaning } ?? false,
       editedExample: fetched.map { trim($0.exampleEn) != trim(exampleEn) } ?? false,
       editedIpa: fetched.map { trim($0.ipa) != trim(ipa) } ?? false)
+    if bookmarked { analytics.logWordBookmarkToggled(isBookmarked: true, screen: .registration) }
     // 登録単語数の節目でのレビュー依頼(条件は ReviewPrompter が判定する)。依頼は
     // ReviewConfig.promptDelay だけ待ってから出る。成否は登録に関係しないので待たない。
     Task { [review] in await review.onWordRegistered() }
@@ -294,6 +298,7 @@ final class WordRegistrationModel {
     backToInput()
     word = ""
     registeredWord = nil
+    bookmarked = false
   }
 
   /// 既に登録済みの単語なら、エラーを立てて true を返す。

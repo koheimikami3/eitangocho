@@ -51,6 +51,18 @@ enum ProPurchaseSource: String, Sendable {
   case proPrompt
 }
 
+/// ブックマークを付け外しした場所(word_bookmark_toggled の screen)。
+enum BookmarkScreen: String, Sendable {
+  /// 学習中のカードの右クリックのメニュー(macOS)。
+  case learning
+  /// 全単語の行・表と、その右クリックのメニュー。
+  case allWords
+  /// 単語の編集シート・ダイアログ。
+  case wordEdit
+  /// 単語の登録シート(登録したときに付いていれば送る)。
+  case registration
+}
+
 /// レビュー依頼を出した契機(review_requested の trigger)。
 enum ReviewTrigger: String, Sendable {
   /// クイズを最後まで終えた直後。

@@ -9,7 +9,6 @@ struct WordCard: View {
   let showIpa: Bool
   let meaningLabel: String
   let onToggleLearned: (Bool) -> Void
-  let onToggleFavorite: (Bool) -> Void
   let onTap: () -> Void
   /// 右クリックのメニューを開く(押した位置を受け取る)。
   let onContextMenu: (CGPoint) -> Void
@@ -91,8 +90,6 @@ struct WordCard: View {
       // 箱の左端を区切り線・本文の左端に揃える。
       .offset(x: px(-6))
       Spacer(minLength: 0)
-      FavoriteButton(isFavorite: word.isFavorite, onToggle: onToggleFavorite)
-      Spacer().frame(width: px(4))
       PronunciationButton(word: word.word, variant: .cardPill)
     }
     .padding(.top, px(6 + 1))

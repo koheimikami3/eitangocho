@@ -56,7 +56,7 @@ struct ExportFile: Encodable {
     var correctCount = 0
     var createdAt: Date?
     var updatedAt: Date?
-    /// 属するグループの ID(お気に入りは `WordGroup.favoriteID`)。Swift 版の v9 で足した任意のキー。
+    /// 属するグループの ID(ブックマークは `WordGroup.bookmarkID`)。Swift 版の v9 で足した任意のキー。
     /// nil はキーが無い(グループを知らない Flutter 版などが書いた)ことを表し、取り込みではこちらのグループを残す。
     /// 形式の version は上げない(古い版はこのキーを無視して読める。docs/design.md「ネイティブ版への引き継ぎ」)。
     var groupIds: [String]?

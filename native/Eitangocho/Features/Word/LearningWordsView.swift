@@ -40,11 +40,10 @@ struct LearningWordsView: View {
       showIpa: settings.showIpa,
       meaningLabel: String(localized: language.showMeaningLabel),
       onToggleLearned: { value in Task { await store.setLearned(word, value) } },
-      onToggleFavorite: { value in Task { await store.setFavorite(word, value, view: .learning) } },
       onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
       onContextMenu: { position in
         WordContextMenu.show(
-          at: position, word: word, store: store, language: language, view: .learning, overlay: overlay,
+          at: position, word: word, store: store, language: language, screen: .learning, overlay: overlay,
           colors: colors)
       }
     )

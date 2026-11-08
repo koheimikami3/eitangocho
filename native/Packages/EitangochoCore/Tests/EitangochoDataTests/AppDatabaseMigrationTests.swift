@@ -130,12 +130,12 @@ struct AppDatabaseMigrationTests {
       try DriftSchemaFixtures.createV4(db, userVersion: 8)
       try db.execute(sql: #"ALTER TABLE "words" ADD COLUMN "group_ids" TEXT NOT NULL DEFAULT ''"#)
       try DriftSchemaFixtures.insertApple(db)
-      try db.execute(sql: "UPDATE words SET group_ids = 'favorite'")
+      try db.execute(sql: "UPDATE words SET group_ids = 'bookmark'")
     }
 
     let database = try AppDatabase(queue)
 
-    #expect(try words(database).first?.isFavorite == true)
+    #expect(try words(database).first?.isBookmarked == true)
   }
 
   @Test("v9 の DB は何も変えずに開く(辞書キャッシュも残る)")

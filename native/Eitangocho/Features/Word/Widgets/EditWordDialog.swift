@@ -74,8 +74,17 @@ struct EditWordDialog: View {
 
   private var fields: some View {
     VStack(alignment: .leading, spacing: 0) {
-      AppText(.editWordTitle, style: AppTextStyle(size: 16, weight: .w700))
-        .foregroundStyle(colors.textPrimary)
+      // 見出しの右端にブックマーク(iOS の編集シートの見出しの 🔖 と同じ)。「保存」を待たず、押した時点で書く。
+      // 付け外しは一覧の値で見る(このダイアログが受け取った word は開いた時点の写しなので)。
+      let current = store.words.first { $0.id == word.id } ?? word
+      HStack(spacing: 0) {
+        AppText(.editWordTitle, style: AppTextStyle(size: 16, weight: .w700))
+          .foregroundStyle(colors.textPrimary)
+        Spacer(minLength: px(8))
+        BookmarkButton(isBookmarked: current.isBookmarked) { value in
+          Task { await store.setBookmarked(current, value, screen: .wordEdit) }
+        }
+      }
       Spacer().frame(height: px(16))
       HStack(alignment: .top, spacing: px(14)) {
         LabeledTextField(label: String(localized: .fieldWord), text: $wordText)

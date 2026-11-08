@@ -1,6 +1,48 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "addBookmark" : {
+      "comment" : "🔖 のボタンの読み上げ・macOS の右クリックのメニュー",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Bookmark"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir marcador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un signet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブックマークに追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "북마크에 추가"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入書籤"
+          }
+        }
+      }
+    },
     "addShort" : {
       "comment" : "ヘッダーの登録ボタン",
       "extractionState" : "manual",
@@ -39,48 +81,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "＋ 新增"
-          }
-        }
-      }
-    },
-    "addToFavorites" : {
-      "comment" : "★ のボタンの読み上げ・macOS の右クリックのメニュー",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add to Favorites"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir a favoritos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter aux favoris"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入りに追加"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기에 추가"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "加入我的最愛"
           }
         }
       }
@@ -451,6 +451,48 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "返回"
+          }
+        }
+      }
+    },
+    "bookmarksFilter" : {
+      "comment" : "全単語のブックマークの絞り込みのボタンの読み上げ・macOS のヒント",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブックマーク"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "북마크"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書籤"
           }
         }
       }
@@ -1418,48 +1460,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已匯出"
-          }
-        }
-      }
-    },
-    "favoritesFilter" : {
-      "comment" : "全単語のお気に入りの絞り込み・★ のボタンの名前",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorites"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoritos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoris"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入り"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "我的最愛"
           }
         }
       }
@@ -3295,6 +3295,48 @@
         }
       }
     },
+    "noBookmarksYet" : {
+      "comment" : "全単語をブックマークで絞り込んで 0 語のときの案内",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No bookmarked words yet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay palabras con marcador."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun mot dans les signets pour l'instant."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブックマークした単語はまだありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 북마크한 단어가 없어요."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還沒有加入書籤的單字。"
+          }
+        }
+      }
+    },
     "noExample" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3332,48 +3374,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "沒有例句"
-          }
-        }
-      }
-    },
-    "noFavoritesYet" : {
-      "comment" : "全単語をお気に入りで絞り込んで 0 語のときの案内",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No favorites yet.\nWords you star will appear here."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún no hay favoritos.\nLas palabras que marques con ★ aparecerán aquí."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun favori pour l'instant.\nLes mots marqués d'une ★ apparaîtront ici."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入りの単語はまだありません。\n★ を押した単語がここに出ます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 즐겨찾기한 단어가 없어요.\n★를 누른 단어가 여기에 표시돼요."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "還沒有我的最愛。\n按下 ★ 的單字會顯示在這裡。"
           }
         }
       }
@@ -5189,44 +5189,44 @@
         }
       }
     },
-    "removeFromFavorites" : {
-      "comment" : "★ のボタンの読み上げ・macOS の右クリックのメニュー",
+    "removeBookmark" : {
+      "comment" : "🔖 のボタンの読み上げ・macOS の右クリックのメニュー",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove from Favorites"
+            "value" : "Remove Bookmark"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quitar de favoritos"
+            "value" : "Quitar marcador"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retirer des favoris"
+            "value" : "Retirer le signet"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お気に入りから外す"
+            "value" : "ブックマークを外す"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "즐겨찾기에서 빼기"
+            "value" : "북마크 해제"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "從我的最愛移除"
+            "value" : "移除書籤"
           }
         }
       }

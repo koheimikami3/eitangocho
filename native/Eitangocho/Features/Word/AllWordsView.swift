@@ -16,7 +16,7 @@ struct AllWordsView: View {
 
   var body: some View {
     let words = WordListing.filteredAll(
-      store.words, query: shell.searchQuery, order: settings.wordSortOrder, favoritesOnly: shell.favoritesOnly)
+      store.words, query: shell.searchQuery, order: settings.wordSortOrder, bookmarksOnly: shell.bookmarksOnly)
     let language = settings.translationLanguage
     GeometryReader { geometry in
       // 列幅は素の値で決める(倍率を掛ける前の幅に直す)。
@@ -33,18 +33,18 @@ struct AllWordsView: View {
                   columns: columns,
                   showCorrectCount: settings.wordSortOrder.group == .correctCount,
                   onToggleLearned: { value in Task { await store.setLearned(word, value) } },
-                  onToggleFavorite: { value in Task { await store.setFavorite(word, value, view: .allWords) } },
+                  onToggleBookmark: { value in Task { await store.setBookmarked(word, value, screen: .allWords) } },
                   onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
                   onContextMenu: { position in
                     WordContextMenu.show(
-                      at: position, word: word, store: store, language: language, view: .allWords,
+                      at: position, word: word, store: store, language: language, screen: .allWords,
                       overlay: overlay, colors: colors)
                   })
               }
             }
-            // お気に入りで絞っていて 0 語なら、★ の付け方を案内する(単語が無いのではないため)。
-            if words.isEmpty && shell.favoritesOnly && !store.words.isEmpty {
-              AppText(.noFavoritesYet, style: AppTextStyle(size: 13, height: 1.6))
+            // ブックマークで絞っていて 0 語なら、🔖 の付け方を案内する(単語が無いのではないため)。
+            if words.isEmpty && shell.bookmarksOnly && !store.words.isEmpty {
+              AppText(.noBookmarksYet, style: AppTextStyle(size: 13, height: 1.6))
                 .foregroundStyle(colors.textTertiary)
                 .multilineTextAlignment(.center)
                 .padding(.top, px(48))

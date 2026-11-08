@@ -101,15 +101,15 @@ struct WordListingTests {
     #expect(WordListing.filteredAll(words, query: "訳", order: .newest).isEmpty)
   }
 
-  @Test func お気に入りで絞ると検索と並び順もそのまま効く() {
-    var favorites = words
-    for index in favorites.indices where ["banana", "date", "cherry"].contains(favorites[index].word) {
-      favorites[index].groupIds = [WordGroup.favoriteID]
+  @Test func ブックマークで絞ると検索と並び順もそのまま効く() {
+    var bookmarked = words
+    for index in bookmarked.indices where ["banana", "date", "cherry"].contains(bookmarked[index].word) {
+      bookmarked[index].groupIds = [WordGroup.bookmarkID]
     }
     #expect(
-      WordListing.filteredAll(favorites, query: "a", order: .alphabetical, favoritesOnly: true).map(\.word)
+      WordListing.filteredAll(bookmarked, query: "a", order: .alphabetical, bookmarksOnly: true).map(\.word)
         == ["banana", "date"])
-    // 絞らなければ、お気に入りかどうかは並びに関係しない。
-    #expect(WordListing.filteredAll(favorites, query: "a", order: .alphabetical).count == 3)
+    // 絞らなければ、ブックマークかどうかは並びに関係しない。
+    #expect(WordListing.filteredAll(bookmarked, query: "a", order: .alphabetical).count == 3)
   }
 }

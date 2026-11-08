@@ -38,9 +38,9 @@ final class MainShellModel {
   /// (閉じると絞り込み中であることが見えなくなるため)。学習中・全単語で共有する。
   private(set) var isSearchOpen = false
 
-  /// 全単語をお気に入りだけに絞っているか。起動中だけ持ち、保存しない
+  /// 全単語をブックマークだけに絞っているか。起動中だけ持ち、保存しない
   /// (次に開いたとき絞られたままだと、単語が減ったように見えるため)。
-  private(set) var favoritesOnly = false
+  private(set) var bookmarksOnly = false
 
   @ObservationIgnored private let analytics: AnalyticsLogger
 
@@ -62,11 +62,11 @@ final class MainShellModel {
     searchQuery = query
   }
 
-  /// 全単語のお気に入りの絞り込みを切り替える。
-  func setFavoritesOnly(_ isOn: Bool) {
-    guard favoritesOnly != isOn else { return }
-    favoritesOnly = isOn
-    analytics.logFavoritesFilterToggled(isOn)
+  /// 全単語のブックマークの絞り込みを切り替える。
+  func setBookmarksOnly(_ isOn: Bool) {
+    guard bookmarksOnly != isOn else { return }
+    bookmarksOnly = isOn
+    analytics.logBookmarksFilterToggled(isOn)
   }
 
   /// 検索欄のある画面でだけ受け付ける(メニューの ⌘F)。

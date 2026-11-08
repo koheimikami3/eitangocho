@@ -47,9 +47,9 @@ struct AnalyticsReporting: ViewModifier {
       .onChange(of: session.words.isLoaded ? session.words.words.count : nil, initial: true) { _, count in
         if let count { reporter.reportWordCount(count) }
       }
-      .onChange(of: session.words.isLoaded ? session.words.words.count(where: \.isFavorite) : nil, initial: true) {
+      .onChange(of: session.words.isLoaded ? session.words.words.count(where: \.isBookmarked) : nil, initial: true) {
         _, count in
-        if let count { reporter.reportFavoriteCount(count) }
+        if let count { reporter.reportBookmarkCount(count) }
       }
       .onChange(of: session.sync.enabled, initial: true) { _, enabled in
         reporter.reportSyncEnabled(enabled)

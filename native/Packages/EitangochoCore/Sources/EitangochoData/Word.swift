@@ -40,12 +40,12 @@ public struct Word: Identifiable, Hashable, Sendable {
   /// (クイズの回答では更新しない。WordDao.recordQuizResult)。
   public var updatedAt: Date
 
-  /// 単語が属するグループの ID(並びは付けた順)。お気に入りは固定の ID のグループ(`WordGroup.favoriteID`)。
+  /// 単語が属するグループの ID(並びは付けた順)。ブックマークは固定の ID のグループ(`WordGroup.bookmarkID`)。
   /// 知らない ID も書き換えずに持つ(新しい版が足したグループを古い版で消さないため)。
   public var groupIds: [String]
 
-  /// お気に入りか(お気に入りのグループに属するか)。
-  public var isFavorite: Bool { groupIds.contains(WordGroup.favoriteID) }
+  /// ブックマークか(ブックマークのグループに属するか)。
+  public var isBookmarked: Bool { groupIds.contains(WordGroup.bookmarkID) }
 
   public init(
     id: Int64,
@@ -84,11 +84,11 @@ public struct Word: Identifiable, Hashable, Sendable {
 
 /// 単語を分けるグループ。
 ///
-/// お気に入りは、最初からある消せないグループとして扱う(写真アプリのお気に入りアルバムと同じ考え方)。
+/// ブックマークは、最初からある消せないグループとして扱う(写真アプリのお気に入りアルバムと同じ考え方)。
 /// 後で利用者が作るグループを足すときも、単語の側は同じ `group_ids` の列で持つ。
 public enum WordGroup {
-  /// お気に入りのグループの ID。同期の JSON にも書くので変えない。
-  public static let favoriteID = "favorite"
+  /// ブックマークのグループの ID。同期の JSON にも書くので変えない。
+  public static let bookmarkID = "bookmark"
 
   /// `group_ids` の列の値(CSV)を ID の並びにする。品詞の列と同じ形。
   public static func decodeIds(_ csv: String) -> [String] {

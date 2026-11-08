@@ -7,8 +7,8 @@ struct WordTableColumns {
   static let word: CGFloat = 140
   static let ipa: CGFloat = 130
   static let partOfSpeech: CGFloat = 100
-  /// お気に入りの ★。見出しは空にする(★ のボタンだけで何の列か分かるため)。
-  static let favorite: CGFloat = FavoriteButton.size
+  /// ブックマークの 🔖。見出しは空にする(🔖 のボタンだけで何の列か分かるため)。
+  static let bookmark: CGFloat = BookmarkButton.size
   static let pronunciation: CGFloat = 56
   static let gap: CGFloat = 12
   static let horizontalPadding: CGFloat = 20
@@ -18,7 +18,7 @@ struct WordTableColumns {
 
   /// `tableWidth` は素の値(倍率を掛ける前)。
   init(tableWidth: CGFloat) {
-    let fixed = Self.learned + Self.word + Self.ipa + Self.partOfSpeech + Self.favorite + Self.pronunciation
+    let fixed = Self.learned + Self.word + Self.ipa + Self.partOfSpeech + Self.bookmark + Self.pronunciation
     let flexible = max(tableWidth - Self.horizontalPadding * 2 - fixed - Self.gap * 7, 0)
     meaning = flexible * 2 / 5
     example = flexible * 3 / 5

@@ -33,7 +33,6 @@
                 MobileWordCard(
                   word: word, showIpa: settings.showIpa, singleColumn: columns == 1,
                   onToggleLearned: { value in Task { await store.setLearned(word, value) } },
-                  onToggleFavorite: { value in Task { await store.setFavorite(word, value, view: .learning) } },
                   onTap: { onEdit(word) }
                 )
                 .modifier(CardIn())

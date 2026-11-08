@@ -13,13 +13,13 @@
 
     var body: some View {
       let words = WordListing.filteredAll(
-        store.words, query: shell.searchQuery, order: settings.wordSortOrder, favoritesOnly: shell.favoritesOnly)
+        store.words, query: shell.searchQuery, order: settings.wordSortOrder, bookmarksOnly: shell.bookmarksOnly)
       if !store.isLoaded {
         MobileLoadingIndicator()
       } else if words.isEmpty {
-        // お気に入りで絞っていて 0 語なら、★ の付け方を案内する(単語が無いのではないため)。
-        let noFavorites = shell.favoritesOnly && !store.words.isEmpty
-        AppText(noFavorites ? .noFavoritesYet : .noWordsYet, style: AppTextStyle(size: 14, height: 1.6))
+        // ブックマークで絞っていて 0 語なら、🔖 の付け方を案内する(単語が無いのではないため)。
+        let noBookmarks = shell.bookmarksOnly && !store.words.isEmpty
+        AppText(noBookmarks ? .noBookmarksYet : .noWordsYet, style: AppTextStyle(size: 14, height: 1.6))
           .foregroundStyle(palette.textAlpha(45))
           .multilineTextAlignment(.center)
           .padding(32)
@@ -33,12 +33,22 @@
                 word: word, showIpa: settings.showIpa,
                 showCorrectCount: settings.wordSortOrder.group == .correctCount,
                 onToggleLearned: { value in Task { await store.setLearned(word, value) } },
-                onToggleFavorite: { value in Task { await store.setFavorite(word, value, view: .allWords) } },
+                onToggleBookmark: { value in Task { await store.setBookmarked(word, value, screen: .allWords) } },
                 onTap: { onEdit(word) })
             }
           }
         }
+        // 絞り込み(検索・ブックマーク)が変わったら、スクロールを作り直して先頭から見せる。
+        // 下までスクロールした状態で件数が大きく減ると、LazyVStack は前の位置のまま中身の無い範囲を描き、
+        // 単語があるのに一覧が空に見えることがある(2026-11-08 のユーザーの報告)。
+        .id(FilterKey(query: shell.searchQuery, bookmarksOnly: shell.bookmarksOnly))
       }
+    }
+
+    /// スクロールを作り直すきっかけ(一覧の中身が入れ替わる絞り込み)。
+    private struct FilterKey: Hashable {
+      let query: String
+      let bookmarksOnly: Bool
     }
   }
 #endif
