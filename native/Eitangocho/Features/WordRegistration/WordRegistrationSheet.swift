@@ -51,7 +51,8 @@
       return VStack(spacing: 0) {
         switch model.step {
         case .input: inputStep(language)
-        case .loading: loadingStep
+        // 入力のステップと同じ高さに重ねて出す。高さが変わると下のレクタングル広告が上下に動くため。
+        case .loading: inputStep(language).hidden().overlay { loadingStep }
         case .form: formStep(language)
         }
         // 入力から読み込み中へ進んでも読み込み直さないよう、段階の切り替えの外に 1 つだけ置く。
@@ -110,8 +111,7 @@
         AppText(.fetchingDictionary, style: AppTextStyle(size: 13))
           .foregroundStyle(palette.textAlpha(50))
       }
-      .frame(maxWidth: .infinity)
-      .padding(.vertical, 80)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func formStep(_ language: TranslationLanguage) -> some View {
