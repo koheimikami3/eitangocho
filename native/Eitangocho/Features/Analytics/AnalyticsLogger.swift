@@ -82,6 +82,17 @@ struct AnalyticsLogger {
     log("word_learned_toggled", ["to": isLearned ? "learned" : "learning", "soon_after_quiz": boolValue(soon)])
   }
 
+  /// お気に入りの付け外し。`screen` は押した画面(学習中のカード / 全単語の一覧)。
+  /// お気に入りが使われるか、どの画面から付けられるかを見て、グループ(Pro)へ広げるかの判断に使う。
+  func logWordFavoriteToggled(isFavorite: Bool, view: MainView) {
+    log("word_favorite_toggled", ["to": isFavorite ? "favorite" : "none", "screen": screenName(view)])
+  }
+
+  /// 全単語のお気に入りの絞り込みの切り替え。絞り込みが使われるか(★ を付けるだけで終わっていないか)を見る。
+  func logFavoritesFilterToggled(_ isOn: Bool) {
+    log("favorites_filter_toggled", ["to": isOn ? "on" : "off"])
+  }
+
   func logWordDeleted(_ word: Word) {
     log("word_deleted", ["was_learned": boolValue(word.isLearned)])
   }

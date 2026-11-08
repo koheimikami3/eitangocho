@@ -12,6 +12,7 @@
     /// 1 列表示か。ヘッダの組み方だけが変わる(MobileWordCardHeader)。
     let singleColumn: Bool
     let onToggleLearned: (Bool) -> Void
+    let onToggleFavorite: (Bool) -> Void
     let onTap: () -> Void
 
     @Environment(\.palette) private var palette
@@ -79,6 +80,7 @@
         .contentShape(Rectangle())
         .onTapGesture { onToggleLearned(!word.isLearned) }
         Spacer(minLength: 0)
+        MobileFavoriteButton(isFavorite: word.isFavorite, onToggle: onToggleFavorite)
         MobilePronunciationButton(word: word.word, variant: .icon)
       }
     }

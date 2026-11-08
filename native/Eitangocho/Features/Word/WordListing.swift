@@ -22,12 +22,15 @@ enum WordListing {
     learning(filter(words, query: query))
   }
 
-  /// 検索で絞り、設定の並び順で並べた一覧(全単語の画面)。
+  /// 検索(とお気に入り)で絞り、設定の並び順で並べた一覧(全単語の画面)。
   ///
   /// 並べ替えは DB のクエリではなくここで行う。元の一覧は学習中の一覧や
   /// 件数の表示とも共有しており、クエリ側で並べると全単語以外にも波及するため。
-  static func filteredAll(_ words: [Word], query: String, order: WordSortOrder) -> [Word] {
-    filter(words, query: query).sorted { compare($0, $1, order) < 0 }
+  static func filteredAll(
+    _ words: [Word], query: String, order: WordSortOrder, favoritesOnly: Bool = false
+  ) -> [Word] {
+    let favorites = favoritesOnly ? words.filter(\.isFavorite) : words
+    return filter(favorites, query: query).sorted { compare($0, $1, order) < 0 }
   }
 
   private static func filter(_ words: [Word], query: String) -> [Word] {

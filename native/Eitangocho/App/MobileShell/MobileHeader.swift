@@ -112,17 +112,21 @@
       }
     }
 
-    /// 全単語の並び替えの行。左に表示中の件数(検索で絞り込んだ後)、右に現在の並び順のボタン。
+    /// 全単語の並び替えの行。左にお気に入りの絞り込みと表示中の件数(絞り込んだ後)、右に現在の並び順のボタン。
     ///
-    /// 件数は検索語があるときだけ出す。検索していなければタイトルの脇の件数と同じ数の重複になり、
+    /// 件数は検索か絞り込みをしているときだけ出す。どちらもしていなければタイトルの脇の件数と同じ数の重複になり、
     /// 検索中はタイトルの行が検索欄に置き換わって、絞り込んだ件数を伝えられるのがここだけになるため。
     private var sortRow: some View {
       let query = shell.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
       return HStack(spacing: 8) {
-        if !query.isEmpty {
-          let shown = WordListing.filteredAll(words.words, query: shell.searchQuery, order: settings.wordSortOrder).count
+        MobileFavoritesFilterButton(shell: shell)
+        if !query.isEmpty || shell.favoritesOnly {
+          let shown = WordListing.filteredAll(
+            words.words, query: shell.searchQuery, order: settings.wordSortOrder, favoritesOnly: shell.favoritesOnly
+          ).count
           AppText(String(localized: .showingWordCount(shown)), style: AppTextStyle(size: 12))
             .foregroundStyle(palette.textAlpha(45))
+            .lineLimit(1)
         }
         Spacer(minLength: 0)
         MobileWordSortButton(settings: settings)

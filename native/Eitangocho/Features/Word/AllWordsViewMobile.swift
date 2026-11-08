@@ -12,11 +12,14 @@
     @Environment(\.palette) private var palette
 
     var body: some View {
-      let words = WordListing.filteredAll(store.words, query: shell.searchQuery, order: settings.wordSortOrder)
+      let words = WordListing.filteredAll(
+        store.words, query: shell.searchQuery, order: settings.wordSortOrder, favoritesOnly: shell.favoritesOnly)
       if !store.isLoaded {
         MobileLoadingIndicator()
       } else if words.isEmpty {
-        AppText(.noWordsYet, style: AppTextStyle(size: 14))
+        // お気に入りで絞っていて 0 語なら、★ の付け方を案内する(単語が無いのではないため)。
+        let noFavorites = shell.favoritesOnly && !store.words.isEmpty
+        AppText(noFavorites ? .noFavoritesYet : .noWordsYet, style: AppTextStyle(size: 14, height: 1.6))
           .foregroundStyle(palette.textAlpha(45))
           .multilineTextAlignment(.center)
           .padding(32)
@@ -30,6 +33,7 @@
                 word: word, showIpa: settings.showIpa,
                 showCorrectCount: settings.wordSortOrder.group == .correctCount,
                 onToggleLearned: { value in Task { await store.setLearned(word, value) } },
+                onToggleFavorite: { value in Task { await store.setFavorite(word, value, view: .allWords) } },
                 onTap: { onEdit(word) })
             }
           }

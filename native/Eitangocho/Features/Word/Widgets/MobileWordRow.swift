@@ -11,6 +11,7 @@
     /// 覚えた回数を訳の下の行に出すか(覚えた回数で並べているときだけ、並びの根拠として見せる)。
     var showCorrectCount = false
     let onToggleLearned: (Bool) -> Void
+    let onToggleFavorite: (Bool) -> Void
     let onTap: () -> Void
 
     @Environment(\.palette) private var palette
@@ -42,6 +43,8 @@
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           Spacer().frame(width: 8)
+          // ★ と 🔊 はどちらも 44pt 幅のタップ領域を持つので、間は空けずに並べる。
+          MobileFavoriteButton(isFavorite: word.isFavorite, onToggle: onToggleFavorite)
           MobilePronunciationButton(word: word.word, variant: .icon)
         }
         .padding(.horizontal, 16)
