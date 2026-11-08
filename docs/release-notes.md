@@ -22,6 +22,68 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 2.17.0 (build 33)
+
+iOS・macOS 共通(両方 build 33)。「自動入力」は同梱の辞書を 23,311 語に増やしたこと(熟語・複合語を含み、全語に韓国語の訳がある)。
+「つづりの候補」は辞書に無いつづりで候補を出すこと。「一部の画面」は macOS のツールバー・メニューの Liquid Glass 化と、
+iOS の検索・登録シート・削除の確認など。iOS の登録 30 語での Pro の案内、登録したカードが弾む演出、計測の追加は掲載していない。
+
+日本語:
+
+```
+単語をブックマークして、あとでまとめて見返せるようにしました。
+自動入力できる英単語と熟語を増やしました。
+つづりを間違えたときに、正しい単語の候補を表示するようにしました。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+可將單字加入書籤，方便之後一併複習。
+增加了可自動填入的英文單字與慣用語。
+拼錯單字時，會顯示正確單字的建議。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+Ahora puedes marcar palabras para repasarlas después todas juntas.
+Aumentamos las palabras y expresiones que se completan automáticamente.
+Si escribes mal una palabra, ahora te sugerimos la correcta.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+Ajout des signets pour revoir vos mots tous ensemble plus tard.
+Plus de mots et d'expressions remplis automatiquement.
+En cas de faute d'orthographe, le mot correct est désormais suggéré.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Added bookmarks so you can review words together later.
+Autofill now covers more words and idioms.
+Misspelled words now show suggestions for the correct spelling.
+Improved the design of some screens for readability.
+```
+
+한국어:
+
+```
+단어를 북마크해 두고 나중에 한꺼번에 다시 볼 수 있게 했어요.
+자동 입력되는 영어 단어와 숙어를 늘렸어요.
+철자를 틀렸을 때 올바른 단어를 추천해 드려요.
+일부 화면의 디자인을 보기 쉽게 조정했어요.
+```
+
+---
+
 ## 2.16.0 (build 32)
 
 iOS・macOS 共通(両方 build 32)。今回から韓国語のローカリゼーションがあり、新機能の欄は 6 言語ぶん入れる。
