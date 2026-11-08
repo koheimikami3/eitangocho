@@ -24,14 +24,14 @@ struct MeaningRevealArea: View {
           .background(shape.fill(colors.inputFill))
           .overlay(shape.strokeBorder(colors.inputBorder, lineWidth: px(1)))
       } else {
-        DottedBorderBox(backgroundColor: isHovered ? colors.textAlpha(3) : nil) {
+        DottedBorderBox {
           AppText(showLabel, style: AppTextStyle(size: 12))
             .foregroundStyle(colors.textAlpha(40))
         }
       }
     }
-    // Flutter 版は InkWell で包んでおり、ホバー中は Material の薄い重ね色が乗る。
-    .overlay(shape.fill(isHovered ? colors.materialHover : .clear).allowsHitTesting(false))
+    // ホバーは薄いグレーを重ねて示す。未表示・表示中で同じ色にする(切り替えても押せる場所の見え方が変わらないように)。
+    .overlay(shape.fill(isHovered ? colors.textAlpha(3) : .clear).allowsHitTesting(false))
     // カードのクリック(編集)には伝えない。
     .hoverTap($isHovered, in: shape, action: onToggle)
   }

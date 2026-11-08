@@ -7,6 +7,8 @@ import SwiftUI
 /// ホバーで濃くする。
 struct BookmarkButton: View {
   let isBookmarked: Bool
+  /// 絵柄の高さ。表の行は 🔊 と釣り合う既定の値、編集ダイアログは見出しの横で小さく見えないよう大きくする。
+  var iconHeight: CGFloat = 18
   let onToggle: (Bool) -> Void
 
   @Environment(\.colors) private var colors
@@ -19,7 +21,7 @@ struct BookmarkButton: View {
   var body: some View {
     let label: LocalizedStringResource = isBookmarked ? .removeBookmark : .addBookmark
     BookmarkIcon(
-      filled: isBookmarked, color: isBookmarked ? colors.accent : colors.textAlpha(isHovered ? 50 : 30), height: px(14))
+      filled: isBookmarked, color: isBookmarked ? colors.accent : colors.textAlpha(isHovered ? 50 : 30), height: px(iconHeight))
       .frame(width: px(Self.size), height: px(Self.size))
       .hoverTap($isHovered, in: Rectangle()) { onToggle(!isBookmarked) }
       #if os(macOS)

@@ -81,7 +81,7 @@ struct EditWordDialog: View {
         AppText(.editWordTitle, style: AppTextStyle(size: 16, weight: .w700))
           .foregroundStyle(colors.textPrimary)
         Spacer(minLength: px(8))
-        BookmarkButton(isBookmarked: current.isBookmarked) { value in
+        BookmarkButton(isBookmarked: current.isBookmarked, iconHeight: 20) { value in
           Task { await store.setBookmarked(current, value, screen: .wordEdit) }
         }
       }
