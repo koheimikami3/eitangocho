@@ -29,9 +29,17 @@
 
     @Environment(\.palette) private var palette
     @Environment(\.mobileSheetLayout) private var layout
+    /// 下端に置いたもの(バナー広告)の高さ。広告が無いと 0 になる。
+    @State private var footerHeight: CGFloat = 0
 
     /// 画面高に対するシートの高さ(デザインの height:88%)。
     private static var heightFactor: CGFloat { 0.88 }
+
+    /// スクロール領域の下の余白。シートの下端は画面の下端まで届くので、下端に広告が無く
+    /// キーボードも出ていないときは、ホームインジケータの高さを足す(最後のボタンが画面の角の丸みに掛からないように)。
+    private var contentBottomPadding: CGFloat {
+      40 + (footerHeight == 0 && layout.keyboardHeight == 0 ? layout.bottomSafeArea : 0)
+    }
 
     var body: some View {
       let shape = UnevenRoundedRectangle(topLeadingRadius: 18, topTrailingRadius: 18)
@@ -43,7 +51,7 @@
           ScrollView {
             content()
               .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(EdgeInsets(top: 14, leading: 18, bottom: 40, trailing: 18))
+              .padding(EdgeInsets(top: 14, leading: 18, bottom: contentBottomPadding, trailing: 18))
               // 何も無いところのタップでキーボードを閉じる。複数行の欄は Return を「完了」にしているが、
               // ほかに閉じる手段が無いと困るため。スクロールでは閉じない(下の欄を見に行くたびに閉じないように)。
               .background { KeyboardDismissTapArea() }
@@ -54,6 +62,7 @@
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         footer()
+          .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footerHeight = $0 }
       }
       .frame(height: layout.availableHeight * Self.heightFactor)
       .clipShape(shape)
