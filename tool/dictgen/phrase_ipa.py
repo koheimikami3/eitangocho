@@ -162,6 +162,111 @@ def join_words(phrase, word_ipa):
     return "/" + " ".join(parts) + "/"
 
 
+# 派生語の組み立て(derive)。強勢の位置を動かさない語尾・接頭辞だけを扱う。
+# -ity・-ation・-ic のように強勢が動く語尾は、元の語からは決まらないので扱わない(WEB_IPA で手で埋める)
+# 語尾 → 元の語の候補の作り方(綴り)と、元の語の IPA に足す音。順に試し、最初に元の語が引けたものを使う
+SUFFIXES = [
+    # -ically(chaotically ← chaotic)・-ally(geologically ← geological)は ipa-dict の書き方(politically /pəˈlɪtɪkli/)に揃える
+    ("ically", lambda w: [w[:-4]], "li"),
+    ("ally", lambda w: [w[:-2]], "i"),
+    # -ably・-ibly(reliably ← reliable): 元の語の末尾の /bəl/ を /bli/ にする
+    ("bly", lambda w: [w[:-1] + "e"], None),
+    ("ily", lambda w: [w[:-3] + "y"], None),
+    ("ly", lambda w: [w[:-2]], "li"),
+    ("iness", lambda w: [w[:-5] + "y"], "nəs"),
+    ("ness", lambda w: [w[:-4]], "nəs"),
+    ("ment", lambda w: [w[:-4]], "mənt"),
+    ("ful", lambda w: [w[:-3]], "fəl"),
+    ("less", lambda w: [w[:-4]], "ləs"),
+    ("able", lambda w: [w[:-4], w[:-4] + "e"], "əbəl"),
+    ("ers", lambda w: [w[:-1]], "z"),
+    ("er", lambda w: [w[:-2], w[:-1]], "ɚ"),
+    ("ist", lambda w: [w[:-3]], "ɪst"),
+    ("ing", lambda w: [w[:-3], w[:-3] + "e"], "ɪŋ"),
+    # sloped は slope + d(slop + ed と読まない)ので、e を残した形を先に試す
+    ("ed", lambda w: [w[:-1], w[:-2], w[:-3]], None),
+    ("s", lambda w: [w[:-1]], None),
+]
+# 接頭辞と付ける音。un-・in- は元の語の第 1 強勢を残し(unsure /ʌnˈʃʊɹ/)、ほかは接頭辞に第 2 強勢を置く
+# (preindustrial /ˌpɹiɪnˈdʌstɹiəl/)。cyber- は複合語の前の語として第 1 強勢を持ち、元の語は第 2 強勢に下げる
+PREFIXES = {
+    "un": "ʌn", "in": "ɪn", "im": "ɪm", "pre": "ˌpɹi", "sub": "ˌsʌb", "inter": "ˌɪntɚ", "counter": "ˌkaʊntɚ",
+    "anti": "ˌænti", "post": "ˌpoʊst", "non": "ˌnɑn",
+}
+COMPOUND_HEADS = {"cyber": "ˈsaɪbɚ"}
+# 複合語の後ろの語にしない語。語尾として扱う(recommendable を recommend + able、cultish を cult + ish と分けない)。
+# ipa-dict には語尾や略語も見出しにあるので、語尾と同じ綴りの語(ion・age・mic)も入れる
+NOT_COMPOUND_TAILS = {
+    "able", "ably", "ness", "less", "ment", "ful", "ally", "ically", "ing", "ers", "ist", "ism", "ish", "age", "ion",
+    "ic", "mic", "ala", "ide", "ity", "ize", "ise", "ous", "ive", "ent", "ant", "ence", "ance", "ate",
+}
+VOICELESS = ("p", "k", "f", "θ", "s", "ʃ", "t͡ʃ", "t")
+SIBILANTS = ("s", "z", "ʃ", "ʒ", "t͡ʃ", "d͡ʒ")
+
+
+def derive(word, word_ipa, depth=0, compounds=True):
+    """派生語・つながった複合語の IPA(囲みの / / なし)を、元の語の IPA から組み立てる。組み立てられなければ空文字。
+
+    word_ipa は 1 語の IPA を返す関数(無ければ空文字)。元の語も派生語のこと(unreliably ← reliably ← reliable)が
+    あるので、2 段まで自分を呼ぶ。複合語(hairdryer)は前の語に第 1 強勢、後ろの語に第 2 強勢を置く(英語の複合名詞の決まり)。
+    """
+    if depth > 2:
+        return ""
+    # 接頭辞を外した残りは、語そのものか語尾の付いた派生語に限る(intergalactic を in + ter + galactic と分けない)
+    lookup = lambda w: (ipa := word_ipa(w)) and clean(ipa) or derive(w, word_ipa, depth + 1, compounds=False)
+
+    for suffix, bases, sound in SUFFIXES:
+        if not word.endswith(suffix) or len(word) - len(suffix) < 3:
+            continue
+        for base in bases(word):
+            base_ipa = (ipa := word_ipa(base)) and clean(ipa)
+            if not base_ipa:
+                continue
+            if suffix == "bly":
+                if re.search(r"(ə?l̩|əl)$", base_ipa):
+                    return re.sub(r"(ə?l̩|əl)$", "li", base_ipa)
+                continue
+            if suffix == "ily":
+                if base_ipa.endswith("i"):
+                    return base_ipa[:-1] + "əli"
+                continue
+            if suffix == "ed":
+                last = base_ipa[-3:] if base_ipa.endswith(("t͡ʃ",)) else base_ipa[-1]
+                return base_ipa + ("ɪd" if last in ("t", "d") else "t" if last in VOICELESS else "d")
+            if suffix == "s":
+                last = base_ipa[-3:] if base_ipa.endswith(("t͡ʃ", "d͡ʒ")) else base_ipa[-1]
+                return base_ipa + ("ɪz" if last in SIBILANTS else "s" if last in VOICELESS else "z")
+            if suffix == "ly" and base_ipa.endswith("l"):
+                # -fully・-ally の l は 1 つしか読まない(insightfully /ɪnˈsaɪtfəli/)
+                return base_ipa + "i"
+            if suffix == "ally" and not base_ipa.endswith("əl"):
+                continue
+            if suffix == "ically" and not base_ipa.endswith("ɪk"):
+                continue
+            return base_ipa + sound
+
+    for head, head_ipa in COMPOUND_HEADS.items():
+        if word.startswith(head) and (base_ipa := lookup(word[len(head):])):
+            return head_ipa + secondary(base_ipa)
+    # 長い接頭辞から試す(inter- を in- として外さない)
+    for prefix, prefix_ipa in sorted(PREFIXES.items(), key=lambda item: -len(item[0])):
+        if word.startswith(prefix) and len(word) - len(prefix) >= 4 and (base_ipa := lookup(word[len(prefix):])):
+            return prefix_ipa + primary(base_ipa)
+
+    if not compounds:
+        return ""
+    # 前の語を長い方から試す(noticeboard を no + ticeboard と分けない)。ただし前の語が複数形の s で終わるときは、
+    # s を後ろの語に回した分け方を使う(kickstart は kicks + tart でなく kick + start)
+    for i in range(len(word) - 3, 2, -1):
+        head, tail = word[:i], word[i:]
+        if tail in NOT_COMPOUND_TAILS or (head.endswith("s") and word_ipa(head[:-1])):
+            continue
+        head_ipa, tail_ipa = word_ipa(head), word_ipa(tail)
+        if head_ipa and tail_ipa:
+            return primary(clean(head_ipa)) + secondary(clean(tail_ipa))
+    return ""
+
+
 # ipa-dict の値を手で直したもの・ipa-dict に無い語。辞書に入れる単語(kaikki に IPA が無い 163 語)を全部読み、
 # CMU 発音辞書由来の崩れ(複合語の区切り違い・第 1 強勢が 2 つ・un- の弱化・t の脱落)があったものだけ直した
 IPA_DICT_FIXES = {
@@ -216,6 +321,38 @@ IPA_DICT_FIXES = {
     "pawnbroker": "ˈpɔnˌbɹoʊkɚ", "postgraduate": "ˌpoʊstˈɡɹæd͡ʒuət", "pullover": "ˈpʊlˌoʊvɚ", "raja": "ˈɹɑd͡ʒə",
     "remonstrance": "ɹɪˈmɑnstɹəns", "shoal": "ʃoʊl", "solipsism": "ˈsɑləpˌsɪzəm", "totemic": "toʊˈtɛmɪk",
     "undemonstrative": "ˌʌndɪˈmɑnstɹətɪv", "waistcoat": "ˈweɪstˌkoʊt",
+}
+
+# kaikki・ipa-dict に無いか崩れていて、derive でも組み立てられない(または組み立てを誤る)語の米音。
+# Cambridge Dictionary の米音を、kaikki の書き方(ɹ・ɛ・長音の印なし・t の弾音なし)に直して書いた(2026-11-08)
+WEB_IPA = {
+    "mp3 player": "ˌɛmpiˈθɹi ˌpleɪɚ", "phrasal verb": "ˌfɹeɪzəl ˈvɝb", "physicality": "ˌfɪzɪˈkæləti",
+    "genomic": "d͡ʒɪˈnoʊmɪk", "circumnavigation": "ˌsɝkəmˌnævəˈɡeɪʃən", "materialization": "məˌtɪɹiələˈzeɪʃən",
+    "materialisation": "məˌtɪɹiələˈzeɪʃən", "retrospection": "ˌɹɛtɹəˈspɛkʃən", "proprietorial": "pɹəˌpɹaɪəˈtɔɹiəl",
+    "recumbent": "ɹɪˈkʌmbənt", "ephemerality": "ɪˌfɛmɚˈæləti", "topographical": "ˌtɑpəˈɡɹæfɪkəl",
+    "angularity": "ˌæŋɡjəˈlɛɹəti", "inexorability": "ˌɪnˌɛksɚəˈbɪləti", "relegation": "ˌɹɛləˈɡeɪʃən",
+    "ecommerce": "ˌiˈkɑmɝs", "regenerative": "ɹɪˈd͡ʒɛnəɹətɪv", "rondo": "ˈɹɑndoʊ", "captaincy": "ˈkæptənsi",
+    "cryptography": "kɹɪpˈtɑɡɹəfi", "luminosity": "ˌluməˈnɑsəti", "taxonomic": "ˌtæksəˈnɑmɪk",
+    "betrothed": "bɪˈtɹoʊðd", "hydrology": "haɪˈdɹɑləd͡ʒi", "resonator": "ˈɹɛzənˌeɪtɚ", "onside": "ˌɑnˈsaɪd",
+    "trigonometry": "ˌtɹɪɡəˈnɑmətɹi", "hallo": "hæˈloʊ", "agave": "əˈɡɑvi", "masala": "məˈsɑlə",
+    "wasabi": "wəˈsɑbi", "esports": "ˈiˌspɔɹts", "hijab": "ˈhɪd͡ʒæb", "halal": "hæˈlæl",
+    "islamophobia": "ɪzˌlæməˈfoʊbiə", "omg": "ˌoʊˌɛmˈd͡ʒi", "gif": "ɡɪf", "ebook": "ˈiˌbʊk",
+    "self-aggrandisement": "ˌsɛlfəˈɡɹændɪzmənt",
+    # 句の組み立て(compose・join_words)に使う語
+    "skive": "skaɪv", "laze": "leɪz", "mooch": "mut͡ʃ", "quieten": "ˈkwaɪətən", "homeroom": "ˈhoʊmɹum",
+    "miso": "ˈmisoʊ", "sharpener": "ˈʃɑɹpənɚ",
+    # derive・ipa-dict の値が誤っていた語(複合語の区切り違い・語尾を語と取り違え・英音の値)
+    "cultish": "ˈkʌltɪʃ", "metalled": "ˈmɛtəld", "clothespin": "ˈkloʊðzˌpɪn", "unwaveringly": "ʌnˈweɪvɚɪŋli",
+    "anticlimactically": "ˌæntiklaɪˈmæktɪkli", "tantalisingly": "ˈtæntəˌlaɪzɪŋli",
+    "radiotherapy": "ˌɹeɪdioʊˈθɛɹəpi", "physiotherapy": "ˌfɪzioʊˈθɛɹəpi", "physiotherapist": "ˌfɪzioʊˈθɛɹəpɪst",
+    "radiocarbon": "ˌɹeɪdioʊˈkɑɹbən", "neurotransmitter": "ˌnʊɹoʊtɹænsˈmɪtɚ", "echolocate": "ˌɛkoʊˈloʊkeɪt",
+    # Cambridge に無く、Web の検索で見つけた辞書の値(Vocabulary.com・WordReference・Dictionary.com・SpanishDict)
+    "taciturnity": "ˌtæsɪˈtɝnəti", "fabulation": "ˌfæbjəˈleɪʃən", "fabulate": "ˈfæbjəˌleɪt",
+    "emulsification": "ɪˌmʌlsəfəˈkeɪʃən", "presentational": "ˌpɹɛzənˈteɪʃənəl",
+    # Web に見出しが無く、Cambridge で確かめた元の語(demystify・choreograph・maternal・enviable)に
+    # 強勢の位置が決まった語尾(-ation・-ical・-istic)を足した
+    "demystification": "diˌmɪstəfəˈkeɪʃən", "choreographical": "ˌkɔɹiəˈɡɹæfɪkəl",
+    "maternalistic": "məˌtɝnəˈlɪstɪk", "wordage": "ˈwɝdɪd͡ʒ", "unenviably": "ʌnˈɛnviəbli", "uptime": "ˈʌpˌtaɪm",
 }
 
 # 句を組み立てるときだけ使う語の IPA。kaikki の先頭の値が句の意味と合わないもの(bow to の bow は「弓」の発音ではない)、

@@ -23,7 +23,7 @@ import sys
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from phrase_ipa import PHRASE_WORD_IPA, compose, join_words, load_ipa_dict
+from phrase_ipa import PHRASE_WORD_IPA, WEB_IPA, compose, derive, join_words, load_ipa_dict
 from validate import check_ko_pair, check_pair
 
 ROOT = Path(__file__).resolve().parent
@@ -128,32 +128,41 @@ def phonemic(ipa):
 def fill_missing_ipa(words):
     """kaikki に IPA が無い語を埋め、埋めた数を返す。句の組み立ては kaikki の値で埋まった単語を先に使う。
 
-    - 単語: ipa-dict → 英綴りを米綴りに直して ipa-dict → 綴り違いの行き先(alt_of)の順。
-      alt_of には方言・誤記・略語の行き先(are → our)も混ざるので最後に回し、綴りが似た行き先だけを使う。
-      派生語(impolitely)・つながった複合語(toothache)は組み立てない(強勢が推測になるため空のまま)
+    - 単語: WEB_IPA(Web の辞書で確かめた値)→ ipa-dict → 英綴りを米綴りに直して ipa-dict → 綴り違いの行き先(alt_of)
+      → 派生語・つながった複合語の組み立て(phrase_ipa.derive)の順。
+      alt_of には方言・誤記・略語の行き先(are → our)も混ざるので後に回し、綴りが似た行き先だけを使う。
+      組み立ては強勢の動かない語尾・接頭辞と複合語だけ(2026-11-08 に、空のままにする方針から改めた)
     - 句動詞: phrase_ipa.compose。それ以外の空白・ハイフン入りの語は phrase_ipa.join_words
       (ハイフン入りは先に 1 語として探す。e-book のように ipa-dict に 1 語で載る語があるため)
     """
     ipa_dict = load_ipa_dict()
     alt_of = load_alt_of()
     kaikki = {word: entry["ipa"] for word, entry in words.items() if entry["ipa"]}
-    word_ipa = lambda w: kaikki.get(w) or ipa_dict.get(w, "")
+
+    def from_dict(word):
+        for spelling in [word, *us_spellings(word)]:
+            if spelling in ipa_dict:
+                return ipa_dict[spelling]
+        return ""
+
+    word_ipa = lambda w: kaikki.get(w) or WEB_IPA.get(w) or from_dict(w)
     phrase_word_ipa = lambda w: PHRASE_WORD_IPA.get(w) or word_ipa(w)
 
     def single(word):
-        for spelling in [word, *us_spellings(word)]:
-            if spelling in ipa_dict:
-                return f"/{ipa_dict[spelling]}/"
+        if ipa := from_dict(word):
+            return f"/{ipa}/"
         for target in alt_of.get(word, []):
             if SequenceMatcher(None, word, target).ratio() >= ALT_OF_MIN_SIMILARITY and (ipa := word_ipa(target)):
                 return ipa if ipa.startswith("/") else f"/{ipa}/"
-        return ""
+        return (ipa := derive(word, word_ipa)) and f"/{ipa}/"
 
     filled = 0
     for word, entry in words.items():
         if entry["ipa"]:
             continue
-        if " " in word:
+        if word in WEB_IPA:
+            ipa = f"/{WEB_IPA[word]}/"
+        elif " " in word:
             ipa = compose(word, phrase_word_ipa) or join_words(word, phrase_word_ipa)
         else:
             ipa = single(word) or ("-" in word and join_words(word, phrase_word_ipa)) or ""
@@ -177,6 +186,9 @@ US_SPELLINGS = [
     (r"isation", "ization"), (r"is(e|ed|es|er|ers|ing)$", r"iz\1"), (r"ys(e|ed|es|ing)$", r"yz\1"),
     (r"our", "or"), (r"tre(s?)$", r"ter\1"), (r"ogue$", "og"), (r"ence$", "ense"),
     (r"ll(ed|ing|er|ers)$", r"l\1"), (r"ilful", "illful"), (r"amme$", "am"), (r"ae", "e"), (r"oe", "e"),
+    # 英綴りで l が 1 つの動詞(enrol・instal・appal)とその派生、-isable、cosy、sceptic、councillor
+    (r"([^l])l$", r"\1ll"), (r"([^l])lment$", r"\1llment"), (r"is(able|ably)$", r"iz\1"), (r"osy$", "ozy"),
+    (r"^scep", "skep"), (r"cillor", "cilor"),
 ]
 
 
