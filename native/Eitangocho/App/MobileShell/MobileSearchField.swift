@@ -29,6 +29,9 @@
           systemName: "xmark", accessibilityLabel: String(localized: .cancel),
           glassID: MobileGlassID(id: "close", namespace: namespace)
         ) {
+          // 先にフォーカスを外してキーボードを下ろし始める。欄は 🔍 へ縮む間も画面に残るので、
+          // 閉じるだけだとその動きが終わるまでキーボードが残る。
+          focused = false
           withAnimation(.smooth) { shell.cancelSearch() }
         }
       }
