@@ -122,15 +122,16 @@
           MobileRegistrationWarningBanner(message: baseFormNotice)
             .padding(.bottom, 14)
         }
-        if let notice = model.notice {
-          MobileRegistrationWarningBanner(message: RegistrationMessages.notice(notice, language: language))
-            .padding(.bottom, 14)
-        }
+        // 綴りの候補があれば、辞書の注意と同じ帯にまとめて出す。
+        let noticeMessage = model.notice.map { RegistrationMessages.notice($0, language: language) }
         if !model.spellingSuggestions.isEmpty {
-          MobileSpellingSuggestionBanner(suggestions: model.spellingSuggestions) { suggestion in
+          MobileSpellingSuggestionBanner(message: noticeMessage, suggestions: model.spellingSuggestions) { suggestion in
             Task { await model.applySpellingSuggestion(suggestion) }
           }
           .padding(.bottom, 14)
+        } else if let noticeMessage {
+          MobileRegistrationWarningBanner(message: noticeMessage)
+            .padding(.bottom, 14)
         }
         if model.translationFailed {
           MobileRegistrationWarningBanner(message: String(localized: .exampleTranslationFailed(languageLabel)))

@@ -1,8 +1,13 @@
 import SwiftUI
 
-/// 綴りの誤りとみられる入力に、正しい綴りの候補を出す帯(「もしかして: independent」)。
+/// 辞書の注意と、綴りの誤りとみられる入力への正しい綴りの候補をまとめて出す帯
+/// (「辞書に見つかりませんでした。…」の下に「もしかして: independent」)。
+///
 /// 見た目は DictionaryWarningBanner にそろえ、候補は押せる語にする。押すとその語で自動入力をやり直す。
+/// 注意と候補は同じ原因(辞書に当たらない)の話なので、帯を 2 つ重ねず 1 つにまとめる。
+/// 注意が無く候補だけのときは、候補の行だけを出す。
 struct SpellingSuggestionBanner: View {
+  let message: String?
   let suggestions: [String]
   let onSelect: (String) -> Void
 
@@ -11,10 +16,15 @@ struct SpellingSuggestionBanner: View {
 
   var body: some View {
     let shape = RoundedRectangle(cornerRadius: px(8))
-    HStack(spacing: px(10)) {
-      AppText(.noticeSpellingSuggestion, style: AppTextStyle(size: 13))
-      ForEach(suggestions, id: \.self) { suggestion in
-        SuggestionLink(word: suggestion) { onSelect(suggestion) }
+    VStack(alignment: .leading, spacing: px(6)) {
+      if let message {
+        AppText(message, style: AppTextStyle(size: 13))
+      }
+      HStack(spacing: px(10)) {
+        AppText(.noticeSpellingSuggestion, style: AppTextStyle(size: 13))
+        ForEach(suggestions, id: \.self) { suggestion in
+          SuggestionLink(word: suggestion) { onSelect(suggestion) }
+        }
       }
     }
     .foregroundStyle(colors.warningBannerForeground)
