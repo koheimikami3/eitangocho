@@ -246,6 +246,8 @@ final class WordRegistrationModel {
     }
     busy = true
     defer { busy = false }
+    // 押した時点の 🔖 を控え、保存と計測の両方に使う(書き込みを待つ間に 🔖 を押されても食い違わないように)。
+    let bookmarked = self.bookmarked
     // フォームでも英単語を書き換えられるため、保存時にも重複を見る
     // (ステップ 1 で弾いた単語に戻された場合もここで止まる)。
     if await rejectIfDuplicate(headword) { return false }
