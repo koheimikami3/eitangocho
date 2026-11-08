@@ -12,6 +12,8 @@
     let onAdd: () -> Void
 
     @Environment(\.palette) private var palette
+    /// 🔍 の丸と検索欄のガラスを結ぶ(形を変えるアニメーション)。
+    @Namespace private var glassNamespace
 
     private static var titleFontSize: CGFloat { 20 }
     private static var countFontSize: CGFloat { 12 }
@@ -20,6 +22,47 @@
       let view = shell.view
       let showSearchAndAdd = view == .learning || view == .allWords
       VStack(alignment: .leading, spacing: 0) {
+        titleRow(view, showSearchAndAdd: showSearchAndAdd)
+          .frame(minHeight: 44)
+        if view == .allWords {
+          // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
+          // 右上の 🔍・＋ は 44pt の丸で、Flutter 版の「＋ 登録」の文字のボタンより背が高い。
+          // 4pt だと並び替えのボタンと上下に接して見えるので 12pt 空ける。
+          sortRow
+            .padding(.top, 12)
+            .padding(.bottom, 10)
+        } else {
+          Spacer().frame(height: 8)
+        }
+      }
+      .padding(EdgeInsets(top: 6, leading: AppDimensions.mobilePadding, bottom: 0, trailing: AppDimensions.mobilePadding))
+      .background {
+        Rectangle()
+          .fill(palette.surface)
+          .appShadows(palette.headerShadow, in: Rectangle(), scale: 1)
+          .ignoresSafeArea(edges: .top)
+      }
+    }
+
+    /// タイトル・件数と 🔍・＋ の行。検索欄を開いている間は、行ごと検索欄と ✕ に置き換える
+    /// (行を増やさず、一覧を下にずらさないため。どの一覧かは下のタブで分かる)。
+    /// iOS 26 以降は行全体を 1 つの GlassEffectContainer に入れ、🔍 の丸が検索欄へ形を変えて伸びるようにする。
+    @ViewBuilder
+    private func titleRow(_ view: MainView, showSearchAndAdd: Bool) -> some View {
+      if #available(iOS 26, *) {
+        GlassEffectContainer(spacing: MobileHeaderButtons.spacing) {
+          titleRowContent(view, showSearchAndAdd: showSearchAndAdd)
+        }
+      } else {
+        titleRowContent(view, showSearchAndAdd: showSearchAndAdd)
+      }
+    }
+
+    @ViewBuilder
+    private func titleRowContent(_ view: MainView, showSearchAndAdd: Bool) -> some View {
+      if showSearchAndAdd && shell.isSearchOpen {
+        MobileSearchField(shell: shell, namespace: glassNamespace)
+      } else {
         HStack(spacing: 8) {
           // 件数はタイトルとベースラインで揃える(上下中央だと小さい件数がタイトルの中ほどに浮く)。
           HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -34,32 +77,12 @@
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           if showSearchAndAdd {
-            MobileHeaderButtons(onSearch: shell.openSearch, onAdd: onAdd)
+            MobileHeaderButtons(
+              namespace: glassNamespace,
+              onSearch: { withAnimation(.smooth) { shell.openSearch() } },
+              onAdd: onAdd)
           }
         }
-        .frame(minHeight: 44)
-        if showSearchAndAdd && shell.isSearchOpen {
-          MobileSearchField(shell: shell)
-            .padding(.top, 4)
-            .padding(.bottom, 10)
-        }
-        if view == .allWords {
-          // 並び替えは全単語だけ(学習中は登録順のカード表示のまま)。
-          // 右上の 🔍・＋ は 44pt の丸で、Flutter 版の「＋ 登録」の文字のボタンより背が高い。
-          // 4pt だと並び替えのボタンと上下に接して見えるので、検索欄が閉じているときは 12pt 空ける。
-          sortRow
-            .padding(.top, shell.isSearchOpen ? 0 : 12)
-            .padding(.bottom, 10)
-        } else if !(showSearchAndAdd && shell.isSearchOpen) {
-          Spacer().frame(height: 8)
-        }
-      }
-      .padding(EdgeInsets(top: 6, leading: AppDimensions.mobilePadding, bottom: 0, trailing: AppDimensions.mobilePadding))
-      .background {
-        Rectangle()
-          .fill(palette.surface)
-          .appShadows(palette.headerShadow, in: Rectangle(), scale: 1)
-          .ignoresSafeArea(edges: .top)
       }
     }
 

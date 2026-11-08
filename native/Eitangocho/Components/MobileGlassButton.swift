@@ -12,6 +12,8 @@
     let accessibilityLabel: String
     var iconSize: CGFloat = 17
     var prominent = false
+    /// 同じ GlassEffectContainer の別のガラスへ形を変えて移るときの ID(ヘッダの 🔍 が検索欄に伸びる)。
+    var glassID: MobileGlassID?
     let action: () -> Void
 
     @Environment(\.palette) private var palette
@@ -21,9 +23,14 @@
 
     var body: some View {
       if #available(iOS 26, *) {
-        Button(action: action) { icon }
+        let button = Button(action: action) { icon }
           .buttonStyle(.plain)
           .glassEffect(prominent ? .regular.tint(palette.accent).interactive() : .regular.interactive(), in: .circle)
+        if let glassID {
+          button.glassEffectID(glassID.id, in: glassID.namespace)
+        } else {
+          button
+        }
       } else if prominent {
         MobilePressable(action: action) {
           icon
@@ -47,6 +54,12 @@
         .contentShape(Circle())
         .accessibilityLabel(Text(verbatim: accessibilityLabel))
     }
+  }
+
+  /// Liquid Glass の形を変えるアニメーションで、ガラスどうしを結びつける ID(iOS 26 以降だけ効く)。
+  struct MobileGlassID {
+    let id: String
+    let namespace: Namespace.ID
   }
 
   /// iOS 版の文字の主ボタン(シート右上の「登録」「保存」)。高さは丸いボタンと揃える。
