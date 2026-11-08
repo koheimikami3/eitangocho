@@ -2680,37 +2680,37 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter manually"
+            "value" : "Type here"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escribe manualmente"
+            "value" : "Escribe aquí"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisie manuelle"
+            "value" : "Saisir ici"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "手動で入力してください"
+            "value" : "入力してください"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "직접 입력해 주세요"
+            "value" : "입력해 주세요"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請手動輸入"
+            "value" : "請輸入"
           }
         }
       }
