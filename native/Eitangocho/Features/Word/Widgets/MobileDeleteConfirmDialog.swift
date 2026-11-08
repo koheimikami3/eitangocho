@@ -10,7 +10,7 @@
     /// 確定すると `onDeleted` を呼び(編集シートを閉じるのに使う)、削除する。
     @MainActor
     static func present(_ word: Word, store: WordStore, onDeleted: @escaping () -> Void) {
-      guard let presenter = topViewController() else { return }
+      guard let presenter = UIApplication.shared.topViewController else { return }
       let alert = UIAlertController(
         title: String(localized: .deleteConfirmTitle(word.word)), message: String(localized: .deleteConfirmBody),
         preferredStyle: .alert)
@@ -22,18 +22,6 @@
           Task { await store.delete(word) }
         })
       presenter.present(alert, animated: true)
-    }
-
-    /// アラートを出す画面(いちばん上に出ている画面。QuizInterstitialAd と同じ探し方)。
-    private static func topViewController() -> UIViewController? {
-      let root = UIApplication.shared.connectedScenes
-        .compactMap { $0 as? UIWindowScene }
-        .flatMap(\.windows)
-        .first(where: \.isKeyWindow)?
-        .rootViewController
-      var top = root
-      while let presented = top?.presentedViewController { top = presented }
-      return top
     }
   }
 #endif
