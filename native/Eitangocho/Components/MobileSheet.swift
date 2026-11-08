@@ -144,9 +144,16 @@
         .padding(.top, !showGrabber && hasButtons ? 6 : 0)
       }
       .frame(maxWidth: .infinity)
-      .overlay(alignment: .bottom) {
-        Rectangle().fill(palette.borderAlpha(6)).frame(height: 1)
+      // 下端は一覧のヘッダ(MobileHeader)と同じ影にする。中身がこの下を流れるので、線より「上に載っている」ことが伝わる。
+      // 面はシートの上角の丸みに合わせる(並び替えのシートは切り抜かないので、四角だと角がはみ出す)。
+      .background {
+        let shape = UnevenRoundedRectangle(topLeadingRadius: 18, topTrailingRadius: 18)
+        shape
+          .fill(palette.surface)
+          .appShadows(palette.headerShadow, in: shape, scale: 1)
       }
+      // 影を後ろに並ぶ中身(入力欄の面など)より上に描く。
+      .zIndex(1)
       .mobileSheetDragHandle()
     }
   }

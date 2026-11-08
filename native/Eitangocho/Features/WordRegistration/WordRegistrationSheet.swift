@@ -81,12 +81,15 @@
       VStack(alignment: .leading, spacing: 16) {
         AppText(language.registrationIntro, style: AppTextStyle(size: 12, height: 1.6))
           .foregroundStyle(palette.textAlpha(50))
-        MobileLabeledField(
-          label: String(localized: .fieldWord), text: $model.word, hint: "apple", asciiKeyboard: true,
-          correction: false, onSubmit: autoFill)
-        MobileFilledButton(
-          label: String(localized: .autoFill), padding: EdgeInsets(top: 13, leading: 13, bottom: 13, trailing: 13),
-          cornerRadius: 11, expands: true, action: autoFill)
+        // 「自動入力」はすぐ上の欄に入れた語に働くボタンなので、欄との間を他より詰めて組に見せる。
+        VStack(spacing: 12) {
+          MobileLabeledField(
+            label: String(localized: .fieldWord), text: $model.word, hint: "apple", asciiKeyboard: true,
+            correction: false, onSubmit: autoFill)
+          MobileFilledButton(
+            label: String(localized: .autoFill), padding: EdgeInsets(top: 13, leading: 13, bottom: 13, trailing: 13),
+            cornerRadius: 11, expands: true, action: autoFill)
+        }
         if let errorMessage = errorText(language) {
           AppText(errorMessage, style: AppTextStyle(size: 12))
             .foregroundStyle(palette.danger)
@@ -99,6 +102,8 @@
             .frame(maxWidth: .infinity)
         }
       }
+      // 見出しの下からの余白を、フォームの最初の項目(MobileFormRows の上の余白)とそろえる。
+      .padding(.top, 12)
     }
 
     private func autoFill() {

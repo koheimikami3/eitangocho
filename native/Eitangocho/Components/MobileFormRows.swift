@@ -7,8 +7,9 @@
   struct MobileFormRows<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
-    /// 項目の上下の余白(デザインの 14)。
-    private static var verticalPadding: CGFloat { 14 }
+    /// 項目の上下の余白。項目の間は 2 倍の 24pt になる(デザインの 14 = 28pt は間延びするので詰めた。
+    /// 見出しと欄の間の 7pt の 3 倍以上あれば、見出しがどの欄のものかは迷わない)。
+    private static var verticalPadding: CGFloat { 12 }
 
     var body: some View {
       VStack(alignment: .leading, spacing: 0) {
