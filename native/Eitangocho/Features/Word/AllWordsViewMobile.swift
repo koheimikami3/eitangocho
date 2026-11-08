@@ -17,8 +17,10 @@
       if !store.isLoaded {
         MobileLoadingIndicator()
       } else if words.isEmpty {
-        // ブックマークで絞っていて 0 語なら、🔖 の付け方を案内する(単語が無いのではないため)。
-        let noBookmarks = shell.bookmarksOnly && !store.words.isEmpty
+        // ブックマークで絞っていて 1 語も付いていなければ、🔖 の付け方を案内する(単語が無いのではないため)。
+        // 付いていても検索で 0 語になったときは、この案内は出さない。
+        let noBookmarks =
+          shell.bookmarksOnly && !store.words.isEmpty && !store.words.contains(where: \.isBookmarked)
         AppText(noBookmarks ? .noBookmarksYet : .noWordsYet, style: AppTextStyle(size: 14, height: 1.6))
           .foregroundStyle(palette.textAlpha(45))
           .multilineTextAlignment(.center)

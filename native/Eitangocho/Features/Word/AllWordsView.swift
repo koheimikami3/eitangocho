@@ -42,8 +42,11 @@ struct AllWordsView: View {
                   })
               }
             }
-            // ブックマークで絞っていて 0 語なら、🔖 の付け方を案内する(単語が無いのではないため)。
-            if words.isEmpty && shell.bookmarksOnly && !store.words.isEmpty {
+            // ブックマークで絞っていて 1 語も付いていなければ、🔖 の付け方を案内する(単語が無いのではないため)。
+            // 付いていても検索で 0 語になったときは、この案内は出さない。
+            if words.isEmpty && shell.bookmarksOnly && !store.words.isEmpty
+              && !store.words.contains(where: \.isBookmarked)
+            {
               AppText(.noBookmarksYet, style: AppTextStyle(size: 13, height: 1.6))
                 .foregroundStyle(colors.textTertiary)
                 .multilineTextAlignment(.center)
