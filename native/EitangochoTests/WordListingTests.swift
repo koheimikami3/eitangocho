@@ -100,4 +100,16 @@ struct WordListingTests {
     // 訳はすべて「<単語> の訳」なので、訳も対象なら全件が一致してしまう。
     #expect(WordListing.filteredAll(words, query: "訳", order: .newest).isEmpty)
   }
+
+  @Test func ブックマークで絞ると検索と並び順もそのまま効く() {
+    var bookmarked = words
+    for index in bookmarked.indices where ["banana", "date", "cherry"].contains(bookmarked[index].word) {
+      bookmarked[index].groupIds = [WordGroup.bookmarkID]
+    }
+    #expect(
+      WordListing.filteredAll(bookmarked, query: "a", order: .alphabetical, bookmarksOnly: true).map(\.word)
+        == ["banana", "date"])
+    // 絞らなければ、ブックマークかどうかは並びに関係しない。
+    #expect(WordListing.filteredAll(bookmarked, query: "a", order: .alphabetical).count == 3)
+  }
 }

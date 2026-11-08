@@ -220,6 +220,37 @@ struct WordDaoTests {
     #expect(try await dao.getAll().first?.isLearned == false)
   }
 
+  @Test("setBookmarked でブックマークを付け外しし、updatedAt を進め、ほかのグループは残す")
+  func togglesBookmark() async throws {
+    let created = Date(timeIntervalSince1970: 1_700_000_000)
+    let id = try await dao.insertWord(apple(), now: created)
+    try await database.writer.write { db in
+      try db.execute(sql: "UPDATE words SET group_ids = 'future' WHERE id = ?", arguments: [id])
+    }
+
+    let bookmarked = created.addingTimeInterval(60)
+    try await dao.setBookmarked(id: id, true, now: bookmarked)
+    var word = try #require(try await dao.getAll().first)
+    #expect(word.groupIds == ["bookmark", "future"])
+    #expect(word.updatedAt == bookmarked)
+
+    try await dao.setBookmarked(id: id, false, now: bookmarked.addingTimeInterval(60))
+    word = try #require(try await dao.getAll().first)
+    #expect(word.groupIds == ["future"])
+    #expect(!word.isBookmarked)
+  }
+
+  @Test("編集してもブックマークは外れない")
+  func editKeepsBookmark() async throws {
+    let id = try await dao.insertWord(apple())
+    try await dao.setBookmarked(id: id, true)
+
+    try await dao.updateWord(
+      id: id, WordEdit(word: "apple", meaning: "林檎", ipa: "", partsOfSpeech: [], exampleEn: "", exampleTranslation: ""))
+
+    #expect(try await dao.getAll().first?.isBookmarked == true)
+  }
+
   @Test("recordQuizResult(knew: true) は correctCount+1・lastReviewedAt を付け、updatedAt は変えない")
   func recordsKnewAnswer() async throws {
     let created = Date(timeIntervalSince1970: 1_700_000_000)

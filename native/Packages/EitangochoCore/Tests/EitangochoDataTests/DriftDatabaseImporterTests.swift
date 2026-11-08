@@ -79,7 +79,7 @@ final class DriftDatabaseImporterTests {
 
     // 開けば最新のスキーマで作られる。
     let database = try openDestination()
-    #expect(try database.writer.read { try AppDatabase.userVersion($0) } == 8)
+    #expect(try database.writer.read { try AppDatabase.userVersion($0) } == 9)
   }
 
   @Test("v7 の DB を引き継ぐと単語・削除ログ・辞書がそろい、記録が残る")
@@ -136,7 +136,7 @@ final class DriftDatabaseImporterTests {
     guard case .performed(let record) = outcome else { Issue.record("\(outcome)"); return }
     #expect(record.sourceUserVersion == version)
     let database = try openDestination()
-    #expect(try await database.writer.read { try AppDatabase.userVersion($0) } == 8)
+    #expect(try await database.writer.read { try AppDatabase.userVersion($0) } == 9)
     #expect(try await database.wordDao.getAll().first?.translationLanguage == "ja")
     #expect(try await database.dictionaryCacheDao.find("apple") == nil)
   }

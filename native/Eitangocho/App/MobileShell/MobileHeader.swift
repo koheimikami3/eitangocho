@@ -112,20 +112,28 @@
       }
     }
 
-    /// 全単語の並び替えの行。左に表示中の件数(検索で絞り込んだ後)、右に現在の並び順のボタン。
+    /// 全単語の並び替えの行。左にブックマークの絞り込みと表示中の件数(検索で絞り込んだ後)、右に現在の並び順のボタン。
     ///
-    /// 件数は検索語があるときだけ出す。検索していなければタイトルの脇の件数と同じ数の重複になり、
+    /// 件数は検索かブックマークで絞り込んでいるときだけ出す。絞り込んでいなければタイトルの脇の件数と同じ数の重複になり、
     /// 検索中はタイトルの行が検索欄に置き換わって、絞り込んだ件数を伝えられるのがここだけになるため。
+    /// ブックマークで絞った件数はタイトルの脇の件数(全単語の数)と違うので出す(2026-11-08 のユーザー判断)。
+    /// ボタンは縮めず、幅が足りなければ件数の末尾を省略する(長い訳の言語・長い並び順の文言のとき)。
     private var sortRow: some View {
       let query = shell.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
       return HStack(spacing: 8) {
-        if !query.isEmpty {
-          let shown = WordListing.filteredAll(words.words, query: shell.searchQuery, order: settings.wordSortOrder).count
+        MobileBookmarksFilterButton(shell: shell)
+          .fixedSize()
+        if !query.isEmpty || shell.bookmarksOnly {
+          let shown = WordListing.filteredAll(
+            words.words, query: shell.searchQuery, order: settings.wordSortOrder, bookmarksOnly: shell.bookmarksOnly
+          ).count
           AppText(String(localized: .showingWordCount(shown)), style: AppTextStyle(size: 12))
             .foregroundStyle(palette.textAlpha(45))
+            .lineLimit(1)
         }
         Spacer(minLength: 0)
         MobileWordSortButton(settings: settings)
+          .fixedSize()
       }
     }
   }

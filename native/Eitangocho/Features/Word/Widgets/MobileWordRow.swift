@@ -11,6 +11,7 @@
     /// 覚えた回数を訳の下の行に出すか(覚えた回数で並べているときだけ、並びの根拠として見せる)。
     var showCorrectCount = false
     let onToggleLearned: (Bool) -> Void
+    let onToggleBookmark: (Bool) -> Void
     let onTap: () -> Void
 
     @Environment(\.palette) private var palette
@@ -41,8 +42,10 @@
             }
           }
           .frame(maxWidth: .infinity, alignment: .leading)
-          Spacer().frame(width: 8)
-          MobilePronunciationButton(word: word.word, variant: .icon)
+          // 🔖 のタップ領域は絵柄の左右に余白を持つので、訳との間は空けずに並べる(訳に回る幅を残すため)。
+          MobileBookmarkButton(isBookmarked: word.isBookmarked, onToggle: onToggleBookmark)
+          // 🔊 の丸の左の余白は 🔖 との間の分だけにする(44pt のままだと 🔖 と離れすぎ、訳の幅も削る)。
+          MobilePronunciationButton(word: word.word, variant: .icon, iconTapWidth: 32)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

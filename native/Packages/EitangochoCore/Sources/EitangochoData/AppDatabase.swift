@@ -7,11 +7,12 @@ import GRDB
 /// `PRAGMA user_version` で持ち、drift の番号を引き継ぐ。GRDB の
 /// `DatabaseMigrator` は使わない(`grdb_migrations` 表を作らない)。ファイルを
 /// drift と互換のまま保てば、Flutter に戻す版が必要になってもそのまま開ける。
-/// 今後スキーマを変えるときは v9 以降にし、列・テーブルの追加だけにする
+/// 今後スキーマを変えるときは v10 以降にし、列・テーブルの追加だけにする
 /// (docs/design.md「データ・同期」)。
 public final class AppDatabase: Sendable {
   /// v7 までは drift の `schemaVersion` と同じ番号。v8 からは Swift 版だけが上げる。
-  public static let schemaVersion = 8
+  /// v9: 単語の属するグループ(`group_ids`。お気に入りもその 1 つ)。
+  public static let schemaVersion = 9
 
   public let writer: any DatabaseWriter
 
@@ -91,7 +92,8 @@ public final class AppDatabase: Sendable {
           "last_reviewed_at" INTEGER NULL,
           "correct_count" INTEGER NOT NULL DEFAULT 0,
           "created_at" INTEGER NOT NULL,
-          "updated_at" INTEGER NOT NULL
+          "updated_at" INTEGER NOT NULL,
+          "group_ids" TEXT NOT NULL DEFAULT ''
         );
         CREATE TABLE "deleted_words" (
           "word" TEXT NOT NULL,
@@ -142,6 +144,11 @@ public final class AppDatabase: Sendable {
     // kaikki から入れ直される。
     if version < 8 {
       try db.execute(sql: "DELETE FROM dictionary_cache_entries")
+    }
+    // v8 → v9: 単語の属するグループの列を足す(Swift 版だけの列。drift は新しい版の DB を開いても何もしないので、
+    // Flutter 版に戻しても列が残るだけで読み書きできる)。v4 と同じく、列があれば足さない。
+    if version < 9, try !db.columns(in: "words").contains(where: { $0.name == "group_ids" }) {
+      try db.execute(sql: #"ALTER TABLE "words" ADD COLUMN "group_ids" TEXT NOT NULL DEFAULT ''"#)
     }
   }
 }

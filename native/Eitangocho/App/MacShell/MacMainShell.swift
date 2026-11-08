@@ -23,6 +23,8 @@
         }
       }
       .background(colors.background)
+      // 信号機ボタンを標準のサイドバーのアプリと同じく内側へ寄せる。
+      .background(TrafficLightsPlacement())
       // タイトルバーを透明にして、サイドバーが信号機ボタンの背後まで届く見た目にする。
       .ignoresSafeArea()
     }

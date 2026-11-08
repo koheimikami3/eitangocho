@@ -80,4 +80,16 @@ struct AnalyticsLoggerTests {
         ["to": "learning", "soon_after_quiz": "false"],
       ])
   }
+
+  @Test func ブックマークの付け外しと絞り込みは画面と向きを送る() {
+    logger.logWordBookmarkToggled(isBookmarked: true, screen: .wordEdit)
+    logger.logWordBookmarkToggled(isBookmarked: false, screen: .allWords)
+    logger.logBookmarksFilterToggled(true)
+    #expect(
+      client.eventsNamed("word_bookmark_toggled") == [
+        ["to": "bookmarked", "screen": "word_edit"],
+        ["to": "none", "screen": "all_words"],
+      ])
+    #expect(client.eventsNamed("bookmarks_filter_toggled") == [["to": "on"]])
+  }
 }

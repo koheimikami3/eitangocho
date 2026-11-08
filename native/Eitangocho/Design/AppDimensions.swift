@@ -7,6 +7,9 @@ import CoreGraphics
 nonisolated enum AppDimensions {
   static let sidebarWidth: CGFloat = 212
   static let toolbarHeight: CGFloat = 52
+  /// macOS 26 以降のツールバーに並ぶガラスの部品(🔖・並び順・検索欄・単語を登録)の高さ。
+  /// ガラスは縁が目立つので、高さがずれると不揃いに見える。全部をこの値に揃える。
+  static let toolbarControlHeight: CGFloat = 36
   static let contentPadding: CGFloat = 20
   /// 登録フォーム・編集モーダルの幅
   static let formWidth: CGFloat = 560

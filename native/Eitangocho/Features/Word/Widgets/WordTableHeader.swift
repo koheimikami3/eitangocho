@@ -16,6 +16,7 @@ struct WordTableHeader: View {
       cell(String(localized: .tablePartOfSpeech), width: WordTableColumns.partOfSpeech)
       cell(meaningLabel, width: columns.meaning)
       cell(String(localized: .tableExample), width: columns.example)
+      cell("", width: WordTableColumns.bookmark)
       cell(String(localized: .tablePronunciation), width: WordTableColumns.pronunciation)
     }
     .padding(.horizontal, px(WordTableColumns.horizontalPadding))

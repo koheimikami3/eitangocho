@@ -43,7 +43,8 @@ struct LearningWordsView: View {
       onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
       onContextMenu: { position in
         WordContextMenu.show(
-          at: position, word: word, store: store, language: language, overlay: overlay, colors: colors)
+          at: position, word: word, store: store, language: language, screen: .learning, overlay: overlay,
+          colors: colors)
       }
     )
   }

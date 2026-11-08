@@ -67,7 +67,8 @@
         return
       }
       try? await Task.sleep(for: Self.presentDelay)
-      guard let viewController = Self.topViewController() else {
+      // 広告はいちばん上に出ている画面から出す。
+      guard let viewController = UIApplication.shared.topViewController else {
         release()
         return
       }
@@ -86,18 +87,6 @@
 
     private func release() {
       isHoldingResult = false
-    }
-
-    /// 広告を出す画面(いちばん上に出ている画面)。
-    private static func topViewController() -> UIViewController? {
-      let root = UIApplication.shared.connectedScenes
-        .compactMap { $0 as? UIWindowScene }
-        .flatMap(\.windows)
-        .first(where: \.isKeyWindow)?
-        .rootViewController
-      var top = root
-      while let presented = top?.presentedViewController { top = presented }
-      return top
     }
   }
 

@@ -15,7 +15,8 @@ struct AllWordsView: View {
   @Environment(\.appOverlay) private var overlay
 
   var body: some View {
-    let words = WordListing.filteredAll(store.words, query: shell.searchQuery, order: settings.wordSortOrder)
+    let words = WordListing.filteredAll(
+      store.words, query: shell.searchQuery, order: settings.wordSortOrder, bookmarksOnly: shell.bookmarksOnly)
     let language = settings.translationLanguage
     GeometryReader { geometry in
       // 列幅は素の値で決める(倍率を掛ける前の幅に直す)。
@@ -32,12 +33,25 @@ struct AllWordsView: View {
                   columns: columns,
                   showCorrectCount: settings.wordSortOrder.group == .correctCount,
                   onToggleLearned: { value in Task { await store.setLearned(word, value) } },
+                  onToggleBookmark: { value in Task { await store.setBookmarked(word, value, screen: .allWords) } },
                   onTap: { EditWordDialog.present(word, store: store, language: language, overlay: overlay) },
                   onContextMenu: { position in
                     WordContextMenu.show(
-                      at: position, word: word, store: store, language: language, overlay: overlay, colors: colors)
+                      at: position, word: word, store: store, language: language, screen: .allWords,
+                      overlay: overlay, colors: colors)
                   })
               }
+            }
+            // ブックマークで絞っていて 1 語も付いていなければ、🔖 の付け方を案内する(単語が無いのではないため)。
+            // 付いていても検索で 0 語になったときは、この案内は出さない。
+            if words.isEmpty && shell.bookmarksOnly && !store.words.isEmpty
+              && !store.words.contains(where: \.isBookmarked)
+            {
+              AppText(.noBookmarksYet, style: AppTextStyle(size: 13, height: 1.6))
+                .foregroundStyle(colors.textTertiary)
+                .multilineTextAlignment(.center)
+                .padding(.top, px(48))
+                .frame(maxWidth: .infinity)
             }
           }
         }

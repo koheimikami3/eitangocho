@@ -7,7 +7,7 @@
     let store: WordStore
     let shell: MainShellModel
     let settings: SettingsStore
-    /// 登録したばかりの見出し語。そのカードを弾ませて、まわりに波紋を添える(MobileCardPop)。
+    /// 登録したばかりの見出し語。そのカードを弾ませる(MobileCardPop)。
     var celebratedWord: String?
     let onEdit: (Word) -> Void
     let onRegister: () -> Void

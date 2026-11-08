@@ -53,7 +53,7 @@ struct AppOverlayHost: View {
 }
 
 /// スナックバーの帯(Flutter の Material 3 の SnackBar の既定: inverseSurface の地・
-/// 本文は bodyMedium・左右 24 と上下 14 の余白・高さ 6 の影・角丸なし)。
+/// 本文は bodyMedium・左右 24 と上下 14 の余白・高さ 6 の影・角丸なし)。macOS 26 以降は浮いたガラスのカプセル(glassCapsule)。
 private struct SnackBarView: View {
   let message: String
 
@@ -61,6 +61,32 @@ private struct SnackBarView: View {
   @Environment(\.uiScale) private var px
 
   var body: some View {
+    #if os(macOS)
+      if #available(macOS 26, *) {
+        glassCapsule
+      } else {
+        bar
+      }
+    #else
+      bar
+    #endif
+  }
+
+  #if os(macOS)
+    /// macOS 26 以降: 下端から少し浮かせた、中央寄せの Liquid Glass のカプセル(ツールバーの部品と同じ素材)。
+    /// 全幅の帯だと窓の下端に張り付いて見え、浮いたガラスのサイドバー・ツールバーと揃わないため。
+    @available(macOS 26, *)
+    private var glassCapsule: some View {
+      AppText(message, style: AppTextStyle(size: 14))
+        .foregroundStyle(colors.textPrimary)
+        .padding(.horizontal, px(20))
+        .padding(.vertical, px(12))
+        .glassEffect(.regular, in: .capsule)
+        .padding(.bottom, px(20))
+    }
+  #endif
+
+  private var bar: some View {
     AppText(message, style: AppTextStyle(size: 14))
       .foregroundStyle(colors.materialOnInverseSurface)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -99,15 +125,41 @@ private struct PopupMenuBox: View {
       }
     }
     .padding(px(4 + 1))
-    .background(shape.fill(colors.menuBackground))
-    .overlay(shape.strokeBorder(colors.borderAlpha(12), lineWidth: px(1)))
-    .appShadows(colors.menuShadow, in: shape, scale: px.factor)
+    .modifier(MenuSurface(shape: shape))
     // Esc で閉じる。
     .focusable()
     .focused($focused)
     .focusEffectDisabled()
     .onEscape(perform: close)
     .onAppear { focused = true }
+  }
+}
+
+/// メニューの箱の地。macOS 26 以降は Liquid Glass(標準のメニューと同じく後ろが透ける)。
+/// それより前と iOS は、メニューの地 + 枠線 + 影。
+private struct MenuSurface: ViewModifier {
+  let shape: RoundedRectangle
+
+  @Environment(\.colors) private var colors
+  @Environment(\.uiScale) private var px
+
+  func body(content: Content) -> some View {
+    #if os(macOS)
+      if #available(macOS 26, *) {
+        content.glassEffect(.regular, in: shape)
+      } else {
+        fallback(content)
+      }
+    #else
+      fallback(content)
+    #endif
+  }
+
+  private func fallback(_ content: Content) -> some View {
+    content
+      .background(shape.fill(colors.menuBackground))
+      .overlay(shape.strokeBorder(colors.borderAlpha(12), lineWidth: px(1)))
+      .appShadows(colors.menuShadow, in: shape, scale: px.factor)
   }
 }
 

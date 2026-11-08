@@ -20,6 +20,8 @@
         // 既定の倍率でウィンドウを最小幅まで狭めると収まらないので、そのときは並び順の文字を省略して縮む。
         if shell.view == .allWords {
           Spacer(minLength: px(16))
+          BookmarksFilterButton(shell: shell)
+          Spacer().frame(width: px(8))
           WordSortButton(settings: settings)
           Spacer().frame(width: px(10))
         } else {
@@ -31,24 +33,37 @@
             .fixedSize()
           Spacer().frame(width: px(10))
         }
-        AppFilledButton(
-          label: String(localized: .addWord), verticalPadding: 6, fontSize: 13, borderRadius: 7
-        ) {
-          shell.selectView(.registration)
-        }
-        .fixedSize()
+        ToolbarAddButton { shell.selectView(.registration) }
+          .fixedSize()
       }
       .padding(.horizontal, px(16))
-      // 下の境界線の分だけ中身を狭める(Flutter の Container は枠線の幅を内側の余白に足す)。
-      .padding(.bottom, px(1))
-      .frame(height: px(AppDimensions.toolbarHeight))
+      .modifier(ToolbarSurface())
       .frame(maxWidth: .infinity)
       // タイトルバーの代わり: 空いている所のドラッグで移動、ダブルクリックで拡大 / 元に戻す。
       .background(WindowDragArea())
-      // iOS のヘッダと同じく面の色(ライトは白)にし、下のグレーの地(カードを並べる面)と分ける。
-      .background(colors.surface)
-      .overlay(alignment: .bottom) {
-        Rectangle().fill(colors.border).frame(height: px(1))
+    }
+  }
+
+  /// ツールバーの帯。macOS 26 以降は帯を描かず、下の地のまま部品(ガラス)だけを浮かせる
+  /// (標準のツールバーと同じ)。それより前は、iOS のヘッダと同じく面の色(ライトは白)の帯 + 下の境界線で、
+  /// 下のグレーの地(カードを並べる面)と分ける。
+  private struct ToolbarSurface: ViewModifier {
+    @Environment(\.colors) private var colors
+    @Environment(\.uiScale) private var px
+
+    func body(content: Content) -> some View {
+      if #available(macOS 26, *) {
+        content.frame(height: px(AppDimensions.toolbarHeight))
+      } else {
+        content
+          // 下の境界線の分だけ中身を狭める(Flutter の Container は枠線の幅を内側の余白に足す)。
+          .padding(.bottom, px(1))
+          .frame(height: px(AppDimensions.toolbarHeight))
+          .frame(maxWidth: .infinity)
+          .background(colors.surface)
+          .overlay(alignment: .bottom) {
+            Rectangle().fill(colors.border).frame(height: px(1))
+          }
       }
     }
   }

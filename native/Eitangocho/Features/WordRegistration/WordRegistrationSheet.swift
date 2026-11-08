@@ -40,7 +40,10 @@
       MobileSheet(
         title: String(localized: .navRegistration), leftLabel: leftLabel, leftIcon: isForm ? .back : .close,
         onLeft: leftAction(isForm),
-        rightLabel: rightLabel, onRight: { save() }
+        rightLabel: rightLabel, onRight: { save() },
+        // ブックマークはフォームのときだけ。単語はまだ無いので、「登録」を押したときに一緒に付ける。
+        headerAccessory: isForm
+          ? AnyView(MobileSheetBookmarkButton(isBookmarked: model.bookmarked) { model.bookmarked = $0 }) : nil
       ) {
         stepContent
       } footer: {

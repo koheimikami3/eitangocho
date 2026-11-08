@@ -50,6 +50,13 @@ final class WordStore {
     await perform { try await dao.setLearned(id: word.id, isLearned) }
   }
 
+  /// カード・一覧の 🔖 の操作。学習中・全単語の画面が同じことをするため 1 つにまとめる(`setLearned` と同じ)。
+  /// `view` は押した画面(計測用)。
+  func setBookmarked(_ word: Word, _ isBookmarked: Bool, screen: BookmarkScreen) async {
+    analytics.logWordBookmarkToggled(isBookmarked: isBookmarked, screen: screen)
+    await perform { try await dao.setBookmarked(id: word.id, isBookmarked) }
+  }
+
   /// 同じ単語が他に登録されていれば返す(編集で単語名を既存の単語に書き換えさせないため)。
   func duplicate(of word: String, excluding id: Int64? = nil) async -> Word? {
     do {

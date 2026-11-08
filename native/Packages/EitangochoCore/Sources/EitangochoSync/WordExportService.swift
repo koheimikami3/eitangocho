@@ -70,6 +70,8 @@ public struct WordExportService: Sendable {
   /// - 一致なし: 追加(ファイルの createdAt / updatedAt を保つ)
   /// - 一致あり: ファイル側の updatedAt が新しいときだけ上書き(word の表記・
   ///   createdAt は DB 側を保つ)。それ以外は変更なし
+  /// - グループ(お気に入りなど)は内容と一緒に上書きする。ただしファイルの単語に `groupIds` のキーが無ければ
+  ///   (グループを知らない版が書いた)、こちらのグループを残す
   /// - クイズの回答の実績は単語の勝敗と切り離し、lastReviewedAt はファイルと DB の新しい方、
   ///   correctCount は大きい方を採る(手動の取り込みでも古いバックアップで回数を減らさない)
   /// - word / japanese の欠落・型の不正・空文字の行は飛ばして続ける
@@ -254,7 +256,7 @@ private struct PlannedEntry {
       exampleEn: entry.exampleEn, exampleTranslation: entry.exampleTranslation,
       translationLanguage: entry.translationLanguage, audioUrl: entry.audioUrl,
       isLearned: entry.isLearned, lastReviewedAt: lastReviewedAt, correctCount: correctCount,
-      createdAt: createdAt, updatedAt: updatedAt)
+      createdAt: createdAt, updatedAt: updatedAt, groupIds: entry.groupIds)
   }
 }
 
