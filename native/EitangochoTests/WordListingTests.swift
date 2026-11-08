@@ -100,4 +100,16 @@ struct WordListingTests {
     // 訳はすべて「<単語> の訳」なので、訳も対象なら全件が一致してしまう。
     #expect(WordListing.filteredAll(words, query: "訳", order: .newest).isEmpty)
   }
+
+  @Test func お気に入りで絞ると検索と並び順もそのまま効く() {
+    var favorites = words
+    for index in favorites.indices where ["banana", "date", "cherry"].contains(favorites[index].word) {
+      favorites[index].groupIds = [WordGroup.favoriteID]
+    }
+    #expect(
+      WordListing.filteredAll(favorites, query: "a", order: .alphabetical, favoritesOnly: true).map(\.word)
+        == ["banana", "date"])
+    // 絞らなければ、お気に入りかどうかは並びに関係しない。
+    #expect(WordListing.filteredAll(favorites, query: "a", order: .alphabetical).count == 3)
+  }
 }

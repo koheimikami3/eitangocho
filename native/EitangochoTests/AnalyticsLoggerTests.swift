@@ -80,4 +80,16 @@ struct AnalyticsLoggerTests {
         ["to": "learning", "soon_after_quiz": "false"],
       ])
   }
+
+  @Test func お気に入りの付け外しと絞り込みは画面と向きを送る() {
+    logger.logWordFavoriteToggled(isFavorite: true, view: .learning)
+    logger.logWordFavoriteToggled(isFavorite: false, view: .allWords)
+    logger.logFavoritesFilterToggled(true)
+    #expect(
+      client.eventsNamed("word_favorite_toggled") == [
+        ["to": "favorite", "screen": "learning"],
+        ["to": "none", "screen": "all_words"],
+      ])
+    #expect(client.eventsNamed("favorites_filter_toggled") == [["to": "on"]])
+  }
 }

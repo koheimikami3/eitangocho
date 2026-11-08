@@ -20,6 +20,8 @@
         // 既定の倍率でウィンドウを最小幅まで狭めると収まらないので、そのときは並び順の文字を省略して縮む。
         if shell.view == .allWords {
           Spacer(minLength: px(16))
+          FavoritesFilterButton(shell: shell)
+          Spacer().frame(width: px(8))
           WordSortButton(settings: settings)
           Spacer().frame(width: px(10))
         } else {

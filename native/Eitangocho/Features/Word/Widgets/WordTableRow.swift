@@ -8,6 +8,7 @@ struct WordTableRow: View {
   /// 覚えた回数を単語の下に出すか。普段は出さず、覚えた回数で並べているときだけ並びの根拠として見せる。
   let showCorrectCount: Bool
   let onToggleLearned: (Bool) -> Void
+  let onToggleFavorite: (Bool) -> Void
   let onTap: () -> Void
   let onContextMenu: (CGPoint) -> Void
 
@@ -54,7 +55,10 @@ struct WordTableRow: View {
       }
       .frame(width: px(columns.example), alignment: .leading)
       // 行は上揃えなので、28 のボタンをそのまま置くと 13px の文字の行より低く見える。
-      // 上下中央を先頭列のチェックの箱に揃えるだけ、見た目だけ引き上げる。
+      // 上下中央を先頭列のチェックの箱に揃えるだけ、見た目だけ引き上げる(★ と 🔊 で同じ)。
+      FavoriteButton(isFavorite: word.isFavorite, onToggle: onToggleFavorite)
+        .offset(y: px(-5))
+        .frame(width: px(WordTableColumns.favorite), alignment: .topLeading)
       PronunciationButton(word: word.word, variant: .tableIcon)
         .offset(y: px(-5))
         .frame(width: px(WordTableColumns.pronunciation), alignment: .topLeading)

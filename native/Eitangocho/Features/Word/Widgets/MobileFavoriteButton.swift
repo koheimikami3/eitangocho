@@ -15,6 +15,7 @@
     private static let iconSize: CGFloat = 18
 
     var body: some View {
+      let label: LocalizedStringResource = isFavorite ? .removeFromFavorites : .addToFavorites
       MobilePressable(action: { onToggle(!isFavorite) }) {
         Image(systemName: isFavorite ? "star.fill" : "star")
           .font(.system(size: Self.iconSize, weight: .medium))
@@ -23,7 +24,7 @@
           .frame(width: MobilePronunciationButton.minTapTarget, height: MobilePronunciationButton.circleDiameter)
           .contentShape(Rectangle())
       }
-      .accessibilityLabel(Text(isFavorite ? .removeFromFavorites : .addToFavorites))
+      .accessibilityLabel(Text(label))
     }
   }
 #endif
