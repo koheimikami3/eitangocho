@@ -3,7 +3,7 @@
 
   /// iOS 版の「テーマカラー」の画面(8 色の一覧。設定から押して進む)。選ぶとすぐアプリ全体の色が変わる。
   ///
-  /// 未購入のときはブルー以外に鍵を付け、押すと Pro 版で選べることを案内する(MobileThemeColorLockedDialog。
+  /// 未購入のときはブルー以外に鍵を付け、押すと Pro 版で選べることを案内する(MobileProOfferDialog。
   /// そこから設定のトップの Pro の欄と同じ購入ができる)。買えたら、そのまま選べる状態になる。
   struct ThemeColorViewMobile: View {
     let settings: SettingsStore
@@ -26,7 +26,9 @@
               ThemeColorSwatch(color: color, selected: palette.theme == color, locked: locked) {
                 if locked {
                   analytics.logThemeColorLockedTapped()
-                  if let purchase { MobileThemeColorLockedDialog.present(purchase: purchase, overlay: overlay) }
+                  if let purchase {
+                    MobileProOfferDialog.present(purchase: purchase, source: .themeColor, overlay: overlay)
+                  }
                 } else {
                   settings.setThemeColor(color)
                 }

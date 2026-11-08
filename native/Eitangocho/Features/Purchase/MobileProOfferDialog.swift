@@ -1,18 +1,22 @@
 #if os(iOS)
   import SwiftUI
 
-  /// テーマカラーの画面で鍵の付いた色を押したときの案内。中身は設定画面の Pro の欄(MobileProOffer)と同じで、
+  /// Pro 版の案内のダイアログ。中身は設定画面の Pro の欄(MobileProOffer)と同じで、
   /// 一番下だけ「購入を復元」の代わりに「閉じる」を置く。
   ///
-  /// 押してすぐ購入の画面を出すと驚かせるので、一度ここで買うかどうかを選ばせる。色だけでなく広告の非表示も
-  /// 同じ買い物で手に入ることを伝えるため、Pro の欄の一覧をそのまま見せる。買えたら閉じる。
-  struct MobileThemeColorLockedDialog: View {
+  /// 出すのは、テーマカラーの画面で鍵の付いた色を押したとき(`.themeColor`)と、登録単語数が一定を超えた人の
+  /// 保存直後に 1 回だけ(`.proPrompt`。ProPrompter)。どちらも押してすぐ購入の画面を出すと驚かせるので、
+  /// 一度ここで買うかどうかを選ばせる。色だけでなく広告の非表示も同じ買い物で手に入ることを伝えるため、
+  /// Pro の欄の一覧をそのまま見せる。買えたら閉じる。
+  struct MobileProOfferDialog: View {
     let purchase: PurchaseModel
+    /// 計測用(どこで出した案内から購入を始めたか)。
+    let source: ProPurchaseSource
     let dismiss: () -> Void
 
     var body: some View {
       AppDialogSurface(cornerRadius: 14) {
-        MobileProOffer(purchase: purchase, source: .themeColor, onClose: dismiss)
+        MobileProOffer(purchase: purchase, source: source, onClose: dismiss)
           // Pro の欄の余白(上 14・左右 14・下は「閉じる」の 10 + 2)はカードの中の詰めた値なので、ダイアログでは
           // 足して上 24・左右 22・下 18 にする(削除の確認と ATT の案内の間くらい)。
           .padding(EdgeInsets(top: 10, leading: 8, bottom: 6, trailing: 8))
@@ -27,9 +31,9 @@
 
     /// 出す。幕は削除の確認ダイアログと同じ。
     @MainActor
-    static func present(purchase: PurchaseModel, overlay: AppOverlay?) {
+    static func present(purchase: PurchaseModel, source: ProPurchaseSource, overlay: AppOverlay?) {
       overlay?.present(barrier: Color(argb: 0x6614_1923)) { dismiss in
-        MobileThemeColorLockedDialog(purchase: purchase, dismiss: dismiss)
+        MobileProOfferDialog(purchase: purchase, source: source, dismiss: dismiss)
       }
     }
   }
