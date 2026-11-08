@@ -10,15 +10,15 @@
   struct WordRegistrationSheet: View {
     let settings: SettingsStore
     let dismiss: () -> Void
-    /// 保存してシートを閉じた後に呼ぶ(Pro の案内など、閉じた後に重ねるもの)。
-    let onRegistered: () -> Void
+    /// 保存してシートを閉じた後に、登録した見出し語を渡して呼ぶ(カードの演出・Pro の案内など、閉じた後に重ねるもの)。
+    let onRegistered: (String) -> Void
 
     @Environment(\.palette) private var palette
     @State private var model: WordRegistrationModel
 
     init(
       settings: SettingsStore, dao: WordDao, wordInfo: any WordInfoProvider, analytics: AnalyticsLogger,
-      review: ReviewPrompter, dismiss: @escaping () -> Void, onRegistered: @escaping () -> Void = {}
+      review: ReviewPrompter, dismiss: @escaping () -> Void, onRegistered: @escaping (String) -> Void = { _ in }
     ) {
       self.settings = settings
       self.dismiss = dismiss
@@ -72,9 +72,11 @@
     /// macOS 版は登録の画面に留まるが、iOS はシートを閉じるだけでよい(背後の一覧は WordStore が更新する)。
     private func save() {
       Task {
+        // 保存では見出し語を正規化して書くので、一覧の単語と突き合わせられるよう同じ形にして渡す。
+        let headword = normalizeHeadword(model.word)
         if await model.save() {
           dismiss()
-          onRegistered()
+          onRegistered(headword)
         }
       }
     }

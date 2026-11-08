@@ -21,6 +21,8 @@
     @State private var tabBarTop: CGFloat?
     /// タブバー上のバナーの帯の高さ(出ていない間は 0)。タブの中身の下余白に足す。
     @State private var bannerHeight: CGFloat = 0
+    /// 登録したばかりの見出し語(学習中のカードで演出を出す間だけ持つ)。
+    @State private var celebratedWord: String?
 
     var body: some View {
       let shell = model.shell
@@ -105,8 +107,8 @@
         switch view {
         case .learning, .registration:
           LearningWordsViewMobile(
-            store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit,
-            onRegister: openRegistration)
+            store: session.words, shell: model.shell, settings: model.settings, celebratedWord: celebratedWord,
+            onEdit: openEdit, onRegister: openRegistration)
         case .allWords:
           AllWordsViewMobile(store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit)
         case .quiz:
@@ -134,7 +136,19 @@
         WordRegistrationSheet(
           settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
           analytics: model.analytics, review: session.review, dismiss: dismiss,
-          onRegistered: { offerProIfNeeded() })
+          onRegistered: { headword in
+            celebrate(headword)
+            offerProIfNeeded()
+          })
+      }
+    }
+
+    /// 登録したカードに演出を出す(学習中のカードの画面にいるときだけ見える)。演出が終わったら外す。
+    private func celebrate(_ headword: String) {
+      celebratedWord = headword
+      Task {
+        try? await Task.sleep(for: .seconds(1.5))
+        if celebratedWord == headword { celebratedWord = nil }
       }
     }
 
