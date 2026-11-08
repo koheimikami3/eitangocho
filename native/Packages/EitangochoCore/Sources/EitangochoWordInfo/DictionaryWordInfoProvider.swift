@@ -151,6 +151,49 @@ public struct DictionaryWordInfoProvider: WordInfoProvider {
     return info
   }
 
+  /// 綴りの候補の最大数。
+  static let maxSpellingSuggestions = 3
+
+  /// 綴りの候補の 2 段目(近い綴り)を探す最短の文字数。短い語は 1 文字違いの語が多すぎて当てにならない。
+  static let minSuggestionLength = 4
+
+  /// 綴りを誤ったとみられる語の候補。事前生成辞書に(書き方の違いでも)当たる語には出さない
+  /// (`loose` は Wiktionary に `lose` の誤りの語義も持つが、それ自体が普通の語のため)。
+  ///
+  /// 1. kaikki の語義がすべて綴り違い(`alt-of`・`misspelling`)で、誤りの語義があれば、その行き先
+  ///    (Wiktionary が記録した正しい綴り)。fetch の直後に呼ぶ前提で、キャッシュだけを見る(通信しない)
+  /// 2. kaikki にも EJDict にも見出しが無い 1 語なら、事前生成辞書の綴りが近い見出し
+  ///    (候補を押せば辞書の値がそろう語に限るため)
+  public func spellingSuggestions(for word: String) async -> [String] {
+    let normalized = normalizeHeadword(word).lowercased()
+    guard !normalized.isEmpty else { return [] }
+    for spelling in [normalized] + Self.lookupVariants(of: normalized)
+    where await prebuiltDictionary.contains(spelling) {
+      return []
+    }
+
+    let entriesJson = try? await cacheDao.find(normalized)
+    let entries = (try? entriesJson.map(KaikkiClient.parseEntries)) ?? []
+    let senses = entries.flatMap(\.senses)
+    if !senses.isEmpty {
+      guard senses.allSatisfy({ $0.tags.contains("alt-of") || $0.tags.contains("misspelling") }) else { return [] }
+      var suggestions: [String] = []
+      for sense in senses where sense.tags.contains("misspelling") {
+        for altOf in sense.altOf {
+          let target = normalizeHeadword(altOf.word ?? "").lowercased()
+          guard !target.isEmpty, target != normalized, !suggestions.contains(target) else { continue }
+          suggestions.append(target)
+        }
+      }
+      return Array(suggestions.prefix(Self.maxSpellingSuggestions))
+    }
+
+    guard !normalized.contains(" "), normalized.count >= Self.minSuggestionLength else { return [] }
+    await ensureEjdictImported()
+    if (try? await ejdictDao.lookup(normalized)) != nil { return [] }
+    return await prebuiltDictionary.nearestHeadwords(to: normalized, limit: Self.maxSpellingSuggestions)
+  }
+
   /// 事前生成辞書に無かったときに試す、書き方の違い(試す順、入力そのものは含まない)。
   ///
   /// ハイフンと空白(hyphenVariants)、句の中の代名詞や記号(placeholderVariants)、

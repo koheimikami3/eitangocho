@@ -62,6 +62,54 @@ public actor PrebuiltDictionary {
     }
   }
 
+  /// 見出しがあるか(言語を問わない)。綴りの候補を出すかを決めるのに使う。
+  public func contains(_ word: String) -> Bool {
+    loadedWords()[word] != nil
+  }
+
+  /// 綴りが近い見出し(空白を含まない語だけ)を、近い順に最大 `limit` 語返す。綴りの誤りの候補に使う。
+  ///
+  /// 許す違いは 5 文字以下の語で 1 文字、6 文字以上で 2 文字まで(短い語に 2 文字違いを許すと、
+  /// 関係のない語ばかりになるため)。同じ近さなら先頭の文字が同じ語を先にする(打ち間違いは
+  /// 先頭より途中に起きやすいため)。
+  public func nearestHeadwords(to word: String, limit: Int) -> [String] {
+    let target = Array(word)
+    let maxDistance = target.count <= 5 ? 1 : 2
+    var found: [(word: String, distance: Int, sameFirst: Bool)] = []
+    for headword in loadedWords().keys where !headword.contains(" ") && headword != word {
+      let candidate = Array(headword)
+      guard abs(candidate.count - target.count) <= maxDistance else { continue }
+      let distance = Self.editDistance(target, candidate)
+      if distance <= maxDistance {
+        found.append((headword, distance, candidate.first == target.first))
+      }
+    }
+    return found
+      .sorted { ($0.distance, $0.sameFirst ? 0 : 1, $0.word) < ($1.distance, $1.sameFirst ? 0 : 1, $1.word) }
+      .prefix(limit)
+      .map(\.word)
+  }
+
+  /// 文字の挿入・削除・置換と、隣り合う 2 文字の入れ替えを 1 と数える編集距離。
+  /// 入れ替え(recieve → receive)は打ち間違いでよく起きるので、2 ではなく 1 と数える。
+  static func editDistance(_ a: [Character], _ b: [Character]) -> Int {
+    if a.isEmpty { return b.count }
+    if b.isEmpty { return a.count }
+    var table = Array(repeating: Array(repeating: 0, count: b.count + 1), count: a.count + 1)
+    for i in 0...a.count { table[i][0] = i }
+    for j in 0...b.count { table[0][j] = j }
+    for i in 1...a.count {
+      for j in 1...b.count {
+        let cost = a[i - 1] == b[j - 1] ? 0 : 1
+        table[i][j] = min(table[i - 1][j] + 1, table[i][j - 1] + 1, table[i - 1][j - 1] + cost)
+        if i > 1, j > 1, a[i - 1] == b[j - 2], a[i - 2] == b[j - 1] {
+          table[i][j] = min(table[i][j], table[i - 2][j - 2] + 1)
+        }
+      }
+    }
+    return table[a.count][b.count]
+  }
+
   /// 読めなかったら空の辞書として扱う(自動入力は今までの取得経路で続けられる)。
   private func loadedWords() -> [String: Word] {
     if let words { return words }

@@ -260,6 +260,47 @@ struct DictionaryWordInfoProviderTests {
     #expect(DictionaryWordInfoProvider.pluralVariants(of: "kidney") == [])
   }
 
+  @Test("kaikki が綴りの誤りとして記録した語は、正しい綴りを候補に返す(キャッシュに alt_of が残る)")
+  func spellingSuggestionsFromKaikkiMisspelling() async throws {
+    let independant = """
+      {"word":"independant","pos":"adj","senses":[\
+      {"glosses":["Obsolete form of independent."],"tags":["alt-of","obsolete"],"alt_of":[{"word":"independent"}]},\
+      {"glosses":["Misspelling of independent."],"tags":["alt-of","misspelling"],"alt_of":[{"word":"independent"}]}]}
+      """
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(independant))
+
+    _ = try await provider.fetch("independant")
+
+    #expect(await provider.spellingSuggestions(for: "independant") == ["independent"])
+    #expect(kaikkiCalls.count == 1)
+  }
+
+  @Test("kaikki に普通の語義がある語・事前生成辞書に当たる語には、綴りの候補を出さない")
+  func noSpellingSuggestionsForRealWords() async throws {
+    let loose = """
+      {"word":"loose","pos":"adj","senses":[{"glosses":["Not fixed in place."],"tags":[]},\
+      {"glosses":["Misspelling of lose."],"tags":["alt-of","misspelling"],"alt_of":[{"word":"lose"}]}]}
+      """
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(loose))
+    _ = try await provider.fetch("loose")
+
+    #expect(await provider.spellingSuggestions(for: "loose").isEmpty)
+    #expect(await provider.spellingSuggestions(for: "ping pong").isEmpty)
+  }
+
+  @Test("kaikki にも EJDict にも無い 1 語は、事前生成辞書の綴りが近い見出しを候補に返す")
+  func spellingSuggestionsFromNearHeadwords() async throws {
+    let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) })
+
+    #expect(await provider.spellingSuggestions(for: "emial") == ["email"])
+    // 句と短すぎる語は近い綴りを探さない
+    #expect(await provider.spellingSuggestions(for: "potato chipz").isEmpty)
+    #expect(await provider.spellingSuggestions(for: "rnu").isEmpty)
+    // EJDict に見出しがある語は誤りとみなさない
+    try await seedEjdict(["emial": "(テスト用の見出し)"])
+    #expect(await provider.spellingSuggestions(for: "emial").isEmpty)
+  }
+
   @Test("活用形は、事前生成辞書に載る原形の値を原形の見出しで返す(キャッシュから読んでも同じ)")
   func mapsInflectionToPrebuiltHeadword() async throws {
     let provider = makeProvider(prebuilt: .init { Data(prebuiltFixture.utf8) }, kaikki: ok(ranJsonl))
