@@ -40,6 +40,13 @@ public struct Word: Identifiable, Hashable, Sendable {
   /// (クイズの回答では更新しない。WordDao.recordQuizResult)。
   public var updatedAt: Date
 
+  /// 単語が属するグループの ID(並びは付けた順)。お気に入りは固定の ID のグループ(`WordGroup.favoriteID`)。
+  /// 知らない ID も書き換えずに持つ(新しい版が足したグループを古い版で消さないため)。
+  public var groupIds: [String]
+
+  /// お気に入りか(お気に入りのグループに属するか)。
+  public var isFavorite: Bool { groupIds.contains(WordGroup.favoriteID) }
+
   public init(
     id: Int64,
     word: String,
@@ -54,7 +61,8 @@ public struct Word: Identifiable, Hashable, Sendable {
     lastReviewedAt: Date? = nil,
     correctCount: Int = 0,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    groupIds: [String] = []
   ) {
     self.id = id
     self.word = word
@@ -70,6 +78,26 @@ public struct Word: Identifiable, Hashable, Sendable {
     self.correctCount = correctCount
     self.createdAt = createdAt
     self.updatedAt = updatedAt
+    self.groupIds = groupIds
+  }
+}
+
+/// 単語を分けるグループ。
+///
+/// お気に入りは、最初からある消せないグループとして扱う(写真アプリのお気に入りアルバムと同じ考え方)。
+/// 後で利用者が作るグループを足すときも、単語の側は同じ `group_ids` の列で持つ。
+public enum WordGroup {
+  /// お気に入りのグループの ID。同期の JSON にも書くので変えない。
+  public static let favoriteID = "favorite"
+
+  /// `group_ids` の列の値(CSV)を ID の並びにする。品詞の列と同じ形。
+  public static func decodeIds(_ csv: String) -> [String] {
+    csv.split(separator: ",").map(String.init)
+  }
+
+  /// ID の並びを `group_ids` の列の値(CSV)にする。
+  public static func encodeIds(_ ids: [String]) -> String {
+    ids.joined(separator: ",")
   }
 }
 
@@ -90,7 +118,8 @@ extension Word: FetchableRecord {
       lastReviewedAt: lastReviewedAt.map(DatabaseTimestamp.date),
       correctCount: row["correct_count"],
       createdAt: DatabaseTimestamp.date(row["created_at"]),
-      updatedAt: DatabaseTimestamp.date(row["updated_at"])
+      updatedAt: DatabaseTimestamp.date(row["updated_at"]),
+      groupIds: WordGroup.decodeIds((row["group_ids"] as String?) ?? "")
     )
   }
 }

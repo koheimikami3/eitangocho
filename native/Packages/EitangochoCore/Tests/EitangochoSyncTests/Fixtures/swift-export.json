@@ -14,6 +14,9 @@
       "createdAt" : "2026-10-01T00:00:00.000Z",
       "exampleEn" : "She achieved her goal.",
       "exampleJa" : "她實現了目標。",
+      "groupIds" : [
+
+      ],
       "ipa" : "/əˈtʃiːv/",
       "isLearned" : true,
       "japanese" : "實現",
@@ -31,6 +34,9 @@
       "createdAt" : "2026-09-30T23:59:59.000Z",
       "exampleEn" : "",
       "exampleJa" : "",
+      "groupIds" : [
+
+      ],
       "ipa" : "",
       "isLearned" : false,
       "japanese" : "〜を使い果たす",

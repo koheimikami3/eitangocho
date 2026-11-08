@@ -56,13 +56,17 @@ struct ExportFile: Encodable {
     var correctCount = 0
     var createdAt: Date?
     var updatedAt: Date?
+    /// 属するグループの ID(お気に入りは `WordGroup.favoriteID`)。Swift 版の v9 で足した任意のキー。
+    /// nil はキーが無い(グループを知らない Flutter 版などが書いた)ことを表し、取り込みではこちらのグループを残す。
+    /// 形式の version は上げない(古い版はこのキーを無視して読める。docs/design.md「ネイティブ版への引き継ぎ」)。
+    var groupIds: [String]?
 
     private enum CodingKeys: String, CodingKey {
       case word
       case meaning = "japanese"
       case ipa, partsOfSpeech, exampleEn
       case exampleTranslation = "exampleJa"
-      case translationLanguage, audioUrl, isLearned, lastReviewedAt, correctCount, createdAt, updatedAt
+      case translationLanguage, audioUrl, isLearned, lastReviewedAt, correctCount, createdAt, updatedAt, groupIds
     }
 
     init(_ word: Word) {
@@ -79,6 +83,7 @@ struct ExportFile: Encodable {
       correctCount = word.correctCount
       createdAt = word.createdAt
       updatedAt = word.updatedAt
+      groupIds = word.groupIds
     }
 
     /// JSON の 1 行を読む。Flutter 版(json_serializable)が読めない行は読めない扱いにする:
@@ -155,6 +160,13 @@ struct ExportFile: Encodable {
         else { return nil }
         correctCount = count
       }
+
+      // Flutter 版は知らないキーとして読み飛ばすので、型が違っても行ごと捨てず「キーが無い」と同じに扱う
+      // (グループだけのために単語を失わないため)。
+      if let list = object[CodingKeys.groupIds.rawValue] as? [Any] {
+        let ids = list.compactMap { $0 as? String }
+        groupIds = ids.count == list.count ? ids : nil
+      }
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -173,6 +185,8 @@ struct ExportFile: Encodable {
       try container.encode(correctCount, forKey: .correctCount)
       try container.encode(createdAt.map(ExportDate.format), forKey: .createdAt)
       try container.encode(updatedAt.map(ExportDate.format), forKey: .updatedAt)
+      // グループが無くても空の配列を書く(キーが無いと「グループを知らない版が書いた」と読まれ、外したことが伝わらない)。
+      try container.encode(groupIds ?? [], forKey: .groupIds)
     }
   }
 }

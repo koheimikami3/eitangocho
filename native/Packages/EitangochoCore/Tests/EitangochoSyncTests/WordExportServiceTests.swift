@@ -79,6 +79,57 @@ struct WordExportServiceTests {
     #expect(after.first?.createdAt == Self.base)
   }
 
+  // MARK: - グループ(お気に入り)
+
+  @Test("お気に入りは書き出しの groupIds に出て、取り込むと戻る")
+  func roundTripsFavorite() async throws {
+    let id = try await insert("apple")
+    try await dao.setFavorite(id: id, true, now: Self.base)
+    try await insert("banana")
+
+    let json = try await service.exportJson()
+    let words = try #require(try object(json)["words"] as? [[String: Any]])
+    let groupsByWord = Dictionary(
+      uniqueKeysWithValues: words.map { ($0["word"] as? String ?? "", $0["groupIds"] as? [String]) })
+    #expect(groupsByWord["apple"] == ["favorite"])
+    // グループが無くても空の配列を書く(外したことを伝えるため)。
+    #expect(groupsByWord["banana"] == [])
+
+    for word in try await dao.getAll() { try await dao.deleteWord(id: word.id) }
+    try await service.importJson(json)
+    #expect(try await dao.getAll().first { $0.word == "apple" }?.isFavorite == true)
+  }
+
+  @Test("新しいファイルの空の groupIds はお気に入りを外し、知らない ID はそのまま持つ")
+  func overwritesGroupsFromNewerFile() async throws {
+    let id = try await insert("apple")
+    try await dao.setFavorite(id: id, true, now: Self.base)
+
+    var cleared = entry("apple", "りんご", updatedAt: Self.day(1))
+    cleared["groupIds"] = ["future-group"]
+    try await service.importJson(v1([cleared]))
+
+    let word = try #require(try await dao.getAll().first)
+    #expect(word.groupIds == ["future-group"])
+    #expect(!word.isFavorite)
+  }
+
+  @Test("groupIds の無い新しいファイル(Flutter 版など)で上書きしても、お気に入りは残す", arguments: [false, true])
+  func keepsGroupsWhenKeyIsMissing(invalidType: Bool) async throws {
+    let id = try await insert("apple")
+    try await dao.setFavorite(id: id, true, now: Self.base)
+
+    var newer = entry("apple", "リンゴ", updatedAt: Self.day(1))
+    // 型の違う値も、キーが無いのと同じに扱う(グループのために単語を捨てない)。
+    if invalidType { newer["groupIds"] = "favorite" }
+    let result = try await service.importJson(v1([newer]))
+
+    #expect(result.updated == 1)
+    let word = try #require(try await dao.getAll().first)
+    #expect(word.meaning == "リンゴ")
+    #expect(word.isFavorite)
+  }
+
   @Test("ファイル側の updatedAt が古い・同時刻なら上書きされない(変更なし)", arguments: [-1.0, 0.0])
   func olderOrSameFileLoses(offsetDays: Double) async throws {
     let id = try await insert("apple", meaning: "りんご")

@@ -77,6 +77,9 @@ public struct ImportedWord: Sendable {
   public var correctCount: Int
   public var createdAt: Date
   public var updatedAt: Date
+  /// 属するグループ。nil はファイルにキーが無かった(グループを知らない版が書いた)ことを表し、
+  /// 上書きでもこちらのグループを残す(Flutter 版の端末で編集した単語の ★ を消さないため)。
+  public var groupIds: [String]?
 
   public init(
     word: String,
@@ -91,7 +94,8 @@ public struct ImportedWord: Sendable {
     lastReviewedAt: Date? = nil,
     correctCount: Int = 0,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    groupIds: [String]? = nil
   ) {
     self.word = word
     self.meaning = meaning
@@ -106,6 +110,7 @@ public struct ImportedWord: Sendable {
     self.correctCount = correctCount
     self.createdAt = createdAt
     self.updatedAt = updatedAt
+    self.groupIds = groupIds
   }
 }
 
@@ -258,6 +263,20 @@ public struct WordDao: Sendable {
     }
   }
 
+  /// お気に入りを付け外しする。`setLearned` と同じく updatedAt を進める(同期で他の端末へ伝えるため)。
+  /// ほかのグループの ID はそのまま残す。
+  public func setFavorite(id: Int64, _ isFavorite: Bool, now: Date = .now) async throws {
+    try await writer.write { db in
+      guard let csv = try String.fetchOne(db, sql: "SELECT group_ids FROM words WHERE id = ?", arguments: [id])
+      else { return }
+      var ids = WordGroup.decodeIds(csv).filter { $0 != WordGroup.favoriteID }
+      if isFavorite { ids.insert(WordGroup.favoriteID, at: 0) }
+      try db.execute(
+        sql: "UPDATE words SET group_ids = ?, updated_at = ? WHERE id = ?",
+        arguments: [WordGroup.encodeIds(ids), DatabaseTimestamp.seconds(now), id])
+    }
+  }
+
   public func setLearned(id: Int64, _ isLearned: Bool, now: Date = .now) async throws {
     try await writer.write { db in
       try db.execute(
@@ -303,14 +322,15 @@ public struct WordDao: Sendable {
           sql: """
             INSERT INTO words (word, ipa, japanese, parts_of_speech, example_en, example_ja,
                                translation_language, audio_url, is_learned, last_reviewed_at,
-                               correct_count, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                               correct_count, created_at, updated_at, group_ids)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
           arguments: [
             word.word, word.ipa, word.meaning, PartOfSpeech.encodeList(word.partsOfSpeech),
             word.exampleEn, word.exampleTranslation, word.translationLanguage, word.audioUrl,
             word.isLearned, word.lastReviewedAt.map(DatabaseTimestamp.seconds), word.correctCount,
             DatabaseTimestamp.seconds(word.createdAt), DatabaseTimestamp.seconds(word.updatedAt),
+            WordGroup.encodeIds(word.groupIds ?? []),
           ])
       }
       for (id, update) in updates {
@@ -330,6 +350,11 @@ public struct WordDao: Sendable {
               word.lastReviewedAt.map(DatabaseTimestamp.seconds), word.correctCount,
               DatabaseTimestamp.seconds(word.updatedAt), id,
             ])
+          // グループを知らない版が書いた行(groupIds が nil)なら、こちらのグループを残す。
+          if let groupIds = word.groupIds {
+            try db.execute(
+              sql: "UPDATE words SET group_ids = ? WHERE id = ?", arguments: [WordGroup.encodeIds(groupIds), id])
+          }
         case .quizProgress(let lastReviewedAt, let correctCount):
           try db.execute(
             sql: "UPDATE words SET last_reviewed_at = ?, correct_count = ? WHERE id = ?",
