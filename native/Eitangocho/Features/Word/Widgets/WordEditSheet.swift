@@ -14,7 +14,6 @@
     let dismiss: () -> Void
 
     @Environment(\.palette) private var palette
-    @Environment(\.appOverlay) private var overlay
     @State private var wordText: String
     @State private var ipa: String
     @State private var meaning: String
@@ -106,7 +105,7 @@
     }
 
     private func confirmDelete() {
-      MobileDeleteConfirmDialog.present(word, store: store, overlay: overlay, onDeleted: dismiss)
+      MobileDeleteConfirmDialog.present(word, store: store, onDeleted: dismiss)
     }
 
     private func save() async {
