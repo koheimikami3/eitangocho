@@ -49,9 +49,14 @@
       ) {
         VStack(alignment: .leading, spacing: 0) {
           MobileFormRows {
-            MobileLabeledField(label: String(localized: .fieldWord), text: $wordText, asciiKeyboard: true, correction: false)
-            // IPA は ASCII ではないので英字キーボードにしない。
-            MobileLabeledField(label: String(localized: .fieldIpa), text: $ipa)
+            // 登録シートと同じく単語と IPA を 1 行に並べ、長い句・IPA は欄の中で横に流す。
+            HStack(alignment: .top, spacing: 14) {
+              MobileLabeledField(label: String(localized: .fieldWord), text: $wordText, asciiKeyboard: true, correction: false)
+                .frame(maxWidth: .infinity)
+              // IPA は ASCII ではないので英字キーボードにしない。
+              MobileLabeledField(label: String(localized: .fieldIpa), text: $ipa)
+                .frame(maxWidth: .infinity)
+            }
             MobileLabeledField(label: String(localized: language.meaningFieldLabel), text: $meaning, lineLimit: 1...Int.max)
             VStack(alignment: .leading, spacing: 7) {
               MobileFieldLabel(label: String(localized: .fieldPartsOfSpeech))

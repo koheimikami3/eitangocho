@@ -137,10 +137,16 @@
             .padding(.bottom, 14)
         }
         MobileFormRows {
-          MobileLabeledField(
-            label: String(localized: .fieldWord), text: $model.word, asciiKeyboard: true, correction: false)
-          // IPA は ASCII ではないので英字キーボードにしない。
-          MobileLabeledField(label: String(localized: .fieldIpa), text: $model.ipa, autoFilled: model.showsBadge(.ipa))
+          // macOS 版と同じく単語と IPA を 1 行に並べる。長い句・IPA は折り返さず欄の中で横に流す
+          // (欄の高さをそろえ、下の欄の位置を動かさないため)。
+          HStack(alignment: .top, spacing: 14) {
+            MobileLabeledField(
+              label: String(localized: .fieldWord), text: $model.word, asciiKeyboard: true, correction: false)
+              .frame(maxWidth: .infinity)
+            // IPA は ASCII ではないので英字キーボードにしない。
+            MobileLabeledField(label: String(localized: .fieldIpa), text: $model.ipa, autoFilled: model.showsBadge(.ipa))
+              .frame(maxWidth: .infinity)
+          }
           MobileLabeledField(
             label: String(localized: language.meaningFieldLabel), text: $model.meaning, lineLimit: 1...Int.max,
             autoFilled: model.showsBadge(.meaning))
