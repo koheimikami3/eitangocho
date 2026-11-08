@@ -82,12 +82,10 @@
           .padding(.horizontal, 4 + 1)
           .padding(.vertical, 9 + 1)
           .background(Capsule().fill(isSelected ? background : palette.surface))
-          // 選択中は文字色で縁取り、未選択は淡い縁 + 小さな影で「押せる面」に見せる。
+          // 選択中は文字色で縁取り、未選択は淡い縁で「押せる面」に見せる。影は付けない(縁だけで押せる面に見え、
+          // iOS 26 の平らな見た目に馴染むため。2026-11-09 のユーザー判断)。
           // 縁の濃さは入力欄の枠(AppPalette.wellShadow)と揃える。
           .overlay(Capsule().strokeBorder(isSelected ? foreground : palette.borderAlpha(28), lineWidth: 1))
-          .appShadows(
-            isSelected ? [] : [AppShadow(color: Color(argb: 0x0F10_1828), blurRadius: 1.5, y: 1)], in: Capsule(),
-            scale: 1)
           .animation(.linear(duration: 0.12), value: isSelected)
       }
     }

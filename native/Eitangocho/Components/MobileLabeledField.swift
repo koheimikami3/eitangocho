@@ -57,6 +57,8 @@
       MobileWell(color: palette.wellBackground, shadows: palette.wellShadow, cornerRadius: 9) {
         Group {
           if let lineLimit {
+            // 縦に伸びる TextField は欄の高さを行間抜きで測るので、2 行以上になると中身が行間の分だけ欄からはみ出し、
+            // 欄の中で文が少しスクロールする。それでも行間がある方が読みやすいので付ける(2026-11-09 のユーザー判断)。
             TextField("", text: $text, prompt: prompt, axis: .vertical)
               .lineLimit(lineLimit)
               .lineSpacing(max(layout.lineSpacing, 0))
