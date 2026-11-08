@@ -126,6 +126,12 @@
           MobileRegistrationWarningBanner(message: RegistrationMessages.notice(notice, language: language))
             .padding(.bottom, 14)
         }
+        if !model.spellingSuggestions.isEmpty {
+          MobileSpellingSuggestionBanner(suggestions: model.spellingSuggestions) { suggestion in
+            Task { await model.applySpellingSuggestion(suggestion) }
+          }
+          .padding(.bottom, 14)
+        }
         if model.translationFailed {
           MobileRegistrationWarningBanner(message: String(localized: .exampleTranslationFailed(languageLabel)))
             .padding(.bottom, 14)

@@ -74,6 +74,12 @@ struct WordRegistrationView: View {
         DictionaryWarningBanner(message: noticeText(notice, language))
         Spacer().frame(height: px(16))
       }
+      if !model.spellingSuggestions.isEmpty {
+        SpellingSuggestionBanner(suggestions: model.spellingSuggestions) { suggestion in
+          Task { await model.applySpellingSuggestion(suggestion) }
+        }
+        Spacer().frame(height: px(16))
+      }
       // iOS の登録シートと同じく、辞書の警告と同じバナーで出す。
       if model.translationFailed {
         DictionaryWarningBanner(message: String(localized: .exampleTranslationFailed(languageLabel)))
