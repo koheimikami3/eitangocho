@@ -31,6 +31,8 @@ final class AppModel {
     let wordInfo: any WordInfoProvider
     let quiz: QuizModel
     let review: ReviewPrompter
+    /// 登録の保存直後に 1 回だけ出す Pro の案内の判定(呼ぶのは iOS だけ。macOS は課金が無く、条件を満たさない)。
+    let proPrompter: ProPrompter
   }
 
   /// 起動の失敗。
@@ -201,6 +203,9 @@ final class AppModel {
         let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
         let keepsQuizRound = false
       #endif
+      let proPrompter = ProPrompter(dao: database.wordDao, analytics: analytics) { [purchase] in
+        purchase.isProUnlockedKnown && !purchase.proUnlocked && purchase.priceText != nil
+      }
       phase = .ready(
         Session(
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
@@ -211,7 +216,7 @@ final class AppModel {
           ) { [words] in
             WordListing.learned(words.words)
           },
-          review: review))
+          review: review, proPrompter: proPrompter))
       await sync.start()
     }
   }
