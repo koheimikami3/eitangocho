@@ -134,7 +134,7 @@ struct LicenseCatalogTests {
       items.map(\.name) == [
         "Andika", "Eitangocho Dictionary", "EJDict-hand", "Firebase", "Google Translate", "GoogleAdsOnDeviceConversion",
         "GoogleAppMeasurement", "GoogleUtilities", "GRDB.swift", "Inter", "ipa-dict", "nanopb", "Noto Sans JP", "Noto Sans KR", "Noto Sans TC",
-        "Promises", "Tatoeba", "Wiktionary / kaikki.org",
+        "Promises", "RevenueCat", "Tatoeba", "Wiktionary / kaikki.org",
       ])
     let summaries = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.summary) })
     #expect(summaries["Inter"] == "SIL Open Font License 1.1")
@@ -143,6 +143,7 @@ struct LicenseCatalogTests {
     #expect(summaries["Tatoeba"] == "CC BY 2.0 FR")
     #expect(summaries["Eitangocho Dictionary"] == "CC BY-SA 4.0")
     #expect(summaries["ipa-dict"] == "MIT License")
+    #expect(summaries["RevenueCat"] == "MIT License")
   }
 
   @Test func iOSだけのパッケージの本文も同梱されている() throws {
@@ -156,7 +157,6 @@ struct LicenseCatalogTests {
     #expect(
       summaries == [
         "GoogleMobileAds": "Apache License 2.0", "GoogleUserMessagingPlatform": "Apache License 2.0",
-        "RevenueCat": "MIT License",
       ])
   }
 }

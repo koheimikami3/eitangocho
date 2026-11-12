@@ -11,26 +11,31 @@ struct PronunciationButton: View {
     case cardPill
     /// 全単語テーブルの発音列。28×28 の円のアイコンのみ。
     case tableIcon
-    /// クイズカード。高さ 32 のピル + 「発音を聞く」。
-    case quizPill
+    /// クイズカードの右上の角。36×36 の円のアイコンのみ(iOS と同じく文字を付けず、主張を抑える)。
+    case quizIcon
 
     /// ピルの高さ / アイコンボタンの一辺。
     var height: CGFloat {
       switch self {
       case .cardPill: 26
       case .tableIcon: 28
-      case .quizPill: 32
+      case .quizIcon: 36
       }
     }
 
-    var iconSize: CGFloat { self == .cardPill ? 13 : 15 }
+    var iconSize: CGFloat {
+      switch self {
+      case .cardPill: 13
+      case .tableIcon: 15
+      case .quizIcon: 17
+      }
+    }
 
     /// ラベル。アイコンのみの形は nil。
     var label: LocalizedStringResource? {
       switch self {
       case .cardPill: .pronunciationShort
-      case .tableIcon: nil
-      case .quizPill: .listenPronunciation
+      case .tableIcon, .quizIcon: nil
       }
     }
 
@@ -40,16 +45,14 @@ struct PronunciationButton: View {
     var horizontalPadding: CGFloat {
       switch self {
       case .cardPill: 10
-      case .tableIcon: 0
-      case .quizPill: 14
+      case .tableIcon, .quizIcon: 0
       }
     }
 
     var gap: CGFloat {
       switch self {
       case .cardPill: 5
-      case .tableIcon: 0
-      case .quizPill: 6
+      case .tableIcon, .quizIcon: 0
       }
     }
   }

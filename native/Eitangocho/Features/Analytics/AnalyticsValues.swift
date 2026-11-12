@@ -34,6 +34,8 @@ enum QuizTrigger: Sendable {
   case tab
   /// 結果画面の「続ける」。
   case continued
+  /// 結果画面の「忘れた単語だけもう一度」(iOS。2.18.0)。
+  case retry
 }
 
 /// Pro 購入の段階(pro_purchase の stage)。
@@ -49,6 +51,17 @@ enum ProPurchaseSource: String, Sendable {
   case themeColor
   /// 登録単語数が一定を超えた人に保存直後に 1 回だけ出す案内(ProPrompter)。
   case proPrompt
+  /// クイズの入口の鍵付きの項目の案内(MobileProOfferDialog。2.18.0)。
+  case quiz
+}
+
+/// クイズの入口で押された鍵付きの項目(quiz_option_locked_tapped の option)。
+enum QuizLockedOption: String, Sendable {
+  case sourceBookmarks
+  case sourceAll
+  case countThirty
+  case countFifty
+  case countAll
 }
 
 /// ブックマークを付け外しした場所(word_bookmark_toggled の screen)。
@@ -92,7 +105,13 @@ func quizTriggerValue(_ trigger: QuizTrigger) -> String {
   switch trigger {
   case .tab: "tab"
   case .continued: "continue"
+  case .retry: "retry"
   }
+}
+
+/// クイズの問題数(quiz_started の question_count)。
+func quizQuestionCountValue(_ count: QuizQuestionCount) -> String {
+  count == .all ? "all" : String(count.limit)
 }
 
 /// 出題方向。enum の名前の `ja` は多言語化前の名残で、訳の言語は日本語に限らないため、

@@ -1,13 +1,6 @@
 import EitangochoData
 
-/// 1 セッションの出題数。
-///
-/// 回答ごとに lastReviewedAt を記録するので、全単語を回す仕組みは区切りの長さに
-/// 依存しない。区切りは結果画面(忘れた単語の見返し・レビュー依頼)に
-/// 届くためのもので、短い方が手軽に終えられ、結果画面にも届きやすい。
-let quizQuestionCount = 10
-
-/// 学習済み単語から 1 セッション分の出題を選ぶ(Flutter 版の selectQuizQuestions)。
+/// 出題元の単語から 1 セッション分(`count` 語まで)の出題を選ぶ(Flutter 版の selectQuizQuestions)。
 ///
 /// 1. まだ一度も答えていない単語(lastReviewedAt が nil)をランダムに先に出す。
 ///    覚えた後、まだ一度も想起を確かめていないため
@@ -17,10 +10,10 @@ let quizQuestionCount = 10
 ///
 /// 途中でやめても、答えていない単語は日時が古いまま残るので次回の先頭に来る
 /// (続きの位置を別に覚えておく必要がない)。
-func selectQuizQuestions(_ learned: [Word]) -> [Word] {
-  let unanswered = learned.filter { $0.lastReviewedAt == nil }.shuffled()
-  let answered = learned.compactMap { word in word.lastReviewedAt.map { (word, $0) } }
+func selectQuizQuestions(_ words: [Word], count: Int = QuizQuestionCount.ten.limit) -> [Word] {
+  let unanswered = words.filter { $0.lastReviewedAt == nil }.shuffled()
+  let answered = words.compactMap { word in word.lastReviewedAt.map { (word, $0) } }
     .sorted { $0.1 < $1.1 }
     .map(\.0)
-  return Array((unanswered + answered).prefix(quizQuestionCount)).shuffled()
+  return Array((unanswered + answered).prefix(count)).shuffled()
 }

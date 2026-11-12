@@ -58,5 +58,10 @@ struct AnalyticsValuesTests {
   @Test func 機械的に変換すると崩れる値は個別に決める() {
     #expect(syncFailureValue(.noICloud) == "no_icloud")
     #expect(quizTriggerValue(.continued) == "continue")
+    #expect(quizTriggerValue(.retry) == "retry")
+    #expect(quizQuestionCountValue(.ten) == "10")
+    #expect(quizQuestionCountValue(.thirty) == "30")
+    #expect(quizQuestionCountValue(.fifty) == "50")
+    #expect(quizQuestionCountValue(.all) == "all")
   }
 }

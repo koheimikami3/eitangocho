@@ -55,7 +55,7 @@
             if isLoading {
               // 読み込み中は白紙が見えるため、面の色で覆ってインジケータを出す。
               palette.surface
-                .overlay { CircularProgress(color: palette.accent) }
+                .overlay { MobileSpinner() }
             }
           }
       }

@@ -1,15 +1,15 @@
 #if os(iOS)
   import SwiftUI
 
-  /// iOS 版のヘッダ(Flutter 版の MobileHeader)。ビュー名・件数・🔍 と ＋・検索欄・全単語の並び替えの行。
+  /// iOS 版のヘッダ(Flutter 版の MobileHeader)。ビュー名・件数・🔍・⚙・検索欄・全単語の並び替えの行。
   ///
-  /// 🔍・＋ は学習中 / 全単語のときだけ出す。検索欄は 🔍 で開き、検索語がある間は開いたまま(MainShellModel)。
+  /// 🔍 は学習中 / 全単語のときだけ出す(＋ は右下に浮かせる。MobileAddButton)。⚙(設定を開く)はどのタブでも出す(試作)。検索欄は 🔍 で開き、検索語がある間は開いたまま(MainShellModel)。
   /// 下端は線ではなく影で区切る。影はコンテンツの上に落ちるので、シェルがヘッダを前面に置く。
   struct MobileHeader: View {
     let shell: MainShellModel
     let settings: SettingsStore
     let words: WordStore
-    let onAdd: () -> Void
+    let onSettings: () -> Void
 
     @Environment(\.palette) private var palette
     /// 🔍 の丸と検索欄のガラスを結ぶ(形を変えるアニメーション)。
@@ -76,12 +76,9 @@
             }
           }
           .frame(maxWidth: .infinity, alignment: .leading)
-          if showSearchAndAdd {
-            MobileHeaderButtons(
-              namespace: glassNamespace,
-              onSearch: { withAnimation(.smooth) { shell.openSearch() } },
-              onAdd: onAdd)
-          }
+          MobileHeaderButtons(
+            namespace: glassNamespace, showsSearch: showSearchAndAdd,
+            onSearch: { withAnimation(MobileSearchField.toggleAnimation) { shell.openSearch() } }, onSettings: onSettings)
         }
       }
     }
@@ -93,15 +90,7 @@
       AppFonts.isCjk(AppLocale.current) ? (Self.titleFontSize - Self.countFontSize) * AppFonts.cjkEmBoxDescent : 0
     }
 
-    private func title(_ view: MainView) -> LocalizedStringResource {
-      switch view {
-      case .learning: .navLearning
-      case .allWords: .navAllWords
-      case .quiz: .navQuiz
-      case .registration: .navRegistration
-      case .settings: .navSettings
-      }
-    }
+    private func title(_ view: MainView) -> LocalizedStringResource { view.mobileTitle }
 
     /// 件数はタイトルの脇に小さく出す(学習中 / 全単語のみ。検索で絞り込む前の件数)。
     private func count(_ view: MainView) -> String {
@@ -134,6 +123,20 @@
         Spacer(minLength: 0)
         MobileWordSortButton(settings: settings)
           .fixedSize()
+      }
+    }
+  }
+
+  extension MainView {
+    /// iOS のヘッダのタイトル(設定の画面の戻るボタンの読み上げにも使う)。
+    var mobileTitle: LocalizedStringResource {
+      switch self {
+      case .learning: .navLearning
+      case .allWords: .navAllWords
+      // タブ名と揃える(2.18.0)。「フラッシュ」は日本語では馴染みが薄く、4 択を入れるとカードをめくる形だけではなくなるため。
+      case .quiz: .navQuiz
+      case .registration: .navRegistration
+      case .settings: .navSettings
       }
     }
   }

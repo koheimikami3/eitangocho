@@ -17,6 +17,11 @@ enum WordListing {
     words.filter(\.isLearned)
   }
 
+  /// ブックマークした単語(全単語の絞り込み・クイズの出題元)。
+  static func bookmarked(_ words: [Word]) -> [Word] {
+    words.filter(\.isBookmarked)
+  }
+
   /// 検索で絞った学習中の一覧(学習中のカードの画面)。
   static func filteredLearning(_ words: [Word], query: String) -> [Word] {
     learning(filter(words, query: query))
@@ -29,8 +34,8 @@ enum WordListing {
   static func filteredAll(
     _ words: [Word], query: String, order: WordSortOrder, bookmarksOnly: Bool = false
   ) -> [Word] {
-    let bookmarked = bookmarksOnly ? words.filter(\.isBookmarked) : words
-    return filter(bookmarked, query: query).sorted { compare($0, $1, order) < 0 }
+    let source = bookmarksOnly ? bookmarked(words) : words
+    return filter(source, query: query).sorted { compare($0, $1, order) < 0 }
   }
 
   private static func filter(_ words: [Word], query: String) -> [Word] {

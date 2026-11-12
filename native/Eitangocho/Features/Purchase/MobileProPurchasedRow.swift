@@ -17,10 +17,10 @@
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         AppText(.purchased, style: AppTextStyle(size: 13, weight: .w600))
-          .foregroundStyle(palette.proButtonDoneForeground)
+          .foregroundStyle(palette.disabledButtonForeground)
           .padding(.horizontal, 12)
           .padding(.vertical, 8)
-          .background(RoundedRectangle(cornerRadius: 9).fill(palette.proButtonDone))
+          .background(RoundedRectangle(cornerRadius: 9).fill(palette.disabledButton))
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 13)

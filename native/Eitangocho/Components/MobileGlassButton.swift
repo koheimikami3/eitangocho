@@ -12,6 +12,8 @@
     /// 読み上げの名前(アイコンだけで文字が無いため)。
     let accessibilityLabel: String
     var iconSize: CGFloat = 17
+    /// 丸の直径。既定はヘッダのタイトルの行の高さに合わせた `diameter`。
+    var size: CGFloat = Self.diameter
     var prominent = false
     /// 同じ GlassEffectContainer の別のガラスへ形を変えて移るときの ID(ヘッダの 🔍 が検索欄に伸びる)。
     var glassID: MobileGlassID?
@@ -55,11 +57,12 @@
           customIcon
         } else {
           Image(systemName: systemName)
-            .font(.system(size: iconSize, weight: .semibold))
+            // 線は一段細い medium にする(semibold だと大きくした 🔍・⚙ が隣の太字のタイトルと同じ重さに見えたため。試作)。
+            .font(.system(size: iconSize, weight: .medium))
             .foregroundStyle(prominent ? .white : palette.text)
         }
       }
-        .frame(width: Self.diameter, height: Self.diameter)
+        .frame(width: size, height: size)
         .contentShape(Circle())
         .accessibilityLabel(Text(verbatim: accessibilityLabel))
     }

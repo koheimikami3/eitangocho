@@ -17,7 +17,7 @@ enum RestoreStatus {
 /// 単語帳としては使える。
 @Observable
 final class PurchaseModel {
-  /// 課金を扱える環境か(iOS かつ SDK キーが設定済み)。false のときは設定画面に Pro の欄ごと出さない。
+  /// 課金を扱える環境か(SDK キーが設定済み)。false のときは設定画面に Pro の欄ごと出さない。
   private(set) var available: Bool
   /// Pro が解禁されているか。広告の出し分けはこの 1 点で決まる。
   private(set) var proUnlocked = false
@@ -79,7 +79,7 @@ final class PurchaseModel {
   /// 押しても何も起きないボタンを残すより、無い方が分かりやすい。
   private func initialize() async {
     guard client.isAvailable else {
-      purchaseLogger.info("課金は無効です(iOS 以外、または SDK キーが未設定)")
+      purchaseLogger.info("課金は無効です(SDK キーが未設定)")
       markProUnlockedKnown()
       return
     }

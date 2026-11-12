@@ -62,12 +62,12 @@ final class AnalyticsReporter {
     setProperty("sync_enabled", boolValue(enabled))
   }
 
-  /// Pro を購入済みか(iOS だけ)。購入状態が分かってから呼ぶ(それまでは未購入に見えるため)。
+  /// Pro を購入済みか(macOS は 2.18.0 から)。購入状態が分かってから呼ぶ(それまでは未購入に見えるため)。
   func reportPro(_ unlocked: Bool) {
     setProperty("is_pro", boolValue(unlocked))
   }
 
-  /// 画面に出ているテーマカラー(iOS だけ。ThemeColor の rawValue)。購入状態が分かってから呼ぶ。
+  /// 画面に出ているテーマカラー(ThemeColor の rawValue。macOS は 2.18.0 から)。購入状態が分かってから呼ぶ。
   /// Pro の人がどの色を選んでいるかを `is_pro` と並べて見て、色を外す・足す判断に使う。
   func reportThemeColor(_ color: ThemeColor) {
     setProperty("theme_color", color.rawValue)

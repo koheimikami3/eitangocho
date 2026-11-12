@@ -17,28 +17,27 @@ struct AnalyticsReporting: ViewModifier {
 
   func body(content: Content) -> some View {
     content
+      // 購入状態は RevenueCat から届くまで未購入に見えるので、分かってから送る(Flutter 版と同じ。macOS も 2.18.0 から)。
+      .onChange(of: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil, initial: true) { _, unlocked in
+        if let unlocked { reporter.reportPro(unlocked) }
+      }
+      // テーマカラーは画面に出ている色を送る(未購入ならブルー)。購入状態が分かるまでは決まらないので待つ。
+      .onChange(
+        of: purchase.isProUnlockedKnown
+          ? ThemeColor.displayed(selected: settings.themeColor, proUnlocked: purchase.proUnlocked) : nil,
+        initial: true
+      ) { _, color in
+        if let color { reporter.reportThemeColor(color) }
+      }
       #if os(iOS)
-        // 購入状態は RevenueCat から届くまで未購入に見えるので、分かってから送る(Flutter 版と同じ)。
-        .onChange(of: purchase.isProUnlockedKnown ? purchase.proUnlocked : nil, initial: true) { _, unlocked in
-          if let unlocked { reporter.reportPro(unlocked) }
-        }
-        // テーマカラーは画面に出ている色を送る(未購入ならブルー)。購入状態が分かるまでは決まらないので待つ。
-        .onChange(
-          of: purchase.isProUnlockedKnown
-            ? ThemeColor.displayed(selected: settings.themeColor, proUnlocked: purchase.proUnlocked) : nil,
-          initial: true
-        ) { _, color in
-          if let color { reporter.reportThemeColor(color) }
-        }
         // トラッキング許可は起動時とアクティブに戻るたびに読む。状態を読むだけで、ダイアログは出さない
         // (出すのは TrackingAuthorizer)。
         .onChange(of: scenePhase, initial: true) { _, phase in
           if phase == .active { reporter.reportTrackingStatus(trackingClient.statusName()) }
         }
       #endif
-      .onChange(of: shell.view, initial: true) { previous, view in
+      .onChange(of: shell.view, initial: true) { _, view in
         reporter.reportScreen(view)
-        session.quiz.viewChanged(from: previous, to: view)
       }
       .onChange(of: AnalyticsReporter.settingsProperties(settings), initial: true) { _, properties in
         reporter.reportSettings(properties)

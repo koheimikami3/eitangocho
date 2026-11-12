@@ -14,7 +14,7 @@
 		A10000000000000000000036 /* EitangochoWordInfo in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000035 /* EitangochoWordInfo */; };
 		A10000000000000000000052 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000051 /* FirebaseAnalytics */; };
 		A10000000000000000000062 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = A10000000000000000000061 /* GoogleMobileAds */; };
-		A10000000000000000000065 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = A10000000000000000000064 /* RevenueCat */; };
+		A10000000000000000000065 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000064 /* RevenueCat */; };
 		A10000000000000000000130 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000030 /* Inter.ttf */; };
 		A10000000000000000000131 /* NotoSansJP.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* NotoSansJP.ttf */; };
 		A10000000000000000000132 /* NotoSansTC.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000032 /* NotoSansTC.ttf */; };

@@ -3,11 +3,17 @@
   import SwiftUI
 
   /// iOS 版のクイズの結果の画面(成績・忘れていた単語の一覧・次の行動。Flutter 版の MobileQuizResultView)。
+  ///
+  /// 次の行動は 2.18.0 で「忘れた単語だけもう一度」(忘れた単語があるときの主ボタン)・「続ける」・「条件を変える」
+  /// (入口へ)にした。クイズの後に学習済み→学習中へ戻す操作が多く、忘れた単語をその場で練習し直したい人が多いと見たため。
   struct MobileQuizResultView: View {
     let okCount: Int
     let forgotWords: [Word]
+    /// 全部の回の一巡の案内(「一巡しました」か進み具合)。それ以外は nil。
+    let cycleNote: String?
+    let onRetry: () -> Void
     let onContinue: () -> Void
-    let onToLearning: () -> Void
+    let onChangeConditions: () -> Void
     /// 広告の下の Pro への導線を押したとき。
     let onOpenPro: () -> Void
 
@@ -15,11 +21,18 @@
 
     var body: some View {
       VStack(spacing: 0) {
-        AppText(.quizDone, style: AppTextStyle(size: 22, weight: .w700))
+        // 学習中の単語からも出せるようになったので「復習完了」ではなく「クイズ完了」(2.18.0。macOS は学習済みだけなので
+        // 今の「復習完了」のまま)。
+        AppText(.quizCompleted, style: AppTextStyle(size: 22, weight: .w700))
           .foregroundStyle(palette.text)
         Spacer().frame(height: 6)
         AppText(.quizSummary(okCount, forgotWords.count), style: AppTextStyle(size: 14))
           .foregroundStyle(palette.textAlpha(60))
+        if let cycleNote {
+          Spacer().frame(height: 4)
+          AppText(cycleNote, style: AppTextStyle(size: 13, weight: .w600))
+            .foregroundStyle(palette.accent)
+        }
         if !forgotWords.isEmpty {
           Spacer().frame(height: 16)
           MobileQuizForgotList(words: forgotWords)
@@ -27,13 +40,30 @@
         // 上の余白は広告自身が持ち、読み込めなければ高さごと消えて今のレイアウトに戻る(Flutter 版と同じ)。
         MobileQuizRectangleAd(onOpenPro: onOpenPro)
         Spacer().frame(height: 16)
-        HStack(spacing: 10) {
-          MobileFilledButton(label: String(localized: .quizContinue), expands: true, action: onContinue)
-          // 2 つとも主ボタン(どちらも次の行動として同格)。
-          MobileFilledButton(label: String(localized: .toLearningList), expands: true, action: onToLearning)
+        // 塗りの主ボタンを必ず 1 つ置き、次に押すものをはっきりさせる。忘れた単語があれば「もう一度」、
+        // 無ければ「続ける」を主にする(淡いボタンだけが並ぶと主役がいなくなるため)。
+        VStack(spacing: 10) {
+          if forgotWords.isEmpty {
+            MobileFilledButton(label: String(localized: .quizContinue), expands: true, action: onContinue)
+            secondaryButton(.quizChangeConditions, action: onChangeConditions)
+          } else {
+            MobileFilledButton(
+              label: String(localized: .quizRetryForgotten(forgotWords.count)), expands: true, action: onRetry)
+            HStack(spacing: 10) {
+              secondaryButton(.quizContinue, action: onContinue)
+              secondaryButton(.quizChangeConditions, action: onChangeConditions)
+            }
+          }
         }
       }
       .multilineTextAlignment(.center)
+    }
+
+    /// 結果の副ボタン(淡いアクセント色。主ボタンより控えめにする)。
+    private func secondaryButton(_ label: LocalizedStringResource, action: @escaping () -> Void) -> some View {
+      MobileSoftButton(
+        label: String(localized: label), color: palette.accentOnSoft, background: palette.accentSoftButton,
+        action: action)
     }
   }
 

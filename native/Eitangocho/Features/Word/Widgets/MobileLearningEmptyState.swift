@@ -1,17 +1,19 @@
 #if os(iOS)
   import SwiftUI
 
-  /// iOS 版の学習中 0 件の空の状態(Flutter 版の MobileLearningEmptyState)。
+  /// iOS 版の学習中 0 件の空の状態(Flutter 版の MobileLearningEmptyState)。案内文 + 「単語を登録」。
+  /// 登録が 0 語のときのクイズの入口でも、案内文を替えて使う。
   ///
   /// macOS 版と分けるのは登録の導線が違うため。iOS に登録の画面は無く、ヘッダの ＋ と同じくシートで開く。
   struct MobileLearningEmptyState: View {
+    var message: LocalizedStringResource = .learningEmpty
     let onRegister: () -> Void
 
     @Environment(\.palette) private var palette
 
     var body: some View {
       VStack(spacing: 16) {
-        AppText(.learningEmpty, style: AppTextStyle(size: 14, height: 1.7))
+        AppText(message, style: AppTextStyle(size: 14, height: 1.7))
           .foregroundStyle(palette.textAlpha(45))
           .multilineTextAlignment(.center)
         MobileFilledButton(

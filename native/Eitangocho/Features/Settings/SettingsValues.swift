@@ -73,6 +73,94 @@ enum QuizDirection: String, CaseIterable, Sendable {
   }
 }
 
+/// クイズの出題元(iOS のクイズの入口で選ぶ)。rawValue は UserDefaults に保存する名前で、計測の値も兼ねる。
+///
+/// 学習中・学習済みは状態、ブックマークは印なので重なりうる(ブックマークは学習状態に関係なく印の付いた単語)。
+enum QuizSource: String, CaseIterable, Sendable {
+  case learning
+  case learned
+  case bookmarks
+  case all
+
+  /// Pro で解放する出題元か。使い込んでいる人ほど欲しくなるものを Pro にし、
+  /// 入口の離脱を減らす学習中・学習済みは無料にする(2026-11 のユーザーの判断)。
+  var requiresPro: Bool { lockedOption != nil }
+
+  /// Pro でないときに押されたら記録する値(quiz_option_locked_tapped)。無料の出題元は nil。
+  var lockedOption: QuizLockedOption? {
+    switch self {
+    case .learning, .learned: nil
+    case .bookmarks: .sourceBookmarks
+    case .all: .sourceAll
+    }
+  }
+
+  var label: LocalizedStringResource {
+    switch self {
+    case .learning: .quizSourceLearning
+    case .learned: .quizSourceLearned
+    case .bookmarks: .quizSourceBookmarks
+    case .all: .quizSourceAll
+    }
+  }
+
+  /// 全単語のうち、この出題元に入る単語。
+  func words(from words: [Word]) -> [Word] {
+    switch self {
+    case .learning: WordListing.learning(words)
+    case .learned: WordListing.learned(words)
+    case .bookmarks: WordListing.bookmarked(words)
+    case .all: words
+    }
+  }
+}
+
+/// クイズの 1 回の問題数。`all` は出題元を一巡する(50 問ごとに区切って結果を出す)。
+///
+/// 10 を既定(macOS は 10 問だけ)にするのは、回答ごとに lastReviewedAt を記録するので全単語を回す仕組みは
+/// 区切りの長さに依存せず、区切りは結果画面(忘れた単語の見返し・レビュー依頼)に届くためのものだから。
+/// 短い方が手軽に終えられ、結果画面にも届きやすい。
+///
+/// 20 を置かないのは、結果の「続ける」で 10 語ずつ進めるため 20 は「続ける」1 回と変わらないから。
+/// 中間は 10 とはっきり違う量(30・50)にする(2026-11 のユーザーの判断)。
+/// 10 だけを無料にする。解き終えるたびに全画面広告を出すので、無料で 1 回を長くすると広告の回数が減るため。
+enum QuizQuestionCount: String, CaseIterable, Sendable {
+  case ten
+  case thirty
+  case fifty
+  case all
+
+  /// 1 回(全部では 1 区切り)に出す最大の問題数。
+  var limit: Int {
+    switch self {
+    case .ten: 10
+    case .thirty: 30
+    case .fifty, .all: 50
+    }
+  }
+
+  var requiresPro: Bool { lockedOption != nil }
+
+  /// Pro でないときに押されたら記録する値(quiz_option_locked_tapped)。無料の 10 問は nil。
+  var lockedOption: QuizLockedOption? {
+    switch self {
+    case .ten: nil
+    case .thirty: .countThirty
+    case .fifty: .countFifty
+    case .all: .countAll
+    }
+  }
+
+  var label: LocalizedStringResource {
+    switch self {
+    case .ten: .quizCountTen
+    case .thirty: .quizCountThirty
+    case .fifty: .quizCountFifty
+    case .all: .quizCountAll
+    }
+  }
+}
+
 /// 全単語一覧の並び順。学習中一覧・クイズ・エクスポートの並びには影響しない。
 ///
 /// 「基準 + 昇順/降順」に分けず 8 通りを平らに持つのは、学習状態のように

@@ -75,11 +75,15 @@ nonisolated struct AppPalette: Equatable, Sendable {
   /// 発音ボタンの枠線(--acc-line)。ダークは文字色と同じ色相で引く。
   var accentLine: Color { isDark ? withAlpha(0x73, tones.onSoftDark) : withAlpha(0x6B, tones.accent) }
 
-  /// 購入済みで押せなくなった購入ボタンの地。
-  var proButtonDone: Color { isDark ? Color(argb: 0x1FFF_FFFF) : Color(argb: 0xFFEC_ECEF) }
+  /// 淡いボタン(枠なしの副ボタン)の地。accentSoft(12%)だと背景の薄いグレーとの差が小さく、ボタンではなく
+  /// 面に見えたため、一段濃く敷く(ライト 20%・ダーク 30%。2.18.0 のクイズで試作)。
+  var accentSoftButton: Color { isDark ? withAlpha(0x4D, tones.accentDark) : withAlpha(0x33, tones.accent) }
 
-  /// 購入済みの購入ボタンの文字色。ダークだけ 1 段明るいのはデザイン準拠。
-  var proButtonDoneForeground: Color { textAlpha(isDark ? 60 : 50) }
+  /// 押せないボタンの地(購入済みの購入ボタン・単語の無い出題元のクイズの開始ボタン)。
+  var disabledButton: Color { isDark ? Color(argb: 0x1FFF_FFFF) : Color(argb: 0xFFEC_ECEF) }
+
+  /// 押せないボタンの文字色。ダークだけ 1 段明るいのはデザイン準拠。
+  var disabledButtonForeground: Color { textAlpha(isDark ? 60 : 50) }
 
   /// 主ボタンの地(--btnGrad。上 → 下)。上から下へわずかに暗くして膨らみを出す。
   var buttonGradient: [Color] {
@@ -93,6 +97,9 @@ nonisolated struct AppPalette: Equatable, Sendable {
   /// 削除ボタンの輪郭(--dangerLine)と押下中の地(--dangerSoft)
   var dangerLine: Color { isDark ? Color(argb: 0x80FF_6B6B) : Color(argb: 0x73C0_3030) }
   var dangerSoft: Color { isDark ? Color(argb: 0x1FFF_6B6B) : Color(argb: 0x12C0_3030) }
+
+  /// 赤の淡いボタン(クイズの「忘れていた」)の地。accentSoftButton と同じ理由で dangerSoft より一段濃く敷く。
+  var dangerSoftButton: Color { isDark ? Color(argb: 0x33FF_6B6B) : Color(argb: 0x21C0_3030) }
 
   // MARK: - 線
 
@@ -134,30 +141,16 @@ nonisolated struct AppPalette: Equatable, Sendable {
       : [AppShadow(color: Color(argb: 0x4700_0000), blurRadius: 0, spread: 1)]
   }
 
-  /// ヘッダの下端の線と影(--elevHead)。
+  /// ヘッダの下端の線(--elevHead)。主画面のヘッダとシートのヘッダで使う。
+  /// 線の下のぼかした影は外した(2026-11-12 の試作)。カードやガラスのボタンにも影があり、帯にまで影を付けると
+  /// 画面に影が重なってうるさく見えたため。境目は細い線だけで分かる。
   var headerShadow: [AppShadow] {
-    isDark
-      ? [
-        AppShadow(color: Color(argb: 0x14FF_FFFF), blurRadius: 0, y: 1),
-        AppShadow(color: Color(argb: 0x9900_0000), blurRadius: 12, spread: -12, y: 5),
-      ]
-      : [
-        AppShadow(color: Color(argb: 0x1410_1828), blurRadius: 0, y: 1),
-        AppShadow(color: Color(argb: 0x3310_1828), blurRadius: 12, spread: -13, y: 5),
-      ]
+    [AppShadow(color: isDark ? Color(argb: 0x14FF_FFFF) : Color(argb: 0x1410_1828), blurRadius: 0, y: 1)]
   }
 
-  /// 広告帯など画面下端に重なる面の上端の線と影(--elevUp)。headerShadow を上下反転した強さ。
+  /// 広告帯など画面下端に重なる面の上端の線(--elevUp)。headerShadow を上下反転したもの(影は同じ理由で外した)。
   var bottomBarShadow: [AppShadow] {
-    isDark
-      ? [
-        AppShadow(color: Color(argb: 0x14FF_FFFF), blurRadius: 0, y: -1),
-        AppShadow(color: Color(argb: 0x9900_0000), blurRadius: 12, spread: -12, y: -5),
-      ]
-      : [
-        AppShadow(color: Color(argb: 0x1410_1828), blurRadius: 0, y: -1),
-        AppShadow(color: Color(argb: 0x3310_1828), blurRadius: 12, spread: -13, y: -5),
-      ]
+    [AppShadow(color: isDark ? Color(argb: 0x14FF_FFFF) : Color(argb: 0x1410_1828), blurRadius: 0, y: -1)]
   }
 
   /// 主ボタンの影(--btnShadow の inset 以外)

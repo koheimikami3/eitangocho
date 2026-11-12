@@ -123,7 +123,7 @@
 
     private var loadingStep: some View {
       VStack(spacing: 14) {
-        CircularProgress(color: palette.accent, size: 28, lineWidth: 3, trackColor: palette.borderAlpha(10))
+        MobileSpinner()
         AppText(.fetchingDictionary, style: AppTextStyle(size: 13))
           .foregroundStyle(palette.textAlpha(50))
       }

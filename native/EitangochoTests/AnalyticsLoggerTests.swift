@@ -92,4 +92,13 @@ struct AnalyticsLoggerTests {
       ])
     #expect(client.eventsNamed("bookmarks_filter_toggled") == [["to": "on"]])
   }
+
+  // MARK: - quiz_option_locked_tapped
+
+  @Test func クイズの入口の鍵付きの項目をsnake_caseで送る() {
+    logger.logQuizOptionLockedTapped(.sourceBookmarks)
+    logger.logQuizOptionLockedTapped(.countAll)
+    #expect(
+      client.eventsNamed("quiz_option_locked_tapped") == [["option": "source_bookmarks"], ["option": "count_all"]])
+  }
 }
