@@ -51,7 +51,7 @@
           .lineLimit(1)
           .layoutPriority(1)
         if syncing {
-          CircularProgress(color: palette.accent, size: 16, lineWidth: 2)
+          MobileSpinner.small()
             .padding(.leading, 8)
         }
       }

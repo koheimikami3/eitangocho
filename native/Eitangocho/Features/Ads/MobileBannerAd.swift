@@ -19,6 +19,9 @@
   struct MobileBannerAd: View {
     /// シートや押して進む画面に覆われていない・クイズ結果でない(TabBarBannerVisibility)か。
     let visible: Bool
+    /// シート・押して進む画面・ダイアログに覆われて隠しているか。覆われている間は下余白を 0 にせず残す。
+    /// 0 にすると裏の画面が詰め直され、高さいっぱいのクイズのカードの文字や一覧がシートの裏で動いて見えるため。
+    var covered = false
     /// 帯の高さ(広告 + 上下の余白)。出ていない間は 0。
     let onHeightChange: (CGFloat) -> Void
 
@@ -53,9 +56,11 @@
               .appShadows(palette.bottomBarShadow, in: shape, scale: 1)
           }
         } else {
-          // 消えている間は下余白も返す。
+          // 消えている間は下余白も返す(覆われて隠しているだけの間は残す。covered を参照)。
           Color.clear.frame(height: 0)
-            .onAppear { onHeightChange(0) }
+            .onAppear { if !covered { onHeightChange(0) } }
+            // 覆いが外れても出さない条件(クイズ結果など)が残っていれば、そこで下余白を返す。
+            .onChange(of: covered) { _, isCovered in if !isCovered { onHeightChange(0) } }
         }
       }
       .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in

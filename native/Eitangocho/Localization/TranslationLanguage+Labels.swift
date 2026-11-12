@@ -47,8 +47,8 @@ extension TranslationLanguage {
     usesDefinition ? .tableDefinition : .tableMeaning(String(localized: shortLabel))
   }
 
-  /// 登録画面の説明文。
+  /// 登録画面の説明文。iOS の登録シートで 1 行に収まるよう、訳の言語名は入れない(選んだ言語の訳なのは自明なため)。
   var registrationIntro: LocalizedStringResource {
-    usesDefinition ? .registrationIntroDefinition : .registrationIntro(String(localized: shortLabel))
+    usesDefinition ? .registrationIntroDefinition : .registrationIntro
   }
 }

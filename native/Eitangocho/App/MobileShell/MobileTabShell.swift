@@ -4,8 +4,9 @@
 
   /// iOS 版のシェル: ヘッダ + 標準の下タブバー(Flutter 版の TabBarShell)。
   ///
-  /// タブは 4 つ(学習中 / 全単語 / クイズ / 設定)。タブバーは標準の TabView(iOS 26 以降は Liquid Glass)。
-  /// 単語登録はタブに置かず、ヘッダの ＋ からシートで開く。検索もタブにしない(iOS 26 の検索タブは使わない)。
+  /// タブは 3 つ(学習中 / 全単語 / クイズ)。設定はたまにしか開かないのでタブにせず、ヘッダ右上の ⚙ から
+  /// 下のシートで開く(試作。一時的に開いて閉じれば元の画面に戻る、という意味がシートの方が合うため)。タブバーは標準の TabView(iOS 26 以降は Liquid Glass)。
+  /// 単語登録はタブに置かず、右下に浮かせた ＋ からシートで開く。検索もタブにしない(iOS 26 の検索タブは使わない)。
   /// ヘッダはタブごとに持たず TabView の上に 1 つだけ置く(Flutter 版と同じ構成。検索欄が 1 つで済む)。
   /// キーボードが出ている間は、タブバーはキーボードの下に隠れる(標準の挙動)。
   struct MobileTabShell: View {
@@ -27,15 +28,15 @@
     var body: some View {
       let shell = model.shell
       VStack(spacing: 0) {
-        MobileHeader(shell: shell, settings: model.settings, words: session.words, onAdd: openRegistration)
-          // ヘッダの影をコンテンツの上に落とす。
+        MobileHeader(shell: shell, settings: model.settings, words: session.words, onSettings: openSettings)
+          // ヘッダの下端の線をコンテンツの上に描く。
           .zIndex(1)
         TabView(selection: selection) {
           Tab(value: MainView.learning) {
             tabContent(.learning)
           } label: {
-            // デザインは「カードが 2 枚重なった」線画(Flutter 版は Icons.filter_none)。
-            Label(String(localized: .navLearning), systemImage: "square.on.square")
+            // 開いた本(単語帳を開いて覚えている途中)。試作。
+            Label(String(localized: .navLearning), systemImage: "book")
           }
           Tab(value: MainView.allWords) {
             tabContent(.allWords)
@@ -45,12 +46,8 @@
           Tab(value: MainView.quiz) {
             tabContent(.quiz)
           } label: {
-            Label(String(localized: .navQuizShort), systemImage: "bolt")
-          }
-          Tab(value: MainView.settings) {
-            tabContent(.settings)
-          } label: {
-            Label(String(localized: .navSettings), systemImage: "gearshape")
+            // 斜めに重なった 2 枚のカード(単語カードをめくって答えを確かめる)。試作。
+            Label(String(localized: .navQuizShort), systemImage: "rectangle.portrait.on.rectangle.portrait.angled")
           }
         }
         .tint(palette.accent)
@@ -59,7 +56,7 @@
           // 重ねる側の下端からタブバーの上端までを空ける。TabView の枠が下のセーフエリアを含むか
           // (iOS 26 以降は含み、iOS 18 は含まない)に左右されないよう、どちらも画面の座標で測る。
           GeometryReader { geometry in
-            MobileBannerAd(visible: bannerVisible) { bannerHeight = $0 }
+            MobileBannerAd(visible: bannerVisible, covered: overlayCovers) { bannerHeight = $0 }
               .padding(.bottom, max(geometry.frame(in: .global).maxY - (tabBarTop ?? .infinity), 0))
               .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
           }
@@ -81,11 +78,11 @@
 
     /// タブの選択。クイズのタブは、回が無いときだけ出題を始め、途中の回・結果はそのまま見せる
     /// (`QuizModel.enterFromTab`。Flutter 版は押すたびにやり直していた)。
-    /// 登録はタブではない(シートで開く)ので、万一その状態になっても学習中を返す。
+    /// 登録・設定はタブではない(シート・押して進む画面で開く)ので、万一その状態になっても学習中を返す。
     private var selection: Binding<MainView> {
       let shell = model.shell
       return Binding(
-        get: { shell.view == .registration ? .learning : shell.view },
+        get: { shell.view == .registration || shell.view == .settings ? .learning : shell.view },
         set: { view in
           if view == .quiz { session.quiz.enterFromTab() }
           shell.selectView(view)
@@ -96,28 +93,42 @@
     /// (Flutter 版は上に画面が積まれたこと(RouteAware の didPushNext)で隠していた。見えていない広告の
     /// インプレッションを稼がないため)。クイズ結果ではレクタングルに譲る。
     private var bannerVisible: Bool {
+      !overlayCovers && TabBarBannerVisibility.isVisible(view: model.shell.view, quizPhase: session.quiz.phase)
+    }
+
+    /// シート・押して進む画面・ダイアログのどれかが主画面を覆っているか。
+    private var overlayCovers: Bool {
       let overlay = model.overlay
-      let covered = overlay.sheet != nil || !overlay.pages.isEmpty || !overlay.dialogs.isEmpty
-      return !covered && TabBarBannerVisibility.isVisible(view: model.shell.view, quizPhase: session.quiz.phase)
+      return overlay.sheet != nil || !overlay.pages.isEmpty || !overlay.dialogs.isEmpty
     }
 
     @ViewBuilder
     private func tabContent(_ view: MainView) -> some View {
       Group {
         switch view {
-        case .learning, .registration:
+        case .learning, .registration, .settings:
           LearningWordsViewMobile(
             store: session.words, shell: model.shell, settings: model.settings, celebratedWord: celebratedWord,
             onEdit: openEdit, onRegister: openRegistration)
+            .safeAreaPadding(.bottom, MobileAddButton.clearance)
         case .allWords:
           AllWordsViewMobile(store: session.words, shell: model.shell, settings: model.settings, onEdit: openEdit)
+            .safeAreaPadding(.bottom, MobileAddButton.clearance)
         case .quiz:
-          QuizViewMobile(quiz: session.quiz, shell: model.shell, settings: model.settings)
-        case .settings:
-          SettingsViewMobile(session: session, settings: model.settings, shell: model.shell)
+          QuizViewMobile(
+            quiz: session.quiz, shell: model.shell, settings: model.settings, onRegister: openRegistration,
+            onOpenSettings: openSettings)
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .overlay(alignment: .bottomTrailing) {
+        // 検索している間は隠す(探す作業に集中させ、絞り込んだ一覧の右下のカードを ＋ で覆わないため)。
+        if (view == .learning || view == .allWords) && !model.shell.isSearchOpen {
+          MobileAddButton(action: openRegistration)
+            .transition(.scale(scale: 0.6).combined(with: .opacity))
+        }
+      }
+      .animation(.smooth(duration: 0.2), value: model.shell.isSearchOpen)
       // バナーが重なる分を下の余白にする(Flutter 版はタブバーの高さ + バナーの高さを渡していた)。
       .safeAreaPadding(.bottom, bannerHeight)
       .background(palette.background)
@@ -127,7 +138,7 @@
       }
     }
 
-    /// ヘッダの ＋・学習中の空の状態のボタン。登録シートを開く。
+    /// 右下の ＋・学習中の空の状態のボタン。登録シートを開く。
     private func openRegistration() {
       // iOS の登録はシートなので主画面の切り替え(AnalyticsReporting)には現れない。
       // 開いたことをここで送る(macOS の登録の画面と同じ名前)。
@@ -140,6 +151,15 @@
             celebrate(headword)
             offerProIfNeeded()
           })
+      }
+    }
+
+    /// ヘッダの ⚙・クイズ結果の Pro への導線。設定をシートで開く(先頭に Pro の欄がある)。
+    private func openSettings() {
+      // タブではないので主画面の切り替え(AnalyticsReporting)には現れない。開いたことをここで送る(登録と同じ)。
+      model.analytics.logScreenView("settings")
+      model.overlay.presentSheet { [model, session] dismiss in
+        MobileSettingsSheet(session: session, settings: model.settings, dismiss: dismiss)
       }
     }
 

@@ -17,15 +17,13 @@
   struct SettingsViewMobile: View {
     let session: AppModel.Session
     let settings: SettingsStore
-    let shell: MainShellModel
 
     @Environment(\.openURL) private var openURL
     @Environment(\.purchase) private var purchase
-    /// 表示の位置。タブが選ばれるたびに先頭へ戻す(下記)。
-    @State private var position = ScrollPosition(edge: .top)
     @Environment(\.appOverlay) private var overlay
     @Environment(\.analytics) private var analytics
     @Environment(\.palette) private var palette
+    @Environment(\.mobileSheetLayout) private var sheetLayout
 
     var body: some View {
       ScrollView {
@@ -74,17 +72,13 @@
             #endif
           }
         }
-        // 最後のカードがタブバーに近づきすぎないよう、設定画面だけ下を余分に空ける。
+        // 最後のカードが画面の下端に近づきすぎないよう、下を余分に空ける。シートは画面の下端まで届き、
+        // ホームインジケータの分のセーフエリアが無いので、その高さも足す。
         .padding(
           EdgeInsets(
             top: AppDimensions.mobilePadding, leading: AppDimensions.mobilePadding,
-            bottom: AppDimensions.mobilePadding * 2, trailing: AppDimensions.mobilePadding))
-      }
-      // タブが選ばれるたびに先頭から表示する(Flutter 版はタブの切り替えのたびに作り直していた)。
-      // クイズ結果の Pro への導線は、設定のタブに移るだけで先頭の Pro の欄が見えることを前提にしている。
-      .scrollPosition($position)
-      .onChange(of: shell.view) { _, view in
-        if view == .settings { position.scrollTo(edge: .top) }
+            bottom: AppDimensions.mobilePadding * 2 + sheetLayout.bottomSafeArea,
+            trailing: AppDimensions.mobilePadding))
       }
     }
 
@@ -107,11 +101,8 @@
     }
 
     private var learning: some View {
+      // クイズの出題方向は 2.18.0 でクイズの入口へ移した(クイズの条件を 1 か所にまとめるため)。
       MobileSettingsSection(title: String(localized: .sectionLearning)) {
-        MobileSettingsLinkRow(
-          label: String(localized: .quizDirection),
-          value: String(localized: settings.quizDirection.label(settings.translationLanguage))
-        ) { overlay?.push { QuizDirectionViewMobile(settings: settings) } }
         MobileSettingsLinkRow(
           label: String(localized: .sectionTranslation), value: String(localized: settings.translationLanguage.label)
         ) { overlay?.push { TranslationLanguageViewMobile(settings: settings) } }

@@ -7,6 +7,12 @@ struct CircularProgress: View {
   var lineWidth: CGFloat = 4
   /// 弧の下に敷く輪の色(Flutter の backgroundColor)。nil なら敷かない。
   var trackColor: Color?
+  /// 弧の長さ(輪 1 周に対する割合)。
+  var arcLength: CGFloat = 0.75
+  /// 弧の端の形。
+  var lineCap: CGLineCap = .square
+  /// 1 周にかける秒数。
+  var period: Double = 1
 
   @Environment(\.uiScale) private var px
   @State private var rotating = false
@@ -23,12 +29,12 @@ struct CircularProgress: View {
 
   private var arc: some View {
     Circle()
-      .trim(from: 0, to: 0.75)
-      .stroke(color, style: StrokeStyle(lineWidth: px(lineWidth), lineCap: .square))
+      .trim(from: 0, to: arcLength)
+      .stroke(color, style: StrokeStyle(lineWidth: px(lineWidth), lineCap: lineCap))
       // 繰り返しのアニメーションは回転だけに掛ける。`.animation(_:value:)` で掛けると、出た瞬間に親の
       // レイアウトが動いた分(位置の変化)まで繰り返し動かし続け、弧だけが下の輪からずれて回る
       // (クイズを解き終えた直後の「広告を表示します」で起きた)。
-      .animation(.linear(duration: 1).repeatForever(autoreverses: false)) { content in
+      .animation(.linear(duration: period).repeatForever(autoreverses: false)) { content in
         content.rotationEffect(.degrees(rotating ? 360 : 0))
       }
       .onAppear { rotating = true }

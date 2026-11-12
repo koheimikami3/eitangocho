@@ -10,8 +10,8 @@ struct AppOverlayHost: View {
   var body: some View {
     ZStack {
       #if os(iOS)
-        // 押し出した画面の上にシート、その上にダイアログを重ねる(編集シートの上に削除の確認を出す)。
-        MobilePushLayer(overlay: overlay)
+        // シートの上にダイアログを重ねる(編集シートの上に削除の確認を出す)。
+        // 押し出した画面は設定のシートの中に描く(MobileSettingsSheet)。
         // シートはキーボードを避ける必要があるので、全面に広げる指定を自分で持つ。
         MobileSheetLayer(overlay: overlay)
       #endif

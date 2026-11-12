@@ -26,6 +26,8 @@
           MobileProFeatureRow(label: String(localized: .proFeatureNoAds), upcoming: false)
           MobileProFeatureRow(
             label: String(localized: .proFeatureThemeColors(ThemeColor.allCases.count)), upcoming: false)
+          // クイズの入口のブックマーク・すべて・50問・全部(2.18.0)。
+          MobileProFeatureRow(label: String(localized: .proFeatureQuizOptions), upcoming: false)
           // 機能が増えることだけを伝え、この買い切りに含めるとは約束しない(将来の別売りの余地を残す)。
           // 機能を足したら、この行の上に 1 行増やす。
           MobileProFeatureRow(label: String(localized: .proFeatureMore), upcoming: true)
@@ -97,9 +99,6 @@
 
     @Environment(\.palette) private var palette
 
-    /// 処理中のインジケータの直径。
-    private static let indicatorSize: CGFloat = 16
-
     var body: some View {
       let enabled = !purchasing && action != nil
       // 押せる間と処理中はアクセント色のまま。価格を引けずに押せないときだけグレーに落とす。
@@ -112,11 +111,12 @@
         // 処理中もボタンの高さを変えないよう、文字を見えないまま残してインジケータを重ねる。
         ZStack {
           AppText(label, style: style)
-            .foregroundStyle(filled ? .white : palette.proButtonDoneForeground)
+            .foregroundStyle(filled ? .white : palette.disabledButtonForeground)
             .opacity(purchasing ? 0 : 1)
           if purchasing {
             // App Store のダイアログが出るまでの待ちを埋める。
-            CircularProgress(color: .white, size: Self.indicatorSize, lineWidth: 2)
+            // 青い地の上で見えるよう白にする。
+            MobileSpinner.small(color: .white)
           }
         }
         .frame(maxWidth: .infinity)
@@ -125,7 +125,7 @@
           if filled {
             shape.fill(palette.buttonFill)
           } else {
-            shape.fill(palette.proButtonDone)
+            shape.fill(palette.disabledButton)
           }
         }
         .appShadows(filled ? palette.buttonShadow : [], in: shape, scale: 1)

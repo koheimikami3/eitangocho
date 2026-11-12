@@ -9,8 +9,10 @@
     enum Variant {
       /// 学習中カードのフッタ・全単語リストの行。円形アイコンのみ。
       case icon
-      /// クイズカード。ピル + 「発音を聞く」。
-      case pill
+      /// クイズカードの右上の角。一回り大きい円形アイコンのみ。
+      /// 以前は答えの下に置いた「発音を聞く」の文字付きのピルだったが、答えのカードで唯一の色付きの部品として
+      /// 訳より先に目に入ったため、アイコンだけにして主張を抑えた(スピーカーで音が出ると分かり、学習中のカードもアイコンだけのため)。
+      case large
     }
 
     let word: String
@@ -24,10 +26,10 @@
 
     /// アイコンのみの形のタップ領域の幅(Apple のヒューマンインターフェイスガイドラインの 44pt)。
     static let minTapTarget: CGFloat = 44
-    /// ピル形の高さ(デザインの min-height:36px)。
-    static let pillHeight: CGFloat = 36
     /// アイコンのみの形の円の直径。この形はこの値が高さになる。
     static let circleDiameter: CGFloat = 30
+    /// クイズカードの円の直径。カードに 1 つだけ置くので、行やフッタの円より一回り大きくする。
+    static let largeCircleDiameter: CGFloat = 36
 
     private static var iconSize: CGFloat { 15 }
 
@@ -35,9 +37,11 @@
       MobilePressable(action: { openPronunciation(word) }) {
         switch variant {
         case .icon: iconButton
-        case .pill: pillButton
+        case .large: largeButton
         }
       }
+      // アイコンだけなので、読み上げには何のボタンかを言葉で伝える。
+      .accessibilityLabel(Text(.listenPronunciation))
     }
 
     /// タップ領域は既定で 44pt 幅 × 30pt 高。高さを 44pt にするとカードのフッタが間延びするので幅だけ広げる。
@@ -51,16 +55,13 @@
         .frame(width: iconTapWidth, height: Self.circleDiameter, alignment: .trailing)
     }
 
-    private var pillButton: some View {
-      HStack(spacing: 6) {
-        SpeakerIcon(size: Self.iconSize, color: palette.accentOnSoft)
-        AppText(.listenPronunciation, style: AppTextStyle(size: 13, weight: .w700))
-          .foregroundStyle(palette.accentOnSoft)
-      }
-      .padding(.horizontal, 15)
-      .frame(height: Self.pillHeight)
-      .background(Capsule().fill(palette.accentSoft))
-      .overlay(Capsule().strokeBorder(palette.accentLine, lineWidth: 1))
+    /// 見た目は iconButton と同じ作りで、円とアイコンを一回り大きくする。タップ領域は 44pt 四方。
+    private var largeButton: some View {
+      SpeakerIcon(size: 17, color: palette.accentOnSoft)
+        .frame(width: Self.largeCircleDiameter, height: Self.largeCircleDiameter)
+        .background(Circle().fill(palette.accentSoft))
+        .overlay(Circle().strokeBorder(palette.accentLine, lineWidth: 1))
+        .frame(width: Self.minTapTarget, height: Self.minTapTarget)
     }
   }
 #endif

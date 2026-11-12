@@ -25,6 +25,11 @@
     var scrollableBody = true
     /// 上端のつまみ(下へスワイプで閉じられる合図)を出すか。閉じるボタンだけで閉じる発音シートは出さない。
     var showGrabber = true
+    /// ステータスバーのすぐ下まで伸ばすか(iOS 標準の大きいシートの高さ)。項目の多い設定のシートで使う。
+    /// 既定の 88% のまま(登録・編集など)は、キーボードが出る前提の作りを変えないため。
+    var reachesTop = false
+    /// ヘッダの地の色。nil なら面の色(白)。中身の地がグレーのシート(設定)は、ヘッダも同じグレーにして続けて見せる。
+    var headerBackground: Color?
     @ViewBuilder let content: () -> Content
     /// スクロール領域の外側、シート最下部に固定で置くもの(バナー広告。6c で使う)。
     @ViewBuilder var footer: () -> Footer
@@ -36,6 +41,14 @@
 
     /// 画面高に対するシートの高さ(デザインの height:88%)。
     private static var heightFactor: CGFloat { 0.88 }
+    /// 上まで伸ばすときの、ステータスバーとの間(下の画面の上端が少し覗き、シートだと分かる)。
+    private static var topGap: CGFloat { 10 }
+
+    private var height: CGFloat {
+      reachesTop
+        ? layout.availableHeight - layout.topSafeArea - Self.topGap
+        : layout.availableHeight * Self.heightFactor
+    }
 
     /// スクロール領域の下の余白。シートの下端は画面の下端まで届くので、下端に広告が無く
     /// キーボードも出ていないときは、ホームインジケータの高さを足す(最後のボタンが画面の角の丸みに掛からないように)。
@@ -48,7 +61,8 @@
       VStack(spacing: 0) {
         MobileSheetHeader(
           title: title, titleFontSize: titleFontSize, showGrabber: showGrabber, leftLabel: leftLabel,
-          leftIcon: leftIcon, onLeft: onLeft, rightLabel: rightLabel, onRight: onRight, accessory: headerAccessory)
+          leftIcon: leftIcon, onLeft: onLeft, rightLabel: rightLabel, onRight: onRight, accessory: headerAccessory,
+          background: headerBackground)
         if scrollableBody {
           ScrollView {
             content()
@@ -66,7 +80,7 @@
         footer()
           .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footerHeight = $0 }
       }
-      .frame(height: layout.availableHeight * Self.heightFactor)
+      .frame(height: height)
       .clipShape(shape)
       // 面の色はキーボードの裏まで伸ばす(切り抜きの外に描く)。
       .background(alignment: .top) {
@@ -80,13 +94,13 @@
     init(
       title: String, titleFontSize: CGFloat = 15, leftLabel: String, leftIcon: MobileSheetLeftIcon = .close,
       onLeft: @escaping () -> Void, rightLabel: String? = nil, onRight: (() -> Void)? = nil,
-      headerAccessory: AnyView? = nil, scrollableBody: Bool = true, showGrabber: Bool = true,
-      @ViewBuilder content: @escaping () -> Content
+      headerAccessory: AnyView? = nil, scrollableBody: Bool = true, showGrabber: Bool = true, reachesTop: Bool = false,
+      headerBackground: Color? = nil, @ViewBuilder content: @escaping () -> Content
     ) {
       self.init(
         title: title, titleFontSize: titleFontSize, leftLabel: leftLabel, leftIcon: leftIcon, onLeft: onLeft,
         rightLabel: rightLabel, onRight: onRight, headerAccessory: headerAccessory, scrollableBody: scrollableBody,
-        showGrabber: showGrabber,
+        showGrabber: showGrabber, reachesTop: reachesTop, headerBackground: headerBackground,
         content: content, footer: { EmptyView() })
     }
   }
@@ -123,6 +137,8 @@
     var onRight: (() -> Void)?
     /// 右上の主ボタンの左に並べる丸いボタン。
     var accessory: AnyView?
+    /// 地の色。nil なら面の色(白)。
+    var background: Color?
 
     @Environment(\.palette) private var palette
 
@@ -154,15 +170,15 @@
         .padding(.top, !showGrabber && hasButtons ? 6 : 0)
       }
       .frame(maxWidth: .infinity)
-      // 下端は一覧のヘッダ(MobileHeader)と同じ影にする。中身がこの下を流れるので、線より「上に載っている」ことが伝わる。
+      // 下端は一覧のヘッダ(MobileHeader)と同じ細い線にする。
       // 面はシートの上角の丸みに合わせる(並び替えのシートは切り抜かないので、四角だと角がはみ出す)。
       .background {
         let shape = UnevenRoundedRectangle(topLeadingRadius: 18, topTrailingRadius: 18)
         shape
-          .fill(palette.surface)
+          .fill(background ?? palette.surface)
           .appShadows(palette.headerShadow, in: shape, scale: 1)
       }
-      // 影を後ろに並ぶ中身(入力欄の面など)より上に描く。
+      // 線を後ろに並ぶ中身(入力欄の面など)より上に描く。
       .zIndex(1)
       .mobileSheetDragHandle()
     }

@@ -49,7 +49,7 @@ final class AppOverlay {
   }
 
   /// 右から押し出して重ねる画面(iOS。Flutter 版の Navigator.push = 設定からライセンスへ)。
-  /// タブバー・ヘッダごと覆う(Flutter 版はルートの Navigator に積むため)。シートとダイアログはこの上に出る。
+  /// 設定のシートの中に重ねる(MobileSettingsSheet が MobilePushLayer を持つ)。シートを閉じたら一緒に外す。
   struct Page: Identifiable {
     let id: UUID
     var content: AnyView
@@ -126,6 +126,7 @@ final class AppOverlay {
     withAnimation(Self.sheetExit) {
       self.sheet = nil
     }
+    pages.removeAll()
   }
 
   /// Flutter の BottomSheet の出入り(250 ms で出て 200 ms で引っ込む)。

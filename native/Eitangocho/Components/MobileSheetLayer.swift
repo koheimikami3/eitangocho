@@ -13,6 +13,7 @@
     /// 画面の高さ(キーボードを除かない)と下端のホームインジケータの高さ。
     @State private var screenHeight: CGFloat = 0
     @State private var bottomSafeArea: CGFloat = 0
+    @State private var topSafeArea: CGFloat = 0
 
     var body: some View {
       GeometryReader { proxy in
@@ -35,7 +36,7 @@
           MobileSheetLayout(
             availableHeight: proxy.size.height,
             keyboardHeight: max(screenHeight - proxy.size.height, 0),
-            bottomSafeArea: bottomSafeArea))
+            bottomSafeArea: bottomSafeArea, topSafeArea: topSafeArea))
       }
       // 上下のセーフエリアには広げ、キーボードは避ける(シートの寸法の基準がキーボードの上の高さになる)。
       .ignoresSafeArea(.container)
@@ -45,6 +46,7 @@
           Color.clear
             .onGeometryChange(for: EdgeInsets.self, of: { $0.safeAreaInsets }) { insets in
               bottomSafeArea = insets.bottom
+              topSafeArea = insets.top
               screenHeight = proxy.size.height + insets.top + insets.bottom
             }
         }
@@ -61,6 +63,8 @@
     var keyboardHeight: CGFloat = 0
     /// 下端のホームインジケータの高さ(中身の高さに合わせるシートが下に空ける)。
     var bottomSafeArea: CGFloat = 0
+    /// 上端のステータスバーの高さ(上まで伸ばすシートが、その下で止まるのに使う)。
+    var topSafeArea: CGFloat = 0
   }
 
   extension EnvironmentValues {

@@ -5,7 +5,8 @@
   /// 登録シート・編集シートの最下部に固定するバナー(Flutter 版の MobileSheetBannerAd)。
   ///
   /// `MobileSheet` の `footer` に渡す。スクロール領域の外側に置くのはデザインどおり。下の余白だけ
-  /// タブバー上のバナーより厚い(22pt)のは、シートの下端がホームインジケータに接するため。
+  /// タブバー上のバナーより厚い(36pt)のは、シートの下端がホームインジケータと画面の丸い角に接するため
+  /// (22pt では広告の枠の下の角が画面の角にかかって欠けた)。
   ///
   /// **キーボードが出ている間は出さない**。シートはキーボードの分だけ持ち上がるので、そのまま置くと
   /// 入力欄とキーボードの間に広告が挟まる。誤タップは AdMob のポリシー違反(無効なクリック)に
@@ -22,9 +23,9 @@
     /// このシートで出す広告。シートを開いたときに先読みから受け取り、シートを閉じるまで持つ。
     @State private var loader: MobileAdLoader?
 
-    /// デザインの余白(padding:8px 12px 22px)。
+    /// 余白(デザインの padding:8px 12px 22px から、下だけ画面の角にかからない分を足した)。
     private static let topPadding: CGFloat = 8
-    private static let bottomPadding: CGFloat = 22
+    private static let bottomPadding: CGFloat = 36
     nonisolated private static let horizontalPadding: CGFloat = 12
 
     /// シートの幅から要求する広告サイズ。先読み(`MobileAdPreloader`)も同じものを使う。
@@ -62,7 +63,7 @@
           )
           .frame(maxWidth: .infinity)
           // シートと同じ地の色にし(灰色の帯にすると別の部品が挟まったように見えるため)、
-          // 上端は一覧の下のバナー(MobileBannerAd)と同じ影で入力欄と分ける。シートの見出しの下の影と対になる。
+          // 上端は一覧の下のバナー(MobileBannerAd)と同じ線で入力欄と分ける。シートの見出しの下の線と対になる。
           .background(palette.surface)
           .appShadows(palette.bottomBarShadow, in: Rectangle(), scale: 1)
       }

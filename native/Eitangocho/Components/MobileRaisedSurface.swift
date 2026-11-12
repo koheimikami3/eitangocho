@@ -1,7 +1,7 @@
 #if os(iOS)
   import SwiftUI
 
-  /// 影で浮かせた、押せる面(学習中カード・クイズの「忘れていた」ボタン。Flutter 版の MobileRaisedSurface)。
+  /// 影で浮かせた、押せる面(学習中カード。Flutter 版の MobileRaisedSurface)。
   ///
   /// 押している間は縮むだけで、地・影は変えない(2.2.0 で沈み込みをやめた。ユーザー判断)。
   struct MobileRaisedSurface<Content: View>: View {

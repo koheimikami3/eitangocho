@@ -13,6 +13,8 @@
 
     /// 🔍 のボタンとこの欄のガラスを結ぶ ID。
     static let searchGlassID = "search"
+    /// 開く・閉じる動き。既定の .smooth(0.5 秒)では、押してから欄が伸びきるまでが遅れて見えたため短くする。
+    static let toggleAnimation: Animation = .snappy(duration: 0.3)
 
     @Environment(\.palette) private var palette
     @Environment(\.textScale) private var textScale
@@ -32,7 +34,7 @@
           // 先にフォーカスを外してキーボードを下ろし始める。欄は 🔍 へ縮む間も画面に残るので、
           // 閉じるだけだとその動きが終わるまでキーボードが残る。
           focused = false
-          withAnimation(.smooth) { shell.cancelSearch() }
+          withAnimation(Self.toggleAnimation) { shell.cancelSearch() }
         }
       }
       // 🔍 で開いた直後(検索語が空)と、開いている間に 🔍 を押し直したときにフォーカスを当てる。
@@ -40,7 +42,7 @@
       .onAppear { if shell.searchQuery.isEmpty { focused = true } }
       .onChange(of: shell.searchFocusRequest) { focused = true }
       .onChange(of: focused) { _, isFocused in
-        if !isFocused { withAnimation(.smooth) { shell.searchFocusLost() } }
+        if !isFocused { withAnimation(Self.toggleAnimation) { shell.searchFocusLost() } }
       }
     }
 
