@@ -161,7 +161,7 @@ struct AnalyticsLogger {
     log("theme_color_locked_tapped")
   }
 
-  /// 未購入の人がクイズの入口の鍵付きの項目を押した(iOS だけ。2.18.0)。テーマカラーと同じく、
+  /// 未購入の人がクイズの入口の鍵付きの項目を押した(2.18.0)。テーマカラーと同じく、
   /// pro_purchase の source=quiz と並べて、どの項目が購入の動機になっているかを見る。
   func logQuizOptionLockedTapped(_ option: QuizLockedOption) {
     log("quiz_option_locked_tapped", ["option": snakeCase(option.rawValue)])

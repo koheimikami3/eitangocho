@@ -25,7 +25,7 @@
         if quiz.phase == .active, let word = quiz.current {
           // 出題中はスクロールさせず、カードを画面の高さいっぱいに広げる(長い中身はカードの中でスクロール)。
           MobileActiveQuiz(
-            quiz: quiz, word: word, direction: settings.quizDirection, roundLabel: roundLabel, onAnswer: answer,
+            quiz: quiz, word: word, direction: settings.quizDirection, roundLabel: quiz.roundLabel, onAnswer: answer,
             onQuit: { quiz.showEntrance() }
           )
           .padding(20)
@@ -55,7 +55,7 @@
     @ViewBuilder
     private var content: some View {
       switch quiz.phase {
-      case .empty, .entrance:
+      case .entrance:
         MobileQuizEntrance(quiz: quiz, settings: settings, onRegister: onRegister)
       case .done:
         // インタースティシャルを出している間は、結果の画面(とそのレクタングル)を作らない。
@@ -63,7 +63,7 @@
           MobileQuizAdNotice()
         } else {
           MobileQuizResultView(
-            okCount: quiz.okCount, forgotWords: quiz.forgotWords, cycleNote: cycleNote,
+            okCount: quiz.okCount, forgotWords: quiz.forgotWords, cycleNote: quiz.cycleNote,
             onRetry: { quiz.retryForgotten() }, onContinue: { quiz.continueRound() },
             onChangeConditions: { quiz.showEntrance() }, onOpenPro: onOpenSettings)
         }
@@ -71,25 +71,6 @@
         // 出題中は body で別に組む(スクロールさせないため)。
         EmptyView()
       }
-    }
-
-    /// 出題中の上に出す、何を出している回か(出題元と、全部なら一巡の進み具合)。
-    private var roundLabel: String {
-      switch quiz.round {
-      case .retry: return String(localized: .quizSourceForgotten)
-      case .source(let source, let count):
-        let name = String(localized: source.label)
-        guard count == .all, let progress = quiz.cycleProgress(source) else { return name }
-        return name + " · " + String(localized: .quizCycleProgress(progress.done, progress.total))
-      case nil: return ""
-      }
-    }
-
-    /// 結果に出す一巡の案内(全部の回だけ)。一巡し終えたら「一巡しました」、途中なら進み具合。
-    private var cycleNote: String? {
-      guard case .source(let source, .all) = quiz.round else { return nil }
-      if quiz.completedCycle { return String(localized: .quizCycleCompleted) }
-      return quiz.cycleProgress(source).map { String(localized: .quizCycleProgress($0.done, $0.total)) }
     }
 
     /// 回答する。最後の問題なら、出せるインタースティシャルがあるときは結果の画面を待たせてから答え、

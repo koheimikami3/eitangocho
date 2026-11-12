@@ -27,24 +27,18 @@ struct QuizModelTests {
       currentWords: { words })
   }
 
-  @Test func startは学習済みから出題数分を選んで出題する() async throws {
+  @Test func 学習済みの10問で始めると出題数分を選んで出題する() async throws {
     let model = try await setupLearned(QuizQuestionCount.ten.limit + 1)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     #expect(model.phase == .active)
     #expect(model.questions.count == QuizQuestionCount.ten.limit)
     #expect(model.index == 0)
     #expect(!model.revealed)
   }
 
-  @Test func 学習済みが0件だとphaseがemptyになる() async throws {
-    let model = try await setupLearned(0)
-    model.start(trigger: .tab)
-    #expect(model.phase == .empty)
-  }
-
   @Test func answerKnewでindexが進みokCountが加算され最終問題でdoneになる() async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
 
     await model.answerKnew()
     #expect(model.index == 1)
@@ -59,7 +53,7 @@ struct QuizModelTests {
 
   @Test func answerForgotで単語が学習中に戻りforgotWordsに追加される() async throws {
     let model = try await setupLearned(1)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     let target = try #require(model.questions.first)
 
     await model.answerForgot()
@@ -73,14 +67,14 @@ struct QuizModelTests {
     #expect(model.forgotWords.map(\.id) == [target.id])
   }
 
-  // MARK: - 回をタブの切り替えをまたいで保つ(iOS)
+  // MARK: - 回をほかの画面への切り替えをまたいで保つ
 
   /// 今ある単語を差し替えられる入れ物(戻ってきたときに読む `currentWords` の元)。
   private final class WordsBox {
     var words: [Word] = []
   }
 
-  /// 学習済み単語を n 件入れ、回を保つモデルを返す。
+  /// 学習済み単語を n 件入れ、今ある単語を差し替えられるモデルを返す。
   private func setupKeepingRound(_ count: Int) async throws -> (QuizModel, WordsBox) {
     for i in 0..<count {
       let id = try await database.wordDao.insertWord(NewWord(word: "word\(i)", meaning: "訳\(i)"))
@@ -90,20 +84,17 @@ struct QuizModelTests {
     box.words = try await database.wordDao.getAll()
     let model = QuizModel(
       dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
-      keepsRoundAcrossViews: true, currentWords: { box.words })
+      currentWords: { box.words })
     return (model, box)
   }
 
-  @Test func 回を保つときはタブを移って戻っても続きから出題する() async throws {
+  @Test func ほかの画面へ移って戻っても続きから出題する() async throws {
     let (model, _) = try await setupKeepingRound(3)
     model.start(source: .learned, count: .ten, trigger: .tab)
-    model.viewChanged(from: .learning, to: .quiz)
     await model.answerKnew()
     model.reveal()
 
-    model.viewChanged(from: .quiz, to: .learning)
     model.enterFromTab()
-    model.viewChanged(from: .learning, to: .quiz)
 
     #expect(model.phase == .active)
     #expect(model.index == 1)
@@ -112,7 +103,7 @@ struct QuizModelTests {
     #expect(analytics.eventsNamed("quiz_started").count == 1)
   }
 
-  @Test func 回を保つときは選んでいるタブを押し直してもやり直さない() async throws {
+  @Test func 選んでいるタブを押し直してもやり直さない() async throws {
     let (model, _) = try await setupKeepingRound(3)
     model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
@@ -121,7 +112,7 @@ struct QuizModelTests {
     #expect(analytics.eventsNamed("quiz_started").count == 1)
   }
 
-  @Test func 回を保つときは結果の画面のままでタブから入ってもやり直さない() async throws {
+  @Test func 結果の画面のままでタブから入ってもやり直さない() async throws {
     let (model, _) = try await setupKeepingRound(1)
     model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
@@ -130,7 +121,7 @@ struct QuizModelTests {
     #expect(model.okCount == 1)
   }
 
-  @Test func 回を保つときはタブから入ると出題を始めずに入口を出す() async throws {
+  @Test func 回が無いときにタブから入ると出題を始めずに入口を出す() async throws {
     let (model, _) = try await setupKeepingRound(3)
     model.enterFromTab()
     #expect(model.phase == .entrance)
@@ -145,7 +136,7 @@ struct QuizModelTests {
     #expect(analytics.eventsNamed("quiz_empty_shown").count == 1)
   }
 
-  @Test func 回を保つときは離れている間の削除を残りの出題から外し編集を反映する() async throws {
+  @Test func 離れている間の削除を残りの出題から外し編集を反映する() async throws {
     let (model, box) = try await setupKeepingRound(3)
     model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
@@ -167,7 +158,7 @@ struct QuizModelTests {
     #expect(!model.revealed, "出題中の単語が消えたら次の単語は開示前から")
   }
 
-  @Test func 回を保つときに残りがすべて消えたらそこまでで回を終える() async throws {
+  @Test func 離れている間に残りがすべて消えたらそこまでで回を終える() async throws {
     let (model, box) = try await setupKeepingRound(2)
     model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
@@ -181,28 +172,19 @@ struct QuizModelTests {
     #expect(analytics.eventsNamed("quiz_completed").count == 1)
   }
 
-  @Test func 回を保たないときはタブから入るたびに始め直す() async throws {
-    let model = try await setupLearned(3)
-    model.enterFromTab()
-    await model.answerKnew()
-    model.enterFromTab()
-    #expect(model.index == 0)
-    #expect(analytics.eventsNamed("quiz_started").count == 2)
-  }
-
   @Test func revealでrevealedがtrueになる() async throws {
     let model = try await setupLearned(1)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     #expect(model.revealed)
   }
 
   @Test func 始め直すと前の回の進み具合を消す() async throws {
     let model = try await setupLearned(3)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     await model.answerKnew()
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     #expect(model.index == 0)
     #expect(model.okCount == 0)
     #expect(!model.revealed)
@@ -213,7 +195,7 @@ struct QuizModelTests {
   @Test(arguments: [QuizKey.space, .enter, .numpadEnter])
   func 開示前のSpaceとEnterで答えが開示される(key: QuizKey) async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     await model.handleKey(key)?.value
     #expect(model.revealed)
   }
@@ -221,7 +203,7 @@ struct QuizModelTests {
   @Test(arguments: [QuizKey.rightArrow, .digit2])
   func 開示後の右矢印と2で覚えているとして次に進む(key: QuizKey) async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     await model.handleKey(key)?.value
     #expect(model.index == 1)
@@ -232,7 +214,7 @@ struct QuizModelTests {
   @Test(arguments: [QuizKey.leftArrow, .digit1])
   func 開示後の左矢印と1で忘れていたとして次に進む(key: QuizKey) async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     await model.handleKey(key)?.value
     #expect(model.index == 1)
@@ -241,7 +223,7 @@ struct QuizModelTests {
 
   @Test func 開示前は左右の矢印が無反応() async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     #expect(model.handleKey(.leftArrow) == nil)
     #expect(model.handleKey(.rightArrow) == nil)
     #expect(model.index == 0)
@@ -250,14 +232,14 @@ struct QuizModelTests {
 
   @Test func 開示後はSpaceを受け付けない() async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     #expect(model.handleKey(.space) == nil)
   }
 
   @Test func 回答の書き込み中は次の回答を受け付けない() async throws {
     let model = try await setupLearned(3)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     // キーリピートで同じ単語に二重に答えない。
     let first = model.handleKey(.rightArrow)
@@ -268,19 +250,19 @@ struct QuizModelTests {
     #expect(model.okCount == 1)
   }
 
-  @Test func 回答の書き込み中に画面を移ったら書き終えても回を進めない() async throws {
+  @Test func 回答の書き込み中に入口へ戻ったら書き終えても回を進めない() async throws {
     let model = try await setupLearned(1)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
-    // 回答を DB への書き込みで待たせている間に別の画面へ移る。
+    // 回答を DB への書き込みで待たせている間に × で入口へ戻る。
     let resume = holdDatabase(database)
     let answer = model.handleKey(.rightArrow)
     try await letTasksReachDatabase()
-    model.viewChanged(from: .quiz, to: .learning)
+    model.showEntrance()
     resume()
     await answer?.value
 
-    #expect(model.phase == .empty)
+    #expect(model.phase == .entrance)
     #expect(analytics.eventsNamed("quiz_completed").isEmpty)
     // 答えた記録そのものは残す。
     #expect(try await database.wordDao.getAll().first?.lastReviewedAt != nil)
@@ -288,12 +270,12 @@ struct QuizModelTests {
 
   @Test func 回答の書き込み中に始め直したら新しい回を進めない() async throws {
     let model = try await setupLearned(3)
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.reveal()
     let resume = holdDatabase(database)
     let answer = model.handleKey(.rightArrow)
     try await letTasksReachDatabase()
-    model.start(trigger: .tab)
+    model.start(source: .learned, count: .ten, trigger: .tab)
     resume()
     await answer?.value
 
@@ -306,7 +288,7 @@ struct QuizModelTests {
 
   @Test func 始めた契機と最後まで答えた結果を送る() async throws {
     let model = try await setupLearned(2)
-    model.start(trigger: .continued)
+    model.start(source: .learned, count: .ten, trigger: .continued)
     await model.answerKnew()
     await model.answerForgot()
 
@@ -318,14 +300,7 @@ struct QuizModelTests {
     #expect(analytics.eventsNamed("quiz_completed") == [["ok_count": 1, "forgot_count": 1]])
   }
 
-  @Test func 学習済みが0件ならquiz_empty_shownだけを送る() async throws {
-    let model = try await setupLearned(0)
-    model.start(trigger: .tab)
-    #expect(analytics.eventsNamed("quiz_empty_shown").count == 1)
-    #expect(analytics.eventsNamed("quiz_started").isEmpty)
-  }
-
-  // MARK: - 入口の出題元・問題数(iOS)
+  // MARK: - 入口の出題元・問題数
 
   private let suiteName = "QuizModelTests-\(UUID().uuidString)"
 
@@ -348,7 +323,7 @@ struct QuizModelTests {
     let settings = makeSettings()
     let model = QuizModel(
       dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
-      keepsRoundAcrossViews: true, settings: settings, currentWords: { box.words })
+      settings: settings, currentWords: { box.words })
     return (model, box, settings)
   }
 

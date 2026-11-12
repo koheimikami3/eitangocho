@@ -101,7 +101,7 @@ struct RootView: View {
         shell: model.shell, settings: model.settings,
         learningCount: WordListing.learning(session.words.words).count,
         wordCount: session.words.words.count,
-        onStartQuiz: { session.quiz.start(trigger: .tab) }
+        onEnterQuiz: { session.quiz.enterFromTab() }
       ) { view in
         mainContent(view, session: session)
       }
@@ -126,7 +126,7 @@ struct RootView: View {
           shell: model.shell, settings: model.settings, dao: session.database.wordDao, wordInfo: session.wordInfo,
           analytics: model.analytics, review: session.review)
       case .quiz:
-        QuizView(quiz: session.quiz, shell: model.shell, settings: model.settings)
+        QuizView(quiz: session.quiz, settings: model.settings) { model.shell.selectView(.registration) }
       case .settings:
         SettingsView(
           settings: model.settings, sync: session.sync, exportService: WordExportService(database: session.database))

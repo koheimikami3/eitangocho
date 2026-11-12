@@ -6,8 +6,9 @@
     let shell: MainShellModel
     let learningCount: Int
     let wordCount: Int
-    /// クイズを押したとき(選択中に押し直したときも)。画面を移す前に出題をやり直す。
-    let onStartQuiz: () -> Void
+    /// クイズを押したとき(選択中に押し直したときも)。回が無ければ入口、途中の回・結果はそのまま見せる
+    /// (`QuizModel.enterFromTab`。2.17.0 までは押すたびに学習済みから出題をやり直していた)。
+    let onEnterQuiz: () -> Void
 
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
@@ -25,7 +26,7 @@
         item(.navAllWords, count: "\(wordCount)", view: .allWords)
         // 件数は出さない。学習済みの語数を出しても、1 回に出題するのは
         // 決まった語数なので、何の数か分かりにくいため。
-        item(.navQuiz, view: .quiz, onSelect: onStartQuiz)
+        item(.navQuiz, view: .quiz, onSelect: onEnterQuiz)
         item(.navRegistration, view: .registration)
         Spacer(minLength: 0)
         item(.navSettings, view: .settings)

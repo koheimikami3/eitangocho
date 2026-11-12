@@ -2,7 +2,8 @@
   import EitangochoSync
   import SwiftUI
 
-  /// macOS 版の設定画面(Pro・表示・外観・テーマカラー・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
+  /// macOS 版の設定画面(Pro・表示・外観・テーマカラー・訳の言語・データ・サポート・情報)。変更は即保存。
+  /// クイズの出題の向きは 2.18.0 でクイズの入口へ移した(iOS と同じ)。
   /// Flutter 版の SettingsView。
   struct SettingsView: View {
     let settings: SettingsStore
@@ -48,16 +49,6 @@
           SettingsSection(title: String(localized: .themeColor)) {
             SettingsCard {
               ThemeColorPicker(settings: settings)
-            }
-          }
-          SettingsSection(title: String(localized: .sectionQuiz)) {
-            SettingsCard {
-              ForEach(QuizDirection.allCases, id: \.self) { direction in
-                SettingsRadioRow(
-                  label: String(localized: direction.label(settings.translationLanguage)),
-                  selected: settings.quizDirection == direction
-                ) { settings.setQuizDirection(direction) }
-              }
             }
           }
           SettingsSection(title: String(localized: .sectionTranslation)) {

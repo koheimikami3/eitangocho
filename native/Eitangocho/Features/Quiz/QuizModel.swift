@@ -10,20 +10,18 @@ enum QuizKey: Sendable {
 
 /// フラッシュクイズの進行(Flutter 版の QuizPageNotifier と QuizPageState)。
 ///
-/// アプリが生きている間 1 つを持ち続ける。macOS はクイズの画面への入口(サイドバー・結果の「続ける」)で
-/// 必ず `start(trigger:)` を呼ぶので、入るたびに新しい回になる(Flutter 版と同じ)。
+/// アプリが生きている間 1 つを持ち続け、回をほかの画面への切り替えをまたいで保つ。
+/// iOS で、解き終えたときに出すインタースティシャルをタブを移ってやり直すことで避けられないようにするため
+/// (2026-11-01 のユーザーの判断)。回が無いときはクイズの入口(`.entrance`)を出し、出題元・問題数を選んで
+/// `start(source:count:trigger:)` で始める(2.18.0)。
 ///
-/// iOS は回をタブの切り替えをまたいで保つ(`keepsRoundAcrossViews`。2026-11-01 のユーザーの判断)。
-/// 解き終えたときに出すインタースティシャルを、タブを移ってやり直すことで避けられないようにするため。
-/// iOS は回が無いときにクイズの入口(`.entrance`)を出し、出題元・問題数を選んで `start(source:count:trigger:)` で
-/// 始める(2.18.0)。macOS は入口を持たず、学習済みから 10 問の今までの動き(`start(trigger:)`)のまま。
+/// macOS も 2.18.0 から同じ動きにした。それまではクイズの画面に入るたびに学習済みから 10 問を始め直し、
+/// 画面を離れると回を捨てていた(Flutter 版の名残。答えは 1 問ごとに記録済みなので、保っても困らない)。
 @Observable
 final class QuizModel {
   /// セッションの局面。
   enum Phase: Sendable {
-    /// 出題できる単語が無い(macOS)。
-    case empty
-    /// 出題元・問題数を選ぶ入口(iOS)。
+    /// 出題元・問題数を選ぶ入口。
     case entrance
     case active, done
   }
@@ -36,18 +34,18 @@ final class QuizModel {
     case retry
   }
 
-  private(set) var phase: Phase = .empty
+  private(set) var phase: Phase = .entrance
 
-  /// セッション開始時に学習済み単語から選んだ出題(selectQuizQuestions)のスナップショット。
-  /// セッション中の学習済みの変更は進行に影響させない。回をタブの切り替えをまたいで保つときだけ、
-  /// 戻ってきたときに残りの出題へ削除・編集を反映する(`enterFromTab()`)。
+  /// 回を始めたときに出題元から選んだ出題(selectQuizQuestions)のスナップショット。
+  /// 回の途中の学習済みなどの変更は進行に影響させない。ほかの画面から戻ってきたときだけ、
+  /// 残りの出題へ削除・編集を反映する(`enterFromTab()`)。
   private(set) var questions: [Word] = []
   private(set) var index = 0
   private(set) var revealed = false
   private(set) var okCount = 0
   private(set) var forgotWords: [Word] = []
 
-  /// 今の回が何を出しているか。入口・空のときは nil。
+  /// 今の回が何を出しているか。入口のときは nil。
   private(set) var round: Round?
 
   /// 今の回が、どの単語もまだ一度も出題していない状態で始めた回か(初めてのクイズ)。
@@ -68,25 +66,22 @@ final class QuizModel {
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let review: ReviewPrompter
-  @ObservationIgnored private let keepsRoundAcrossViews: Bool
   @ObservationIgnored private let currentWords: () -> [Word]
-  /// 入口で選んだ条件と「全部」の一巡の保存先(iOS)。macOS は使わないので nil でよい。
+  /// 入口で選んだ条件と「全部」の一巡の保存先。テストでは nil でよい(条件を覚えず、全部は毎回出題元の全体から選ぶ)。
   @ObservationIgnored private let settings: SettingsStore?
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "quiz")
 
-  /// `currentWords` は今ある単語すべて。始めるたびに読んで出題元の単語を選ぶ。
-  /// `keepsRoundAcrossViews` はタブを移っても回を保つか(iOS)。保つときは、戻ってきたときに
-  /// `currentWords` を読んで残りの出題に削除・編集を反映する。
+  /// `currentWords` は今ある単語すべて。始めるたびに読んで出題元の単語を選び、ほかの画面から戻ってきたときにも
+  /// 読んで残りの出題に削除・編集を反映する。
   init(
-    dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, keepsRoundAcrossViews: Bool = false,
-    settings: SettingsStore? = nil, currentWords: @escaping () -> [Word]
+    dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, settings: SettingsStore? = nil,
+    currentWords: @escaping () -> [Word]
   ) {
     self.settings = settings
     self.dao = dao
     self.analytics = analytics
     self.review = review
-    self.keepsRoundAcrossViews = keepsRoundAcrossViews
     self.currentWords = currentWords
   }
 
@@ -96,20 +91,7 @@ final class QuizModel {
   /// 出題中が回の最後の問題か(答えると結果になる)。
   var isOnLastQuestion: Bool { phase == .active && index + 1 >= questions.count }
 
-  /// 学習済み単語から 1 セッション分を選んで新しい回を始める(選び方は selectQuizQuestions)。
-  /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
-  /// `trigger` は計測用(どこから始めたか)。
-  func start(trigger: QuizTrigger) {
-    let questions = selectQuizQuestions(QuizSource.learned.words(from: currentWords()))
-    if questions.isEmpty {
-      resetSession([], phase: .empty)
-      analytics.logQuizEmptyShown()
-    } else {
-      begin(questions, round: .source(.learned, .ten), trigger: trigger)
-    }
-  }
-
-  // MARK: - iOS の入口
+  // MARK: - 入口
 
   /// 出題元が未保存のときの既定。学習済みがあれば学習済み(今までの利用者の出題元)、無ければ学習中
   /// (初めての人がクイズで空の画面に当たらないように)。
@@ -186,8 +168,10 @@ final class QuizModel {
     word.lastReviewedAt.map { $0 < start } ?? true
   }
 
-  /// 入口で選んだ出題元・問題数で新しい回を始める(iOS)。選んだ条件は覚えておく。
+  /// 入口で選んだ出題元・問題数で新しい回を始める(選び方は selectQuizQuestions)。選んだ条件は覚えておく。
+  /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
   /// 「全部」は一巡の残りから 50 問を選び、残りが無ければ一巡を始め直す(`pool`)。
+  /// `trigger` は計測用(どこから始めたか)。
   func start(source: QuizSource, count: QuizQuestionCount, trigger: QuizTrigger, now: Date = .now) {
     settings?.setQuizSource(source)
     settings?.setQuizQuestionCount(count)
@@ -211,7 +195,7 @@ final class QuizModel {
     begin(questions, round: .retry, trigger: .retry)
   }
 
-  /// `questions` で新しい回を始めて記録する(macOS・iOS の始め方とやり直しで共通)。
+  /// `questions` で新しい回を始めて記録する(出題元からの始め方とやり直しで共通)。
   private func begin(_ questions: [Word], round: Round, trigger: QuizTrigger) {
     // 初めてのクイズかは、回を始める前の状態で見る。
     let isFirst = currentWords().allSatisfy { $0.lastReviewedAt == nil }
@@ -232,11 +216,12 @@ final class QuizModel {
   }
 
   /// 結果の「続ける」。同じ出題元・問題数で次の回へ(やり直しの回の後は、その前の出題元の回へ)。
+  /// やり直しの回は出題元の回の結果からしか始められないので、出題元の回が無いことは無いが、念のため入口に戻す。
   func continueRound() {
     if let (source, count) = lastSourceRound {
       start(source: source, count: count, trigger: .continued)
     } else {
-      start(trigger: .continued)
+      showEntrance()
     }
   }
 
@@ -245,35 +230,19 @@ final class QuizModel {
     resetSession([], phase: .entrance)
   }
 
-  /// クイズのタブから入ったとき(iOS。選んでいるタブを押し直したときも)。
+  /// クイズのタブ(macOS はサイドバー)から入ったとき(選んでいるものを押し直したときも)。
   ///
-  /// 回を保つときは、回が無いときだけ始める。途中の回は続きから(離れている間の削除・編集を反映して)、
-  /// 結果は結果のまま見せ、押し直してもやり直さない(やり直せるとインタースティシャルを避けられるため)。
-  /// 保たないときは毎回始め直す。
+  /// 回が無ければ入口を出す。途中の回は続きから(離れている間の削除・編集を反映して)、
+  /// 結果は結果のまま見せ、押し直してもやり直さない(やり直せると iOS のインタースティシャルを避けられるため)。
   func enterFromTab() {
-    guard keepsRoundAcrossViews else {
-      start(trigger: .tab)
-      return
-    }
     switch phase {
-    case .empty, .entrance:
+    case .entrance:
       showEntrance()
       // 入口で選ばれている出題元が空なら、今までの空の画面と同じく記録する(Pro かは問わず保存した値で見る)。
       let source = settings?.quizSource ?? Self.defaultSource(currentWords())
       if wordCount(source) == 0 { analytics.logQuizEmptyShown() }
     case .active: refreshRemainingQuestions()
     case .done: break
-    }
-  }
-
-  /// 表示中の画面が変わったとき。回の途中でクイズ以外の画面へ移ったら、その回を捨てる
-  /// (書き込み中だった回答が、離れた後に回を進めて完了と数えないように)。
-  /// macOS はクイズへの入口で必ず `start(trigger:)` を呼ぶので、戻ってきたときは新しい回になる。
-  /// 回を保つとき(iOS)は、移っても回は続いているので何もしない。
-  func viewChanged(from previous: MainView, to next: MainView) {
-    guard !keepsRoundAcrossViews else { return }
-    if previous == .quiz && next != .quiz && phase == .active {
-      resetSession([], phase: .empty)
     }
   }
 
@@ -381,5 +350,26 @@ final class QuizModel {
     // 満たさなければ何も起きない)。依頼の成否はクイズの進行に関係しないので待たない。
     let (okCount, total) = (okCount, questions.count)
     Task { await review.onQuizCompleted(okCount: okCount, total: total) }
+  }
+}
+
+extension QuizModel {
+  /// 出題中の上に出す、何を出している回か(出題元と、全部なら一巡の進み具合)。両 OS で使う。
+  var roundLabel: String {
+    switch round {
+    case .retry: return String(localized: .quizSourceForgotten)
+    case .source(let source, let count):
+      let name = String(localized: source.label)
+      guard count == .all, let progress = cycleProgress(source) else { return name }
+      return name + " · " + String(localized: .quizCycleProgress(progress.done, progress.total))
+    case nil: return ""
+    }
+  }
+
+  /// 結果に出す一巡の案内(全部の回だけ)。一巡し終えたら「一巡しました」、途中なら進み具合。
+  var cycleNote: String? {
+    guard case .source(let source, .all) = round else { return nil }
+    if completedCycle { return String(localized: .quizCycleCompleted) }
+    return cycleProgress(source).map { String(localized: .quizCycleProgress($0.done, $0.total)) }
   }
 }

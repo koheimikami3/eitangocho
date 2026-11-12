@@ -1,11 +1,10 @@
 import SwiftUI
 
-/// クイズの出題カード(Flutter 版の QuizCard)。進捗・表面・IPA・答えを表示するボタン、
+/// クイズの出題カード(Flutter 版の QuizCard)。表面・IPA・答えを表示するボタン、
 /// 答えを開いた後は区切り線 + 裏面 + 例文を出す。
 /// 発音のボタンは答えが分からないよう、英単語が出ている側にだけ置く
 /// (en→ja は表面、ja→en は答えの面)。
 struct QuizCard: View {
-  let progress: String
   let front: String
   /// 表面に出す IPA(空なら出さない。ja→en のときは空で渡す)。
   let ipa: String
@@ -24,9 +23,6 @@ struct QuizCard: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      AppText(progress, style: AppTextStyle(size: 12))
-        .foregroundStyle(colors.textTertiary)
-      Spacer().frame(height: px(16))
       card
       if !revealed {
         Spacer().frame(height: px(16))

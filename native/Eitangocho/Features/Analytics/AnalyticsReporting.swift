@@ -36,9 +36,8 @@ struct AnalyticsReporting: ViewModifier {
           if phase == .active { reporter.reportTrackingStatus(trackingClient.statusName()) }
         }
       #endif
-      .onChange(of: shell.view, initial: true) { previous, view in
+      .onChange(of: shell.view, initial: true) { _, view in
         reporter.reportScreen(view)
-        session.quiz.viewChanged(from: previous, to: view)
       }
       .onChange(of: AnalyticsReporter.settingsProperties(settings), initial: true) { _, properties in
         reporter.reportSettings(properties)

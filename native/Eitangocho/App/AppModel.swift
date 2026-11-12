@@ -196,11 +196,8 @@ final class AppModel {
         let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics) {
           [quizInterstitial] in quizInterstitial.isHoldingResult
         }
-        // iOS は回をタブの切り替えをまたいで保つ(解き終えたときのインタースティシャルを避けられないように)。
-        let keepsQuizRound = true
       #else
         let review = ReviewPrompter(client: reviewClient, dao: database.wordDao, analytics: analytics)
-        let keepsQuizRound = false
       #endif
       let proPrompter = ProPrompter(dao: database.wordDao, analytics: analytics) { [purchase] in
         purchase.isProUnlockedKnown && !purchase.proUnlocked && purchase.priceText != nil
@@ -210,8 +207,8 @@ final class AppModel {
           database: database, sync: sync, importOutcome: outcome, locations: locations, words: words,
           wordInfo: makeWordInfoProvider(database),
           quiz: QuizModel(
-            dao: database.wordDao, analytics: analytics, review: review, keepsRoundAcrossViews: keepsQuizRound,
-            settings: settings, currentWords: { [words] in words.words }),
+            dao: database.wordDao, analytics: analytics, review: review, settings: settings,
+            currentWords: { [words] in words.words }),
           review: review, proPrompter: proPrompter))
       await sync.start()
     }
