@@ -105,13 +105,18 @@ struct AnalyticsLogger {
     log("search_used", ["screen": screenName(view)])
   }
 
-  func logQuizStarted(trigger: QuizTrigger, questions: [Word], now: Date = .now) {
-    log(
-      "quiz_started",
-      [
-        "trigger": quizTriggerValue(trigger),
-        "review_gap_bucket": reviewGapBucket(questions.map(\.lastReviewedAt), now: now),
-      ])
+  /// クイズを始めた。`source` は出題元(nil は「忘れた単語だけもう一度」で forgotten)、`count` は問題数
+  /// (やり直しの回は送らない)。出題元・問題数の選択肢を残すか、Pro で解放する項目が使われているかの判断用(2.18.0)。
+  func logQuizStarted(
+    trigger: QuizTrigger, questions: [Word], source: QuizSource?, count: QuizQuestionCount?, now: Date = .now
+  ) {
+    var parameters: [String: AnyHashable] = [
+      "trigger": quizTriggerValue(trigger),
+      "review_gap_bucket": reviewGapBucket(questions.map(\.lastReviewedAt), now: now),
+      "source": source?.rawValue ?? "forgotten",
+    ]
+    if let count { parameters["question_count"] = quizQuestionCountValue(count) }
+    log("quiz_started", parameters)
   }
 
   func logQuizEmptyShown() {
@@ -154,6 +159,12 @@ struct AnalyticsLogger {
   /// 押す人が少ない(色が購入の動機になっていない)のか、押しても買われない(案内や価格の問題)のかを分ける。
   func logThemeColorLockedTapped() {
     log("theme_color_locked_tapped")
+  }
+
+  /// 未購入の人がクイズの入口の鍵付きの項目を押した(iOS だけ。2.18.0)。テーマカラーと同じく、
+  /// pro_purchase の source=quiz と並べて、どの項目が購入の動機になっているかを見る。
+  func logQuizOptionLockedTapped(_ option: QuizLockedOption) {
+    log("quiz_option_locked_tapped", ["option": snakeCase(option.rawValue)])
   }
 
   /// 登録単語数が一定を超えた人に Pro の案内を出した(iOS だけ。ProPrompter)。pro_purchase の source=pro_prompt と
