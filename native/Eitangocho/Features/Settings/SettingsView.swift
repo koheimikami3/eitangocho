@@ -2,7 +2,7 @@
   import EitangochoSync
   import SwiftUI
 
-  /// macOS 版の設定画面(表示・外観・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
+  /// macOS 版の設定画面(Pro・表示・外観・テーマカラー・クイズ・訳の言語・データ・サポート・情報)。変更は即保存。
   /// Flutter 版の SettingsView。
   struct SettingsView: View {
     let settings: SettingsStore
@@ -14,12 +14,17 @@
     @Environment(\.openURL) private var openURL
     @Environment(\.appOverlay) private var overlay
     @Environment(\.analytics) private var analytics
+    @Environment(\.purchase) private var purchase
 
     var body: some View {
       // スクロール領域はビューの全幅に広げ、中身だけを左に寄せる。スクロール領域ごと寄せると、
       // スクロールバーがカードのすぐ横に出る(全単語の表と同じく、ビューの右端に出す)。
       ScrollView {
         VStack(alignment: .leading, spacing: px(22)) {
+          // iOS と同じく先頭に置く。課金を扱えない環境(SDK キーが未設定・初期化の失敗)では欄ごと出さない。
+          if let purchase, purchase.available {
+            ProSection(purchase: purchase)
+          }
           SettingsSection(title: String(localized: .sectionDisplay)) {
             SettingsCard {
               SettingsToggleRow(label: String(localized: .showIpa), value: settings.showIpa) {
@@ -29,8 +34,7 @@
               UiScaleSlider(value: settings.uiScale) { settings.setUiScale($0) }
             }
           }
-          // iOS は次の階層の画面に分けるが、macOS は横幅に余裕があるので、クイズの出題方向と同じく
-          // 独立したセクションにラジオの行を並べる。テーマカラーは課金の無い macOS には置かない。
+          // iOS は次の階層の画面に分けるが、macOS は横幅に余裕があるので、独立したセクションにラジオの行を並べる。
           SettingsSection(title: String(localized: .sectionAppearance)) {
             SettingsCard {
               ForEach(AppAppearance.allCases, id: \.self) { appearance in
@@ -38,6 +42,12 @@
                   label: String(localized: appearance.label), selected: settings.appearance == appearance
                 ) { settings.setAppearance(appearance) }
               }
+            }
+          }
+          // テーマカラーは外観とは別の欄にする(iOS と同じく別の行に分け、Pro で解放するものとして目に入るように)。
+          SettingsSection(title: String(localized: .themeColor)) {
+            SettingsCard {
+              ThemeColorPicker(settings: settings)
             }
           }
           SettingsSection(title: String(localized: .sectionQuiz)) {

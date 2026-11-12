@@ -44,15 +44,16 @@ enum LicenseCatalog {
     ("GoogleUtilities", "GoogleUtilities-LICENSE"),
     ("Promises", "Promises-LICENSE"),
     ("nanopb", "nanopb-LICENSE"),
+    // 課金。2.18.0 から macOS にもリンクする(macOS でも Pro を買えるようにしたため)。
+    ("RevenueCat", "RevenueCat-LICENSE"),
   ]
 
-  /// iOS だけにリンクする Swift パッケージ(広告・課金。pbxproj の `platformFilters = (ios)`)。
+  /// iOS だけにリンクする Swift パッケージ(広告。pbxproj の `platformFilter = ios`)。
   /// macOS の成果物には入らないので、macOS の一覧には出さない。
   static let iOSOnlyPackages = [
     // GoogleMobileAds と、それがリンクする同意管理の SDK。
     ("GoogleMobileAds", "GoogleMobileAds-LICENSE"),
     ("GoogleUserMessagingPlatform", "GoogleUserMessagingPlatform-LICENSE"),
-    ("RevenueCat", "RevenueCat-LICENSE"),
   ]
 
   /// この OS の成果物にリンクされる Swift パッケージ。

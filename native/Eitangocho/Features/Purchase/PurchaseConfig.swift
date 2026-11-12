@@ -15,16 +15,9 @@ enum PurchaseConfig {
   /// 「広告を非表示にする」の entitlement ID(RevenueCat のダッシュボードで作る)。
   static let entitlementId = "pro"
 
-  /// 課金を扱えるか。
+  /// 課金を扱えるか(SDK キーが設定済みか)。
   ///
-  /// iOS 限定なのは、macOS には広告が無く解禁するものが何も無いため(macOS には SDK もリンクしていない)。
-  /// 将来 macOS にも Pro 機能を出すときは、Bundle ID が同じ = Universal Purchase なので同じ entitlement を
-  /// そのまま使える。
-  static var isAvailable: Bool {
-    #if os(iOS)
-      !appleApiKey.isEmpty
-    #else
-      false
-    #endif
-  }
+  /// macOS でも同じ entitlement を使う。Bundle ID が同じ(Universal Purchase)なので、どちらの OS で買っても
+  /// 両方で Pro になる。macOS には広告が無く、テーマカラーとクイズの選択肢を解放する(2.18.0 から)。
+  static var isAvailable: Bool { !appleApiKey.isEmpty }
 }

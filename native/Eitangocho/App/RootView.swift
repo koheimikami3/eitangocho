@@ -32,7 +32,7 @@ struct RootView: View {
       .environment(\.ads, model.ads)
       // レビュー依頼の口は画面からしか取れないので、ここで ReviewPrompter のクライアントに渡す。
       .onAppear { model.reviewClient.action = requestReview }
-      .environment(\.colors, isDark ? .dark : .light)
+      .environment(\.colors, AppColors(isDark: isDark, theme: themeColor))
       .environment(\.openPronunciation, openPronunciation)
       #if os(iOS)
         .environment(\.palette, AppPalette(isDark: isDark, theme: themeColor))

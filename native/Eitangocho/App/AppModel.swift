@@ -90,14 +90,13 @@ final class AppModel {
     self.overlay = overlay
     analytics = AnalyticsLogger(FirebaseAnalyticsClient.start())
     shell = MainShellModel(analytics: analytics)
+    purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
     #if os(iOS)
-      purchase = PurchaseModel(client: RevenueCatPurchasesClient(), analytics: analytics)
       tracking = TrackingAuthorizer(
         client: trackingClient, isActive: { UIApplication.shared.applicationState == .active },
         explain: { await MobileTrackingPromptDialog.show(overlay: overlay) })
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: GoogleMobileAdsSDK(), platformSupported: true)
     #else
-      purchase = PurchaseModel(client: UnavailablePurchasesClient(), analytics: analytics)
       // macOS には広告が無いので、ATT も聞かない(AdsController が iOS 以外では呼ばない)。
       tracking = TrackingAuthorizer(client: trackingClient) { true }
       ads = AdsController(purchase: purchase, tracking: tracking, sdk: NoAdsSDK(), platformSupported: false)

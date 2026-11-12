@@ -6,29 +6,37 @@ import SwiftUI
 /// 見た目の正はこちら(Swift 版)と Flutter 版の両方で揃えておく。
 /// ライト / ダークは OS の外観ではなく設定の `appearance` で決める。
 ///
+/// アクセント系のトークン(accent・ホバー・accentSoft・accentLine・accentOnSoft・buttonGradient・buttonShadow)は
+/// テーマカラー(`theme`)から作る(2.18.0。iOS の AppPalette と同じ値の表 ThemeColor.tones を使う)。
+/// ブルーは今までの macOS の値のまま(iOS の刷新で変えた淡い地の文字色・影の色みは macOS には入れていない)。
+///
 /// 画面からは `@Environment(\.colors) private var colors` で引く。
 nonisolated struct AppColors: Equatable, Sendable {
   let isDark: Bool
+  var theme: ThemeColor = .free
 
   static let light = AppColors(isDark: false)
   static let dark = AppColors(isDark: true)
 
   // MARK: - アクセント
 
-  /// 主要アクション。ライト / ダーク共通(アイコンと同色)。
-  var accent: Color { Color(argb: 0xFF42_9FF0) }
-  var accentHover: Color { Color(argb: 0xFF2B_8EE0) }
+  /// 主要アクション。ブルーはライト / ダーク共通(アイコンと同色)。グラファイトだけダークで明るくする。
+  var accent: Color { opaque(accentRGB) }
+
+  /// ホバー中のアクセント。ブルーの元の値(#429FF0 → #2B8EE0)と同じく、彩度を上げて明度を下げる。
+  var accentHover: Color {
+    theme == .blue ? Color(argb: 0xFF2B_8EE0) : Self.hover(accentRGB)
+  }
 
   /// 主ボタンのグラデーション(上 → 下)。iOS の AppPalette.buttonGradient と同じ値。
   var buttonGradient: [Color] {
-    isDark
-      ? [Color(argb: 0xFF44_9DF0), Color(argb: 0xFF37_95E9)]
-      : [Color(argb: 0xFF4D_A4F2), Color(argb: 0xFF3F_9CEF)]
+    let (top, bottom) = isDark ? tones.gradientDark : tones.gradientLight
+    return [opaque(top), opaque(bottom)]
   }
 
   /// 主ボタンのホバー中のグラデーション(上 → 下)。通常時の buttonGradient を
-  /// 同じ向きのまま一段暗くしたもの。
-  var buttonGradientHover: [Color] { [Color(argb: 0xFF3F_9CEF), accentHover] }
+  /// 同じ向きのまま一段暗くしたもの(上はライトの下端の色、下はホバー中のアクセント)。
+  var buttonGradientHover: [Color] { [opaque(tones.gradientLight.1), accentHover] }
 
   /// 主ボタンの影(iOS の AppPalette.buttonShadow と同じ値)。
   var buttonShadow: [AppShadow] {
@@ -36,7 +44,10 @@ nonisolated struct AppColors: Equatable, Sendable {
       ? [AppShadow(color: Color(argb: 0x5900_0000), blurRadius: 2, y: 1)]
       : [
         AppShadow(color: Color(argb: 0x0D10_1828), blurRadius: 1, y: 1),
-        AppShadow(color: Color(argb: 0x3D26_78C8), blurRadius: 4, spread: -3, y: 1),
+        // 2 枚目はアクセントの色みを帯びた影。ブルーは元の値、ほかの色は淡い地の文字色で代える(iOS と同じ)。
+        AppShadow(
+          color: theme == .blue ? Color(argb: 0x3D26_78C8) : withAlpha(0x3D, tones.onSoftLight), blurRadius: 4,
+          spread: -3, y: 1),
       ]
   }
 
@@ -82,16 +93,27 @@ nonisolated struct AppColors: Equatable, Sendable {
 
   // 発音ボタン(アクセント色を淡く敷いた上に濃い青の文字・アイコンを載せる)。
   // ダークは地が暗いぶん濃く敷き、線は文字色と同じ色相で引く(iOS のダークと同じ)。
-  var accentSoft: Color { isDark ? Color(argb: 0x3842_9FF0) : Color(argb: 0x1A42_9FF0) }
-  var accentSoftHover: Color { isDark ? Color(argb: 0x5242_9FF0) : Color(argb: 0x3342_9FF0) }
-  var accentLine: Color { isDark ? Color(argb: 0x737E_C2FF) : Color(argb: 0x6142_9FF0) }
-  var accentLineHover: Color { isDark ? Color(argb: 0xA67E_C2FF) : Color(argb: 0x9942_9FF0) }
+  var accentSoft: Color { withAlpha(isDark ? 0x38 : 0x1A, accentRGB) }
+  /// ホバー中の淡い地。ブルー以外の色は淡い地の文字色を 12% の地で 4.5:1 前後に合わせてあり(ThemeColor.tones)、
+  /// 地を濃くすると 4.5:1 を割るため、地は変えずに線(accentLineHover)だけでホバーを示す。
+  var accentSoftHover: Color {
+    theme == .blue ? withAlpha(isDark ? 0x52 : 0x33, accentRGB) : accentSoft
+  }
+  var accentLine: Color { isDark ? withAlpha(0x73, tones.onSoftDark) : withAlpha(0x61, accentRGB) }
+  var accentLineHover: Color { isDark ? withAlpha(0xA6, tones.onSoftDark) : withAlpha(0x99, accentRGB) }
 
   /// accentSoft の上に載せる文字・アイコン色。
   ///
   /// ライトは accent(#429FF0)では淡い地に対して 2.56:1 しか出ないため濃い青にする
-  /// (通常 5.08:1 / hover 4.61:1)。ダークは iOS と同じ値。
-  var accentOnSoft: Color { isDark ? Color(argb: 0xFF7E_C2FF) : Color(argb: 0xFF17_6AB4) }
+  /// (通常 5.08:1 / hover 4.61:1)。ダークとブルー以外の色は iOS と同じ値。
+  var accentOnSoft: Color {
+    if isDark { return opaque(tones.onSoftDark) }
+    return theme == .blue ? Color(argb: 0xFF17_6AB4) : opaque(tones.onSoftLight)
+  }
+
+  /// 押せないボタンの地と文字(Pro の欄の購入ボタン・「購入済み」。iOS の AppPalette と同じ値)。
+  var disabledButton: Color { isDark ? Color(argb: 0x1FFF_FFFF) : Color(argb: 0xFFEC_ECEF) }
+  var disabledButtonForeground: Color { textAlpha(isDark ? 60 : 50) }
 
   // MARK: - 状態色
 
@@ -199,6 +221,41 @@ nonisolated struct AppColors: Equatable, Sendable {
 
   /// ボーダー・区切り線の不透明度つき色。本文系と同じ導出だが、意味が違うので呼び分ける。
   func borderAlpha(_ percent: Int) -> Color { alpha(percent) }
+
+  private var tones: ThemeColor.Tones { theme.tones }
+
+  /// アクセント(0xRRGGBB)。
+  private var accentRGB: UInt32 { isDark ? tones.accentDark : tones.accent }
+
+  /// 0xRRGGBB の不透明な色。
+  private func opaque(_ rgb: UInt32) -> Color { Color(argb: 0xFF00_0000 | rgb) }
+
+  /// 0xRRGGBB に不透明度(0x00〜0xFF)を付けた色。
+  private func withAlpha(_ alpha: UInt32, _ rgb: UInt32) -> Color { Color(argb: alpha << 24 | rgb) }
+
+  /// ホバー中の色。ブルーの元の値(#429FF0 → #2B8EE0)の変え方に合わせ、彩度の残り(1 − 彩度)を 7 割に、
+  /// 明度を 93.4% にする(色相は変えない)。
+  private static func hover(_ rgb: UInt32) -> Color {
+    let r = Double(rgb >> 16 & 0xFF) / 255
+    let g = Double(rgb >> 8 & 0xFF) / 255
+    let b = Double(rgb & 0xFF) / 255
+    let maxValue = max(r, g, b)
+    let delta = maxValue - min(r, g, b)
+    var hue = 0.0
+    if delta > 0 {
+      if maxValue == r {
+        hue = ((g - b) / delta).truncatingRemainder(dividingBy: 6)
+      } else if maxValue == g {
+        hue = (b - r) / delta + 2
+      } else {
+        hue = (r - g) / delta + 4
+      }
+      hue /= 6
+      if hue < 0 { hue += 1 }
+    }
+    let saturation = maxValue == 0 ? 0 : delta / maxValue
+    return Color(hue: hue, saturation: 1 - (1 - saturation) * 0.7, brightness: maxValue * 0.934)
+  }
 
   private func alpha(_ percent: Int) -> Color {
     (isDark ? Color.white : Color.black).opacity(Double(percent) / 100)
