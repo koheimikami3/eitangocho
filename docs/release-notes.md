@@ -22,6 +22,109 @@ App Store / Mac App Store の「このバージョンの新機能」に掲載し
 
 ---
 
+## 3.0.0 (build 34)
+
+iOS・macOS 共通(両方 build 34)。入った内容が違うので文面を分ける。「クイズ機能を刷新」は、入口を作って出題元・問題数・向きを
+選べるようにしたこと(ブックマーク・すべての出題元と 30 問以上は Pro)。macOS は Pro を買えるようにし、テーマカラーを入れた。
+iOS の「画面のレイアウト」は、設定をタブから ⚙ のシートに移したことと右下の ＋。「忘れた単語だけもう一度」、
+計測の追加、初めてのクイズで全画面広告を出さないことは掲載していない。
+
+### iOS
+
+日本語:
+
+```
+クイズ機能を刷新し、出題する単語や問題数を選べるようにしました。
+画面のレイアウトを整理しました。
+```
+
+繁體中文:
+
+```
+全新改版測驗功能，可選擇出題的單字與題數。
+整理了畫面的版面配置。
+```
+
+Español:
+
+```
+Renovamos el quiz: ahora puedes elegir qué palabras y cuántas preguntas incluir.
+Reorganizamos las pantallas.
+```
+
+Français:
+
+```
+Refonte du quiz : choisissez les mots et le nombre de questions.
+Réorganisation des écrans.
+```
+
+English:
+
+```
+Revamped quizzes so you can choose which words and how many questions to include.
+Reorganized the app's screens.
+```
+
+한국어:
+
+```
+퀴즈 기능을 새롭게 바꿔, 출제할 단어와 문제 수를 고를 수 있게 했어요.
+화면 구성을 정리했어요.
+```
+
+### macOS
+
+日本語:
+
+```
+Mac でも Pro 版を使えるようにしました。テーマカラーを8色から選べます。
+クイズ機能を刷新し、出題する単語や問題数を選べるようにしました。
+一部の画面のデザインを見やすく調整しました。
+```
+
+繁體中文:
+
+```
+Mac 版也能使用 Pro 版了，可從 8 種主題色中選擇。
+全新改版測驗功能，可選擇出題的單字與題數。
+調整了部分畫面的設計，使其更易於閱讀。
+```
+
+Español:
+
+```
+La Versión Pro ya está disponible en Mac: elige entre 8 colores de tema.
+Renovamos el quiz: ahora puedes elegir qué palabras y cuántas preguntas incluir.
+Ajustamos el diseño de algunas pantallas para que sean más fáciles de leer.
+```
+
+Français:
+
+```
+La Version Pro est désormais disponible sur Mac : choisissez parmi 8 couleurs de thème.
+Refonte du quiz : choisissez les mots et le nombre de questions.
+Ajustement du design de certaines pages pour une meilleure lisibilité.
+```
+
+English:
+
+```
+Pro is now available on Mac, letting you choose from 8 theme colors.
+Revamped quizzes so you can choose which words and how many questions to include.
+Improved the design of some screens for readability.
+```
+
+한국어:
+
+```
+Mac에서도 Pro 버전을 쓸 수 있게 했어요. 테마 색상을 8가지 중에서 고를 수 있어요.
+퀴즈 기능을 새롭게 바꿔, 출제할 단어와 문제 수를 고를 수 있게 했어요.
+일부 화면의 디자인을 보기 쉽게 조정했어요.
+```
+
+---
+
 ## 2.17.0 (build 33)
 
 iOS・macOS 共通(両方 build 33)。「自動入力」は同梱の辞書を 23,311 語に増やしたこと(熟語・複合語を含み、全語に韓国語の訳がある)。
