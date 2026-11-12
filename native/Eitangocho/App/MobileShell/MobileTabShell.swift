@@ -47,7 +47,7 @@
             tabContent(.quiz)
           } label: {
             // 斜めに重なった 2 枚のカード(単語カードをめくって答えを確かめる)。試作。
-            Label(String(localized: .navQuizShort), systemImage: "rectangle.portrait.on.rectangle.portrait.angled")
+            Label(String(localized: .navQuiz), systemImage: "rectangle.portrait.on.rectangle.portrait.angled")
           }
         }
         .tint(palette.accent)

@@ -3093,48 +3093,7 @@
       }
     },
     "navQuiz" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Flash quiz"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quiz rápido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quiz express"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フラッシュクイズ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "플래시 퀴즈"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "單字測驗"
-          }
-        }
-      }
-    },
-    "navQuizShort" : {
-      "comment" : "タブバーの短いラベル",
+      "comment" : "クイズの画面の名前(iOS のタブ・ヘッダ、macOS のサイドバー・ツールバー)",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

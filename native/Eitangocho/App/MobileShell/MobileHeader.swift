@@ -134,7 +134,7 @@
       case .learning: .navLearning
       case .allWords: .navAllWords
       // タブ名と揃える(2.18.0)。「フラッシュ」は日本語では馴染みが薄く、4 択を入れるとカードをめくる形だけではなくなるため。
-      case .quiz: .navQuizShort
+      case .quiz: .navQuiz
       case .registration: .navRegistration
       case .settings: .navSettings
       }

@@ -102,6 +102,10 @@ nonisolated struct AppColors: Equatable, Sendable {
   var accentLine: Color { isDark ? withAlpha(0x73, tones.onSoftDark) : withAlpha(0x61, accentRGB) }
   var accentLineHover: Color { isDark ? withAlpha(0xA6, tones.onSoftDark) : withAlpha(0x99, accentRGB) }
 
+  /// 淡いボタン(クイズ結果の「続ける」など)の地。accentSoft だと背景の薄いグレーとの差が小さく、ボタンに
+  /// 見えないため一段濃く敷く(iOS の AppPalette.accentSoftButton と同じ値)。
+  var accentSoftButton: Color { withAlpha(isDark ? 0x4D : 0x33, accentRGB) }
+
   /// accentSoft の上に載せる文字・アイコン色。
   ///
   /// ライトは accent(#429FF0)では淡い地に対して 2.56:1 しか出ないため濃い青にする
@@ -126,6 +130,9 @@ nonisolated struct AppColors: Equatable, Sendable {
 
   /// 淡い赤の地(クイズ結果の「忘れていた単語」の見出し。iOS の AppPalette.dangerSoft と同じ値)。
   var dangerSoft: Color { isDark ? Color(argb: 0x1FFF_6B6B) : Color(argb: 0x12C0_3030) }
+
+  /// 赤の淡いボタン(クイズの「忘れていた」)の地。dangerSoft より一段濃く敷く(iOS の AppPalette と同じ値)。
+  var dangerSoftButton: Color { isDark ? Color(argb: 0x33FF_6B6B) : Color(argb: 0x21C0_3030) }
 
   /// 完了の知らせ(登録しました 等)
   var success: Color { isDark ? Color(argb: 0xFF6F_D39A) : Color(argb: 0xFF1C_7A3F) }

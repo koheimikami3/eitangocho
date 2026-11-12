@@ -18,10 +18,13 @@
       GeometryReader { geometry in
         ScrollView {
           content
-            .frame(maxWidth: px(480))
+            // 出題中はカードを一回り大きく見せるため広くする(入口・結果は今までの幅のまま)。
+            .frame(maxWidth: px(quiz.phase == .active ? 560 : 480))
             .frame(maxWidth: .infinity, minHeight: max(geometry.size.height - px(40), 0))
             .padding(px(20))
         }
+        // 収まっているときは引っぱっても動かさない(スクロールは画面より高いときだけ)。
+        .scrollBounceBehavior(.basedOnSize)
       }
     }
 
@@ -51,6 +54,7 @@
 
     @Environment(\.colors) private var colors
     @Environment(\.uiScale) private var px
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -66,28 +70,32 @@
           back: isJaToEn ? word.word : word.meaning,
           exampleEn: word.exampleEn,
           exampleTranslation: word.exampleTranslation,
-          englishWord: word.word,
-          pronunciationOnFront: !isJaToEn,
-          onReveal: { quiz.reveal() })
-        if quiz.revealed {
-          Spacer().frame(height: px(16))
-          QuizAnswerButtons(
-            onForgot: { Task { await quiz.answerForgot() } },
-            onKnew: { Task { await quiz.answerKnew() } })
-        }
+          englishWord: word.word)
+        Spacer().frame(height: px(16))
+        QuizAnswerButtons(
+          revealed: quiz.revealed, onReveal: { withAnimation(revealAnimation) { quiz.reveal() } },
+          onForgot: { Task { await quiz.answerForgot() } },
+          onKnew: { Task { await quiz.answerKnew() } })
       }
       .focusable()
       .focused($focused)
       // キーを受けるためだけの焦点なので、焦点の枠は出さない。
       .focusEffectDisabled()
       .onKeyPress(phases: .down) { press in
-        guard let key = QuizKey(press), quiz.handleKey(key) != nil else { return .ignored }
-        return .handled
+        guard let key = QuizKey(press) else { return .ignored }
+        // 答えの表示はボタンと同じく、単語を上へ滑らかに動かす(回答は動かさないので、同じ取引の中でも影響しない)。
+        let handled = withAnimation(revealAnimation) { quiz.handleKey(key) }
+        return handled == nil ? .ignored : .handled
       }
       // Esc は × と同じく入口に戻る。
       .onExitCommand { quiz.showEntrance() }
       // 画面に入ったとき(入口・「続ける」から始めたとき)にすぐキーを受けられるようにする。
       .onAppear { focused = true }
+    }
+
+    /// 答えを表示するときの動き(単語が縦中央から上へ上がる。iOS と同じ)。「視差効果を減らす」の人には動かさない。
+    private var revealAnimation: Animation? {
+      reduceMotion ? nil : .smooth(duration: 0.3)
     }
 
     /// 何を出している回か(出題元と、全部なら一巡の進み具合)・何問目か・入口へ戻る ×。

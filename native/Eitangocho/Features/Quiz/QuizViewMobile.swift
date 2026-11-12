@@ -40,6 +40,8 @@
                 .frame(maxWidth: .infinity, minHeight: max(geometry.size.height - 40, 0), alignment: alignment)
                 .padding(20)
             }
+            // 収まっているときは引っぱっても動かさない(スクロールは画面より高いときだけ)。
+            .scrollBounceBehavior(.basedOnSize)
           }
         }
       }
