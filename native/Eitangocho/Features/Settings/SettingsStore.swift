@@ -21,9 +21,22 @@ final class SettingsStore {
     static let translationLanguage = "translationLanguage"
     /// 2.14.0 で足した(Flutter 版には無い)。
     static let themeColor = "themeColor"
+    /// 2.18.0 で足した(iOS のクイズの入口)。
+    static let quizSource = "quizSource"
+    static let quizQuestionCount = "quizQuestionCount"
+    /// 出題元ごとの「全部」の一巡を始めた日時(出題元の名前 → 1970 年からの秒)。
+    static let quizCycleStarts = "quizCycleStarts"
   }
 
   private(set) var quizDirection: QuizDirection
+
+  /// クイズの出題元。未保存なら nil(入口が単語の状態から既定を決める。`QuizModel.defaultSource`)。
+  private(set) var quizSource: QuizSource?
+  private(set) var quizQuestionCount: QuizQuestionCount
+
+  /// 出題元ごとの「全部」の一巡を始めた日時。一巡の残りは、前回出題日がこれより前か未出題の単語。
+  /// 単語の ID の一覧を持たないので、削除・追加・同期にもそのまま追従する。
+  private(set) var quizCycleStarts: [QuizSource: Date]
   private(set) var showIpa: Bool
 
   /// DeepL API Free のキー。未設定(空)なら例文の訳をスキップする。
@@ -56,6 +69,13 @@ final class SettingsStore {
       defaults.string(forKey: key).flatMap { T(rawValue: $0) } ?? fallback
     }
     quizDirection = value(Key.quizDirection, default: .enToJa)
+    quizSource = defaults.string(forKey: Key.quizSource).flatMap(QuizSource.init(rawValue:))
+    quizQuestionCount = value(Key.quizQuestionCount, default: .ten)
+    let starts = defaults.dictionary(forKey: Key.quizCycleStarts) as? [String: Double] ?? [:]
+    quizCycleStarts = Dictionary(
+      uniqueKeysWithValues: starts.compactMap { key, seconds in
+        QuizSource(rawValue: key).map { ($0, Date(timeIntervalSince1970: seconds)) }
+      })
     showIpa = defaults.object(forKey: Key.showIpa) as? Bool ?? true
     deeplApiKey = defaults.string(forKey: Key.deeplApiKey) ?? ""
     uiScale = defaults.object(forKey: Key.uiScale) as? Double ?? AppDimensions.defaultUiScale
@@ -78,6 +98,24 @@ final class SettingsStore {
   func setQuizDirection(_ direction: QuizDirection) {
     defaults.set(direction.rawValue, forKey: Key.quizDirection)
     quizDirection = direction
+  }
+
+  func setQuizSource(_ source: QuizSource) {
+    defaults.set(source.rawValue, forKey: Key.quizSource)
+    quizSource = source
+  }
+
+  func setQuizQuestionCount(_ count: QuizQuestionCount) {
+    defaults.set(count.rawValue, forKey: Key.quizQuestionCount)
+    quizQuestionCount = count
+  }
+
+  /// 出題元の「全部」の一巡を `date` から始め直す(秒への揃え方は QuizModel が決める)。
+  func setQuizCycleStart(_ source: QuizSource, _ date: Date) {
+    quizCycleStarts[source] = date
+    defaults.set(
+      Dictionary(uniqueKeysWithValues: quizCycleStarts.map { ($0.key.rawValue, $0.value.timeIntervalSince1970) }),
+      forKey: Key.quizCycleStarts)
   }
 
   func setShowIpa(_ value: Bool) {

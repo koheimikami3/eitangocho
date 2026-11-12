@@ -21,17 +21,17 @@ struct QuizModelTests {
       let id = try await database.wordDao.insertWord(NewWord(word: "word\(i)", meaning: "訳\(i)"))
       try await database.wordDao.setLearned(id: id, true)
     }
-    let learned = WordListing.learned(try await database.wordDao.getAll())
+    let words = try await database.wordDao.getAll()
     return QuizModel(
-      dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao)
-    ) { learned }
+      dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
+      currentWords: { words })
   }
 
   @Test func startは学習済みから出題数分を選んで出題する() async throws {
-    let model = try await setupLearned(quizQuestionCount + 1)
+    let model = try await setupLearned(QuizQuestionCount.ten.limit + 1)
     model.start(trigger: .tab)
     #expect(model.phase == .active)
-    #expect(model.questions.count == quizQuestionCount)
+    #expect(model.questions.count == QuizQuestionCount.ten.limit)
     #expect(model.index == 0)
     #expect(!model.revealed)
   }
@@ -90,14 +90,13 @@ struct QuizModelTests {
     box.words = try await database.wordDao.getAll()
     let model = QuizModel(
       dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
-      keepsRoundAcrossViews: true, currentWords: { box.words }
-    ) { WordListing.learned(box.words) }
+      keepsRoundAcrossViews: true, currentWords: { box.words })
     return (model, box)
   }
 
   @Test func 回を保つときはタブを移って戻っても続きから出題する() async throws {
     let (model, _) = try await setupKeepingRound(3)
-    model.enterFromTab()
+    model.start(source: .learned, count: .ten, trigger: .tab)
     model.viewChanged(from: .learning, to: .quiz)
     await model.answerKnew()
     model.reveal()
@@ -115,7 +114,7 @@ struct QuizModelTests {
 
   @Test func 回を保つときは選んでいるタブを押し直してもやり直さない() async throws {
     let (model, _) = try await setupKeepingRound(3)
-    model.enterFromTab()
+    model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
     model.enterFromTab()
     #expect(model.index == 1)
@@ -124,28 +123,31 @@ struct QuizModelTests {
 
   @Test func 回を保つときは結果の画面のままでタブから入ってもやり直さない() async throws {
     let (model, _) = try await setupKeepingRound(1)
-    model.enterFromTab()
+    model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
     model.enterFromTab()
     #expect(model.phase == .done)
     #expect(model.okCount == 1)
   }
 
-  @Test func 回を保つときも学習済みが無かった後はタブから入ると始める() async throws {
-    let (model, box) = try await setupKeepingRound(0)
+  @Test func 回を保つときはタブから入ると出題を始めずに入口を出す() async throws {
+    let (model, _) = try await setupKeepingRound(3)
     model.enterFromTab()
-    #expect(model.phase == .empty)
+    #expect(model.phase == .entrance)
+    #expect(analytics.eventsNamed("quiz_started").isEmpty)
+    #expect(analytics.eventsNamed("quiz_empty_shown").isEmpty)
+  }
 
-    let id = try await database.wordDao.insertWord(NewWord(word: "new", meaning: "新"))
-    try await database.wordDao.setLearned(id: id, true)
-    box.words = try await database.wordDao.getAll()
+  @Test func 入口で選ばれている出題元が空ならquiz_empty_shownを送る() async throws {
+    let (model, _) = try await setupKeepingRound(0)
     model.enterFromTab()
-    #expect(model.phase == .active)
+    #expect(model.phase == .entrance)
+    #expect(analytics.eventsNamed("quiz_empty_shown").count == 1)
   }
 
   @Test func 回を保つときは離れている間の削除を残りの出題から外し編集を反映する() async throws {
     let (model, box) = try await setupKeepingRound(3)
-    model.enterFromTab()
+    model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
     let answered = model.questions[0]
     let deleted = model.questions[1]
@@ -167,7 +169,7 @@ struct QuizModelTests {
 
   @Test func 回を保つときに残りがすべて消えたらそこまでで回を終える() async throws {
     let (model, box) = try await setupKeepingRound(2)
-    model.enterFromTab()
+    model.start(source: .learned, count: .ten, trigger: .tab)
     await model.answerKnew()
     let remaining = model.questions[1]
     box.words = box.words.filter { $0.id != remaining.id }
@@ -309,7 +311,10 @@ struct QuizModelTests {
     await model.answerForgot()
 
     // 投入したばかりの単語は一度も答えていない。
-    #expect(analytics.eventsNamed("quiz_started") == [["trigger": "continue", "review_gap_bucket": "0_none"]])
+    #expect(
+      analytics.eventsNamed("quiz_started") == [
+        ["trigger": "continue", "review_gap_bucket": "0_none", "source": "learned", "question_count": "10"]
+      ])
     #expect(analytics.eventsNamed("quiz_completed") == [["ok_count": 1, "forgot_count": 1]])
   }
 
@@ -318,5 +323,166 @@ struct QuizModelTests {
     model.start(trigger: .tab)
     #expect(analytics.eventsNamed("quiz_empty_shown").count == 1)
     #expect(analytics.eventsNamed("quiz_started").isEmpty)
+  }
+
+  // MARK: - 入口の出題元・問題数(iOS)
+
+  private let suiteName = "QuizModelTests-\(UUID().uuidString)"
+
+  private func makeSettings() -> SettingsStore {
+    SettingsStore(defaults: UserDefaults(suiteName: suiteName)!, preferredLanguages: ["ja"])
+  }
+
+  /// 学習中 `learning` 語・学習済み `learned` 語(先頭 `bookmarked` 語にブックマーク)を入れ、
+  /// 入口の条件を保存するモデルを返す。
+  private func setupEntrance(learning: Int, learned: Int, bookmarked: Int = 0) async throws
+    -> (QuizModel, WordsBox, SettingsStore)
+  {
+    for i in 0..<(learning + learned) {
+      let id = try await database.wordDao.insertWord(NewWord(word: "word\(i)", meaning: "訳\(i)"))
+      if i >= learning { try await database.wordDao.setLearned(id: id, true) }
+      if i < bookmarked { try await database.wordDao.setBookmarked(id: id, true) }
+    }
+    let box = WordsBox()
+    box.words = try await database.wordDao.getAll()
+    let settings = makeSettings()
+    let model = QuizModel(
+      dao: database.wordDao, analytics: AnalyticsLogger(analytics), review: disabledReviewPrompter(dao: database.wordDao),
+      keepsRoundAcrossViews: true, settings: settings, currentWords: { box.words })
+    return (model, box, settings)
+  }
+
+  @Test func 出題元の既定は学習済みがあれば学習済み() async throws {
+    let (model, _, _) = try await setupEntrance(learning: 2, learned: 1)
+    #expect(model.entranceSource(proUnlocked: false) == .learned)
+  }
+
+  @Test func 出題元の既定は学習済みが無ければ学習中() async throws {
+    let (model, _, _) = try await setupEntrance(learning: 2, learned: 0)
+    #expect(model.entranceSource(proUnlocked: false) == .learning)
+  }
+
+  @Test func Proでなければ保存したPro向けの出題元と問題数を無料のものに戻して見せる() async throws {
+    let (model, _, settings) = try await setupEntrance(learning: 2, learned: 1)
+    settings.setQuizSource(.bookmarks)
+    settings.setQuizQuestionCount(.fifty)
+    #expect(model.entranceSource(proUnlocked: false) == .learned)
+    #expect(model.entranceCount(proUnlocked: false) == .ten)
+    #expect(model.entranceSource(proUnlocked: true) == .bookmarks)
+    #expect(model.entranceCount(proUnlocked: true) == .fifty)
+    // 購入状態がまだ分からない間は保存した値のまま(Pro の人が読み込み前に始めても条件が戻らないように)。
+    #expect(model.entranceSource(proUnlocked: nil) == .bookmarks)
+    #expect(model.entranceCount(proUnlocked: nil) == .fifty)
+    // 保存した値は消さない(買い直したら戻る)。
+    #expect(settings.quizSource == .bookmarks)
+  }
+
+  @Test(arguments: [
+    (QuizSource.learning, 3), (QuizSource.learned, 2), (QuizSource.bookmarks, 1), (QuizSource.all, 5),
+  ])
+  func 出題元の単語から出題し選んだ条件を覚える(source: QuizSource, expected: Int) async throws {
+    let (model, box, settings) = try await setupEntrance(learning: 3, learned: 2, bookmarked: 1)
+    #expect(model.wordCount(source) == expected)
+    model.start(source: source, count: .ten, trigger: .tab)
+    #expect(model.phase == .active)
+    #expect(model.round == .source(source, .ten))
+    #expect(Set(model.questions.map(\.id)) == Set(source.words(from: box.words).map(\.id)))
+    #expect(settings.quizSource == source)
+  }
+
+  @Test func 出題元が空なら始めずに入口のままにする() async throws {
+    let (model, _, _) = try await setupEntrance(learning: 2, learned: 0)
+    model.start(source: .learned, count: .ten, trigger: .tab)
+    #expect(model.phase == .entrance)
+    #expect(analytics.eventsNamed("quiz_started").isEmpty)
+  }
+
+  @Test func 開始ボタンの数は出せる数と問題数の小さい方() async throws {
+    let (model, _, _) = try await setupEntrance(learning: 7, learned: 60)
+    #expect(model.availableCount(source: .learning, count: .ten) == 7)
+    #expect(model.availableCount(source: .learned, count: .ten) == 10)
+    #expect(model.availableCount(source: .learned, count: .thirty) == 30)
+    #expect(model.availableCount(source: .learned, count: .fifty) == 50)
+    #expect(model.availableCount(source: .learned, count: .all) == 50)
+  }
+
+  @Test func 全部は50問ずつ一巡し一巡を終えたら最初から() async throws {
+    let (model, box, _) = try await setupEntrance(learning: 0, learned: 60)
+    // 始めたのと同じ秒のうちに答えた分も、一巡で答えた数に入る(前回出題日は DB に秒で入る)。
+    model.start(source: .learned, count: .all, trigger: .tab)
+    #expect(model.questions.count == 50)
+    for _ in 0..<50 { await model.answerKnew() }
+    box.words = try await database.wordDao.getAll()
+    #expect(model.phase == .done)
+    #expect(model.cycleProgress(.learned).map { [$0.done, $0.total] } == [50, 60])
+    #expect(!model.completedCycle)
+
+    // 続きは一巡で残っている 10 語。
+    model.continueRound()
+    #expect(model.questions.count == 10)
+    let firstChunk = Set(try await database.wordDao.getAll().filter { $0.lastReviewedAt != nil }.map(\.id))
+    #expect(firstChunk.isDisjoint(with: model.questions.map(\.id)))
+    for _ in 0..<10 { await model.answerKnew() }
+    box.words = try await database.wordDao.getAll()
+    #expect(model.completedCycle)
+
+    // 一巡を終えた後は最初から(出題元の全体から 50 問)。答え終えてすぐ(同じ秒のうちに)始め直しても、
+    // 前の一巡の回答は新しい一巡に数えない。
+    model.continueRound()
+    #expect(model.questions.count == 50)
+    #expect(model.cycleProgress(.learned).map { [$0.done, $0.total] } == [0, 60])
+  }
+
+  @Test func 全部で1語を始めてすぐ答えても一巡を終えたことになる() async throws {
+    let (model, box, _) = try await setupEntrance(learning: 0, learned: 1)
+    model.start(source: .learned, count: .all, trigger: .tab)
+    await model.answerKnew()
+    box.words = try await database.wordDao.getAll()
+    #expect(model.cycleProgress(.learned).map { [$0.done, $0.total] } == [1, 1])
+    #expect(model.completedCycle)
+  }
+
+  @Test func 忘れた単語だけもう一度の後の続けるは元の出題元へ戻る() async throws {
+    let (model, box, _) = try await setupEntrance(learning: 0, learned: 3)
+    model.start(source: .learned, count: .ten, trigger: .tab)
+    await model.answerForgot()
+    await model.answerKnew()
+    await model.answerForgot()
+    let forgot = Set(model.forgotWords.map(\.id))
+    box.words = try await database.wordDao.getAll()
+
+    model.retryForgotten()
+    #expect(model.round == .retry)
+    #expect(Set(model.questions.map(\.id)) == forgot)
+
+    await model.answerKnew()
+    await model.answerKnew()
+    model.continueRound()
+    #expect(model.round == .source(.learned, .ten))
+    let started = analytics.eventsNamed("quiz_started")
+    #expect(started.map { $0["source"] as? String } == ["learned", "forgotten", "learned"])
+    #expect(started[1]["trigger"] as? String == "retry")
+    #expect(started[1]["question_count"] == nil)
+  }
+
+  @Test func どの単語もまだ出題していない回だけ初めてのクイズとする() async throws {
+    let (model, box, _) = try await setupEntrance(learning: 2, learned: 0)
+    model.start(source: .learning, count: .ten, trigger: .tab)
+    #expect(model.isFirstEverRound)
+    await model.answerKnew()
+    await model.answerKnew()
+    box.words = try await database.wordDao.getAll()
+    model.continueRound()
+    #expect(!model.isFirstEverRound)
+  }
+
+  @Test func showEntranceで回を捨てて入口に戻る() async throws {
+    let (model, _, _) = try await setupEntrance(learning: 3, learned: 0)
+    model.start(source: .learning, count: .ten, trigger: .tab)
+    await model.answerKnew()
+    model.showEntrance()
+    #expect(model.phase == .entrance)
+    #expect(model.round == nil)
+    #expect(model.questions.isEmpty)
   }
 }

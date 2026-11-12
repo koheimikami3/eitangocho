@@ -15,12 +15,25 @@ enum QuizKey: Sendable {
 ///
 /// iOS は回をタブの切り替えをまたいで保つ(`keepsRoundAcrossViews`。2026-11-01 のユーザーの判断)。
 /// 解き終えたときに出すインタースティシャルを、タブを移ってやり直すことで避けられないようにするため。
-/// タブから入ったときは `enterFromTab()` で、回が無いときだけ始める。
+/// iOS は回が無いときにクイズの入口(`.entrance`)を出し、出題元・問題数を選んで `start(source:count:trigger:)` で
+/// 始める(2.18.0)。macOS は入口を持たず、学習済みから 10 問の今までの動き(`start(trigger:)`)のまま。
 @Observable
 final class QuizModel {
   /// セッションの局面。
   enum Phase: Sendable {
-    case empty, active, done
+    /// 出題できる単語が無い(macOS)。
+    case empty
+    /// 出題元・問題数を選ぶ入口(iOS)。
+    case entrance
+    case active, done
+  }
+
+  /// 出題中・結果の回が何を出しているか。
+  enum Round: Equatable, Sendable {
+    /// 出題元から選んだ回。
+    case source(QuizSource, QuizQuestionCount)
+    /// 結果の「忘れた単語だけもう一度」の回。
+    case retry
   }
 
   private(set) var phase: Phase = .empty
@@ -34,6 +47,16 @@ final class QuizModel {
   private(set) var okCount = 0
   private(set) var forgotWords: [Word] = []
 
+  /// 今の回が何を出しているか。入口・空のときは nil。
+  private(set) var round: Round?
+
+  /// 今の回が、どの単語もまだ一度も出題していない状態で始めた回か(初めてのクイズ)。
+  /// 初めてのクイズでは全画面広告を出さない(最初の体験を広告で邪魔しないため。2026-11 のユーザーの判断)。
+  private(set) var isFirstEverRound = false
+
+  /// 「忘れた単語だけもう一度」の後の「続ける」で戻る、直前の出題元の回。
+  @ObservationIgnored private var lastSourceRound: (QuizSource, QuizQuestionCount)?
+
   /// 回答を DB に書いている間か。キーの押しっぱなし(キーリピート)で同じ単語に
   /// 二重に答えないよう、書き終えて次の問題に進むまで次の回答を受け付けない。
   @ObservationIgnored private var answering = false
@@ -45,25 +68,26 @@ final class QuizModel {
   @ObservationIgnored private let dao: WordDao
   @ObservationIgnored private let analytics: AnalyticsLogger
   @ObservationIgnored private let review: ReviewPrompter
-  @ObservationIgnored private let learnedWords: () -> [Word]
   @ObservationIgnored private let keepsRoundAcrossViews: Bool
   @ObservationIgnored private let currentWords: () -> [Word]
+  /// 入口で選んだ条件と「全部」の一巡の保存先(iOS)。macOS は使わないので nil でよい。
+  @ObservationIgnored private let settings: SettingsStore?
 
   private static let logger = Logger(subsystem: "com.kohei.mikami.eitangocho", category: "quiz")
 
-  /// `learnedWords` は出題元(学習済みの単語)。始めるたびに読む。
+  /// `currentWords` は今ある単語すべて。始めるたびに読んで出題元の単語を選ぶ。
   /// `keepsRoundAcrossViews` はタブを移っても回を保つか(iOS)。保つときは、戻ってきたときに
-  /// `currentWords`(今ある単語すべて)を読んで残りの出題に削除・編集を反映する。
+  /// `currentWords` を読んで残りの出題に削除・編集を反映する。
   init(
     dao: WordDao, analytics: AnalyticsLogger, review: ReviewPrompter, keepsRoundAcrossViews: Bool = false,
-    currentWords: @escaping () -> [Word] = { [] }, learnedWords: @escaping () -> [Word]
+    settings: SettingsStore? = nil, currentWords: @escaping () -> [Word]
   ) {
+    self.settings = settings
     self.dao = dao
     self.analytics = analytics
     self.review = review
     self.keepsRoundAcrossViews = keepsRoundAcrossViews
     self.currentWords = currentWords
-    self.learnedWords = learnedWords
   }
 
   /// 出題中の単語。
@@ -76,13 +100,149 @@ final class QuizModel {
   /// 直前に答えた単語は日時が新しくなって後ろに回るため、「続ける」では次の単語が出る。
   /// `trigger` は計測用(どこから始めたか)。
   func start(trigger: QuizTrigger) {
-    let questions = selectQuizQuestions(learnedWords())
-    resetSession(questions, phase: questions.isEmpty ? .empty : .active)
+    let questions = selectQuizQuestions(QuizSource.learned.words(from: currentWords()))
     if questions.isEmpty {
+      resetSession([], phase: .empty)
       analytics.logQuizEmptyShown()
     } else {
-      analytics.logQuizStarted(trigger: trigger, questions: questions)
+      begin(questions, round: .source(.learned, .ten), trigger: trigger)
     }
+  }
+
+  // MARK: - iOS の入口
+
+  /// 出題元が未保存のときの既定。学習済みがあれば学習済み(今までの利用者の出題元)、無ければ学習中
+  /// (初めての人がクイズで空の画面に当たらないように)。
+  static func defaultSource(_ words: [Word]) -> QuizSource {
+    WordListing.learned(words).isEmpty ? .learning : .learned
+  }
+
+  /// 入口で選ばれている出題元。保存した出題元が Pro の項目で、今 Pro でなければ(返金など)既定に戻して見せる。
+  /// 保存した値は消さない(買い直したら戻るように。テーマカラーと同じ考え方)。
+  /// `proUnlocked` が nil(購入状態がまだ分からない)の間は保存した値のまま(Pro の人の条件を戻さないように)。
+  func entranceSource(proUnlocked: Bool?) -> QuizSource {
+    let words = currentWords()
+    let saved = settings?.quizSource ?? Self.defaultSource(words)
+    return saved.requiresPro && proUnlocked == false ? Self.defaultSource(words) : saved
+  }
+
+  /// 入口で選ばれている問題数。Pro の項目で今 Pro でなければ 10 問に戻して見せる(nil の間は保存した値のまま)。
+  func entranceCount(proUnlocked: Bool?) -> QuizQuestionCount {
+    let saved = settings?.quizQuestionCount ?? .ten
+    return saved.requiresPro && proUnlocked == false ? .ten : saved
+  }
+
+  /// 出題元の単語の数。
+  func wordCount(_ source: QuizSource) -> Int {
+    source.words(from: currentWords()).count
+  }
+
+  /// 登録が 1 語でもあるか(入口で「単語を登録」を出すかの判定)。
+  var hasAnyWords: Bool { !currentWords().isEmpty }
+
+  /// 入口の開始ボタンに出す、実際に出せる問題数。
+  func availableCount(source: QuizSource, count: QuizQuestionCount) -> Int {
+    min(pool(source: source, count: count).words.count, count.limit)
+  }
+
+  /// 「全部」の一巡の進み具合(答えた数 / 出題元の語数)。一巡を始めていなければ nil。
+  func cycleProgress(_ source: QuizSource) -> (done: Int, total: Int)? {
+    guard let start = settings?.quizCycleStarts[source] else { return nil }
+    let words = source.words(from: currentWords())
+    return (words.count - words.count { Self.isCycleRemaining($0, since: start) }, words.count)
+  }
+
+  /// 今の回が「全部」で、その出題元を一巡し終えたか(結果に「一巡しました」を出す)。
+  var completedCycle: Bool {
+    guard phase == .done, case .source(let source, .all) = round, let progress = cycleProgress(source) else {
+      return false
+    }
+    return progress.total > 0 && progress.done == progress.total
+  }
+
+  /// 出題元・問題数から、出題を選ぶ元の単語と「全部」の一巡を始め直すかを決める。
+  /// 開始ボタンの数(`availableCount`)と実際の出題(`start(source:count:trigger:now:)`)を同じ判断にするため 1 か所に置く。
+  /// 「全部」は一巡の残りから選び、残りが無ければ(一巡を終えたか、初めて)出題元の全体から一巡を始め直す。
+  private func pool(source: QuizSource, count: QuizQuestionCount) -> (words: [Word], restartsCycle: Bool) {
+    let words = source.words(from: currentWords())
+    guard count == .all, let settings else { return (words, false) }
+    guard let start = settings.quizCycleStarts[source] else { return (words, true) }
+    let remaining = words.filter { Self.isCycleRemaining($0, since: start) }
+    return remaining.isEmpty ? (words, true) : (remaining, false)
+  }
+
+  /// 一巡を始め直す日時。前回出題日は DB に秒(切り捨て)で入るので、境界も秒の頭に揃え、
+  /// 始めたのと同じ秒のうちに答えた単語も新しい一巡で答えた数に入れる。
+  /// ただし同じ秒に前の一巡の回答があれば(答え終えてすぐ始め直したとき)、次の秒からにして前の一巡の回答を数えない
+  /// (そのときだけ同じ秒のうちの新しい回答は残りに数えられるが、両方が 1 秒に収まることはまず無い)。
+  private static func cycleStart(now: Date, words: [Word]) -> Date {
+    let second = Date(timeIntervalSince1970: now.timeIntervalSince1970.rounded(.down))
+    let answeredThisSecond = words.contains { ($0.lastReviewedAt ?? .distantPast) >= second }
+    return answeredThisSecond ? second.addingTimeInterval(1) : second
+  }
+
+  /// 「全部」の一巡でまだ答えていない単語か(前回出題日が一巡を始めた日時より前か、未出題)。
+  private static func isCycleRemaining(_ word: Word, since start: Date) -> Bool {
+    word.lastReviewedAt.map { $0 < start } ?? true
+  }
+
+  /// 入口で選んだ出題元・問題数で新しい回を始める(iOS)。選んだ条件は覚えておく。
+  /// 「全部」は一巡の残りから 50 問を選び、残りが無ければ一巡を始め直す(`pool`)。
+  func start(source: QuizSource, count: QuizQuestionCount, trigger: QuizTrigger, now: Date = .now) {
+    settings?.setQuizSource(source)
+    settings?.setQuizQuestionCount(count)
+    let pool = pool(source: source, count: count)
+    if pool.restartsCycle { settings?.setQuizCycleStart(source, Self.cycleStart(now: now, words: pool.words)) }
+    let questions = selectQuizQuestions(pool.words, count: count.limit)
+    guard !questions.isEmpty else {
+      showEntrance()
+      return
+    }
+    begin(questions, round: .source(source, count), trigger: trigger)
+    lastSourceRound = (source, count)
+  }
+
+  /// 結果の「忘れた単語だけもう一度」。直前の回で忘れた単語を、出題の選び方を通さずにそのまま出す
+  /// (離れている間に削除された単語は外し、編集された単語は今の内容にする)。
+  func retryForgotten() {
+    let latest = latestWords()
+    let questions = forgotWords.compactMap { latest[$0.id] }.shuffled()
+    guard !questions.isEmpty else { return }
+    begin(questions, round: .retry, trigger: .retry)
+  }
+
+  /// `questions` で新しい回を始めて記録する(macOS・iOS の始め方とやり直しで共通)。
+  private func begin(_ questions: [Word], round: Round, trigger: QuizTrigger) {
+    // 初めてのクイズかは、回を始める前の状態で見る。
+    let isFirst = currentWords().allSatisfy { $0.lastReviewedAt == nil }
+    resetSession(questions, phase: .active)
+    self.round = round
+    isFirstEverRound = isFirst
+    switch round {
+    case .source(let source, let count):
+      analytics.logQuizStarted(trigger: trigger, questions: questions, source: source, count: count)
+    case .retry:
+      analytics.logQuizStarted(trigger: trigger, questions: questions, source: nil, count: nil)
+    }
+  }
+
+  /// 今ある単語を ID で引く表(離れている間の削除・編集を回の出題に反映するのに使う)。
+  private func latestWords() -> [Int64: Word] {
+    Dictionary(currentWords().map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+  }
+
+  /// 結果の「続ける」。同じ出題元・問題数で次の回へ(やり直しの回の後は、その前の出題元の回へ)。
+  func continueRound() {
+    if let (source, count) = lastSourceRound {
+      start(source: source, count: count, trigger: .continued)
+    } else {
+      start(trigger: .continued)
+    }
+  }
+
+  /// 入口に戻る(出題中の × と、結果の「条件を変える」)。答えは 1 問ごとに記録済みなので確認はしない。
+  func showEntrance() {
+    resetSession([], phase: .entrance)
   }
 
   /// クイズのタブから入ったとき(iOS。選んでいるタブを押し直したときも)。
@@ -96,7 +256,11 @@ final class QuizModel {
       return
     }
     switch phase {
-    case .empty: start(trigger: .tab)
+    case .empty, .entrance:
+      showEntrance()
+      // 入口で選ばれている出題元が空なら、今までの空の画面と同じく記録する(Pro かは問わず保存した値で見る)。
+      let source = settings?.quizSource ?? Self.defaultSource(currentWords())
+      if wordCount(source) == 0 { analytics.logQuizEmptyShown() }
     case .active: refreshRemainingQuestions()
     case .done: break
     }
@@ -116,17 +280,16 @@ final class QuizModel {
   /// 離れている間に削除された単語を残りの出題から外し、編集された単語は今の内容にする。
   /// 答え済みの単語(結果の「忘れていた単語」に出るもの)はそのまま残す。
   private func refreshRemainingQuestions() {
-    let latest = Dictionary(currentWords().map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+    let latest = latestWords()
     let currentID = questions[index].id
     let remaining = questions[index...].compactMap { latest[$0.id] }
     questions = Array(questions[..<index]) + remaining
     // 出題中の単語が消えたら、次の単語は開示前から見せる。
     if remaining.first?.id != currentID { revealed = false }
     guard remaining.isEmpty else { return }
-    // 残りがすべて消えた。1 問も答えていなければ始め直し、答えていればそこまでで回を終える。
+    // 残りがすべて消えた。1 問も答えていなければ入口に戻し、答えていればそこまでで回を終える。
     if index == 0 {
-      resetSession([], phase: .empty)
-      start(trigger: .tab)
+      showEntrance()
     } else {
       finish()
     }
@@ -141,6 +304,8 @@ final class QuizModel {
     revealed = false
     okCount = 0
     forgotWords = []
+    round = nil
+    isFirstEverRound = false
   }
 
   func reveal() {

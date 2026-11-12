@@ -90,6 +90,20 @@ final class SettingsStoreTests {
     #expect(reloaded.deeplApiKey == "my-key")
   }
 
+  @Test func クイズの出題元と問題数と一巡の開始日時を保存して読み直せる() {
+    let store = makeStore()
+    #expect(store.quizSource == nil)
+    #expect(store.quizQuestionCount == .ten)
+    #expect(store.quizCycleStarts.isEmpty)
+    store.setQuizSource(.bookmarks)
+    store.setQuizQuestionCount(.all)
+    store.setQuizCycleStart(.learned, Date(timeIntervalSince1970: 1_790_000_000.7))
+    let reloaded = makeStore()
+    #expect(reloaded.quizSource == .bookmarks)
+    #expect(reloaded.quizQuestionCount == .all)
+    #expect(reloaded.quizCycleStarts == [.learned: Date(timeIntervalSince1970: 1_790_000_000.7)])
+  }
+
   @Test func appearanceの既定はライトでsetAppearanceで切り替わり永続化される() {
     let store = makeStore()
     #expect(store.appearance == .light)

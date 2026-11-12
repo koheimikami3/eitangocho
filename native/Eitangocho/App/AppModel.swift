@@ -212,10 +212,7 @@ final class AppModel {
           wordInfo: makeWordInfoProvider(database),
           quiz: QuizModel(
             dao: database.wordDao, analytics: analytics, review: review, keepsRoundAcrossViews: keepsQuizRound,
-            currentWords: { [words] in words.words }
-          ) { [words] in
-            WordListing.learned(words.words)
-          },
+            settings: settings, currentWords: { [words] in words.words }),
           review: review, proPrompter: proPrompter))
       await sync.start()
     }

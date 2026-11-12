@@ -26,7 +26,7 @@ struct QuizView: View {
   @ViewBuilder
   private var content: some View {
     switch quiz.phase {
-    case .empty:
+    case .empty, .entrance:
       QuizEmptyState { shell.selectView(.learning) }
     case .done:
       QuizResultView(

@@ -26,8 +26,8 @@ struct QuizQuestionSelectionTests {
   @Test func 出題数を超える分は出さず重複もしない() {
     let learned = (0..<25).map { word(Int64($0), answeredDaysAgo: $0) }
     let questions = selectQuizQuestions(learned)
-    #expect(questions.count == quizQuestionCount)
-    #expect(ids(questions).count == quizQuestionCount)
+    #expect(questions.count == QuizQuestionCount.ten.limit)
+    #expect(ids(questions).count == QuizQuestionCount.ten.limit)
   }
 
   @Test func 答えた単語は最後に答えた日時の古い順に選ぶ() {
@@ -40,5 +40,11 @@ struct QuizQuestionSelectionTests {
     let learned = (0..<12).map { word(Int64($0), answeredDaysAgo: 100 + $0) } + [word(100), word(101)]
     // 未出題 2 語 + 答えた中で古い 8 語(id 4〜11)。
     #expect(ids(selectQuizQuestions(learned)) == Set([100, 101] + Array(4..<12)))
+  }
+
+  @Test func 問題数を指定するとその数まで選ぶ() {
+    let learned = (0..<60).map { word(Int64($0), answeredDaysAgo: $0) }
+    #expect(selectQuizQuestions(learned, count: 50).count == 50)
+    #expect(selectQuizQuestions(Array(learned.prefix(7)), count: 50).count == 7)
   }
 }
